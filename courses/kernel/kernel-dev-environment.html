@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>内核开发环境</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/bili">哔哩哔哩: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">内核开发环境</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#安装linux发行版"><span class="toc-section-number">1</span> 安装Linux发行版</a>
+<ul>
+<li><a href="#虚拟机软件"><span class="toc-section-number">1.1</span> 虚拟机软件</a></li>
+<li><a href="#安装ubuntu发行版"><span class="toc-section-number">1.2</span> 安装Ubuntu发行版</a></li>
+<li><a href="#docker环境"><span class="toc-section-number">1.3</span> docker环境</a>
+<ul>
+<li><a href="#nat模式"><span class="toc-section-number">1.3.1</span> NAT模式</a></li>
+<li><a href="#桥接模式todo"><span class="toc-section-number">1.3.2</span> 桥接模式（TODO）</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#代码管理和编辑工具"><span class="toc-section-number">2</span> 代码管理和编辑工具</a>
+<ul>
+<li><a href="#使用code-server浏览和编辑代码"><span class="toc-section-number">2.1</span> 使用code-server浏览和编辑代码</a></li>
+<li><a href="#woboq-codebrowser"><span class="toc-section-number">2.2</span> Woboq CodeBrowser</a></li>
+<li><a href="#git的一些特殊用法"><span class="toc-section-number">2.3</span> git的一些特殊用法</a></li>
+</ul></li>
+<li><a href="#代码编译"><span class="toc-section-number">3</span> 代码编译</a>
+<ul>
+<li><a href="#获取代码"><span class="toc-section-number">3.1</span> 获取代码</a></li>
+<li><a href="#编译步骤"><span class="toc-section-number">3.2</span> 编译步骤</a></li>
+<li><a href="#独立模块编译"><span class="toc-section-number">3.3</span> 独立模块编译</a></li>
+<li><a href="#内核文档编译"><span class="toc-section-number">3.4</span> 内核文档编译</a></li>
+<li><a href="#一些额外的补丁"><span class="toc-section-number">3.5</span> 一些额外的补丁</a></li>
+<li><a href="#发行版替换内核"><span class="toc-section-number">3.6</span> 发行版替换内核</a></li>
+</ul></li>
+<li><a href="#使用qemu测试内核代码"><span class="toc-section-number">4</span> 使用QEMU测试内核代码</a>
+<ul>
+<li><a href="#模拟器与虚拟机"><span class="toc-section-number">4.1</span> 模拟器与虚拟机</a></li>
+<li><a href="#制作测试用的qcow2镜像的脚本"><span class="toc-section-number">4.2</span> 制作测试用的qcow2镜像的脚本</a></li>
+<li><a href="#通过iso安装发行版"><span class="toc-section-number">4.3</span> 通过iso安装发行版</a></li>
+<li><a href="#源码安装qemu"><span class="toc-section-number">4.4</span> 源码安装qemu</a></li>
+<li><a href="#qemu配置"><span class="toc-section-number">4.5</span> qemu配置</a></li>
+<li><a href="#qemu运行qcow2镜像"><span class="toc-section-number">4.6</span> qemu运行qcow2镜像</a></li>
+</ul></li>
+<li><a href="#使用gdb调试内核代码"><span class="toc-section-number">5</span> 使用GDB调试内核代码</a>
+<ul>
+<li><a href="#编译选项和补丁"><span class="toc-section-number">5.1</span> 编译选项和补丁</a></li>
+<li><a href="#qemu命令选项"><span class="toc-section-number">5.2</span> QEMU命令选项</a></li>
+<li><a href="#gdb命令"><span class="toc-section-number">5.3</span> GDB命令</a></li>
+<li><a href="#gdb辅助调试功能"><span class="toc-section-number">5.4</span> GDB辅助调试功能</a></li>
+<li><a href="#gdb打印结构体偏移"><span class="toc-section-number">5.5</span> GDB打印结构体偏移</a></li>
+<li><a href="#ko模块代码调试"><span class="toc-section-number">5.6</span> ko模块代码调试</a></li>
+</ul></li>
+</ul>
+</nav>
+<p><a href="https://www.bilibili.com/video/BV15C411E7Sm/">点击这里在哔哩哔哩bilibili在线观看配套的教学视频</a>。</p>
+<p><a href="https://www.bilibili.com/video/BV1Tx4y187vg/">点击这里在哔哩哔哩bilibili在线观看配套的加餐视频（就是一些补充）</a>。</p>
+<p><a href="https://chenxiaosong.com/courses/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p>下面介绍Linux内核编译环境和测试环境的搭建过程，当然我也为各位朋友准备好了已经安装好的虚拟机镜像，只需下载运行即可。</p>
+<p><a href="https://chenxiaosong.com/baidunetdisk">点击这里从百度网盘下载对应平台的虚拟机镜像</a>，<code>x86_64</code>（也就是你平时用来安装windows系统的电脑，或者2020年前的苹果电脑）选择<code>ubuntu-x64_64.zip</code>，<code>arm64</code>（2020年末之后的苹果电脑）选择<code>ubuntu-aarch64.zip</code>。虚拟机运行后，登录界面的密码是<code>1</code>。</p>
+<h1 data-number="1" id="安装linux发行版"><span class="header-section-number">1</span> 安装Linux发行版</h1>
+<p>安装Linux发行版，你可以选择以下几种方式:</p>
+<ul>
+<li>在物理机上直接安装安装Linux发行版。这是工作时比较推荐的一种安装方法，可以最大程度的利用硬件资源。</li>
+<li>在容器（如docker）中安装Linux发行版。这种方式也能最大程度的利用硬件资源，还能快速恢复开发环境。</li>
+<li>在虚拟机上安装Linux发行版。在学习阶段推荐这种方式安装，因为一旦系统出现什么问题可以快速恢复。</li>
+</ul>
+<h2 data-number="1.1" id="虚拟机软件"><span class="header-section-number">1.1</span> 虚拟机软件</h2>
+<p>接下来介绍几个常用的虚拟机软件。Windows系统推荐使用VirtualBox，arm64苹果系统推荐使用UTM。如果你在看VMware虚拟机相关的视频，<a href="https://www.bilibili.com/video/BV1Ss421T7KY/">请转为查看这个视频</a>;</p>
+<ul>
+<li><a href="https://www.virtualbox.org/">VirtualBox</a>。首先在<a href="https://www.virtualbox.org/wiki/Downloads">VirtualBox下载界面</a>下载对应平台的安装包，比如如果要在Windows系统下安装VirtualBox，点击<strong>Windows hosts</strong>下载安装包。VirtualBox的安装过程很简单，只需根据安装提示操作即可。VirtualBox安装完成后，下载<strong>VirtualBox 7.0.14 Oracle VM VirtualBox Extension Pack</strong>安装插件。<a href="https://isapplesiliconready.com/app/Virtualbox">arm芯片的版本</a>好像只有<a href="https://download.virtualbox.org/virtualbox/7.0.8/">7.0.8版本</a>才有。</li>
+<li><a href="https://www.vmware.com/">VMware</a>。<a href="https://blogs.vmware.com/teamfusion/2024/05/fusion-pro-now-available-free-for-personal-use.html">下载点击这篇文章</a>，注册登录账号，下载时的信息填写类似<code>Address 1: 1ONE, City: SACRAMENTO, Postal code: 94203-0001, Country/Territory: United States, State or province: California</code>。安装过程很简单，只需根据提示操作即可。Linux下安装VMware时需要注意的是<code>/tmp</code>目录的挂载不能在<code>/etc/fstab</code>文件中指定<code>noexec</code>，还需要安装gcc较新的版本（如<code>VMware-Workstation-Full-17.5.1-23298084.x86_64.bundle</code>在ubuntu2204下安装时要安装gcc12，默认安装的是gcc11）。</li>
+<li><a href="https://virt-manager.org/">Virtual Machine Manager</a>。这个虚拟机软件只用在Linux平台上，如果你物理机上安装的操作系统是Linux，那么使用这个软件运行虚拟机就比较合适。比如在Ubuntu上使用命令<code>sudo apt-get install qemu qemu-kvm virt-manager qemu-system -y</code>安装（需要重启才能以非root用户启动）。</li>
+<li><a href="https://mac.getutm.app/">UTM</a>。只针对苹果电脑系统，从<a href="https://docs.getutm.app/installation/macos/">github</a>下载安装包。建议在配置比较高（尤其是内存）的苹果电脑上使用，如果配置比较低可能会遇到一些问题。从<a href="https://docs.getutm.app/installation/macos/">github</a>上下载安装包。导入虚拟机时，选择“创建一个新虚拟机” -&gt; “虚拟化” -&gt; “其他” -&gt; 打勾“Skip ISO boot”，“Storage”选择小一点的容量（如<code>1G</code>），创建虚拟机后打开配置，“VirtIO驱动器” -&gt; “删除”，然后再“新建” -&gt; “导入”，可以选择<code>vmdk</code>或<code>qcow2</code>等格式，会统一转换成<code>qcow2</code>格式，保存后生效。安装后的虚拟机文件在<code>~/Library/Containers/com.utmapp.UTM/Data/Documents</code>目录下，默认Finder中不显示这个目录，可以在家目录下打开<code>Show View Options -&gt; Show Library Folder</code>。需要注意一下，网络如果选择<code>共享网络</code>会出现不稳定断网的情况，建议选择<code>桥接（高级）</code>，选择<code>桥接</code>时如果宿主机的网络切换了（如连了另一个wifi）虚拟机中的网络也要断开重连一下。如果出现虚拟机网络经常断开的情况，可以尝试宿主机换一个稳定的网络。</li>
+</ul>
+<p>配置虚拟机时，Windows系统cpu核数查看方法: 任务管理器-&gt;性能-&gt;CPU，苹果电脑cpu核数查看方法: <code>sysctl hw.ncpu</code>或<code>sysctl -n machdep.cpu.core_count</code>，Linux系统cpu核数查看方法<code>lscpu</code>。</p>
+<h2 data-number="1.2" id="安装ubuntu发行版"><span class="header-section-number">1.2</span> 安装Ubuntu发行版</h2>
+<p>Linux发行版很多，我们选择一个使用人数相对较多的<a href="https://ubuntu.com/">Ubuntu发行版</a>。<a href="https://releases.ubuntu.com/22.04/">x86_64的ubuntu22.04</a>，<a href="http://cdimage.ubuntu.com/jammy/daily-live/current/">arm64的ubuntu22.04</a>下载。<a href="https://releases.ubuntu.com/20.04/">x86_64的ubuntu20.04</a>，<a href="https://ftpmirror.your.org/pub/ubuntu/cdimage/focal/daily-live/current/">arm64的ubuntu20.04</a></p>
+<p>安装内核编译和测试所需软件:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">sudo</span> apt install git -y <span class="co"># 代码管理工具</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="fu">sudo</span> apt install build-essential -y <span class="co"># 编译所需的常用软件，如gcc等</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install qemu qemu-kvm qemu-system -y <span class="co"># qemu虚拟机相关软件</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install virt-manager -y <span class="co"># docker中不需要安装，虚拟机图形界面，会安装iptables，可能需要重启才能以非root用户启动virt-manager，当然对于内核开发来说安装这个软件是为了生成自动生成virbr0网络接口</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="fu">sudo</span> apt install flex bison bc kmod pahole -y <span class="co"># 内核编译所需软件</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install libelf-dev libssl-dev libncurses-dev -y <span class="co"># 内核源码编译依赖的库</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="fu">sudo</span> apt install zstd -y</span></code></pre></div>
+<p>交叉编译所需软件:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install u-boot-tools -y</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="fu">sudo</span> apt install binutils-aarch64-linux-gnu -y <span class="co"># aarch64-linux-gnu-addr2line 等工具</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="fu">sudo</span> apt install gcc-aarch64-linux-gnu -y <span class="co"># aarch64-linux-gnu-gcc</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="fu">sudo</span> apt install gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf -y <span class="co"># arm32的交叉编译软件</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="fu">sudo</span> apt install gcc-riscv64-linux-gnu -y <span class="co"># riscv交叉编译软件</span></span></code></pre></div>
+<p>特定版本的交叉编译软件:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="fu">sudo</span> apt install gcc-9-aarch64-linux-gnu -y <span class="co"># 指定版本的交叉编译软件</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="fu">mv</span> /usr/bin/aarch64-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc.bak <span class="co"># 原来的版本重命名</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="fu">ln</span> -s /usr/bin/aarch64-linux-gnu-gcc-9 /usr/bin/aarch64-linux-gnu-gcc <span class="co"># 指向特定版本</span></span></code></pre></div>
+<h2 data-number="1.3" id="docker环境"><span class="header-section-number">1.3</span> docker环境</h2>
+<p>除了在vmware虚拟机中搭建开发环境，还可以在docker中搭建开发环境。注意qemu的权限配置请参考后面的“qemu配置”相关的章节。</p>
+<h3 data-number="1.3.1" id="nat模式"><span class="header-section-number">1.3.1</span> NAT模式</h3>
+<p>参考<a href="https://chenxiaosong.com/src/translations/qemu/qemu-networking-nat.html">中文翻译QEMU Documentation/Networking/NAT</a>。</p>
+<p>qemu命令行的网络参数修改成（<code>model</code>和<code>macaddr</code>可以自己指定）:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">-net</span> tap <span class="kw">\</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">-net</span> nic,model=virtio,macaddr=00:11:22:33:44:01 <span class="kw">\</span></span></code></pre></div>
+<p>注意在虚拟机中，不要手动配置ip，要运行<code>systemctl restart networking.service</code>自动获取ip地址。</p>
+<h3 data-number="1.3.2" id="桥接模式todo"><span class="header-section-number">1.3.2</span> 桥接模式（TODO）</h3>
+<p>宿主机中桥接模式配置:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">apt</span> install bridge-utils -y # brctl命令</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">brctl</span> addbr br0</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">brctl</span> stp br0 on</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="ex">brctl</span> addif br0 eth0</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="co"># brctl delif br0 eth0</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="ex">ip</span> addr del dev eth0 172.17.0.2/16 # 清除ip</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="ex">ifconfig</span> br0 172.17.0.2/16 up # 或 ifconfig virbr0 172.17.0.2 netmask 172.17.0.1 up</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="ex">route</span> add default gw 172.17.0.1</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="ex">sysctl</span> net.ipv4.ip_forward=1 # 或 echo 1 <span class="op">&gt;</span> /proc/sys/net/ipv4/ip_forward</span></code></pre></div>
+<p>虚拟机中:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">ip</span> addr add 172.17.0.3/16 dev ens2</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co"># ip addr del dev ens2 172.17.0.3/16 # 删除ip</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="ex">ip</span> link set dev ens2 up</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co"># ip link set dev ens2 down</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co"># 网关可不配置</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co"># route del default dev ens2</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="co"># route add default gw 172.17.0.1 # ip route add default via 172.17.0.1 dev ens2</span></span></code></pre></div>
+<p>手动配置ip没法访问外网，暂时还不知道要怎么弄，如果有知道的朋友可以指导我一下。</p>
+<h1 data-number="2" id="代码管理和编辑工具"><span class="header-section-number">2</span> 代码管理和编辑工具</h1>
+<h2 data-number="2.1" id="使用code-server浏览和编辑代码"><span class="header-section-number">2.1</span> 使用code-server浏览和编辑代码</h2>
+<p>为了尽可能的方便，推荐使用code-server在网页上浏览和编辑代码，当然你也可以使用自己习惯的代码浏览和编辑工具。</p>
+<p><a href="https://github.com/coder/code-server">code-server源码</a>托管在GitHub，安装命令:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ex">curl</span> -fsSL https://code-server.dev/install.sh <span class="kw">|</span> <span class="fu">sh</span></span></code></pre></div>
+<p>或者下载<a href="https://github.com/coder/code-server/releases">对应系统的安装包</a>。</p>
+<p>设置开机启动:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="fu">sudo</span> systemctl enable --now code-server@<span class="va">$USER</span></span></code></pre></div>
+<p>配置文件是<code>${HOME}/.config/code-server/config.yaml</code>，当不需要密码时修改成<code>auth: none</code>。</p>
+<p>修改完配置后，需要再重启服务:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="fu">sudo</span> systemctl restart code-server@<span class="va">$USER</span></span></code></pre></div>
+<p>然后打开浏览器输入<code>http://localhost:8888</code>（<code>8888</code>是<code>${HOME}/.config/code-server/config.yaml</code>配置文件中配置的端口）。</p>
+<p>有些格式的文件可能不会自动换行显示，可以勾选<code>View -&gt; Word Wrap</code>。</p>
+<p>注意，和vscode客户端不一样，vscode server装插件时有些插件无法搜索到，这时就需要在<a href="https://marketplace.visualstudio.com/vscode">vscode网站</a>上下载<code>.vsix</code>文件，手动安装。</p>
+<p>常用插件:</p>
+<ul>
+<li><p>C语言（尤其是内核代码）推荐使用插件<a href="https://marketplace.visualstudio.com/items?itemName=jaycetyle.vscode-gnu-global">C/C++ GNU Global</a>。使用命令<code>sudo apt install global -y</code>安装gtags插件，Linux内核代码使用命令<code>make gtags</code>生成索引文件。</p></li>
+<li><p>C++语言推荐使用插件<a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools">C/C++</a>或<a href="https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd">clangd</a>。浏览C/C++代码时，建议这两个插件和<a href="https://marketplace.visualstudio.com/items?itemName=jaycetyle.vscode-gnu-global">C/C++ GNU Global</a>选一个，不要安装多个。</p></li>
+<li><p>Vue.js推荐使用插件<a href="https://marketplace.visualstudio.com/items?itemName=octref.vetur">Vetur</a>、<a href="https://marketplace.visualstudio.com/items?itemName=dariofuzinato.vue-peek">Vue Peek</a>、<a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a>、<a href="https://marketplace.visualstudio.com/items?itemName=CoenraadS.bracket-pair-colorizer-2">Bracket Pair Colorizer 2</a>、<a href="https://marketplace.visualstudio.com/items?itemName=oysun.vuehelper">VueHelper</a></p></li>
+<li><p>markdown插件<a href="https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced">Markdown Preview Enhanced</a></p></li>
+</ul>
+<p>当想在<a href="https://code.visualstudio.com/">vscode客户端</a>打开远程的文件时, 可以使用 <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh">remote-ssh</a>插件.</p>
+<h2 data-number="2.2" id="woboq-codebrowser"><span class="header-section-number">2.2</span> Woboq CodeBrowser</h2>
+<p>https://github.com/KDAB/codebrowser</p>
+<h2 data-number="2.3" id="git的一些特殊用法"><span class="header-section-number">2.3</span> git的一些特殊用法</h2>
+<p>这里我们不介绍git的一般用法，仅介绍一些特殊用法。</p>
+<p>查看帮助文档<code>man 1 git log</code>:</p>
+<pre><code>       -L&lt;start&gt;,&lt;end&gt;:&lt;file&gt;, -L:&lt;funcname&gt;:&lt;file&gt;
+           跟踪给定 &lt;start&gt;,&lt;end&gt; 或函数名正则表达式 &lt;funcname&gt; 所定义的行范围的演变，位于 &lt;file&gt; 内。您不可以提供任何路径规范限定符。目前此功能仅限于从单个修订版本开始的遍历，即您只能提供零个或一个正面修订参数，&lt;start&gt; 和 &lt;end&gt;（或 &lt;funcname&gt;）必须存在于起始修订版本中。您可以多次指定此选项。隐含--patch。可以使用 --no-patch 抑制补丁输出，但当前尚未实现其他差异格式（即 --raw、--numstat、--shortstat、--dirstat、--summary、--name-only、--name-status、--check）。
+
+           &lt;start&gt; 和 &lt;end&gt; 可以采用以下形式之一:
+
+           •   数字
+
+               如果 &lt;start&gt; 或 &lt;end&gt; 是数字，则指定绝对行号（从 1 开始计数）。
+
+           •   /正则表达式/
+
+               此形式将使用与给定 POSIX 正则表达式匹配的第一行。如果 &lt;start&gt; 是正则表达式，则它将从前一个 -L 范围的末尾开始搜索，如果有的话，否则从文件开头开始搜索。如果 &lt;start&gt; 是 ^/正则表达式/，则它将从文件的开头开始搜索。如果 &lt;end&gt; 是正则表达式，则它将从由 &lt;start&gt; 给出的行开始搜索。
+
+           •   +偏移量 或 -偏移量
+
+               这仅对 &lt;end&gt; 有效，并将指定相对于由 &lt;start&gt; 给出的行之前或之后的行数。
+
+           如果 :&lt;funcname&gt; 出现在 &lt;start&gt; 和 &lt;end&gt; 的位置，则它是一个正则表达式，表示从第一行与 &lt;funcname&gt; 匹配的 funcname 行开始，直到下一个 funcname 行。:&lt;funcname&gt; 从前一个 -L 范围的末尾开始搜索，如果有的话，否则从文件的开头开始搜索。^:&lt;funcname&gt; 从文件的开头开始搜索。函数名称的确定方式与 git diff 解析补丁块标题的方式相同（请参见 gitattributes(5) 中关于定义自定义块标题的说明）。</code></pre>
+<p>以内核主线代码<a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/fs/namespace.c?id=8f6f76a6a29f">fs/namespace.c</a>文件为例，查看<code>do_new_mount</code>函数:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="fu">git</span> log -L:do_new_mount:fs/namespace.c</span></code></pre></div>
+<p>我们发现列出的却是<code>do_new_mount_fc</code>的修改记录，因为<code>do_new_mount_fc</code>包含字符串<code>do_new_mount</code>，又在<code>do_new_mount()</code>函数前面，解决方法是在<code>do_new_mount</code>后面再加个<code>\(</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="fu">git</span> log -L:do_new_mount<span class="dt">\(</span>:fs/namespace.c</span></code></pre></div>
+<p>在内核开发过程中我们经常需要找某个commit提交记录是哪个版本引入的，使用以下命令</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="fu">git</span> name-rev <span class="op">&lt;</span>commit<span class="op">&gt;</span></span></code></pre></div>
+<p>如果我们有两个github账号，两个账号不能在网站上添加同一个ssh key，这时我们就要再生成一个ssh key，还要将ssh私钥添加到ssh代理:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="fu">ssh-keygen</span> -t ed25519-sk -C <span class="st">&quot;YOUR_EMAIL&quot;</span> <span class="co"># 生成新的key</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="bu">eval</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">ssh-agent</span> -s<span class="va">)</span><span class="st">&quot;</span> <span class="co"># 启动 SSH 代理</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a><span class="fu">ssh-add</span> ~/.ssh/id_ed25519 <span class="co"># 将 SSH 私钥添加到 SSH 代理</span></span></code></pre></div>
+<p><code>cherry-pick</code>多个<code>commit</code>:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="fu">git</span> cherry-pick <span class="op">&lt;</span>commit1<span class="op">&gt;</span>..<span class="op">&lt;</span>commitN<span class="op">&gt;</span> <span class="co"># 不包含commit1</span></span></code></pre></div>
+<p>如果多个commit中包含有Merge的commit，直接cherry-pick多个会报错<code>error: 提交 xxxx 是一个合并提交但未提供 -m 选项</code>，可以把<code>git log --oneline</code>的输出放到文件<code>commits.txt</code>中，把Merge相关的commit删除，并删除掉每行的后面的commit信息，每行只保留commit号，然后用以下脚本<code>cherry-pick</code>（各位朋友如果有什么更好的方法请一定要联系告诉我）:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="co"># tac 从最后一行开始 cherry-pick</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="fu">tac</span> commits.txt <span class="kw">|</span> <span class="kw">while</span> <span class="va">IFS=</span> <span class="bu">read</span> -r <span class="va">commit</span>; <span class="kw">do</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a>    <span class="fu">git</span> cherry-pick <span class="va">$commit</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a>    <span class="kw">if</span><span class="bu"> [</span> <span class="va">$?</span> <span class="ot">-eq</span> 0<span class="bu"> ]</span>; <span class="kw">then</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a>        <span class="bu">echo</span> <span class="st">&quot;合并成功&quot;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a>    <span class="kw">else</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a>        <span class="bu">echo</span> <span class="st">&quot;合并失败&quot;</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true"></a>        <span class="bu">return</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true"></a>    <span class="kw">fi</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true"></a><span class="kw">done</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&quot;全部合并成功&quot;</span></span></code></pre></div>
+<p><code>git cherry-pick</code>或<code>git am</code>合补丁时如果有冲突，在解决完冲突后，在<code>commit</code>信息中在<code>Conflicts:</code>后列出冲突文件，如:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="ex">Conflicts</span>:</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>        <span class="ex">include/linux/sunrpc/clnt.h</span></span></code></pre></div>
+<p>查看帮助文档<code>man git format-patch</code>:</p>
+<pre><code>--stat[=&lt;width&gt;[,&lt;name-width&gt;[,&lt;count&gt;]]]
+           生成一个 diffstat。默认情况下，文件名部分将使用尽可能多的空间，其余部分用于图形部分。最大宽度默认为终端宽度，如果未连接终端则为 80 列，可以通过 &lt;width&gt; 覆盖。文件名部分的宽度可以通过在逗号后提供另一个宽度 &lt;name-width&gt; 来限制。图形部分的宽度可以通过使用 --stat-graph-width=&lt;width&gt; 来限制（影响所有生成统计图的命令），或通过设置 diff.statGraphWidth=&lt;width&gt;（不影响 git format-patch）。通过提供第三个参数 &lt;count&gt;，可以限制输出到前 &lt;count&gt; 行，如果有更多行，则以 ... 结尾。
+
+           这些参数也可以单独设置，使用 --stat-width=&lt;width&gt;、--stat-name-width=&lt;name-width&gt; 和 --stat-count=&lt;count&gt;。</code></pre>
+<p>如果文件名较长，可以用以下命令让补丁中的路径显示完整:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="fu">git</span> format-patch -3 --cover-letter --stat=300,200</span></code></pre></div>
+<h1 data-number="3" id="代码编译"><span class="header-section-number">3</span> 代码编译</h1>
+<h2 data-number="3.1" id="获取代码"><span class="header-section-number">3.1</span> 获取代码</h2>
+<p>用git下载内核代码，仓库链接可以点击<a href="https://kernel.org/">内核网站</a>上对应版本的<code>[browse] -&gt; summary</code>查看，我们下载<a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git">mainline</a>版本的代码:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a><span class="fu">git</span> clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux.git <span class="co"># 国内使用googlesource仓库链接比较快</span></span></code></pre></div>
+<p>也可以在<a href="https://mirrors.edge.kernel.org/pub/linux/kernel/">/pub/linux/kernel/</a>下载某个版本代码的压缩包。</p>
+<h2 data-number="3.2" id="编译步骤"><span class="header-section-number">3.2</span> 编译步骤</h2>
+<p>建议新建一个<code>build</code>目录，把所有的编译输出存放在这个目录下，注意<a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/configs/x86_64-config"><code>.config</code></a>文件复制到<code>build/.config</code>。<code>.config</code>配置文件至少要打开以下配置（建议通过<code>make O=build menuconfig</code>命令修改）:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="ex">CONFIG_EXT4_FS</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a><span class="ex">CONFIG_XFS_FS</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true"></a><span class="ex">CONFIG_VIRTIO_BLK</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true"></a><span class="ex">CONFIG_VIRTIO_NET</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true"></a><span class="ex">CONFIG_SCSI_VIRTIO</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true"></a><span class="ex">CONFIG_BLK_DEV_SD</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true"></a><span class="ex">CONFIG_BLK_DEV_NVME</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true"></a><span class="ex">CONFIG_BINFMT_MISC</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a><span class="fu">rm</span> build -rf <span class="kw">&amp;&amp;</span> <span class="fu">mkdir</span> build</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true"></a><span class="fu">cp</span> ../tmp/configs/x86_64-config build/.config</span></code></pre></div>
+<p>编译和安装命令如下:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a><span class="fu">make</span> O=build menuconfig <span class="co"># 交互式地配置内核的编译选项，.config文件放在build目录下</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true"></a><span class="fu">make</span> O=build olddefconfig -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true"></a><span class="fu">make</span> O=build bzImage -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span> <span class="co"># x86_64</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true"></a><span class="fu">make</span> O=build Image -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span> <span class="co"># aarch64，比如2020年末之后的arm芯片的苹果电脑上vmware fusion安装的ubuntu</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true"></a><span class="fu">make</span> O=build modules -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true"></a><span class="fu">mkdir</span> -p build/boot <span class="kw">&amp;&amp;</span> <span class="fu">make</span> O=build install INSTALL_PATH=boot -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true"></a><span class="fu">make</span> O=build modules_install INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=mod -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></span></code></pre></div>
+<p>在<code>x86_64</code>下，如果是交叉编译其他架构，<code>ARCH</code>的值为<code>arch/</code>目录下相应的架构，编译命令是:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true"></a><span class="fu">make</span> ARCH=i386 O=build bzImage <span class="co"># x86 32bit</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true"></a><span class="fu">make</span> ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-  O=build zImage <span class="co"># armel, arm eabi(embeded abi) little endian, 传参数用普通寄存器</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true"></a><span class="fu">make</span> ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- O=build zImage <span class="co"># armhf, arm eabi(embeded abi) little endian hard float, 传参数用fpu的寄存器，浮点运算性能更高</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true"></a><span class="fu">make</span> ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- O=build Image</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true"></a><span class="fu">make</span> ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- O=build Image</span></code></pre></div>
+<p>也可以在一个仓库下编译多个体系结构，如:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a><span class="fu">rm</span> x86_64-build -rf <span class="kw">&amp;&amp;</span> <span class="fu">mkdir</span> x86_64-build</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true"></a><span class="fu">cp</span> ../tmp/configs/x86_64-config x86_64-build/.config</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true"></a><span class="fu">rm</span> aarch64-build -rf <span class="kw">&amp;&amp;</span> <span class="fu">mkdir</span> aarch64-build</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true"></a><span class="fu">cp</span> ../tmp/configs/aarch64-config aarch64-build/.config</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true"></a><span class="fu">make</span> O=x86_64-build menuconfig</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true"></a><span class="fu">make</span> ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- O=aarch64-build menuconfig</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true"></a><span class="fu">make</span> O=x86_64-build bzImage -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true"></a><span class="fu">make</span> ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- O=aarch64-build Image -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></span></code></pre></div>
+<p>老版本（如v5.17）编译如果报错<code>FAILED: load BTF from vmlinux: Invalid argument</code>，可以尝试关闭<code>CONFIG_DEBUG_INFO_BTF</code>配置。</p>
+<h2 data-number="3.3" id="独立模块编译"><span class="header-section-number">3.3</span> 独立模块编译</h2>
+<p>举个例子，把Linux内核仓库下的<code>fs/ext2</code>复制出来，修改<code>Makefile</code>文件:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true"></a><span class="ex">CONFIG_EXT2_FS</span> := m</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true"></a><span class="ex">CONFIG_EXT2_FS_XATTR</span> := y</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true"></a><span class="ex">CONFIG_EXT2_FS_POSIX_ACL</span> := y</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true"></a><span class="ex">CONFIG_EXT2_FS_SECURITY</span> := y</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true"></a><span class="ex">EXTRA_CFLAGS</span> += -DCONFIG_EXT2_FS=1 -DCONFIG_EXT2_FS_XATTR=1 <span class="kw">\</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true"></a>                <span class="ex">-DCONFIG_EXT2_FS_POSIX_ACL</span>=1 -DCONFIG_EXT2_FS_SECURITY=1</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true"></a><span class="ex">obj-</span><span class="va">$(</span><span class="ex">CONFIG_EXT2_FS</span><span class="va">)</span> += ext2.o</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true"></a><span class="ex">ext2-y</span> := balloc.o dir.o file.o ialloc.o inode.o <span class="kw">\</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true"></a>          <span class="ex">ioctl.o</span> namei.o super.o symlink.o trace.o</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true"></a></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true"></a><span class="co"># For tracepoints to include our trace.h from tracepoint infrastructure</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true"></a><span class="ex">CFLAGS_trace.o</span> := -I<span class="va">$(</span><span class="ex">src</span><span class="va">)</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true"></a></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true"></a><span class="ex">ext2-</span><span class="va">$(</span><span class="ex">CONFIG_EXT2_FS_XATTR</span><span class="va">)</span>     += xattr.o xattr_user.o xattr_trusted.o</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true"></a><span class="ex">ext2-</span><span class="va">$(</span><span class="ex">CONFIG_EXT2_FS_POSIX_ACL</span><span class="va">)</span> += acl.o</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true"></a><span class="ex">ext2-</span><span class="va">$(</span><span class="ex">CONFIG_EXT2_FS_SECURITY</span><span class="va">)</span>  += xattr_security.o</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true"></a></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true"></a><span class="ex">KDIR</span>    := /root/code/linux/x86_64-build/</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true"></a><span class="ex">PWD</span>     := <span class="va">$(</span><span class="ex">shell</span> pwd<span class="va">)</span></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true"></a></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true"></a><span class="co"># 设置交叉编译工具链的前缀和目标架构</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true"></a><span class="ex">CROSS_COMPILE</span> := aarch64-linux-gnu-</span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true"></a><span class="ex">ARCH</span> := arm64</span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true"></a></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true"></a><span class="ex">all</span>:</span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true"></a>    <span class="va">$(</span><span class="ex">MAKE</span><span class="va">)</span> <span class="ex">-C</span> <span class="va">$(</span><span class="ex">KDIR</span><span class="va">)</span> M=<span class="va">$(</span><span class="ex">PWD</span><span class="va">)</span> ARCH=<span class="va">$(</span><span class="ex">ARCH</span><span class="va">)</span> CROSS_COMPILE=<span class="va">$(</span><span class="ex">CROSS_COMPILE</span><span class="va">)</span> modules</span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true"></a><span class="ex">clean</span>:</span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true"></a>    <span class="va">$(</span><span class="ex">MAKE</span><span class="va">)</span> <span class="ex">-C</span> <span class="va">$(</span><span class="ex">KDIR</span><span class="va">)</span> M=<span class="va">$(</span><span class="ex">PWD</span><span class="va">)</span> ARCH=<span class="va">$(</span><span class="ex">ARCH</span><span class="va">)</span> CROSS_COMPILE=<span class="va">$(</span><span class="ex">CROSS_COMPILE</span><span class="va">)</span> clean</span></code></pre></div>
+<p>然后编译:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true"></a><span class="fu">make</span> <span class="co"># 生成ko文件</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true"></a><span class="fu">make</span> clean <span class="co"># 清除编译结果</span></span></code></pre></div>
+<p>注意minix文件系统的<code>Makefile</code>中的<code>minix-objs</code>要改成<code>minix-y</code>。</p>
+<h2 data-number="3.4" id="内核文档编译"><span class="header-section-number">3.4</span> 内核文档编译</h2>
+<p>参考<a href="https://www.kernel.org/doc/html/latest/translations/zh_CN/doc-guide/sphinx.html">简介 — The Linux Kernel documentation</a>。</p>
+<p>如果你的环境还没安装依赖软件，运行<code>make O=build SPHINXOPTS=-v htmldocs -j`nproc`</code>后可能报以下错误:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a><span class="ex">Documentation</span>/Makefile:<span class="ex">41</span>: 找不到 <span class="st">&#39;sphinx-build&#39;</span> 命令。请确保已安装 Sphinx 并在 PATH 中，或设置 SPHINXBUILD make 变量以指向 <span class="st">&#39;sphinx-build&#39;</span> 可执行文件的完整路径。</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true"></a>检测到的操作系统：<span class="va">DISTRIB_ID=</span>Ubuntu</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true"></a><span class="va">DISTRIB_RELEASE=</span>22.04</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true"></a><span class="va">DISTRIB_CODENAME=</span>jammy</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true"></a><span class="va">DISTRIB_DESCRIPTION=</span><span class="st">&quot;Ubuntu 22.04.2 LTS&quot;</span>。</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true"></a>警告：最好安装 <span class="st">&quot;convert&quot;</span>。</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true"></a>警告：最好安装 <span class="st">&quot;dot&quot;</span>。</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true"></a>警告：最好安装 <span class="st">&quot;dvipng&quot;</span>。</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true"></a>错误：请安装 <span class="st">&quot;ensurepip&quot;</span>，否则构建将无法工作。</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true"></a>警告：最好安装 <span class="st">&quot;fonts-noto-cjk&quot;</span>。</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true"></a>警告：最好安装 <span class="st">&quot;latexmk&quot;</span>。</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true"></a>警告：最好安装 <span class="st">&quot;rsvg-convert&quot;</span>。</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true"></a>警告：最好安装 <span class="st">&quot;texlive-lang-chinese&quot;</span>。</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true"></a>警告：最好安装 <span class="st">&quot;xelatex&quot;</span>。</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true"></a>你应该运行：</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true"></a></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true"></a>        <span class="fu">sudo</span> apt-get install imagemagick graphviz dvipng python3-venv fonts-noto-cjk latexmk librsvg2-bin texlive-lang-chinese texlive-xetex</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true"></a></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true"></a><span class="ex">Sphinx</span> 需要通过以下方式安装：</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true"></a><span class="ex">1</span>) 通过 <span class="ex">pip</span>/<span class="ex">pypi</span>：</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true"></a></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true"></a>        <span class="ex">/usr/bin/python3</span> -m venv sphinx_2.4.4</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true"></a>        <span class="bu">.</span> <span class="ex">sphinx_2.4.4/bin/activate</span></span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true"></a>        <span class="ex">pip</span> install -r ./Documentation/sphinx/requirements.txt</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true"></a></span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true"></a>    如果你想退出虚拟环境，可以使用：</span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true"></a>        <span class="ex">deactivate</span></span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true"></a></span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true"></a><span class="ex">2</span>) 作为包安装：</span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true"></a></span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true"></a>        <span class="fu">sudo</span> apt-get install python3-sphinx</span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true"></a></span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true"></a>    请注意，<span class="ex">Sphinx</span> <span class="op">&gt;</span>= 3.0 会在同名用于多个类型（函数、结构、枚举等）时产生误报警告。这是已知的 Sphinx 错误。更多详情，请查看：</span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true"></a>        <span class="ex">https</span>://github.com/sphinx-doc/sphinx/pull/8313</span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true"></a></span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true"></a>由于缺少 <span class="ex">2</span> 个必需依赖项，无法构建，位于 ./scripts/sphinx-pre-install 第 997 行。</span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true"></a></span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true"></a><span class="ex">make</span>[2]: *** [Documentation/Makefile:43：htmldocs] 错误 2</span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true"></a><span class="ex">make</span>[1]: *** [/home/linux/code/linux/Makefile:1692：htmldocs] 错误 2</span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true"></a><span class="ex">make</span>: *** [Makefile:234：__sub-make] 错误 2</span></code></pre></div>
+<p>根据提示安装所需软件:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install imagemagick graphviz dvipng python3-venv fonts-noto-cjk latexmk librsvg2-bin texlive-lang-chinese texlive-xetex -y</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install python3-sphinx -y</span></code></pre></div>
+<p>再次编译:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true"></a><span class="fu">make</span> O=build SPHINXOPTS=-v htmldocs -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span> <span class="co"># -v 获得更详细的输出。</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true"></a><span class="co"># make O=build cleandocs # 删除生成的文档</span></span></code></pre></div>
+<h2 data-number="3.5" id="一些额外的补丁"><span class="header-section-number">3.5</span> 一些额外的补丁</h2>
+<p>如果你要更方便的使用一些调试的功能，就要加一些额外的补丁。</p>
+<ul>
+<li><p>降低编译优化等级，默认的内核编译优化等级太高，用GDB调试时不太方便，有些函数语句被优化了，无法打断点，这时就要降低编译优化等级。做好的虚拟机中已经打上了降低编译优化等级的补丁。比如<code>x86_64</code>架构下可以在<a href="https://gitee.com/chenxiaosonggitee/blog/tree/master/courses/kernel/src/x86_64"><code>x86_64</code></a>目录下选择对应版本的补丁，更多详细的内容请查看GDB调试相关的章节。</p></li>
+<li><p><code>dump_stack()</code>输出的栈全是问号的解决办法。如果你使用<code>dump_stack()</code>输出的栈全是问号，可以 revert 补丁 <code>f1d9a2abff66 x86/unwind/orc: Don't skip the first frame for inactive tasks</code>。主线已经有补丁做了 revert: <code>230db82413c0 x86/unwind/orc: Fix unreliable stack dump with gcov</code>。</p></li>
+<li><p>肯定还有一些其他有用的补丁，后面再补充哈。</p></li>
+</ul>
+<h2 data-number="3.6" id="发行版替换内核"><span class="header-section-number">3.6</span> 发行版替换内核</h2>
+<p>用发行版<code>/boot/config-`uname -r`</code>配置文件，删除<code>CONFIG_SYSTEM_TRUSTED_KEYS</code>和<code>CONFIG_SYSTEM_REVOCATION_KEYS</code>配置值，在编译环境上编译安装后，删除<code>build/mod/lib/modules/xxx/build</code>和<code>build/mod/lib/modules/xxx/source</code>链接文件，然后压缩（文件太多，不压缩复制会很慢）打包复制到待测环境上。</p>
+<p>把<code>build/mod/lib/modules/xxx/</code>复制到待测环境上的<code>/lib/modules/</code>路径，把<code>build/boot/</code>目录下的文件复制到待测环境上的<code>/boot/</code>路径下。</p>
+<p>生成<code>initrd.img</code>，其中<code>xxx</code>为内核版本:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true"></a><span class="co"># centos</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true"></a><span class="ex">mkinitrd</span> /boot/initrd.img-xxx xxx</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true"></a><span class="co"># ubuntu</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true"></a><span class="ex">mkinitramfs</span> -o /boot/initrd.img-xxx xxx</span></code></pre></div>
+<p>ubuntu下运行<code>update-grub</code>，<code>x86</code>的<code>grub.cfg</code>文件在<code>/boot/grub/grub.cfg</code>，<code>arm64</code>的<code>grub.cfg</code>文件在<code>/boot/efi/boot/grub/grub.cfg</code>。麒麟桌面系统要在把<code>grub.cfg</code>新生成的启动项里的<code>security=kysec</code>改成<code>security=</code>（注意后面有空格）。</p>
+<p>centos下运行<code>grub2-mkconfig -o /boot/grub2/grub.cfg</code>。</p>
+<h1 data-number="4" id="使用qemu测试内核代码"><span class="header-section-number">4</span> 使用QEMU测试内核代码</h1>
+<p>前面介绍完了编译环境，编译出的代码我们不能直接在编译环境上运行，还要再启动qemu虚拟机运行我们编译好的内核。</p>
+<h2 data-number="4.1" id="模拟器与虚拟机"><span class="header-section-number">4.1</span> 模拟器与虚拟机</h2>
+<p>Bochs: x86硬件平台的开源模拟器，帮助文档少，只能模拟x86处理器。</p>
+<p>QEMU: quick emulation，高速度、跨平台的开源模拟器，能模拟x86、arm等处理器，与Linux的KVM配合使用，能达到与真实机接近的速度。</p>
+<p>第1类虚拟机监控程序: 直接在主机硬件上运行，直接向硬件调度资源，速度快。如Linux的KVM（免费）、Windows的Hyper-V（收费）。</p>
+<p>第2类虚拟机监控程序: 在常规操作系统上以软件层或应用的形式运行，速度慢。如Vmware Workstation、Oracal VirtualBox。</p>
+<p>本教程中，我们使用qemu来测试运行内核代码。</p>
+<h2 data-number="4.2" id="制作测试用的qcow2镜像的脚本"><span class="header-section-number">4.2</span> 制作测试用的qcow2镜像的脚本</h2>
+<p>测试编译好的内核我们不直接用发行版的iso镜像安装的系统，而是使用脚本生成比较小的镜像（不含有图形界面）。进入目录<a href="https://gitee.com/chenxiaosonggitee/blog/tree/master/courses"><code>courses</code></a>，选择相应的cpu架构，如<a href="https://gitee.com/chenxiaosonggitee/blog/tree/master/courses/kernel/src/x86_64"><code>x86_64</code></a>目录。执行<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/kernel/src/x86_64/create-raw.sh"><code>create-raw.sh</code></a>生成raw格式的镜像，这个脚本会调用到<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/kernel/src/create-debian.sh"><code>create-debian.sh</code></a>，是从<a href="https://github.com/google/syzkaller/blob/master/tools/create-image.sh">syzkaller的脚本</a>经过修改而来。</p>
+<p>注意riscv64架构的镜像，可以直接下载<a href="https://ubuntu.com/download/risc-v">ubuntu2204</a>（选择[QEMU emulator]），<a href="https://wiki.ubuntu.com/RISC-V/QEMU?_gl=1*5kle2i*_gcl_au*MTE0MzIzMjgyMi4xNzE3NTA4NjU1&amp;_ga=2.54580847.51388592.1718933588-66008337.1718933588">使用文档</a>。</p>
+<p>生成raw格式镜像后，再执行以下命令转换成占用空间更小的qcow2格式:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true"></a><span class="co"># -p 显示进度， -f 源镜像格式， -O 转换后的格式， 后面再紧接的是: 源文件名称，转换后的文件名称</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true"></a><span class="ex">qemu-img</span> convert -p -f raw -O qcow2 image.raw image.qcow2</span></code></pre></div>
+<p>再执行脚本<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/kernel/src/link-scripts.sh"><code>link-scripts.sh</code></a>把脚本链接到相应的目录，执行<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/kernel/src/x86_64/update-base.sh"><code>update-base.sh</code></a>启动虚拟机更新镜像（如再安装一些额外的软件），镜像更新完后关闭虚拟机，再执行<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/kernel/src/x86_64/create-qcow2.sh"><code>create-qcow2.sh</code></a>生成指向基础镜像的qcow2镜像。</p>
+<h2 data-number="4.3" id="通过iso安装发行版"><span class="header-section-number">4.3</span> 通过iso安装发行版</h2>
+<p>也可以在Virtual Machine Manager中通过iso文件安装发行版，安装完成后的qcow2镜像要用命令行启动，安装时不使用LVM，而是把磁盘的某个分区挂载到根路径<code>/</code>。</p>
+<p>在 Virtual Machine Manager 中创建 qcow2 格式，会马上分配所有空间，所以需要在命令行中创建 qcow2:</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true"></a><span class="ex">qemu-img</span> create -f qcow2 image.qcow2 512G</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true"></a><span class="fu">file</span> image.qcow2 <span class="co"># 查看文件的格式</span></span></code></pre></div>
+<p>可以再生成一个qcow2文件<code>image2.qcow2</code>，指向安装好的镜像<code>image.qcow2</code>，<code>image.qcow2</code>作为备份文件， 注意<有些版本的qemu-img>要求源文件和目标文件都要指定绝对路径</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true"></a><span class="ex">qemu-img</span> create -F qcow2 -b /path/image.qcow2 -f qcow2 /path/image2.qcow2 #  -F 源文件格式</span></code></pre></div>
+<p>iso安装发行版本后，默认是<code>/dev/vda1</code>（<code>-device virtio-scsi-pci</code>）挂载到根路径<code>/</code>，如果要重新制作成<code>/dev/vda</code>挂载到根分区<code>/</code>，可以把qcow2文件里的内容复制出来，qcow2格式镜像的挂载:</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install qemu-utils -y <span class="co"># 要先安装工具软件</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true"></a><span class="fu">sudo</span> modprobe nbd max_part=8 <span class="co"># 加载nbd模块</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true"></a><span class="fu">sudo</span> qemu-nbd --connect=/dev/nbd0 image.qcow2 <span class="co"># 连接镜像</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true"></a><span class="fu">sudo</span> fdisk /dev/nbd0 -l <span class="co"># 查看分区</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true"></a><span class="fu">sudo</span> mount /dev/nbd0p1 mnt/ <span class="co"># 挂载分区</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true"></a><span class="fu">sudo</span> umount mnt <span class="co"># 操作完后，卸载分区</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true"></a><span class="fu">sudo</span> qemu-nbd --disconnect /dev/nbd0 <span class="co"># 断开连接</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true"></a><span class="fu">sudo</span> modprobe -r nbd <span class="co"># 移除模块</span></span></code></pre></div>
+<p>当然也可以把qcow2转换成raw格式，然后把raw格式文件里的内容复制出来:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true"></a><span class="ex">qemu-img</span> convert -p -f qcow2 -O raw image.qcow2 image.raw</span></code></pre></div>
+<p>ubuntu24.04报错<code>dmesg</code>中<code>virtio_net virtio0 enp0s1: renamed from eth0</code>，解决办法:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true"></a><span class="fu">sudo</span> vim /etc/netplan/50-cloud-init.yaml <span class="co"># 把网络接口名改成enp0s1</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true"></a><span class="fu">sudo</span> netplan apply</span></code></pre></div>
+<h2 data-number="4.4" id="源码安装qemu"><span class="header-section-number">4.4</span> 源码安装qemu</h2>
+<p>关于各个Linux发行版怎么安装qemu，可以参考<a href="https://www.qemu.org/download/#linux">qemu官网</a>的介绍，下面主要介绍一下源码的安装方式，源码安装方式可以使用qemu的最新特性。</p>
+<p>先安装Ubuntu编译qemu所需的软件:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true"></a><span class="co"># ubuntu 22.04</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install libattr1-dev libcap-ng-dev -y</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true"></a><span class="fu">sudo</span> apt install ninja-build -y</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install libglib2.0-dev -y</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install libpixman-1-dev -y</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true"></a><span class="fu">sudo</span> apt install python3-pip</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true"></a><span class="ex">pip</span> install tomli</span></code></pre></div>
+<p>CentOS发行版安装编译qemu所需的软件:</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true"></a><span class="fu">sudo</span> dnf install glib2-devel -y</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true"></a><span class="fu">sudo</span> dnf install iasl -y</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true"></a><span class="fu">sudo</span> dnf install pixman-devel -y</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true"></a><span class="fu">sudo</span> dnf install libcap-ng-devel -y</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true"></a><span class="fu">sudo</span> dnf install libattr-devel -y</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true"></a></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true"></a><span class="co"># centos 9才需要， http://re2c.org/</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true"></a><span class="fu">git</span> clone https://github.com/skvadrik/re2c.git</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true"></a><span class="ex">./autogen.sh</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true"></a><span class="ex">./configure</span>  --prefix=<span class="va">${HOME}</span>/chenxiaosong/sw/re2c</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true"></a><span class="fu">make</span> <span class="kw">&amp;&amp;</span> <span class="fu">make</span> install</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true"></a></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true"></a><span class="co"># centos 要安装 ninja, https://ninja-build.org/</span></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true"></a><span class="fu">git</span> clone https://github.com/ninja-build/ninja.git <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> ninja</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true"></a><span class="ex">./configure.py</span> --bootstrap</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true"></a></span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true"></a><span class="co"># centos9, https://sparse.docs.kernel.org/en/latest/</span></span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true"></a><span class="fu">git</span> clone git://git.kernel.org/pub/scm/devel/sparse/sparse.git</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true"></a><span class="fu">make</span></span></code></pre></div>
+<p>再下载编译qemu:</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true"></a><span class="fu">git</span> clone https://gitlab.com/qemu-project/qemu.git</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true"></a><span class="bu">cd</span> qemu</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true"></a><span class="fu">git</span> submodule init</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true"></a><span class="fu">git</span> submodule update --recursive</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true"></a><span class="fu">mkdir</span> build</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true"></a><span class="bu">cd</span> build/</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true"></a><span class="ex">../configure</span> --enable-kvm --enable-virtfs --prefix=<span class="va">${HOME}</span>/chenxiaosong/sw/qemu/</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true"></a><span class="fu">make</span> -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></span></code></pre></div>
+<h2 data-number="4.5" id="qemu配置"><span class="header-section-number">4.5</span> qemu配置</h2>
+<p>非root用户没有权限的解决办法:</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true"></a><span class="co"># 源码安装的</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true"></a><span class="fu">sudo</span> chown root libexec/qemu-bridge-helper</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true"></a><span class="fu">sudo</span> chmod u+s libexec/qemu-bridge-helper</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true"></a><span class="co"># apt安装的</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true"></a><span class="fu">sudo</span> chown root /usr/lib/qemu/qemu-bridge-helper</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true"></a><span class="fu">sudo</span> chmod u+s /usr/lib/qemu/qemu-bridge-helper</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true"></a></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true"></a><span class="fu">groups</span> <span class="kw">|</span> <span class="fu">grep</span> kvm</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true"></a><span class="fu">sudo</span> usermod -aG kvm <span class="va">$USER</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true"></a><span class="fu">su</span> - <span class="va">$USER</span> <span class="co"># 或退出shell重新登录, 但在tmux中不起作用</span></span></code></pre></div>
+<p>允许使用<code>virbr0</code>网络接口:</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true"></a><span class="co"># 源码安装的</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true"></a><span class="fu">mkdir</span> -p etc/qemu</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true"></a><span class="ex">vim</span> etc/qemu/bridge.conf # 添加 allow virbr0</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true"></a><span class="co"># apt安装的</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true"></a><span class="fu">sudo</span> mkdir -p /etc/qemu/</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true"></a><span class="fu">sudo</span> vim /etc/qemu/bridge.conf <span class="co"># 添加 allow virbr0</span></span></code></pre></div>
+<p>修改<code>virbr0</code>网段:</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true"></a><span class="ex">virsh</span> net-list # 查看网络情况</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true"></a><span class="ex">virsh</span> net-edit default # 编辑</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true"></a><span class="ex">virsh</span> net-destroy default</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true"></a><span class="ex">virsh</span> net-start default</span></code></pre></div>
+<h2 data-number="4.6" id="qemu运行qcow2镜像"><span class="header-section-number">4.6</span> qemu运行qcow2镜像</h2>
+<p>制作好的Ubuntu虚拟机镜像（从百度网盘中下载的）中的<code>${HOME}/qemu-kernel/start.sh</code>脚本中每个选项的可选值可以使用以下命令查看:</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true"></a><span class="ex">qemu-system-aarch64</span> -cpu ?</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true"></a><span class="ex">qemu-system-x86_64</span> -machine ?</span></code></pre></div>
+<p>如果自己编译内核，启动时指定内核，需要指定<code>-kernel</code>和<code>-append</code>选项。</p>
+<p>如果你的镜像是一个完整的镜像（比如通过iso安装），不想指定内核，就想用镜像本身自带的内核，可以把<code>-kernel</code>和<code>-append</code>选项删除。</p>
+<p>qemu启动后，按快捷键<code>ctrl+a c</code>（先按<code>ctrl+a</code>松开后再按<code>c</code>）再输入<code>quit</code>强制退出qemu，但不建议强制退出。</p>
+<p>在系统启动界面登录进去后（而不是以ssh登录），默认的窗口大小不会自动调整，需要手动调整:</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true"></a><span class="fu">stty</span> size <span class="co"># 可以先在其他窗口查看大小</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&quot;stty rows 54 cols 229&quot;</span> <span class="op">&gt;</span> stty.sh</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true"></a><span class="bu">.</span> <span class="ex">stty.sh</span></span></code></pre></div>
+<p>当启用了9p文件系统，就可以把宿主机的modules目录（当然也可以是其他任何目录）共享给虚拟机，具体参考<a href="https://wiki.qemu.org/Documentation/9psetup">Documentation/9psetup</a>。虚拟机中执行脚本<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/kernel/src/mod-cfg.sh"><code>mod-cfg.sh</code></a>（直接运行<code>bash mod-cfg.sh</code>可以查看使用帮助）挂载和链接模块目录。</p>
+<p>root免密登录，<code>/etc/ssh/sshd_config</code>（注意不是<code>ssh_config</code>） 修改以下内容:</p>
+<pre><code>PermitRootLogin yes
+PasswordAuthentication yes
+PermitEmptyPasswords yes</code></pre>
+<p>曾经使用过fedora发行版，这里记录一下fedora的一些笔记。进入fedora虚拟机后:</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true"></a><span class="co"># fedora 启动的时候等待: A start job is running for /dev/zram0，解决办法: 删除 zram 的配置文件</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true"></a><span class="fu">mv</span> /usr/lib/systemd/zram-generator.conf /usr/lib/systemd/zram-generator.conf.bak</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true"></a><span class="co"># fedora26 安装 vim 前，先升级</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true"></a><span class="fu">sudo</span> dnf update vim-common vim-minimal -y</span></code></pre></div>
+<p>注意fedora中账号密码输完后要用<code>ctrl+j</code>，不要用回车。</p>
+<h1 data-number="5" id="使用gdb调试内核代码"><span class="header-section-number">5</span> 使用GDB调试内核代码</h1>
+<p>我刚开始是做用户态开发的，习惯了利用gdb调试来理解那些写得不好的用户态代码，尤其是公司内部一些不开源的比狗屎还难看的用户态代码（当然其中也包括我自己写的狗屎一样的代码）。</p>
+<p>转方向做了Linux内核开发后，也尝试用qemu+gdb来调试内核代码。</p>
+<p>要特别说明的是，内核的大部分代码是很优美的，并不需要太依赖qemu+gdb这一调试手段，更建议通过阅读代码来理解。但某些写得不好的内核模块如果利用qemu+gdb将能使我们更快的熟悉代码。</p>
+<p>这里只介绍<code>x86_64</code>下的qemu+gdb调试，其他cpu架构以此类推，只需要做些小改动。</p>
+<p>如果是其他cpu架构，要安装:</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true"></a><span class="fu">sudo</span> apt install gdb-multiarch -y</span></code></pre></div>
+<h2 data-number="5.1" id="编译选项和补丁"><span class="header-section-number">5.1</span> 编译选项和补丁</h2>
+<p>首先确保修改以下配置:</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true"></a><span class="va">CONFIG_DEBUG_SECTION_MISMATCH=</span>y # 防止内联</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true"></a><span class="va">CONFIG_DEBUG_INFO=</span>y # 调试信息</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true"></a><span class="va">CONFIG_DEBUG_KERNEL=</span>y # 调试信息</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true"></a><span class="va">CONFIG_GDB_SCRIPTS=</span>y # <span class="fu">gdb</span> python</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true"></a><span class="va">DEBUG_INFO_REDUCED=</span>n # 关闭</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true"></a><span class="va">CONFIG_FRAME_POINTER=</span>y # <span class="ex">Makefile</span> 中选择GCC编译选项</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true"></a><span class="ex">CONFIG_RANDOMIZE_BASE</span> = n # 关闭地址随机化</span></code></pre></div>
+<p>可以使用我常用的<a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/configs/x86_64-config">x86_64的内核配置文件</a>。</p>
+<p>gcc的编译选项<code>O1</code>优化等级不需要修改就可以编译通过。<code>O0</code>优化等级无法编译（尝试<code>CONFIG_JUMP_LABEL=n</code>还是不行），要修改汇编代码，有兴趣的朋友可以和我一直尝试。<code>Og</code>优化等级经过修改可以编译通过，<code>x86_64</code>合入目录<a href="https://gitee.com/chenxiaosonggitee/blog/tree/master/courses/kernel/src/x86_64"><code>courses/kernel/src/x86_64</code></a>对应版本的补丁。建议使用<code>Og</code>优化等级编译，既能满足gdb调试需求，也能尽量少的修改代码。</p>
+<h2 data-number="5.2" id="qemu命令选项"><span class="header-section-number">5.2</span> QEMU命令选项</h2>
+<p>qemu启动虚拟机时，要添加以下几个选项:</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true"></a><span class="ex">-append</span> <span class="st">&quot;nokaslr ...&quot;</span> # 防止地址随机化，编译内核时关闭配置 CONFIG_RANDOMIZE_BASE</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true"></a><span class="ex">-S</span> # 挂起 gdbserver</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true"></a><span class="ex">-gdb</span> tcp::5555 # 端口5555, 使用 -s 选项表示用默认的端口1234</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true"></a><span class="ex">-s</span> # 相当于 -gdb tcp::1234 默认端口1234，不建议用，最好指定端口</span></code></pre></div>
+<p>完整的启动命令查看制作好的Ubuntu虚拟机镜像（从百度网盘中下载的）中的<code>${HOME}/qemu-kernel/start.sh</code>脚本。</p>
+<h2 data-number="5.3" id="gdb命令"><span class="header-section-number">5.3</span> GDB命令</h2>
+<p>启动GDB:</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true"></a><span class="fu">gdb</span> build/vmlinux</span></code></pre></div>
+<p>如果是其他架构:</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true"></a><span class="fu">gdb</span> --tui build/vmlinux <span class="co"># --tui: Use a terminal user interface.</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="kw">set</span> <span class="ex">architecture</span> aarch64</span></code></pre></div>
+<p>进入GDB界面后:</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">target</span> remote:5555 # 对应qemu命令中的-gdb tcp::5555</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">b</span> func_name # 普通断点</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">hb</span> func_name # 硬件断点，有些函数普通断点不会停下, 如: nfs4_atomic_open，降低优化等级后没这个问题</span></code></pre></div>
+<p>gdb命令的用法和用户态程序的调试大同小异。</p>
+<h2 data-number="5.4" id="gdb辅助调试功能"><span class="header-section-number">5.4</span> GDB辅助调试功能</h2>
+<p>使用内核提供的<a href="https://www.kernel.org/doc/Documentation/dev-tools/gdb-kernel-debugging.rst">GDB辅助调试功能</a>可以更方便的调试内核（如打印断点处的进程名和进程id等）。</p>
+<p>内核最新版本（2024.04）使用以下命令开启GDB辅助调试功能，注意最新版本编译出的脚本无法调试4.19和5.10的代码:</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&quot;set auto-load safe-path /&quot;</span> <span class="op">&gt;</span> ~/.gdbinit <span class="co"># 设置自动加载共享库文件的安全路径</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&quot;source </span><span class="va">${HOME}</span><span class="st">/.gdb-linux/vmlinux-gdb.py&quot;</span> <span class="op">&gt;&gt;</span> ~/.gdbinit</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true"></a><span class="fu">make</span> O=build scripts_gdb <span class="co"># 在内核仓库目录下执行</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true"></a><span class="fu">rm</span> -rf <span class="va">${HOME}</span>/.gdb-linux/</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true"></a><span class="fu">mkdir</span> <span class="va">${HOME}</span>/.gdb-linux/</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true"></a><span class="fu">cp</span> build/scripts/gdb/* <span class="va">${HOME}</span>/.gdb-linux/ -rf <span class="co"># 在内核仓库目录下执行</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true"></a><span class="fu">cp</span> scripts/gdb/vmlinux-gdb.py <span class="va">${HOME}</span>/.gdb-linux/ <span class="co"># 在内核仓库目录下执行</span></span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;/sys.path.insert/s/^/# /&#39;</span> <span class="va">${HOME}</span>/.gdb-linux/vmlinux-gdb.py <span class="co"># 将sys.path.insert所在的行注释掉</span></span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;/sys.path.insert/a\sys.path.insert(0, &quot;&#39;</span><span class="va">${HOME}</span><span class="st">&#39;/.gdb-linux&quot;)&#39;</span> <span class="va">${HOME}</span>/.gdb-linux/vmlinux-gdb.py <span class="co"># 插入 sys.path.insert(0, &quot;${HOME}/.gdb-linux&quot;)</span></span></code></pre></div>
+<p>内核5.10使用以下命令开启GDB辅助调试功能，也可以调试内核4.19代码，但无法调试内核最新的代码:</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&quot;set auto-load safe-path /&quot;</span> <span class="op">&gt;</span> ~/.gdbinit <span class="co"># 设置自动加载共享库文件的安全路径</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&quot;source </span><span class="va">${HOME}</span><span class="st">/.gdb-linux-5.10/vmlinux-gdb.py&quot;</span> <span class="op">&gt;&gt;</span> ~/.gdbinit</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true"></a><span class="fu">make</span> O=build scripts_gdb <span class="co"># 在5.10内核仓库目录下执行</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true"></a><span class="fu">rm</span> -rf <span class="va">${HOME}</span>/.gdb-linux-5.10/</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true"></a><span class="fu">mkdir</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true"></a><span class="fu">cp</span> build/scripts/gdb/* <span class="va">${HOME}</span>/.gdb-linux-5.10/ -rf <span class="co"># 在5.10内核仓库目录下执行</span></span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true"></a><span class="fu">cp</span> scripts/gdb/vmlinux-gdb.py <span class="va">${HOME}</span>/.gdb-linux-5.10/ <span class="co"># 在5.10内核仓库目录下执行</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;/sys.path.insert/s/^/# /&#39;</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/vmlinux-gdb.py <span class="co"># 将sys.path.insert所在的行注释掉</span></span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;/sys.path.insert/a\sys.path.insert(0, &quot;&#39;</span><span class="va">${HOME}</span><span class="st">&#39;/.gdb-linux-5.10&quot;)&#39;</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/vmlinux-gdb.py <span class="co"># 插入 sys.path.insert(0, &quot;${HOME}/.gdb-linux-5.10&quot;)</span></span></code></pre></div>
+<p>重新启动GDB就可以使用GDB辅助调试功能:</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="fu">apropos</span> lx <span class="co"># 查看有哪些命令</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">p</span> <span class="va">$lx_current</span>()<span class="ex">.pid</span> # 打印断点所在进程的进程id</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">p</span> <span class="va">$lx_current</span>()<span class="ex">.comm</span> # 打印断点所在进程的进程名</span></code></pre></div>
+<h2 data-number="5.5" id="gdb打印结构体偏移"><span class="header-section-number">5.5</span> GDB打印结构体偏移</h2>
+<p>结构体定义有时候加了很多宏判断，再考虑到内存对齐之类的因素，通过看代码很难确定结构体中某一个成员的偏移大小，使用gdb来打印就很直观。</p>
+<p>如结构体<code>struct cifsFileInfo</code>:</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true"></a><span class="kw">struct</span> cifsFileInfo {</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true"></a>    <span class="kw">struct</span> list_head tlist;</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true"></a>    ...</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true"></a>    <span class="kw">struct</span> tcon_link *tlink;</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true"></a>    ...</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true"></a>    <span class="dt">char</span> *symlink_target;</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true"></a>};</span></code></pre></div>
+<p>想要确定<code>tlink</code>的偏移，可以使用以下命令:</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true"></a><span class="fu">gdb</span> ./cifs.ko <span class="co"># ko文件或vmlinux</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">p</span> <span class="kw">&amp;((</span>struct cifsFileInfo *)0)-&gt;tlink</span></code></pre></div>
+<p><code>(struct cifsFileInfo *)0</code>: 这是将整数值 0 强制类型转换为指向 struct cifsFileInfo 类型的指针。这实际上是创建一个指向虚拟内存地址 0 的指针，该地址通常是无效的。这是一个计算偏移量的技巧，因为偏移量的计算不依赖于结构体的实际实例。</p>
+<p><code>(0)-&gt;tlink</code>: 指向虚拟内存地址 0 的指针的成员<code>tlink</code>。</p>
+<p><code>&amp;(0)-&gt;tlink</code>: tlink的地址，也就是偏移量。</p>
+<h2 data-number="5.6" id="ko模块代码调试"><span class="header-section-number">5.6</span> ko模块代码调试</h2>
+<p>使用<code>gdb vmlinux</code>启动gdb后，如果调用到ko模块里的代码，这时候就不能直接对ko模块的代码进行打断点之类的操作，因为找不到对应的符号。</p>
+<p>这时就要把符号加入进来。首先，查看被调试的qemu虚拟机中的各个段地址:</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true"></a><span class="bu">cd</span> /sys/module/ext4/sections/ <span class="co"># ext4 为模块名</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true"></a><span class="fu">cat</span> .text .data .bss <span class="co"># 输出各个段地址</span></span></code></pre></div>
+<p>在gdb窗口中加载ko文件:</p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true"></a><span class="ex">add-symbol-file</span> <span class="op">&lt;</span>ko文件位置<span class="op">&gt;</span> <span class="op">&lt;</span>text段地址<span class="op">&gt;</span> -s .data <span class="op">&lt;</span>data段地址<span class="op">&gt;</span> -s .bss <span class="op">&lt;</span>bss段地址<span class="op">&gt;</span></span></code></pre></div>
+<p>这时就能开心的对ko模块中的代码进行打断点之类的操作了。</p>
+</body>
+</html>
