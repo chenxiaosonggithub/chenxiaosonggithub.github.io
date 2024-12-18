@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>4.19 nfs_updatepage()空指针解引用问题</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/bili">哔哩哔哩: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">4.19 nfs_updatepage()空指针解引用问题</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#代码流程分析"><span class="toc-section-number">2</span> 代码流程分析</a></li>
+<li><a href="#修复方案"><span class="toc-section-number">3</span> 修复方案</a></li>
+<li><a href="#补丁分析"><span class="toc-section-number">4</span> 补丁分析</a>
+<ul>
+<li><a href="#最新的代码分析"><span class="toc-section-number">4.1</span> 最新的代码分析</a></li>
+<li><a href="#回退的补丁"><span class="toc-section-number">4.2</span> 回退的补丁</a></li>
+</ul></li>
+<li><a href="#构造复现"><span class="toc-section-number">5</span> 构造复现</a></li>
+<li><a href="#与maintainer的交流"><span class="toc-section-number">6</span> 与maintainer的交流</a>
+<ul>
+<li><a href="#打上maintainer说的补丁"><span class="toc-section-number">6.1</span> 打上maintainer说的补丁</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">6.2</span> 代码分析</a></li>
+</ul></li>
+<li><a href="#vmcore解析"><span class="toc-section-number">7</span> vmcore解析</a>
+<ul>
+<li><a href="#查看崩溃在哪一行"><span class="toc-section-number">7.1</span> 查看崩溃在哪一行</a></li>
+<li><a href="#分析栈帧数据"><span class="toc-section-number">7.2</span> 分析栈帧数据</a>
+<ul>
+<li><a href="#确认page-mapping为null"><span class="toc-section-number">7.2.1</span> 确认<code>page-&gt;mapping</code>为<code>NULL</code></a></li>
+<li><a href="#nfs_inode_add_request的第一个参数struct-inode-inode"><span class="toc-section-number">7.2.2</span> <code>nfs_inode_add_request</code>的第一个参数<code>struct inode *inode</code></a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>4.19内核在<code>nfs_updatepage</code>函数中发生空指针解引用。</p>
+<p>社区类似问题的邮件: <a href="https://lore.kernel.org/linux-nfs/6cbd9cf8-49e9-868e-6452-1da2498c1358@oracle.com/">nfs_page_async_flush returning 0 for fatal errors on writeback</a></p>
+<p>相关补丁集: <a href="https://lore.kernel.org/all/20190407175912.23528-1-trond.myklebust@hammerspace.com/">Fix up soft mounts for NFSv4.x</a></p>
+<p>日志:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">BUG</span>: unable to handle kernel NULL pointer dereference at 0000000000000080</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ex">Call</span> Trace:</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a> <span class="ex">nfs_inode_add_request+0x1cc/0x5b8</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a> <span class="ex">nfs_setup_write_request+0x1fa/0x1fc</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a> <span class="ex">nfs_writepage_setup+0x2d/0x7d</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a> <span class="ex">nfs_updatepage+0x8b8/0x936</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a> <span class="ex">nfs_write_end+0x61d/0xd45</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a> <span class="ex">generic_perform_write+0x19a/0x3f0</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a> <span class="ex">nfs_file_write+0x2cc/0x6e5</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a> <span class="ex">new_sync_write+0x442/0x560</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a> <span class="ex">__vfs_write+0xda/0xef</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a> <span class="ex">vfs_write+0x176/0x48b</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a> <span class="ex">ksys_write+0x10a/0x1e9</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a> <span class="ex">__se_sys_write+0x24/0x29</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a> <span class="ex">__x64_sys_write+0x79/0x93</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a> <span class="ex">do_syscall_64+0x16d/0x4bb</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a> <span class="ex">entry_SYSCALL_64_after_hwframe+0x5c/0xc1</span></span></code></pre></div>
+<h1 data-number="2" id="代码流程分析"><span class="header-section-number">2</span> 代码流程分析</h1>
+<p>因为合入了<a href="https://lore.kernel.org/all/20190407175912.23528-20-trond.myklebust@hammerspace.com/"><code>14bebe3c90b3 NFS: Don't interrupt file writeout due to fatal errors</code></a>补丁，<code>nfs_page_async_flush</code>函数中在发生致命错误时<code>page-&gt;mapping</code>被设置为空，而<code>nfs_page_async_flush</code>函数这时不返回错误码，导致<code>nfs_setup_write_request</code>函数中执行到<code>nfs_inode_add_request</code>函数，发生了空指针解引用。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>write</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>  ksys_write</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    vfs_write</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>      __vfs_write</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>        new_sync_write</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>          nfs_file_write</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>            generic_perform_write</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>              nfs_write_end</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>                nfs_updatepage</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>                  nfs_writepage_setup</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>                    nfs_setup_write_request</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>                      <span class="co">// 尝试搜索已经存在的request，如果已存在就更新，并返回非NULL</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>                      nfs_try_to_update_request <span class="co">// return NULL</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>                        nfs_wb_page <span class="co">// return 0</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>                          <span class="cf">if</span> (clear_page_dirty_for_io(page)) <span class="co">// 条件满足</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>                          nfs_writepage_locked <span class="co">// return 0</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>                            nfs_do_writepage <span class="co">// return 0</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>                              <span class="co">// 合入补丁 14bebe3c90b3 NFS: Don&#39;t interrupt file writeout due to fatal errors 后返回 0</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>                              nfs_page_async_flush <span class="co">// return 0</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a>                                nfs_error_is_fatal_on_server <span class="co">// 发生致命错误时</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>                                nfs_write_error_remove_page</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a>                                  generic_error_remove_page</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a>                                    truncate_inode_page</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>                                      truncate_cleanup_page</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a>                                        do_invalidatepage</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a>                                          nfs_invalidate_page</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a>                                            nfs_wb_page_cancel</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a>                                              nfs_inode_remove_request</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a>                                                ClearPagePrivate(head-&gt;wb_page) <span class="co">// 清除private标记</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a>                                      delete_from_page_cache</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a>                                        __delete_from_page_cache</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true"></a>                                          page_cache_tree_delete</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true"></a>                                            page-&gt;mapping = NULL</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true"></a>                          <span class="cf">continue</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true"></a>                          <span class="cf">if</span> (clear_page_dirty_for_io(page)) <span class="co">// 条件不满足</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true"></a>                          <span class="cf">if</span> (!PagePrivate(page)) <span class="co">// 条件满足</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true"></a>                          <span class="cf">break</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true"></a>                      <span class="cf">if</span> (req != NULL) <span class="co">// 条件不满足</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true"></a>                      <span class="co">// 如果不存在就新创建一个request</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true"></a>                      nfs_create_request</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true"></a>                        req-&gt;wb_page    = page <span class="co">// page赋值到新创建的request</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true"></a>                      <span class="co">// 将request与inode关联起来</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true"></a>                      nfs_inode_add_request <span class="co">// 如果 nfs_page_async_flush 不返回0则不执行</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true"></a>                        mapping = page_file_mapping(req-&gt;wb_page)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true"></a>                          <span class="cf">return</span> page-&gt;mapping</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true"></a>                        spin_lock(&amp;mapping-&gt;private_lock) <span class="co">// mapping 为 NULL，发生空指针解引用</span></span></code></pre></div>
+<h1 data-number="3" id="修复方案"><span class="header-section-number">3</span> 修复方案</h1>
+<p>回退补丁<a href="https://lore.kernel.org/all/20190407175912.23528-20-trond.myklebust@hammerspace.com/"><code>14bebe3c90b3 NFS: Don't interrupt file writeout due to fatal errors</code></a>。</p>
+<p>回退补丁后，<code>nfs_page_async_flush</code>函数中在发生致命错误时返回错误码，<code>nfs_setup_write_request</code>函数中不会执行到<code>nfs_inode_add_request</code>函数，从而解决空指针解引用问题。</p>
+<h1 data-number="4" id="补丁分析"><span class="header-section-number">4</span> 补丁分析</h1>
+<p>补丁<a href="https://lore.kernel.org/all/20190407175912.23528-20-trond.myklebust@hammerspace.com/"><code>14bebe3c90b3 NFS: Don't interrupt file writeout due to fatal errors</code></a>所属的补丁集中还有以下几个相关的补丁:</p>
+<p><a href="https://lore.kernel.org/all/20190407175912.23528-21-trond.myklebust@hammerspace.com/"><code>22876f540bdf NFS: Don't call generic_error_remove_page() while holding locks</code></a></p>
+<p><a href="https://lore.kernel.org/all/20190407175912.23528-23-trond.myklebust@hammerspace.com/"><code>6fbda89b257f NFS: Replace custom error reporting mechanism with generic one</code></a></p>
+<h2 data-number="4.1" id="最新的代码分析"><span class="header-section-number">4.1</span> 最新的代码分析</h2>
+<p>补丁集合入后，在最新的代码中, 当<code>nfs_page_async_flush</code>中产生致命错误时，因为<code>nfs_page_assign_folio</code>中赋值了新的<code>folio</code>，<code>nfs_inode_add_request</code>中的<code>mapping</code>不会为空，从而不会发生空指针解引用的问题，也不会发生内存泄露。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>nfs_setup_write_request</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  nfs_try_to_update_request</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    nfs_wb_folio</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>      nfs_writepage_locked</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>        nfs_do_writepage</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>          nfs_page_async_flush</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>            nfs_write_error <span class="co">// 只记录错误，想留给fsync报给用户态</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>  nfs_page_create_from_folio</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>    nfs_page_create</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>    nfs_page_assign_folio</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>      req-&gt;wb_folio = folio <span class="co">// 这个地方保证了不会产生内存泄漏</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>    nfs_inode_add_request</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>      <span class="co">// 注意这个地方是从folio中取出address_space</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>      <span class="kw">struct</span> address_space *mapping = folio_file_mapping(folio)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>      <span class="co">// 这个地方的mapping一定不会是NULL</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>      spin_lock(&amp;mapping-&gt;private_lock)</span></code></pre></div>
+<h2 data-number="4.2" id="回退的补丁"><span class="header-section-number">4.2</span> 回退的补丁</h2>
+<p>补丁<a href="https://lore.kernel.org/all/20190407175912.23528-20-trond.myklebust@hammerspace.com/"><code>14bebe3c90b3 NFS: Don't interrupt file writeout due to fatal errors</code></a>里描述的: 不立刻上报回写错误，而是让<code>fsync</code>上报。</p>
+<p>要说明一下，maintainer自己都没想好这个机制有没问题，具体可以参考我的另一篇文章: <a href="https://chenxiaosong.com/courses/nfs/patches/nfs-handle-writeback-errors-incorrectly.html">《nfs回写错误处理不正确的问题》</a>，这里就不做过多展开。</p>
+<p>而且这是一个重构补丁集，根本就没必要在这里加一个“Fixes:”标签，补丁集是为了改变一个机制，并不是为了解决一个bug。这个补丁之所以会被Greg Kroah-Hartman错误的单独合入到4.19中，就是因为nfs maintainer喜欢乱加“Fixes:”标签，这已经不是他第一次这样做了。</p>
+<h1 data-number="5" id="构造复现"><span class="header-section-number">5</span> 构造复现</h1>
+<p>4.19代码合入补丁<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/nfs/issues/0001-reproduce-4.19-null-ptr-deref-in-nfs_updatepage.patch">0001-reproduce-4.19-null-ptr-deref-in-nfs_updatepage.patch</a>。</p>
+<p>挂载nfs:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="fu">mount</span> -t nfs -o vers=4.1 <span class="va">${nfs_server_ip}</span>:/server/export/dir /mnt</span></code></pre></div>
+<p>不断执行以下脚本，直到发生空指针解引用:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="bu">echo</span> something <span class="op">&gt;</span> something</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="bu">echo</span> something_else <span class="op">&gt;</span> something_else</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="bu">echo</span> something_else_again <span class="op">&gt;</span> something_else_again</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co"># 为什么不直接用 echo something &gt; /mnt/file 呢，因为用ps无法查看到echo进程</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="fu">cat</span> something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="fu">cat</span> something_else <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="fu">cat</span> something_else_again <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span></code></pre></div>
+<h1 data-number="6" id="与maintainer的交流"><span class="header-section-number">6</span> 与maintainer的交流</h1>
+<p><a href="https://lore.kernel.org/all/tencent_BEDA418B8BD86995FBF3E92D4F9F5D342C0A@qq.com/">Question about LTS 4.19 patch “89047634f5ce NFS: Don’t interrupt file writeout due to fatal errors”</a></p>
+<p>Trond回复:</p>
+<pre><code>根据定义，重构是一种不影响代码行为的更改。很明显，这个补丁从未被设计为这样的一个补丁。
+
+出现问题的原因是在4.19.x版本中发生了错误，而在最新版本的内核中没有发生，这是因为前者缺少另一个修复错误的补丁（实际上缺少一个&#39;Fixes:&#39;标签）。
+
+因此，您是否可以检查一下是否应用提交 22876f540bdf (&quot;NFS: Don&#39;t call generic_error_remove_page() while holding locks&quot;)  可以修复这个问题。
+
+请注意，为了解决读取死锁问题（如标签上所指示的），无论如何都需要后一个补丁。</code></pre>
+<h2 data-number="6.1" id="打上maintainer说的补丁"><span class="header-section-number">6.1</span> 打上maintainer说的补丁</h2>
+<p>打上补丁 <a href="https://lore.kernel.org/all/20190407175912.23528-21-trond.myklebust@hammerspace.com/"><code>22876f540bdf ("NFS: Don't call generic_error_remove_page() while holding locks")</code></a> 和 构造补丁<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/nfs/issues/0001-reproduce-4.19-null-ptr-deref-in-nfs_updatepage.patch">0001-reproduce-4.19-null-ptr-deref-in-nfs_updatepage.patch</a>，按照以上的复现步骤执行，可以看到:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ex">root@syzkaller</span>:~# jobs</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>[<span class="ex">1</span>]-  Running                 cat something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>[<span class="ex">3</span>]+  Running                 cat something_else_again <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span></code></pre></div>
+<p>查看进程的状态:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ex">root@syzkaller</span>:~# ps aux <span class="kw">|</span> <span class="fu">grep</span> cat</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="ex">root</span>         448  100  0.0   4740   568 ttyS0    R    07:16   8:30 cat something</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="ex">root</span>         450  0.0  0.0   4740   504 ttyS0    D    07:16   0:00 cat something_else_again</span></code></pre></div>
+<p>顺便从文件名查一下进程号（非必要步骤，就是记录一下曾经的尝试）:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="ex">root@syzkaller</span>:~# lsof /mnt/file</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="ex">COMMAND</span> PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="fu">cat</span>     448 root    1w   REG   0,35       15   12 /mnt/file</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="fu">cat</span>     450 root    1w   REG   0,35       15   12 /mnt/file</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="ex">root@syzkaller</span>:~# fuser /mnt/file</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="ex">/mnt</span>/file:             <span class="ex">448</span>   450</span></code></pre></div>
+<p>查看进程栈:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="ex">root@syzkaller</span>:~# ls /proc/448/task/</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="ex">448</span> # 只有一个线程</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="ex">root@syzkaller</span>:~# cat /proc/448/stack</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">0xffffffffffffffff</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="ex">root@syzkaller</span>:~# ls /proc/450/task/</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="ex">450</span> # 只有一个线程</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="ex">root@syzkaller</span>:~# cat /proc/450/stack </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">call_rwsem_down_write_failed+0x13/0x20</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_start_io_write+0x1a/0x2b</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_file_write+0x1be/0x6e5</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">new_sync_write+0x442/0x560</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">__vfs_write+0xda/0xef</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">vfs_write+0x176/0x48b</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">ksys_write+0x10a/0x1e9</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">__se_sys_write+0x24/0x29</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">__x64_sys_write+0x79/0x93</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">do_syscall_64+0x16d/0x4bb</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">entry_SYSCALL_64_after_hwframe+0x5c/0xc1</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">0xffffffffffffffff</span></span></code></pre></div>
+<h2 data-number="6.2" id="代码分析"><span class="header-section-number">6.2</span> 代码分析</h2>
+<p>合入补丁<a href="https://lore.kernel.org/all/20190407175912.23528-21-trond.myklebust@hammerspace.com/"><code>22876f540bdf ("NFS: Don't call generic_error_remove_page() while holding locks")</code></a>后，<code>generic_error_remove_page</code>不执行，<code>page</code>的private标记不会被清除，所以在<code>nfs_wb_page</code>函数陷入死循环。</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="co">// 其中一个先执行的cat进程，就是那个stack栈只有0xffffffffffffffff的进程</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>write</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>  ksys_write</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a>    vfs_write</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a>      __vfs_write</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>        new_sync_write</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a>          nfs_file_write</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true"></a>            nfs_start_io_write</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true"></a>              <span class="co">// 在这里加打印调试</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true"></a>              <span class="cf">if</span> (!strcmp(inode-&gt;i_sb-&gt;s_type-&gt;name, <span class="st">&quot;nfs4&quot;</span>))</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true"></a>              printk(<span class="st">&quot;%s:%d, inode:%p</span><span class="sc">\n</span><span class="st">&quot;</span>, __func__, __LINE__, inode);</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true"></a>              dump_stack()</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true"></a>              down_write(&amp;inode-&gt;i_rwsem); <span class="co">// 这里获取了锁，另一个后执行的cat进程就获取锁失败</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true"></a>            generic_perform_write</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true"></a>              nfs_write_end</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true"></a>                nfs_updatepage</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true"></a>                  nfs_writepage_setup</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true"></a>                    nfs_setup_write_request</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true"></a>                      <span class="co">// 尝试搜索已经存在的request，如果已存在就更新，并返回非NULL</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true"></a>                      nfs_try_to_update_request <span class="co">// return NULL</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true"></a>                        nfs_wb_page <span class="co">// return 0</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true"></a>                          <span class="cf">if</span> (clear_page_dirty_for_io(page)) <span class="co">// 条件满足</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true"></a>                          nfs_writepage_locked <span class="co">// return 0</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true"></a>                            nfs_do_writepage <span class="co">// return 0</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true"></a>                              <span class="co">// 合入补丁 14bebe3c90b3 NFS: Don&#39;t interrupt file writeout due to fatal errors 后返回 0</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true"></a>                              nfs_page_async_flush <span class="co">// return 0</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true"></a>                                nfs_error_is_fatal_on_server <span class="co">// 发生致命错误时</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true"></a>                                nfs_write_error_remove_page</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true"></a>                                  <span class="co">// 合入22876f540bdf NFS: Don&#39;t call generic_error_remove_page() while holding locks后，</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true"></a>                                  <span class="co">// generic_error_remove_page()不执行，而是执行SetPageError()</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true"></a>                                  generic_error_remove_page</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true"></a>                                    truncate_inode_page</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true"></a>                                      truncate_cleanup_page</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true"></a>                                        do_invalidatepage</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true"></a>                                          nfs_invalidate_page</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true"></a>                                            nfs_wb_page_cancel</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true"></a>                                              nfs_inode_remove_request</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true"></a>                                                <span class="co">// 因为generic_error_remove_page()不执行，所以这里没执行到，</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true"></a>                                                <span class="co">// 后面的 if (!PagePrivate(page)) 条件不满足，陷入死循环</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true"></a>                                                ClearPagePrivate(head-&gt;wb_page) <span class="co">// 清除private标记</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true"></a>                                      delete_from_page_cache</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true"></a>                                        __delete_from_page_cache</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true"></a>                                          page_cache_tree_delete</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true"></a>                                            page-&gt;mapping = NULL</span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true"></a>                          <span class="cf">continue</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true"></a>                          <span class="co">// 开始循环</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true"></a>                          <span class="cf">if</span> (clear_page_dirty_for_io(page)) <span class="co">// 条件不满足</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true"></a>                          <span class="cf">if</span> (!PagePrivate(page)) <span class="co">// 条件不满足，因为没执行generic_error_remove_page，没清除private标记</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true"></a>                          ret = nfs_commit_inode = <span class="dv">0</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true"></a>                          <span class="co">// 进行下一次循环，永远不会结束，狗日的，为什么内核栈会为空呢，为什么</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true"></a>            nfs_end_io_write <span class="co">// 未执行到</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true"></a></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true"></a><span class="co">// 另一个后执行的cat进程</span></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true"></a>write</span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true"></a>  ksys_write</span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true"></a>    vfs_write</span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true"></a>      __vfs_write</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true"></a>        new_sync_write</span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true"></a>          nfs_file_write</span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true"></a>            nfs_start_io_write</span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true"></a>              down_write(&amp;inode-&gt;i_rwsem);</span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true"></a>                call_rwsem_down_write_failed <span class="co">// 获取锁失败</span></span></code></pre></div>
+<h1 data-number="7" id="vmcore解析"><span class="header-section-number">7</span> vmcore解析</h1>
+<h2 data-number="7.1" id="查看崩溃在哪一行"><span class="header-section-number">7.1</span> 查看崩溃在哪一行</h2>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="co"># 查看内核日志</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dmesg <span class="kw">|</span> <span class="fu">less</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="ex">BUG</span>: unable to handle kernel NULL pointer dereference at 0000000000000080</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a><span class="ex">RIP</span>: 0010:_raw_spin_lock+0x1d/0x35</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true"></a> <span class="ex">nfs_inode_add_request+0x1cc/0x5b8</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true"></a><span class="co"># 在内核仓库目录下执行的shell命令，在docker ubuntu2204环境中打印不出具体行号，原因暂时母鸡</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true"></a><span class="ex">./scripts/faddr2line</span> build/vmlinux nfs_inode_add_request+0x1cc/0x5b8 <span class="co"># 或者把vmlinux替换成ko文件</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true"></a><span class="ex">nfs_inode_add_request+0x1cc</span>/0x5b8:</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true"></a><span class="ex">nfs_have_writebacks</span> at include/linux/nfs_fs.h:548 (discriminator 3)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true"></a><span class="kw">(</span><span class="ex">inlined</span> by<span class="kw">)</span> <span class="ex">nfs_inode_add_request</span> at fs/nfs/write.c:774 (discriminator 3)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true"></a><span class="co"># 反汇编指定地址的代码，以查看其汇编指令, -l 选项用于在反汇编时显示源代码行号（如果可用）</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dis -l ffffffff81c0a939</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true"></a><span class="ex">/home/sonvhi/chenxiaosong/code/4.19-stable/build/../include/linux</span>/nfs_fs.h: <span class="ex">248</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true"></a><span class="ex">0xffffffff81c0a939</span> <span class="op">&lt;</span>nfs_inode_add_request+<span class="op">460&gt;</span>: lea    -0xe0(%rbp),<span class="ex">%r14</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true"></a></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> bt # 查看崩溃的栈</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true"></a>[<span class="ex">exception</span> RIP: _raw_spin_lock+29] RIP: ffffffff836c0e4a</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true"></a>[<span class="ex">ffff8880b1ab7a78</span>] nfs_inode_add_request at ffffffff81c0a939</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true"></a>[<span class="ex">ffff8880b1ab7ab0</span>] nfs_setup_write_request at ffffffff81c14312</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true"></a></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true"></a><span class="co"># 查找指定地址的符号信息</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> sym ffffffff836c0e4a # [exception RIP: _raw_spin_lock+29] RIP: ffffffff836c0e4a</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true"></a><span class="ex">ffffffff836c0e4a</span> (T) <span class="ex">_raw_spin_lock+29</span> /home/sonvhi/chenxiaosong/code/4.19-stable/build/../arch/x86/include/asm/atomic.h: 194</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> sym ffffffff81c0a939 # [ffff8880b1ab7a78] nfs_inode_add_request at ffffffff81c0a939</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true"></a><span class="ex">ffffffff81c0a939</span> (t) <span class="ex">nfs_inode_add_request+460</span> /home/sonvhi/chenxiaosong/code/4.19-stable/build/../include/linux/nfs_fs.h: 248</span></code></pre></div>
+<p><code>faddr2line</code>脚本解析是的<code>nfs_inode_add_request</code>函数中的774行，也就是发生问题的<code>spin_lock(&amp;mapping-&gt;private_lock)</code>之后的一行，看来解析还是有一点点的不准，不过不要紧，我们再看<code>dmesg</code>命令中的日志<code>RIP: 0010:_raw_spin_lock+0x1d/0x35</code>，就能确定确实是崩溃在773行<code>spin_lock(&amp;mapping-&gt;private_lock)</code>。</p>
+<p>另外，由crash的<code>dis -l</code>和<code>sym</code>命令定位到<code>include/linux/nfs_fs.h: 248</code>的<code>NFS_I()</code>函数，这就不知道为什么了，麻烦知道的朋友联系我。</p>
+<h2 data-number="7.2" id="分析栈帧数据"><span class="header-section-number">7.2</span> 分析栈帧数据</h2>
+<h3 data-number="7.2.1" id="确认page-mapping为null"><span class="header-section-number">7.2.1</span> 确认<code>page-&gt;mapping</code>为<code>NULL</code></h3>
+<p>查看<code>nfs_inode_add_request</code>函数中的堆栈:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="co"># -F[F]: 类似于 -f，不同之处在于当适用时以符号方式显示堆栈数据；如果堆栈数据引用了 slab cache 对象，将在方括号内显示 slab cache 的名称；在 ia64 架构上，将以符号方式替代参数寄存器的内容。如果输入 -F 两次，并且堆栈数据引用了 slab cache 对象，将同时显示地址和 slab cache 的名称在方括号中。</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> bt -FF</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="co">#10 [ffff8880b1ab79c0] async_page_fault at ffffffff8380119e</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a>    [<span class="ex">exception</span> RIP: _raw_spin_lock+29]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a>    <span class="ex">...</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a>    <span class="ex">RDX</span>: 0000000000000001  RSI: ffff8880b5760000  RDI: 0000000000000002</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true"></a>    <span class="ex">...</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true"></a><span class="co">#11 [ffff8880b1ab7a78] nfs_inode_add_request at ffffffff81c0a939</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true"></a>    <span class="ex">ffff8880b1ab7a80</span>: ffffea0002cd5900 [ffff8880b0cf0b00:nfs_page] </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true"></a>    <span class="ex">...</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> bt -F</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true"></a><span class="co">#11 [ffff8880b1ab7a78] nfs_inode_add_request at ffffffff81c0a939</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true"></a>    <span class="ex">ffff8880b1ab7a80</span>: ffffea0002cd5900 [nfs_page]</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true"></a><span class="co"># -f: 显示堆栈帧中包含的所有数据；此选项可用于确定传递给每个函数的参数；在 ia64 架构上，将显示参数寄存器的内容。</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> bt -f</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true"></a><span class="co">#11 [ffff8880b1ab7a78] nfs_inode_add_request at ffffffff81c0a939</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true"></a>    <span class="ex">ffff8880b1ab7a80</span>: ffffea0002cd5900 ffff8880b0cf0b00</span></code></pre></div>
+<p>注意<code>[ffff8880b0cf0b00:nfs_page]</code>并不一定是<code>nfs_page</code>结构体的起始地址，有可能是中间某个变量的地址，要用<code>kmem</code>命令查看:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff8880b0cf0b00</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a>  <span class="ex">FREE</span> / [ALLOCATED] # 中括号[ALLOCATED]代表已分配</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a>  [<span class="ex">ffff8880b0cf0b00</span>]</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a><span class="ex">...</span></span></code></pre></div>
+<p>只是这里刚好是起始地址，使用地址<code>ffff8880b0cf0b00</code>来查看结构体<code>nfs_page</code>中的数据:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct nfs_page ffff8880b0cf0b00 -x</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a><span class="ex">struct</span> nfs_page {</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>  <span class="ex">...</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a>  <span class="ex">wb_page</span> = 0xffffea0002cd5900,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a>  <span class="ex">...</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a>}</span></code></pre></div>
+<p>再查看<code>wb_page = 0xffffea0002cd5900</code>中的数据:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="ex">struct</span> page {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a>  <span class="ex">...</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a>  <span class="kw">{</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a>    <span class="kw">{</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a>      <span class="ex">...</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a>      <span class="ex">mapping</span> = 0x0,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a>      <span class="ex">...</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true"></a>    <span class="kw">}</span>,</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true"></a>  <span class="kw">}</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true"></a>}</span></code></pre></div>
+<p>再看发生崩溃的地方:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>nfs_inode_add_request</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>  spin_lock(lock = &amp;mapping-&gt;private_lock) <span class="co">// static __always_inline void spin_lock(spinlock_t *lock)</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>    raw_spin_lock(&amp;lock-&gt;rlock)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a>      _raw_spin_lock(&amp;lock-&gt;rlock) <span class="co">// void __lockfunc _raw_spin_lock(raw_spinlock_t *lock)</span></span></code></pre></div>
+<p>再解析结构体偏移:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="co"># 首先已知 struct address_space *mapping = 0</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct address_space -ox</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a><span class="ex">struct</span> address_space {</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a>  <span class="ex">...</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a>  <span class="co"># 这里正好和dmesg日志中对应上: </span><span class="al">BUG</span><span class="co">: unable to handle kernel NULL pointer dereference at 0000000000000080</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true"></a>  <span class="co"># 当然，如果mapping的地址是一个不为NULL的值，比如是一个无效的地址x，那报错的地址就是0000000000000080+x</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true"></a>  [<span class="ex">0x80</span>] spinlock_t private_lock<span class="kw">;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true"></a>  <span class="ex">...</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true"></a>}</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true"></a><span class="ex">SIZE</span>: 0xa8</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct spinlock_t -ox</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true"></a><span class="ex">typedef</span> struct spinlock {</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true"></a>        <span class="ex">union</span> {</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true"></a>  [<span class="ex">0x0</span>]     struct raw_spinlock rlock<span class="kw">;</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true"></a>        };</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true"></a>} <span class="ex">spinlock_t</span><span class="kw">;</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true"></a><span class="ex">SIZE</span>: 0x4</span></code></pre></div>
+<p>x86_64下整数参数使用的寄存器依次为: RDI，RSI，RDX，RCX，R8，R9，<code>_raw_spin_lock</code>只有一个参数，从栈中可以看到<code>RDI: 0000000000000002</code>，这个值是怎么来的呢？估计要看<code>nfs_inode_add_request</code>和<code>_raw_spin_lock</code>的反汇编。</p>
+<h3 data-number="7.2.2" id="nfs_inode_add_request的第一个参数struct-inode-inode"><span class="header-section-number">7.2.2</span> <code>nfs_inode_add_request</code>的第一个参数<code>struct inode *inode</code></h3>
+<p>我们再看一次跟<code>inode</code>有关的栈帧数据:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> bt -FF</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a><span class="co">#10 [ffff8880b1ab79c0] async_page_fault at ffffffff8380119e</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a>    [<span class="ex">exception</span> RIP: _raw_spin_lock+29]</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true"></a>    <span class="ex">...</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true"></a>    <span class="ex">ffff8880b1ab79c8</span>: [ffff8880b6a43ec8:nfs_inode_cache(198:serial-getty@ttyS0.service)] <span class="ex">ffffea0002cd5900</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true"></a>    <span class="ex">...</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true"></a>    <span class="ex">ffff8880b1ab79e8</span>: [ffff8880b6a43ec8:nfs_inode_cache(198:serial-getty@ttyS0.service)] <span class="ex">0000000000000080</span> </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true"></a>    <span class="ex">...</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true"></a><span class="co">#11 [ffff8880b1ab7a78] nfs_inode_add_request at ffffffff81c0a939</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true"></a>    <span class="ex">...</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true"></a>    <span class="ex">ffff8880b1ab7aa0</span>: [ffff888107060a80:kmalloc-128] [ffff8880b6a43ec8:nfs_inode_cache(198:serial-getty@ttyS0.service)] </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true"></a>    <span class="ex">...</span></span></code></pre></div>
+<p>注意地址<code>[ffff8880b6a43ec8:nfs_inode_cache]</code>并不是<code>struct nfs_inode</code>的首地址，而是<code>struct inode</code>的首地址，使用<code>kmem</code>命令解析:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff8880b6a43ec8</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true"></a>  <span class="ex">FREE</span> / [ALLOCATED]</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true"></a>  [<span class="ex">ffff8880b6a43cf0</span>] # 这才是struct nfs_inode的首地址</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct nfs_inode ffff8880b6a43cf0 -ox</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true"></a><span class="ex">struct</span> nfs_inode {</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true"></a>  <span class="ex">...</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true"></a>  [<span class="ex">ffff8880b6a43ec8</span>] struct inode vfs_inode<span class="kw">;</span> # 这就是<span class="ex">struct</span> page的地址</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true"></a>}</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true"></a><span class="ex">SIZE</span>: 0x430</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct inode ffff8880b6a43ec8 -x</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true"></a><span class="ex">struct</span> inode {</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true"></a>  <span class="ex">...</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true"></a>  <span class="ex">i_mapping</span> = 0xffff8880b6a44040,</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true"></a>  <span class="ex">...</span></span></code></pre></div>
+<p><code>inode-&gt;i_mapping</code>的值和<code>nfs_setup_write_request</code>栈中的一个数据一样，以后再研究他们之间的关系吧:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="co">#12 [ffff8880b1ab7ab0] nfs_setup_write_request at ffffffff81c14312</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a>    <span class="ex">...</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true"></a>    <span class="ex">ffff8880b1ab7ad8</span>: [ffff8880b6a44040:nfs_inode_cache(198:serial-getty@ttyS0.service)] <span class="ex">000000000000000f</span> </span></code></pre></div>
+</body>
+</html>
