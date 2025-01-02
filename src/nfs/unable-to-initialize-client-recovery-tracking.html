@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>重启nfs server后client打开文件卡顿很长时间的问题</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/bili">哔哩哔哩: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程:
+chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献:
+chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">重启nfs server后client打开文件卡顿很长时间的问题</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#测试" id="toc-测试"><span
+class="toc-section-number">2</span> 测试</a></li>
+<li><a href="#client端代码分析" id="toc-client端代码分析"><span
+class="toc-section-number">3</span> client端代码分析</a></li>
+<li><a href="#server端代码分析" id="toc-server端代码分析"><span
+class="toc-section-number">4</span> server端代码分析</a></li>
+</ul>
+</nav>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
+<p>用主线内核(<code>7033999ecd7b</code>)测试nfs，发现当server端重启服务<code>systemctl restart nfs-server</code>，client端再读写文件会卡一会儿，5.10内核没有这个现象。</p>
+<p>5.10内核server端重启服务，有如下打印:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   97.616435] nfsd: last <span class="er">server</span> <span class="ex">has</span> exited, flushing export cache</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   98.763518] NFSD: Using <span class="er">UMH</span> <span class="ex">upcall</span> client tracking operations.</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   98.765527] NFSD: starting <span class="er">90-second</span> <span class="ex">grace</span> period <span class="er">(</span><span class="ex">net</span> f0000098<span class="kw">)</span></span></code></pre></div>
+<p>主线内核server端重启服务，有如下打印:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   64.637398] NFSD: Unable <span class="er">to</span> <span class="ex">initialize</span> client recovery tracking! <span class="er">(</span><span class="ex">-110</span><span class="kw">)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   64.639536] NFSD: starting <span class="er">90-second</span> <span class="ex">grace</span> period <span class="er">(</span><span class="ex">net</span> f0000000<span class="kw">)</span></span></code></pre></div>
+<h1 data-number="2" id="测试"><span
+class="header-section-number">2</span> 测试</h1>
+<p>复现命令如下:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 以下命令如果没有特别强调，默认是client端的命令</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart nfs-server <span class="co"># server端命令</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> something</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 为什么不直接用 echo something &gt; /mnt/file 呢，因为用ps命令无法查看到echo进程</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 但是这里好像用cat也没什么卵用，还是要用 ps aux | grep bash 才能找到进程号</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># cat something &gt; /mnt/file</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 还是用后台运行的方式，打印出进程号</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span> <span class="co"># 写文件，后台运行，会打印出进程号</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[1]</span> 493 <span class="co"># 进程号</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart nfs-server <span class="co"># server端命令</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /mnt/file <span class="kw">&amp;</span> <span class="co"># 读文件</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/493/stack</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_delay_interruptible+0x33/0xa0</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_delay+0x40/0x50</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_handle_exception+0xd2/0xf0</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_do_open+0x170/0x280</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_atomic_open+0xa9/0x110</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs_atomic_open+0x3cb/0x720</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] atomic_open+0x8c/0x1b0</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] lookup_open+0x330/0x470</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] open_last_lookups+0x25b/0x4b0</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] path_openat+0xa5/0x190</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_filp_open+0x53/0xc0</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_sys_openat2+0xab/0xe0</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_sys_open+0xb5/0xd0</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] __se_sys_openat+0x2f/0x40</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] __x64_sys_openat+0x23/0x30</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_syscall_64+0xe1/0x1d0</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] entry_SYSCALL_64_after_hwframe+0x6c/0x74</span></code></pre></div>
+<p>server端用主线，client端用5.10，有问题；server端用5.10，client端用主线，没有问题。说明问题出在server端。</p>
+<h1 data-number="3" id="client端代码分析"><span
+class="header-section-number">3</span> client端代码分析</h1>
+<p>虽然问题出在server端，但我们还是先分析一下client端的代码，看看为什么读写文件会卡一会儿。</p>
+<p>加调试打印信息:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/fs/nfs/nfs4proc.c</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/fs/nfs/nfs4proc.c</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-617,6</span> +617,7 @@ int nfs4_handle_exception<span class="er">(</span><span class="ex">struct</span> nfs_server <span class="pp">*</span>server, int errorcode, struct nfs4_</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                        <span class="ex">exception-</span><span class="op">&gt;</span>retry = 0<span class="kw">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">return</span> <span class="ex">ret2</span><span class="kw">;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                <span class="er">}</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               printk<span class="er">(</span><span class="st">&quot;%s:%d, timeout:%ld\n&quot;</span><span class="ex">,</span> __func__, __LINE__, exception-<span class="op">&gt;</span>timeout<span class="kw">);</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                <span class="ex">ret</span> = nfs4_delay<span class="er">(</span><span class="kw">&amp;</span><span class="ex">exception-</span><span class="op">&gt;</span>timeout,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                                <span class="ex">exception-</span><span class="op">&gt;</span>interruptible<span class="kw">);</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                <span class="ex">goto</span> out_retry<span class="kw">;</span></span></code></pre></div>
+<p>测试打印结果如下:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">root@syzkaller:~#</span> time echo something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[1]</span> 547</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  439.410573] nfs4_handle_exception:620, timeout:0</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">439.518513</span><span class="ex">]</span> nfs4_handle_exception:620, timeout:200</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  439.727291] nfs4_handle_exception:620, timeout:400 <span class="er">#</span> <span class="ex">600</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  440.135717] nfs4_handle_exception:620, timeout:800 <span class="er">#</span> <span class="ex">1400</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  440.992090] nfs4_handle_exception:620, timeout:1600 <span class="er">#</span> <span class="ex">3000</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  442.655003] nfs4_handle_exception:620, timeout:3200 <span class="er">#</span> <span class="ex">6200</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  445.919886] nfs4_handle_exception:620, timeout:6400 <span class="er">#</span> <span class="ex">12600</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  452.383892] nfs4_handle_exception:620, timeout:12800 <span class="er">#</span> <span class="ex">25400</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  465.695635] nfs4_handle_exception:620, timeout:25600 <span class="er">#</span> <span class="ex">51000</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  481.055601] nfs4_handle_exception:620, timeout:30000 <span class="er">#</span> <span class="ex">81000</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  496.415008] nfs4_handle_exception:620, timeout:30000 <span class="er">#</span> <span class="ex">111000</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  511.775498] nfs4_handle_exception:620, timeout:30000 <span class="er">#</span> <span class="ex">141000</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    1m27.820s <span class="co"># 87.82s</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="ex">user</span>    0m0.000s</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="ex">sys</span>     0m0.024s</span></code></pre></div>
+<p>server重启服务后，client打开文件时server端不断返回<code>NFS4ERR_GRACE</code>错误，代码流程如下:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>openat</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  do_sys_open</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    do_sys_openat2</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      do_filp_open</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        path_openat</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>          open_last_lookups</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            lookup_open</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>              atomic_open</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                nfs_atomic_open</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                  nfs4_atomic_open</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                    nfs4_do_open</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                      status <span class="op">=</span> _nfs4_do_open</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>                        _nfs4_open_and_get_state</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>                          _nfs4_proc_open</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                            nfs4_run_open_task</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>                              rpc_run_task</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>                              <span class="co">// 从抓包数据可以看出，间隔时间依次是 0.105461, 0.20805, 0.407991, 0.807962, 1.665381, 3.264049, 6.463902, 13.311876, 15.35971</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>                              status <span class="op">=</span> rpc_wait_for_completion_task</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>                      nfs4_handle_exception<span class="op">(</span>status<span class="op">)</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>                        nfs4_do_handle_exception</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>                          <span class="cf">case</span> <span class="op">-</span>NFS4ERR_GRACE<span class="op">:</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>                          exception<span class="op">-&gt;</span>delay <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">if</span> <span class="op">(</span>exception<span class="op">-&gt;</span>delay<span class="op">)</span> <span class="op">{</span> <span class="co">// 条件满足</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>                        nfs4_delay</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>                          nfs4_delay_interruptible</span></code></pre></div>
+<h1 data-number="4" id="server端代码分析"><span
+class="header-section-number">4</span> server端代码分析</h1>
+<p>下面我们再分析server端的问题。</p>
+<p>首先看一下重启服务时的报错信息。前面说过，5.10内核server端重启服务，有如下打印:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   97.616435] nfsd: last <span class="er">server</span> <span class="ex">has</span> exited, flushing export cache</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   98.763518] NFSD: Using <span class="er">UMH</span> <span class="ex">upcall</span> client tracking operations.</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   98.765527] NFSD: starting <span class="er">90-second</span> <span class="ex">grace</span> period <span class="er">(</span><span class="ex">net</span> f0000098<span class="kw">)</span></span></code></pre></div>
+<p>主线内核server端重启服务，有如下错误打印:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   64.637398] NFSD: Unable <span class="er">to</span> <span class="ex">initialize</span> client recovery tracking! <span class="er">(</span><span class="ex">-110</span><span class="kw">)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   64.639536] NFSD: starting <span class="er">90-second</span> <span class="ex">grace</span> period <span class="er">(</span><span class="ex">net</span> f0000000<span class="kw">)</span></span></code></pre></div>
+<p>主线内核打开<code>CONFIG_NFSD_LEGACY_CLIENT_TRACKING</code>配置，没有问题，重启server端服务打印以下日志:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  122.050050] NFSD: Using <span class="er">UMH</span> <span class="ex">upcall</span> client tracking operations.</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  122.074438] NFSD: Using <span class="er">UMH</span> <span class="ex">upcall</span> client tracking operations.</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  122.076097] NFSD: starting <span class="er">90-second</span> <span class="ex">grace</span> period <span class="er">(</span><span class="ex">net</span> f0000000<span class="kw">)</span></span></code></pre></div>
+<p>所以现在要分析没打开<code>CONFIG_NFSD_LEGACY_CLIENT_TRACKING</code>配置时为什么会报错。<code>cld_running()</code>一直返回<code>false</code>。</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// rpc.nfsd进程</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>write</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  ksys_write</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    vfs_write</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>      nfsctl_transaction_write</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        write_threads</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>          nfsd_svc</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>            nfsd_startup_net</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>              nfs4_state_start_net</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                nfsd4_client_tracking_init</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                  status <span class="op">=</span> nfsd4_cld_tracking_init<span class="op">(</span>net<span class="op">)</span> <span class="op">=</span> <span class="op">-</span><span class="dv">110</span> <span class="co">// ETIMEDOUT</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                    running <span class="op">=</span> cld_running<span class="op">()</span> <span class="op">=</span> <span class="kw">false</span> <span class="co">// 判断10次，共1秒</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> <span class="op">(!</span>running<span class="op">)</span> <span class="co">// 条件满足 running == false</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                    status <span class="op">=</span> <span class="op">-</span>ETIMEDOUT</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>                  check_for_legacy_methods<span class="op">(</span>status <span class="op">==</span> <span class="op">-</span>ETIMEDOUT<span class="op">)</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>                  <span class="cf">if</span> <span class="op">(</span>status<span class="op">)</span> <span class="op">{</span> <span class="co">// status == -ETIMEDOUT</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>                  printk<span class="op">(</span>KERN_WARNING <span class="st">&quot;NFSD: Unable to initialize client&quot;</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">&quot;recovery tracking! (</span><span class="sc">%d</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> status<span class="op">)</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>                printk<span class="op">(</span>KERN_INFO <span class="st">&quot;NFSD: starting </span><span class="sc">%lld</span><span class="st">-second grace period (net </span><span class="sc">%x</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>                queue_delayed_work<span class="op">(</span>laundry_wq<span class="op">,</span> <span class="op">&amp;</span>nn<span class="op">-&gt;</span>laundromat_work<span class="op">,</span> nn<span class="op">-&gt;</span>nfsd4_grace <span class="op">*</span> HZ<span class="op">)</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co">// laundromat_work 延时执行的任务</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>laundromat_main</span></code></pre></div>
+<p>下面分析client端请求打开文件时，server为什么会返回错误<code>NFS4ERR_GRACE</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>nfsd</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  svc_recv</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    svc_handle_xprt</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      svc_process</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        svc_process_common</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>          nfsd_dispatch</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>            nfsd4_proc_compound</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>              nfsd4_open</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                status <span class="op">=</span> nfserr_grace</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                open<span class="op">-&gt;</span>op_claim_type <span class="op">==</span> NFS4_OPEN_CLAIM_NULL</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                opens_in_grace<span class="op">(</span>net<span class="op">)</span> <span class="op">=</span> <span class="kw">true</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                  __state_in_grace</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> nfserr_grace</span></code></pre></div>
+</body>
+</html>
