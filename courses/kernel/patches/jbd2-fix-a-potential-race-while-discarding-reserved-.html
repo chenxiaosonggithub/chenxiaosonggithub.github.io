@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>23e3d7f7061f jbd2: fix a potential race while discarding reserved buffers after an abort</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/bili">哔哩哔哩: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程:
+chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献:
+chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">23e3d7f7061f jbd2: fix a potential race while
+discarding reserved buffers after an abort</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#复现程序" id="toc-复现程序"><span
+class="toc-section-number">2</span> 复现程序</a>
+<ul>
+<li><a href="#内核构造补丁" id="toc-内核构造补丁"><span
+class="toc-section-number">2.1</span> 内核构造补丁</a></li>
+<li><a href="#fallocate-文件空洞" id="toc-fallocate-文件空洞"><span
+class="toc-section-number">2.2</span> fallocate 文件空洞</a></li>
+<li><a href="#常规文件-journal-模式"
+id="toc-常规文件-journal-模式"><span
+class="toc-section-number">2.3</span> 常规文件, journal 模式</a></li>
+<li><a href="#常规文件-order-模式" id="toc-常规文件-order-模式"><span
+class="toc-section-number">2.4</span> 常规文件, order 模式</a></li>
+<li><a href="#symbol-link" id="toc-symbol-link"><span
+class="toc-section-number">2.5</span> symbol link</a></li>
+</ul></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">3</span> 代码分析</a></li>
+</ul>
+</nav>
+<p><a
+href="https://www.bilibili.com/video/BV15C411E7Sm/">点击这里在哔哩哔哩bilibili在线观看配套的教学视频</a>。</p>
+<p><a
+href="https://www.bilibili.com/video/BV1Tx4y187vg/">点击这里在哔哩哔哩bilibili在线观看配套的加餐视频（就是一些补充）</a>。</p>
+<p><a
+href="https://chenxiaosong.com/courses/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a
+href="https://patchwork.ozlabs.org/project/linux-ext4/patch/20220317142137.1821590-1-yebin10@huawei.com/"><code>23e3d7f7061f jbd2: fix a potential race while discarding reserved buffers after an abort</code></a></p>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   72.796117] EXT4-fs error <span class="er">(device</span> <span class="ex">sda</span><span class="er">)</span><span class="bu">:</span> ext4_journal_check_start:83: comm fallocate: Detected aborted journal</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   72.826847] EXT4-fs <span class="er">(</span>sda<span class="er">)</span>: <span class="er">Remounting</span> <span class="ex">filesystem</span> read-only</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">fallocate:</span> fallocate failed: Read-only file system</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.791830] jbd2_journal_commit_transaction: jh=0xffff9cfefe725d90 <span class="er">bh=0x0000000000000000</span> <span class="ex">end</span> delay</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.793597] ------------[ cut <span class="er">here</span> <span class="ex">]------------</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.794203] kernel BUG <span class="er">at</span> <span class="ex">fs/jbd2/transaction.c:2063!</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.794886] invalid opcode: <span class="er">0000</span> <span class="ex">[#1]</span> PREEMPT SMP PTI</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.795533] CPU: 4 <span class="er">PID:</span> <span class="ex">2260</span> Comm: jbd2/sda-8 Not tainted 5.17.0-rc8-next-20220315-dirty <span class="co">#150</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.798327] RIP: 0010:__jbd2_journal_unfile_buffer+0x3e/0x60</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>   <span class="er">74.801971</span><span class="ex">]</span> RSP: 0018:ffffa828c24a3cb8 EFLAGS: 00010202</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.802694] RAX: 0000000000000000 <span class="er">RBX:</span> <span class="ex">0000000000000000</span> RCX: 0000000000000000</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.803601] RDX: 0000000000000001 <span class="er">RSI:</span> <span class="ex">ffff9cfefe725d90</span> RDI: ffff9cfefe725d90</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.804554] RBP: ffff9cfefe725d90 <span class="er">R08:</span> <span class="ex">0000000000000000</span> R09: ffffa828c24a3b20</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.805471] R10: 0000000000000001 <span class="er">R11:</span> <span class="ex">0000000000000001</span> R12: ffff9cfefe725d90</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.806385] R13: ffff9cfefe725d98 <span class="er">R14:</span> <span class="ex">0000000000000000</span> R15: ffff9cfe833a4d00</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.807301] FS:  0000000000000000<span class="er">(</span>0000<span class="er">)</span> <span class="er">GS:ffff9d01afb00000(0000)</span> <span class="ex">knlGS:0000000000000000</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.808338] CS:  0010 <span class="er">DS:</span> <span class="ex">0000</span> ES: 0000 CR0: 0000000080050033</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.809084] CR2: 00007f2b81bf4000 <span class="er">CR3:</span> <span class="ex">0000000100056000</span> CR4: 00000000000006e0</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.810047] DR0: 0000000000000000 <span class="er">DR1:</span> <span class="ex">0000000000000000</span> DR2: 0000000000000000</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.810981] DR3: 0000000000000000 <span class="er">DR6:</span> <span class="ex">00000000fffe0ff0</span> DR7: 0000000000000400</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.811897] Call Trace:</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>   <span class="er">74.812241</span><span class="ex">]</span>  <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.812566]  __jbd2_journal_refile_buffer+0x12f/0x180</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>[   74.813246]  <span class="er">jbd2_journal_refile_buffer+0x4c/0xa0</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.813869]  jbd2_journal_commit_transaction.cold+0xa1/0x148</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>[   74.817550]  <span class="er">kjournald2+0xf8/0x3e0</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   74.819056]  kthread+0x153/0x1c0</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>[   74.819963]  <span class="er">ret_from_fork+0x22/0x30</span></span></code></pre></div>
+<h1 data-number="2" id="复现程序"><span
+class="header-section-number">2</span> 复现程序</h1>
+<h2 data-number="2.1" id="内核构造补丁"><span
+class="header-section-number">2.1</span> 内核构造补丁</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>From <span class="dv">3465</span><span class="er">bf5459a86084db84408653ea83789f606eee</span> Mon Sep <span class="dv">17</span> <span class="bn">00</span><span class="op">:</span><span class="bn">00</span><span class="op">:</span><span class="bn">00</span> <span class="dv">2001</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>From<span class="op">:</span> ChenXiaoSong <span class="op">&lt;</span>chenxiaosongemail@foxmail<span class="op">.</span>com<span class="op">&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Date<span class="op">:</span> Wed<span class="op">,</span> <span class="dv">20</span> Apr <span class="dv">2022</span> <span class="dv">23</span><span class="op">:</span><span class="dv">32</span><span class="op">:</span><span class="dv">57</span> <span class="op">+</span><span class="dv">0</span><span class="er">800</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>Subject<span class="op">:</span> <span class="op">[</span>PATCH<span class="op">]</span> reproduce jbd2 deref null ptr</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>Signed<span class="op">-</span>off<span class="op">-</span>by<span class="op">:</span> ChenXiaoSong <span class="op">&lt;</span>chenxiaosongemail@foxmail<span class="op">.</span>com<span class="op">&gt;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">---</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a> fs<span class="op">/</span>ext4<span class="op">/</span>inode<span class="op">.</span>c   <span class="op">|</span> <span class="dv">7</span> <span class="op">+++++++</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a> fs<span class="op">/</span>jbd2<span class="op">/</span>commit<span class="op">.</span>c  <span class="op">|</span> <span class="dv">4</span> <span class="op">++++</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a> fs<span class="op">/</span>jbd2<span class="op">/</span>journal<span class="op">.</span>c <span class="op">|</span> <span class="dv">6</span> <span class="op">++++++</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a> <span class="dv">3</span> files changed<span class="op">,</span> <span class="dv">17</span> insertions<span class="op">(+)</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>diff <span class="op">--</span>git a<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>inode<span class="op">.</span>c b<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>inode<span class="op">.</span>c</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>index <span class="dv">1</span><span class="er">ce13f69fbec..bb4b2fe8968d</span> <span class="dv">100644</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>inode<span class="op">.</span>c</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>inode<span class="op">.</span>c</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">49</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">49</span><span class="op">,</span><span class="dv">7</span> @@</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&quot;truncate.h&quot;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&lt;trace/events/ext4.h&gt;</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>#include <span class="op">&lt;</span>linux<span class="op">/</span>delay<span class="op">.</span>h<span class="op">&gt;</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a> <span class="dt">static</span> __u32 ext4_inode_csum<span class="op">(</span><span class="kw">struct</span> inode <span class="op">*</span>inode<span class="op">,</span> <span class="kw">struct</span> ext4_inode <span class="op">*</span>raw<span class="op">,</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>                  <span class="kw">struct</span> ext4_inode_info <span class="op">*</span>ei<span class="op">)</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">1261</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">1262</span><span class="op">,</span><span class="dv">9</span> @@ <span class="dt">static</span> <span class="dt">int</span> write_end_fn<span class="op">(</span>handle_t <span class="op">*</span>handle<span class="op">,</span> <span class="kw">struct</span> inode <span class="op">*</span>inode<span class="op">,</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(!</span>buffer_mapped<span class="op">(</span>bh<span class="op">)</span> <span class="op">||</span> buffer_freed<span class="op">(</span>bh<span class="op">))</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    set_buffer_uptodate<span class="op">(</span>bh<span class="op">);</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,jh:</span><span class="sc">%p</span><span class="st">x,bh:</span><span class="sc">%p</span><span class="st">x,begin sleep...</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">,</span> bh2jh<span class="op">(</span>bh<span class="op">),</span> bh<span class="op">);</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   mdelay<span class="op">(</span><span class="dv">2000</span><span class="op">);</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,jh:</span><span class="sc">%p</span><span class="st">x,bh:</span><span class="sc">%p</span><span class="st">x,end sleep...</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">,</span> bh2jh<span class="op">(</span>bh<span class="op">),</span> bh<span class="op">);</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    ret <span class="op">=</span> ext4_handle_dirty_metadata<span class="op">(</span>handle<span class="op">,</span> NULL<span class="op">,</span> bh<span class="op">);</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    clear_buffer_meta<span class="op">(</span>bh<span class="op">);</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    clear_buffer_prio<span class="op">(</span>bh<span class="op">);</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">4034</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">4038</span><span class="op">,</span><span class="dv">9</span> @@ <span class="dt">int</span> ext4_punch_hole<span class="op">(</span><span class="kw">struct</span> inode <span class="op">*</span>inode<span class="op">,</span> loff_t offset<span class="op">,</span> loff_t length<span class="op">)</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        ret <span class="op">=</span> ext4_update_disksize_before_punch<span class="op">(</span>inode<span class="op">,</span> offset<span class="op">,</span> length<span class="op">);</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>ret<span class="op">)</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>            <span class="cf">goto</span> out_dio<span class="op">;</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,begin sleep...</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">);</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       mdelay<span class="op">(</span><span class="dv">3000</span><span class="op">);</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,end sleep...</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">);</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        truncate_pagecache_range<span class="op">(</span>inode<span class="op">,</span> first_block_offset<span class="op">,</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>                     last_block_offset<span class="op">);</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>diff <span class="op">--</span>git a<span class="op">/</span>fs<span class="op">/</span>jbd2<span class="op">/</span>commit<span class="op">.</span>c b<span class="op">/</span>fs<span class="op">/</span>jbd2<span class="op">/</span>commit<span class="op">.</span>c</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>index <span class="dv">5</span><span class="er">b9408e3b370..f7a4db3835ee</span> <span class="dv">100644</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>fs<span class="op">/</span>jbd2<span class="op">/</span>commit<span class="op">.</span>c</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>fs<span class="op">/</span>jbd2<span class="op">/</span>commit<span class="op">.</span>c</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">25</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">25</span><span class="op">,</span><span class="dv">7</span> @@</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&lt;linux/blkdev.h&gt;</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&lt;linux/bitops.h&gt;</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&lt;trace/events/jbd2.h&gt;</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>#include <span class="op">&lt;</span>linux<span class="op">/</span>delay<span class="op">.</span>h<span class="op">&gt;</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a> <span class="co">/*</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="co">  * IO end handler for temporary buffer_heads handling writes to the journal.</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="co">@@ -511,6 +512,9 @@ void jbd2_journal_commit_transaction(journal_t *journal)</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a><span class="co">     */</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>commit_transaction<span class="op">-&gt;</span>t_reserved_list<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>        jh <span class="op">=</span> commit_transaction<span class="op">-&gt;</span>t_reserved_list<span class="op">;</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,jh:</span><span class="sc">%p</span><span class="st">x,bh:</span><span class="sc">%p</span><span class="st">x,begin sleep...</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">,</span> jh<span class="op">,</span> jh2bh<span class="op">(</span>jh<span class="op">));</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       mdelay<span class="op">(</span><span class="dv">5000</span><span class="op">);</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,jh:</span><span class="sc">%p</span><span class="st">x,bh:</span><span class="sc">%p</span><span class="st">x,end sleep...</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">,</span> jh<span class="op">,</span> jh2bh<span class="op">(</span>jh<span class="op">));</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>        JBUFFER_TRACE<span class="op">(</span>jh<span class="op">,</span> <span class="st">&quot;reserved, unused: refile&quot;</span><span class="op">);</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>        <span class="co">/*</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="co">         * A jbd2_journal_get_undo_access()+jbd2_journal_release_buffer() may</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="co">diff --git a/fs/jbd2/journal.c b/fs/jbd2/journal.c</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a><span class="co">index fcacafa4510d..9bad5d4b2a84 100644</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a><span class="co">--- a/fs/jbd2/journal.c</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a><span class="co">+++ b/fs/jbd2/journal.c</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a><span class="co">@@ -47,6 +47,7 @@</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a><span class="co"> </span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a><span class="co"> #include &lt;linux/uaccess.h&gt;</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a><span class="co"> #include &lt;asm/page.h&gt;</span></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a><span class="co">+#include &lt;linux/delay.h&gt;</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a><span class="co"> </span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a><span class="co"> #ifdef CONFIG_JBD2_DEBUG</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a><span class="co"> ushort jbd2_journal_enable_debug __read_mostly;</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a><span class="co">@@ -2993,6 +2994,11 @@ static void __journal_remove_journal_head(struct buffer_head *bh)</span></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a><span class="co">    /* Unlink before dropping the lock */</span></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>    bh<span class="op">-&gt;</span>b_private <span class="op">=</span> NULL<span class="op">;</span></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>    jh<span class="op">-&gt;</span>b_bh <span class="op">=</span> NULL<span class="op">;</span>    <span class="co">/* debug, really */</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   <span class="cf">if</span> <span class="op">(</span>strcmp<span class="op">(</span>current<span class="op">-&gt;</span>comm<span class="op">,</span> <span class="st">&quot;fallocate&quot;</span><span class="op">)</span> <span class="op">==</span> <span class="dv">0</span> <span class="op">||</span> strcmp<span class="op">(</span>current<span class="op">-&gt;</span>comm<span class="op">,</span> <span class="st">&quot;ln&quot;</span><span class="op">)</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,jh:</span><span class="sc">%p</span><span class="st">x,bh:</span><span class="sc">%p</span><span class="st">x,begin sleep...</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">,</span> jh<span class="op">,</span> bh<span class="op">);</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       mdelay<span class="op">(</span><span class="dv">10000</span><span class="op">);</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,jh:</span><span class="sc">%p</span><span class="st">x,bh:</span><span class="sc">%p</span><span class="st">x,end sleep...</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">,</span> jh<span class="op">,</span> bh<span class="op">);</span></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   <span class="op">}</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>    clear_buffer_jbd<span class="op">(</span>bh<span class="op">);</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a> <span class="op">}</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="op">--</span> </span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="fl">2.25</span><span class="er">.1</span></span></code></pre></div>
+<h2 data-number="2.2" id="fallocate-文件空洞"><span
+class="header-section-number">2.2</span> fallocate 文件空洞</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">fallocate</span> <span class="at">-l</span> 1M file</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-lh</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># total 1.0M</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># -rw-r--r--. 1 root root 1.0M Apr 21 01:14 file</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">du</span> <span class="at">-c</span> file <span class="at">-h</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1.0M  file</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1.0M  total</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">fallocate</span> <span class="at">-o</span> 0 <span class="at">-l</span> 412K <span class="at">-n</span> <span class="at">-p</span> /mnt/file</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-lh</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># total 612K</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># -rw-r--r--. 1 root root 1.0M Apr 21 01:15 file</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">du</span> <span class="at">-c</span> file <span class="at">-h</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 612K  file</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 612K  total</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="ex">fallocate</span> <span class="at">-l</span> 312K file</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-lh</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># total 924K</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># -rw-r--r--. 1 root root 1.0M Apr 21 01:15 file</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu">du</span> <span class="at">-c</span> file <span class="at">-h</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 924K  file</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 924K  total</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="ex">fallocate</span> <span class="at">-o</span> 312K <span class="at">-l</span> 50K file <span class="co"># 4K对齐,实际分配52K</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-lh</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co"># total 976K</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co"># -rw-r--r--. 1 root root 1.0M Apr 21 01:20 file</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="fu">du</span> <span class="at">-c</span> file <span class="at">-h</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 976K  file</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 976K  total</span></span></code></pre></div>
+<h2 data-number="2.3" id="常规文件-journal-模式"><span
+class="header-section-number">2.3</span> 常规文件, journal 模式</h2>
+<p>c程序:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;errno.h&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;linux/fs.h&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/ioctl.h&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/types.h&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/stat.h&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LEN </span><span class="dv">4096</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> fd<span class="op">,</span> res<span class="op">;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> buf<span class="op">[</span>LEN<span class="op">]</span> <span class="op">=</span> <span class="op">{</span><span class="dv">0</span><span class="op">};</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    fd <span class="op">=</span> open<span class="op">(</span><span class="st">&quot;/mnt/file&quot;</span><span class="op">,</span> O_RDWR<span class="op">);</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>fd <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;open fail, errno:</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> errno<span class="op">);</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> write<span class="op">(</span>fd<span class="op">,</span> buf<span class="op">,</span> LEN<span class="op">);</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>res <span class="op">!=</span> LEN<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;write fail, errno:</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> errno<span class="op">);</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;success</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext4</span> <span class="at">-F</span> <span class="at">-b</span> 4096 /dev/sda</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-o</span> data=journal /dev/sda /mnt</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> /mnt/file <span class="at">-rf</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/dev/zero of=/mnt/file oflag=sync bs=4096 count=2</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">./a.out</span> <span class="kw">&amp;</span> <span class="co"># c程序</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 0.5</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">fallocate</span> <span class="at">-o</span> 0 <span class="at">-l</span> 4096 <span class="at">-n</span> <span class="at">-p</span> /mnt/file <span class="kw">&amp;</span> <span class="co"># 可以只指定 -p</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 1</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-o</span> remount,abort /mnt</span></code></pre></div>
+<h2 data-number="2.4" id="常规文件-order-模式"><span
+class="header-section-number">2.4</span> 常规文件, order 模式</h2>
+<p>c程序:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;errno.h&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;linux/fs.h&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/ioctl.h&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/types.h&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/stat.h&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define LEN </span><span class="dv">4096</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="pp">#define EXT4_JOURNAL_DATA_FL </span><span class="bn">0x00004000</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> fd<span class="op">,</span> res<span class="op">;</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> flags <span class="op">=</span> EXT4_JOURNAL_DATA_FL<span class="op">;</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        <span class="dt">char</span> buf<span class="op">[</span>LEN<span class="op">]</span> <span class="op">=</span> <span class="op">{</span><span class="dv">0</span><span class="op">};</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        fd <span class="op">=</span> open<span class="op">(</span><span class="st">&quot;/mnt/file&quot;</span><span class="op">,</span> O_RDWR<span class="op">);</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>fd <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>                printf<span class="op">(</span><span class="st">&quot;open fail, errno:</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> errno<span class="op">);</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> ioctl<span class="op">(</span>fd<span class="op">,</span> FS_IOC_SETFLAGS<span class="op">,</span> <span class="op">&amp;</span>flags<span class="op">);</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>res <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>                printf<span class="op">(</span><span class="st">&quot;ioctl fail, errno:</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> errno<span class="op">);</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> fsync<span class="op">(</span>fd<span class="op">);</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>res <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>                printf<span class="op">(</span><span class="st">&quot;fsync fail, errno:</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> errno<span class="op">);</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> write<span class="op">(</span>fd<span class="op">,</span> buf<span class="op">,</span> LEN<span class="op">);</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>res <span class="op">!=</span> LEN<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>                printf<span class="op">(</span><span class="st">&quot;write fail, errno:</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> errno<span class="op">);</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;success</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext4</span> <span class="at">-F</span> <span class="at">-b</span> 4096 /dev/sda</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-o</span> nodelalloc /dev/sda /mnt <span class="co"># 必须要指定 nodelalloc</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> /mnt/file <span class="at">-rf</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/dev/zero of=/mnt/file bs=4096 count=2</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">./a.out</span> <span class="kw">&amp;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 0.5</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="ex">fallocate</span> <span class="at">-o</span> 0 <span class="at">-l</span> 4096 <span class="at">-n</span> <span class="at">-p</span> /mnt/file <span class="kw">&amp;</span> <span class="co"># 可以只指定 -p</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 1</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-o</span> remount,abort /mnt</span></code></pre></div>
+<h2 data-number="2.5" id="symbol-link"><span
+class="header-section-number">2.5</span> symbol link</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext4</span> <span class="at">-F</span> <span class="at">-b</span> 4096 /dev/sda</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> /dev/sda /mnt</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /mnt/123456789012345678901234567890/1234567890123456789012345678901234567890 <span class="at">-p</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> /mnt/123456789012345678901234567890/1234567890123456789012345678901234567890/file</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> /mnt/123456789012345678901234567890/1234567890123456789012345678901234567890/file /mnt/link <span class="kw">&amp;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 0.5</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-o</span> remount,abort /mnt</span></code></pre></div>
+<h1 data-number="3" id="代码分析"><span
+class="header-section-number">3</span> 代码分析</h1>
+<p>修复补丁: <a
+href="https://patchwork.ozlabs.org/project/linux-ext4/patch/20220317142137.1821590-1-yebin10@huawei.com/"><code>23e3d7f7061f jbd2: fix a potential race while discarding reserved buffers after an abort</code></a></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// mkfs.ext4 -F -b 4096 /dev/sda</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">// mount -o nodelalloc /dev/sda /mnt</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>mount</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  do_mount</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    path_mount</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      do_new_mount</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        parse_monolithic_mount_data</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>          generic_parse_monolithic</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>            vfs_parse_fs_string</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>              vfs_parse_fs_param</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                ext4_parse_param</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        vfs_get_tree</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>          ext4_get_tree</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>            get_tree_bdev</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>              ext4_fill_super</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                __ext4_fill_super</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                  <span class="co">// EXT4_SB(sb)-&gt;s_mount_opt |= EXT4_MOUNT_DELALLOC</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                  set_opt<span class="op">(</span>sb<span class="op">,</span> DELALLOC<span class="op">)</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                  ext4_apply_options</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// -o nodelalloc 挂载，在这里清除 EXT4_MOUNT_DELALLOC</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>                    sbi<span class="op">-&gt;</span>s_mount_opt <span class="op">&amp;=</span> <span class="op">~</span>ctx<span class="op">-&gt;</span>mask_s_mount_opt</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>                  ext4_load_journal</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>                    ext4_get_journal</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>                      jbd2_journal_init_inode</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>                        journal_init_common</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>                          journal<span class="op">-&gt;</span>j_flags <span class="op">|=</span> JBD2_ABORT</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">// int flags = EXT4_JOURNAL_DATA_FL</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="co">// ioctl(fd, EXT4_IOC_SETFLAGS, &amp;flags)</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>ioctl</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  do_vfs_ioctl</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    ioctl_setflags</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>      vfs_fileattr_set</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>        ext4_fileattr_set</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>          ext4_ioctl_setflags</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>            ext4_change_inode_journal_flag</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>              ext4_set_inode_flag<span class="op">(</span>inode<span class="op">,</span> EXT4_INODE_JOURNAL_DATA<span class="op">)</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>              ext4_set_aops</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>                ext4_inode_journal_mode</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>                  <span class="cf">if</span> <span class="op">(!</span>test_opt<span class="op">(</span>inode<span class="op">-&gt;</span>i_sb<span class="op">,</span> DELALLOC<span class="op">)</span> <span class="co">// delay alloc 不支持 journal 模式</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="co">// mount -o remount,abort /mnt</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>mount</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>  do_mount</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    path_mount</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>      do_remount</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>        reconfigure_super</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>          ext4_reconfigure</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>            __ext4_remount</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>              __ext4_error</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>                ext4_handle_error</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>                  jbd2_journal_abort</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>                    journal<span class="op">-&gt;</span>j_flags <span class="op">|=</span> JBD2_ABORT</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>write</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>  ksys_write</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>    vfs_write</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>      new_sync_write</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>        call_write_iter</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>          ext4_file_write_iter</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>            ext4_buffered_write_iter</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>              generic_perform_write</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>                ext4_write_begin</span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>                  ext4_should_journal_data</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>                    ext4_inode_journal_mode</span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>                      ext4_test_inode_flag<span class="op">(</span>inode<span class="op">,</span> EXT4_INODE_JOURNAL_DATA<span class="op">)</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>                  ext4_walk_page_buffers</span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>                    do_journal_get_write_access</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>                      ext4_journal_get_write_access</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>                        __ext4_journal_get_write_access</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>                          jbd2_journal_get_write_access</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>                            do_get_write_access</span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>                              __jbd2_journal_file_buffer<span class="op">(</span>jh<span class="op">,</span> transaction<span class="op">,</span> BJ_Reserved<span class="op">)</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>                ext4_journalled_write_end</span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>                  ext4_walk_page_buffers</span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>                    write_end_fn</span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>                      ext4_handle_dirty_metadata</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>                        __ext4_handle_dirty_metadata</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>                          jbd2_journal_dirty_metadata</span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>                            is_handle_aborted</span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>                              is_journal_aborted</span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>                                <span class="cf">return</span> journal<span class="op">-&gt;</span>j_flags <span class="op">&amp;</span> JBD2_ABORT</span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>                            <span class="cf">return</span> <span class="op">-</span>EROFS</span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>fallocate</span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>  ksys_fallocate</span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>    vfs_fallocate</span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>      ext4_fallocate</span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>        ext4_punch_hole</span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>          truncate_pagecache_range</span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>            truncate_inode_pages_range</span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a>              truncate_cleanup_folio</span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>                folio_invalidate</span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>                  ext4_journalled_invalidate_folio</span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a>                    __ext4_journalled_invalidate_folio</span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>                      jbd2_journal_invalidate_folio</span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>                        journal_unmap_buffer</span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>                          write_lock<span class="op">(&amp;</span>journal<span class="op">-&gt;</span>j_state_lock<span class="op">)</span></span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>                          zap_buffer<span class="op">:</span></span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>                          write_unlock<span class="op">(&amp;</span>journal<span class="op">-&gt;</span>j_state_lock<span class="op">)</span></span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>                          jbd2_journal_put_journal_head</span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>                            __journal_remove_journal_head</span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>                              jh<span class="op">-&gt;</span>b_bh <span class="op">=</span> NULL</span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>                              clear_buffer_jbd</span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>symlinkat</span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>  do_symlinkat</span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>    vfs_symlink</span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>      ext4_symlink</span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>        __page_symlink</span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>          pagecache_write_end</span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a>            ext4_journalled_write_end</span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>              ext4_walk_page_buffers</span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a>                write_end_fn</span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>                  ext4_handle_dirty_metadata</span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>                    __ext4_handle_dirty_metadata</span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>                      jbd2_journal_dirty_metadata</span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a>                        is_handle_aborted</span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>                          is_journal_aborted</span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>                            <span class="cf">return</span> journal<span class="op">-&gt;</span>j_flags <span class="op">&amp;</span> JBD2_ABORT</span>
+<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">return</span> <span class="op">-</span>EROFS</span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a>        <span class="cf">goto</span> err_drop_inode</span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>        err_drop_inode<span class="op">:</span></span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>        iput</span>
+<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>          iput_final</span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>            evict</span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a>              ext4_evict_inode</span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>                truncate_inode_pages_final</span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a>                  truncate_inode_pages</span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>                    truncate_inode_pages_range</span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a>                      truncate_cleanup_folio</span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a>                        folio_invalidate</span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a>                          ext4_journalled_invalidate_folio</span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a>                            __ext4_journalled_invalidate_folio</span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a>                              jbd2_jouranl_invalidate_folio</span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a>                                journal_unmap_buffer</span>
+<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a>                                  <span class="cf">if</span> <span class="op">(</span>transaction <span class="op">==</span> NULL<span class="op">)</span> <span class="op">{</span> <span class="co">// 条件不满足</span></span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a>                                  <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>transaction <span class="op">==</span> journal<span class="op">-&gt;</span>j_committing_transaction<span class="op">)</span> <span class="op">{</span> <span class="co">// 条件也不满足</span></span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a>                                  <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a>                                  may_free <span class="op">=</span> __dispose_buffer</span>
+<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a>                                    __jbd2_journal_unfile_buffer</span>
+<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a>                                      __jbd2_journal_temp_unlink_buffer</span>
+<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a>                                        <span class="cf">case</span> BJ_Reserved<span class="op">:</span></span>
+<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a>                                        list <span class="op">=</span> <span class="op">&amp;</span>transaction<span class="op">-&gt;</span>t_reserved_list</span>
+<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a>                                        __blist_del_buffer <span class="co">// 从 reserved 链表中删除</span></span>
+<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a>                                    jbd2_journal_put_journal_head</span>
+<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a>                                      <span class="cf">if</span> <span class="op">(!</span>jh<span class="op">-&gt;</span>b_jcount<span class="op">)</span> <span class="co">// jh-&gt;b_jcount == 1</span></span>
+<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a>                                      jbd_unlock_bh_journal_head</span>
+<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a>                                zap_buffer<span class="op">:</span></span>
+<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a>                                write_unlock<span class="op">(&amp;</span>journal<span class="op">-&gt;</span>j_state_lock<span class="op">)</span></span>
+<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a>                                jbd2_journal_put_journal_head</span>
+<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a>                                __journal_remove_journal_head</span>
+<span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a>                                  jh<span class="op">-&gt;</span>b_bh <span class="op">=</span> NULL</span>
+<span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a>                                  clear_buffer_jbd</span>
+<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a>kthread</span>
+<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a>  <span class="co">// kthread_run(kjournald2, ...)</span></span>
+<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a>  kjournald2</span>
+<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a>    jbd2_journal_commit_transaction</span>
+<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a>      <span class="cf">while</span> <span class="op">(</span>commit_transaction<span class="op">-&gt;</span>t_reserved_list<span class="op">)</span></span>
+<span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a>      jh <span class="op">=</span> commit_transaction<span class="op">-&gt;</span>t_reserved_list</span></code></pre></div>
+</body>
+</html>
