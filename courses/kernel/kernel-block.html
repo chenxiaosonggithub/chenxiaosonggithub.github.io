@@ -117,6 +117,8 @@ class="toc-section-number">1</span> 简介</a></li>
 class="toc-section-number">2</span> 缓冲区和缓冲区头</a></li>
 <li><a href="#bio" id="toc-bio"><span
 class="toc-section-number">3</span> bio</a></li>
+<li><a href="#io调试器介绍" id="toc-io调试器介绍"><span
+class="toc-section-number">4</span> I/O调试器介绍</a></li>
 </ul>
 </nav>
 <p><a
@@ -269,5 +271,13 @@ class="header-section-number">3</span> bio</h1>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">int</span>    bv_len<span class="op">;</span></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">int</span>    bv_offset<span class="op">;</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<h1 data-number="4" id="io调试器介绍"><span
+class="header-section-number">4</span> I/O调试器介绍</h1>
+<p>用于保存挂起的块I/O请求的请求队列结构体是<code>struct request_queue</code>，队列中的每项请求用<code>struct request</code>（<code>include/linux/blk-mq.h</code>）表示，每个请求可以包含多个<code>bio</code>。</p>
+<p>磁盘寻址是计算机中最慢的操作之一，为了优化，内核在将I/O请求提交给磁盘之前，会先执行合并与排序的预操作，我们将负责提交I/O请求的子系统称为I/O调度器（I/O
+Schedulers），注意有些书籍翻译成“I/O调度程序“。
+I/O调度器将磁盘I/O资源分配给挂起的块I/O请求。</p>
+<p>I/O调度器管理块设备的请求队列，减少磁盘寻址时间，提高全局吞吐量，注意提高“全局“意味着可能对某些请求不公平。</p>
+<p>合并是将多个请求结合成一个请求，原本要执行的多次磁盘寻址就变成只需要一次磁盘寻址。排序是将请求按磁盘上扇区的排列顺序尽可能的有序排列，从而让磁盘头以直线方向移动，和电梯调度类似。</p>
 </body>
 </html>
