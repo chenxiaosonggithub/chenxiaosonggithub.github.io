@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -95,48 +84,32 @@
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
 <li><a href="https://chenxiaosong.com/bili">哔哩哔哩: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程:
-chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献:
-chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">ghostwriter: 一款makdown编辑器</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#linux下源码安装" id="toc-linux下源码安装"><span
-class="toc-section-number">1</span> Linux下源码安装</a></li>
-<li><a href="#预览界面显示缺陷" id="toc-预览界面显示缺陷"><span
-class="toc-section-number">2</span> 预览界面显示缺陷</a></li>
+<li><a href="#linux下源码安装"><span class="toc-section-number">1</span> Linux下源码安装</a></li>
+<li><a href="#预览界面显示缺陷"><span class="toc-section-number">2</span> 预览界面显示缺陷</a></li>
 </ul>
 </nav>
 <p>写文档，最爽的格式就是markdown。</p>
 <p>曾经尝试过几款自由开源的markdown编辑器，但都不够理想，不是功能不完善就是缺陷多。</p>
-<p>现在我是直接在<a
-href="https://chenxiaosong.com/">自己的个人网站</a>上查看最终的显示效果，具体可以看<a
-href="https://chenxiaosong.com/src/blog-web/blog-web.html">《如何拥有个人域名的网站和邮箱》</a>。</p>
-<p>尝试的其中一款编辑器就是<a
-href="https://ghostwriter.kde.org/">KDE的ghostwriter</a>，这个markdown编辑器功能挺完善，但缺陷也不少。</p>
-<p>2021年时我解决了一个<strong>严重的预览界面显示缺陷</strong><a
-href="https://github.com/KDE/ghostwriter/pull/618/commits">Chinese
-preview in HTML is complete now. Update README.md.</a>。</p>
-<p>如果各位朋友想自己修改或增加功能，可以使用<a
-href="https://github.com/KDE/ghostwriter">github源码</a>安装。</p>
-<h1 data-number="1" id="linux下源码安装"><span
-class="header-section-number">1</span> Linux下源码安装</h1>
-<p>ghostwriter是跨平台的，在Linux、macOS、Windows下都能运行，这里我只介绍Fedora（Linux）下的编译运行，其他平台请参考<a
-href="https://github.com/KDE/ghostwriter/blob/master/README.md">README.md</a>。</p>
+<p>现在我是直接在<a href="https://chenxiaosong.com/">自己的个人网站</a>上查看最终的显示效果，具体可以看<a href="https://chenxiaosong.com/src/blog-web/blog-web.html">《如何拥有个人域名的网站和邮箱》</a>。</p>
+<p>尝试的其中一款编辑器就是<a href="https://ghostwriter.kde.org/">KDE的ghostwriter</a>，这个markdown编辑器功能挺完善，但缺陷也不少。</p>
+<p>2021年时我解决了一个<strong>严重的预览界面显示缺陷</strong><a href="https://github.com/KDE/ghostwriter/pull/618/commits">Chinese preview in HTML is complete now. Update README.md.</a>。</p>
+<p>如果各位朋友想自己修改或增加功能，可以使用<a href="https://github.com/KDE/ghostwriter">github源码</a>安装。</p>
+<h1 data-number="1" id="linux下源码安装"><span class="header-section-number">1</span> Linux下源码安装</h1>
+<p>ghostwriter是跨平台的，在Linux、macOS、Windows下都能运行，这里我只介绍Fedora（Linux）下的编译运行，其他平台请参考<a href="https://github.com/KDE/ghostwriter/blob/master/README.md">README.md</a>。</p>
 <p>先安装Fedora下编译所需的软件:</p>
 <pre class="shell"><code>sudo dnf install qt-devel qt5-qtbase-devel qt5-qtsvg-devel qt5-qtmultimedia-devel qt5-qtwebengine-devel hunspell-devel qt5-linguist -y</code></pre>
-<p>在<a
-href="https://github.com/KDE/ghostwriter">源码</a>目录下编译:</p>
+<p>在<a href="https://github.com/KDE/ghostwriter">源码</a>目录下编译:</p>
 <pre class="shell"><code>qmake-qt5
 make
 # 安装命令可不执行
@@ -145,24 +118,18 @@ make
 <pre class="shell"><code>cd build/release/
 ./ghostwriter</code></pre>
 <p>这个软件曾经用着感觉还行。</p>
-<h1 data-number="2" id="预览界面显示缺陷"><span
-class="header-section-number">2</span> 预览界面显示缺陷</h1>
-<p>2021年6月刚用ghostwriter时，一个很明显的预览界面显示缺陷摆在我面前:
-预览界面中文显示不完整，刚开始想放弃这个软件，但又觉得其他功能挺完善的，最后还是决定自己解决缺陷。</p>
+<h1 data-number="2" id="预览界面显示缺陷"><span class="header-section-number">2</span> 预览界面显示缺陷</h1>
+<p>2021年6月刚用ghostwriter时，一个很明显的预览界面显示缺陷摆在我面前: 预览界面中文显示不完整，刚开始想放弃这个软件，但又觉得其他功能挺完善的，最后还是决定自己解决缺陷。</p>
 <p>现在把这个缺陷介绍一下，也希望各位朋友能和我一起完善ghostwriter。</p>
-<p>导致这个缺陷的<a
-href="https://github.com/KDE/ghostwriter/commit/795de8ba2b3717e23543170c40f2dd2379530a33">commit</a>:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/cmarkgfmapi.cpp</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">-</span>    cmark_parser_feed<span class="op">(</span>parser<span class="op">,</span> text<span class="op">.</span>toLatin1<span class="op">().</span>data<span class="op">(),</span> text<span class="op">.</span>length<span class="op">());</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>    cmark_parser_feed<span class="op">(</span>parser<span class="op">,</span> text<span class="op">.</span>toUtf8<span class="op">().</span>data<span class="op">(),</span> text<span class="op">.</span>length<span class="op">());</span></span></code></pre></div>
+<p>导致这个缺陷的<a href="https://github.com/KDE/ghostwriter/commit/795de8ba2b3717e23543170c40f2dd2379530a33">commit</a>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co">// src/cmarkgfmapi.cpp</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>-    cmark_parser_feed(parser, text.toLatin1().data(), text.length());</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>+    cmark_parser_feed(parser, text.toUtf8().data(), text.length());</span></code></pre></div>
 <p>定位到这个原因后，我修改成如下代码:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/cmarkgfmapi.cpp</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>cmark_parser_feed<span class="op">(</span>parser<span class="op">,</span> text<span class="op">.</span>toLatin1<span class="op">().</span>data<span class="op">(),</span> text<span class="op">.</span>toLocal8Bit<span class="op">().</span>length<span class="op">());</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co">// src/cmarkgfmapi.cpp</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>cmark_parser_feed(parser, text.toLatin1().data(), text.toLocal8Bit().length());</span></code></pre></div>
 <p>中文是Unicode编码，一个汉字占2个字节，而<code>QString.length()</code>一个汉字只当成一个字节，需要修改成<code>QString.toLocal8Bit().length()</code>。</p>
-<p>我的修改方案是<a
-href="https://github.com/KDE/ghostwriter/pull/618/commits">Chinese
-preview in HTML is complete now. Update
-README.md.</a>，lioneie是我曾经的签名。</p>
+<p>我的修改方案是<a href="https://github.com/KDE/ghostwriter/pull/618/commits">Chinese preview in HTML is complete now. Update README.md.</a>，lioneie是我曾经的签名。</p>
 <p>你没看错，就是这么容易解决，参与到自由软件就是这么简单，参与到开源软件就是这么简单。</p>
 </body>
 </html>
