@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -84,194 +95,229 @@
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
 <li><a href="https://chenxiaosong.com/bili">哔哩哔哩: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程:
+chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献:
+chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">文件系统延迟卸载</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#描述"><span class="toc-section-number">1</span> 描述</a></li>
-<li><a href="#调试"><span class="toc-section-number">2</span> 调试</a>
+<li><a href="#描述" id="toc-描述"><span
+class="toc-section-number">1</span> 描述</a></li>
+<li><a href="#调试" id="toc-调试"><span
+class="toc-section-number">2</span> 调试</a>
 <ul>
-<li><a href="#未执行umount---lazy"><span class="toc-section-number">2.1</span> 未执行<code>umount --lazy</code></a></li>
-<li><a href="#执行umount---lazy后"><span class="toc-section-number">2.2</span> 执行<code>umount --lazy</code>后</a></li>
+<li><a href="#未执行umount---lazy" id="toc-未执行umount---lazy"><span
+class="toc-section-number">2.1</span>
+未执行<code>umount --lazy</code></a></li>
+<li><a href="#执行umount---lazy后" id="toc-执行umount---lazy后"><span
+class="toc-section-number">2.2</span>
+执行<code>umount --lazy</code>后</a></li>
 </ul></li>
-<li><a href="#代码分析"><span class="toc-section-number">3</span> 代码分析</a></li>
-<li><a href="#openeuler-overlayfs"><span class="toc-section-number">4</span> openeuler overlayfs</a>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">3</span> 代码分析</a></li>
+<li><a href="#openeuler-overlayfs" id="toc-openeuler-overlayfs"><span
+class="toc-section-number">4</span> openeuler overlayfs</a>
 <ul>
-<li><a href="#使用"><span class="toc-section-number">4.1</span> 使用</a></li>
-<li><a href="#代码分析-1"><span class="toc-section-number">4.2</span> 代码分析</a></li>
+<li><a href="#使用" id="toc-使用"><span
+class="toc-section-number">4.1</span> 使用</a></li>
+<li><a href="#代码分析-1" id="toc-代码分析-1"><span
+class="toc-section-number">4.2</span> 代码分析</a></li>
 </ul></li>
 </ul>
 </nav>
-<h1 data-number="1" id="描述"><span class="header-section-number">1</span> 描述</h1>
+<h1 data-number="1" id="描述"><span
+class="header-section-number">1</span> 描述</h1>
 <p>执行以下命令:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">mkfs.ext2</span> -F /dev/sda</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="fu">mount</span> -t ext2 /dev/sda /mnt</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="bu">cd</span> /mnt <span class="kw">&amp;&amp;</span> <span class="ex">vim</span> file</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="fu">umount</span> --lazy /mnt</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co"># 这时无法执行mkfs</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="ex">mkfs.ext2</span> -F /dev/sda # /dev/sda is apparently in use by the system<span class="kw">;</span> <span class="ex">will</span> not make a filesystem here!</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext2</span> <span class="at">-F</span> /dev/sda</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> ext2 /dev/sda /mnt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /mnt <span class="kw">&amp;&amp;</span> <span class="ex">vim</span> file</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> <span class="at">--lazy</span> /mnt</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 这时无法执行mkfs</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext2</span> <span class="at">-F</span> /dev/sda <span class="co"># /dev/sda is apparently in use by the system; will not make a filesystem here!</span></span></code></pre></div>
 <p>这时，通用的一些命令如<code>df</code>、<code>mount</code>等看不到挂载实例，也无法看到哪些进程正在使用挂载点。</p>
-<h1 data-number="2" id="调试"><span class="header-section-number">2</span> 调试</h1>
+<h1 data-number="2" id="调试"><span
+class="header-section-number">2</span> 调试</h1>
 <p>通过命令<code>strace -o strace.txt -f -v -s 4096 df</code>和<code>strace -o strace.txt -f -v -s 4096 mount</code>可以知道，<code>df</code>、<code>mount</code>命令都是读取<code>/proc/self/mountinfo</code>文件。</p>
 <p>以下命令查询进程:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co"># +D：递归地列出指定目录下所有打开的文件</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">lsof</span> +D /mnt # List Open Files</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co"># -m：表示查询挂载点（而不仅仅是某个文件）</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="fu">fuser</span> -mv /mnt <span class="co"># file user, 显示哪些进程正在访问特定文件、目录或文件系统</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># +D：递归地列出指定目录下所有打开的文件</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">lsof</span> +D /mnt <span class="co"># List Open Files</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -m：表示查询挂载点（而不仅仅是某个文件）</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fuser</span> <span class="at">-mv</span> /mnt <span class="co"># file user, 显示哪些进程正在访问特定文件、目录或文件系统</span></span></code></pre></div>
 <p>正常<code>umount</code>的系统调用:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">umount2</span>(<span class="st">&quot;/mnt&quot;</span>, 0)       = <span class="ex">0</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">umount2</span><span class="er">(</span><span class="st">&quot;/mnt&quot;</span><span class="ex">,</span> 0<span class="kw">)</span>       <span class="ex">=</span> 0</span></code></pre></div>
 <p><code>umount --lazy</code>的系统调用:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">umount2</span>(<span class="st">&quot;/mnt&quot;</span>, MNT_DETACH)       = <span class="ex">0</span></span></code></pre></div>
-<h2 data-number="2.1" id="未执行umount---lazy"><span class="header-section-number">2.1</span> 未执行<code>umount --lazy</code></h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">umount2</span><span class="er">(</span><span class="st">&quot;/mnt&quot;</span><span class="ex">,</span> MNT_DETACH<span class="kw">)</span>       <span class="ex">=</span> 0</span></code></pre></div>
+<h2 data-number="2.1" id="未执行umount---lazy"><span
+class="header-section-number">2.1</span>
+未执行<code>umount --lazy</code></h2>
 <p><code>lsof +D /mnt</code>输出如下:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">COMMAND</span>  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="fu">bash</span>    2924 root  cwd    DIR    7,0     1024    2 /mnt</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">vim</span>     3038 root  cwd    DIR    7,0     1024    2 /mnt</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="ex">vim</span>     3038 root    3u   REG    7,0    12288   15 /mnt/.file.swm</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">COMMAND</span>  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span>    2924 root  cwd    DIR    7,0     1024    2 /mnt</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span>     3038 root  cwd    DIR    7,0     1024    2 /mnt</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span>     3038 root    3u   REG    7,0    12288   15 /mnt/.file.swm</span></code></pre></div>
 <p>通过<code>strace</code>命令可知，这些输出是通过以下方式获取:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="fu">ls</span> /proc/2924/cwd -lh <span class="co"># /proc/2924/cwd -&gt; /mnt</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="fu">ls</span> /proc/3038/cwd -lh <span class="co"># /proc/3038/cwd -&gt; /mnt</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="fu">ls</span> /proc/3038/fd/3 -lh <span class="co"># 3 -&gt; /mnt/.file.swm</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /proc/2924/cwd <span class="at">-lh</span> <span class="co"># /proc/2924/cwd -&gt; /mnt</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /proc/3038/cwd <span class="at">-lh</span> <span class="co"># /proc/3038/cwd -&gt; /mnt</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /proc/3038/fd/3 <span class="at">-lh</span> <span class="co"># 3 -&gt; /mnt/.file.swm</span></span></code></pre></div>
 <p><code>fuser -mv /mnt</code>输出如下:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>                     <span class="ex">USER</span>        PID ACCESS COMMAND</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>/mnt:                <span class="ex">root</span>     kernel mount /mnt</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>                     <span class="ex">root</span>       2924 ..c.. bash</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>                     <span class="ex">root</span>       3038 F.c.. vim</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>                     <span class="ex">USER</span>        PID ACCESS COMMAND</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/mnt:</span>                root     kernel mount /mnt</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                     <span class="ex">root</span>       2924 ..c.. bash</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                     <span class="ex">root</span>       3038 F.c.. vim</span></code></pre></div>
 <p>通过<code>strace</code>命令可知，这些输出是通过以下方式获取:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="fu">cat</span> /proc/mounts</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="ex">statx</span>(0, <span class="st">&quot;/mnt&quot;</span>, ..., stx_mnt_id=0x46}) = <span class="ex">0</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="ex">statx</span>(0, <span class="st">&quot;/proc/2924/cwd&quot;</span>, ..., stx_mnt_id=0x46}) = <span class="ex">0</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="ex">statx</span>(0, <span class="st">&quot;/proc/3038/cwd&quot;</span>, ..., stx_mnt_id=0x46}) = <span class="ex">0</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="ex">statx</span>(0, <span class="st">&quot;/proc/3038/fd/3&quot;</span>, ..., stx_mnt_id=0x46}) = <span class="ex">0</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a><span class="fu">ls</span> /proc/3038/fd/3 -lh <span class="co"># 3 -&gt; /mnt/.file.swm</span></span></code></pre></div>
-<h2 data-number="2.2" id="执行umount---lazy后"><span class="header-section-number">2.2</span> 执行<code>umount --lazy</code>后</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="fu">ls</span> /proc/2924/cwd -lh <span class="co"># /proc/2924/cwd -&gt; /</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="fu">ls</span> /proc/3038/cwd -lh <span class="co"># /proc/3038/cwd -&gt; / , 如果是在/mnt/dir/下打开文件file，则指向/dir</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="fu">ls</span> /proc/3038/fd/3 -lh <span class="co"># /proc/3038/fd/3 -&gt; /.file.swm</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="fu">cat</span> /proc/mounts</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="ex">statx</span>(0, <span class="st">&quot;/&quot;</span>, ..., stx_mnt_id=0x16}) = <span class="ex">0</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="ex">statx</span>(0, <span class="st">&quot;/mnt&quot;</span>, ..., stx_mnt_id=0x16}) = <span class="ex">0</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="ex">statx</span>(0, <span class="st">&quot;/proc/2924/cwd&quot;</span>, ..., stx_mnt_id=0x46}) = <span class="ex">0</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="ex">statx</span>(0, <span class="st">&quot;/proc/3038/cwd&quot;</span>, ..., stx_mnt_id=0x46}) = <span class="ex">0</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="ex">statx</span>(0, <span class="st">&quot;/proc/3038/fd/3&quot;</span>, ..., stx_mnt_id=0x46}) = <span class="ex">0</span></span></code></pre></div>
-<h1 data-number="3" id="代码分析"><span class="header-section-number">3</span> 代码分析</h1>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/mounts</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">statx</span><span class="er">(</span><span class="ex">0,</span> <span class="st">&quot;/mnt&quot;</span>, ..., stx_mnt_id=0x46}<span class="kw">)</span> <span class="ex">=</span> 0</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">statx</span><span class="er">(</span><span class="ex">0,</span> <span class="st">&quot;/proc/2924/cwd&quot;</span>, ..., stx_mnt_id=0x46}<span class="kw">)</span> <span class="ex">=</span> 0</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">statx</span><span class="er">(</span><span class="ex">0,</span> <span class="st">&quot;/proc/3038/cwd&quot;</span>, ..., stx_mnt_id=0x46}<span class="kw">)</span> <span class="ex">=</span> 0</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">statx</span><span class="er">(</span><span class="ex">0,</span> <span class="st">&quot;/proc/3038/fd/3&quot;</span>, ..., stx_mnt_id=0x46}<span class="kw">)</span> <span class="ex">=</span> 0</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /proc/3038/fd/3 <span class="at">-lh</span> <span class="co"># 3 -&gt; /mnt/.file.swm</span></span></code></pre></div>
+<h2 data-number="2.2" id="执行umount---lazy后"><span
+class="header-section-number">2.2</span>
+执行<code>umount --lazy</code>后</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /proc/2924/cwd <span class="at">-lh</span> <span class="co"># /proc/2924/cwd -&gt; /</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /proc/3038/cwd <span class="at">-lh</span> <span class="co"># /proc/3038/cwd -&gt; / , 如果是在/mnt/dir/下打开文件file，则指向/dir</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /proc/3038/fd/3 <span class="at">-lh</span> <span class="co"># /proc/3038/fd/3 -&gt; /.file.swm</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/mounts</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">statx</span><span class="er">(</span><span class="ex">0,</span> <span class="st">&quot;/&quot;</span>, ..., stx_mnt_id=0x16}<span class="kw">)</span> <span class="ex">=</span> 0</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">statx</span><span class="er">(</span><span class="ex">0,</span> <span class="st">&quot;/mnt&quot;</span>, ..., stx_mnt_id=0x16}<span class="kw">)</span> <span class="ex">=</span> 0</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ex">statx</span><span class="er">(</span><span class="ex">0,</span> <span class="st">&quot;/proc/2924/cwd&quot;</span>, ..., stx_mnt_id=0x46}<span class="kw">)</span> <span class="ex">=</span> 0</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">statx</span><span class="er">(</span><span class="ex">0,</span> <span class="st">&quot;/proc/3038/cwd&quot;</span>, ..., stx_mnt_id=0x46}<span class="kw">)</span> <span class="ex">=</span> 0</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ex">statx</span><span class="er">(</span><span class="ex">0,</span> <span class="st">&quot;/proc/3038/fd/3&quot;</span>, ..., stx_mnt_id=0x46}<span class="kw">)</span> <span class="ex">=</span> 0</span></code></pre></div>
+<h1 data-number="3" id="代码分析"><span
+class="header-section-number">3</span> 代码分析</h1>
 <p>打开<code>/proc/self/mountinfo</code>和<code>/proc/mounts</code>涉及的函数:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>mountinfo_open</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>  mounts_open_common</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>    p-&gt;show = show_mountinfo</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a>      seq_printf(m, <span class="st">&quot;%i %i %u:%u &quot;</span>, r-&gt;mnt_id, ...</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>mounts_open</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a>  mounts_open_common</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true"></a>    p-&gt;show = show_vfsmnt</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mountinfo_open</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  mounts_open_common</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    p<span class="op">-&gt;</span>show <span class="op">=</span> show_mountinfo</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      seq_printf<span class="op">(</span>m<span class="op">,</span> <span class="st">&quot;</span><span class="sc">%i</span><span class="st"> </span><span class="sc">%i</span><span class="st"> </span><span class="sc">%u</span><span class="st">:</span><span class="sc">%u</span><span class="st"> &quot;</span><span class="op">,</span> r<span class="op">-&gt;</span>mnt_id<span class="op">,</span> <span class="op">...</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>mounts_open</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  mounts_open_common</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    p<span class="op">-&gt;</span>show <span class="op">=</span> show_vfsmnt</span></code></pre></div>
 <p>读取内容时都涉及到<code>struct seq_operations mounts_op</code>。</p>
 <p><code>ls /proc/5718/cwd -lh</code>的流程:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>do_readlinkat</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a>  vfs_readlink</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a>    proc_pid_readlink</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a>      proc_cwd_link</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>do_readlinkat</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  vfs_readlink</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    proc_pid_readlink</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>      proc_cwd_link</span></code></pre></div>
 <p>正常<code>umount</code>流程:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a>ksys_umount</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a>  path_umount</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a>    do_umount</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a>      <span class="cf">if</span> (flags &amp; MNT_DETACH) <span class="co">// 条件不满足</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a>      propagate_mount_busy <span class="co">// 如果挂载点正在被使用，在这里拦截，umount_tree()不执行</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a>      umount_tree(mnt, UMOUNT_PROPAGATE|UMOUNT_SYNC)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ksys_umount</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  path_umount</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    do_umount</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>flags <span class="op">&amp;</span> MNT_DETACH<span class="op">)</span> <span class="co">// 条件不满足</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>      propagate_mount_busy <span class="co">// 如果挂载点正在被使用，在这里拦截，umount_tree()不执行</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>      umount_tree<span class="op">(</span>mnt<span class="op">,</span> UMOUNT_PROPAGATE<span class="op">|</span>UMOUNT_SYNC<span class="op">)</span></span></code></pre></div>
 <p><code>umount --lazy</code>流程:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a>ksys_umount</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a>  path_umount</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a>    do_umount</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a>      <span class="cf">if</span> (flags &amp; MNT_DETACH) <span class="co">// 条件满足</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a>      umount_tree(mnt, UMOUNT_PROPAGATE)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true"></a>        <span class="co">// move_from_ns()使用gdb调试时，要去掉inline，否则无法进断点</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true"></a>        move_from_ns <span class="co">// 从红黑树中删除</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ksys_umount</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  path_umount</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    do_umount</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>flags <span class="op">&amp;</span> MNT_DETACH<span class="op">)</span> <span class="co">// 条件满足</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>      umount_tree<span class="op">(</span>mnt<span class="op">,</span> UMOUNT_PROPAGATE<span class="op">)</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">// move_from_ns()使用gdb调试时，要去掉inline，否则无法进断点</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        move_from_ns <span class="co">// 从红黑树中删除</span></span></code></pre></div>
 <p>真正卸载流程:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a>__cleanup_mnt</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>  cleanup_mnt</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>    deactivate_super</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a>      deactivate_locked_super</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a>        ext4_kill_sb <span class="co">// 具体文件系统</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a>    mnt_free_id <span class="co">// 释放mnt_id</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>__cleanup_mnt</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  cleanup_mnt</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    deactivate_super</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>      deactivate_locked_super</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        ext4_kill_sb <span class="co">// 具体文件系统</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    mnt_free_id <span class="co">// 释放mnt_id</span></span></code></pre></div>
 <p>挂载加到红黑树的流程:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a>fsmount</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a>  vfs_create_mount</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a>    alloc_vfsmnt</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a>      mnt_alloc_id <span class="co">// 分配mnt_id</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a>  mnt_add_to_ns</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a>move_mount</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true"></a>  do_move_mount</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true"></a>    attach_recursive_mnt</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true"></a>      commit_tree</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true"></a>        mnt_add_to_ns <span class="co">// 加到红黑树中</span></span></code></pre></div>
-<h1 data-number="4" id="openeuler-overlayfs"><span class="header-section-number">4</span> openeuler overlayfs</h1>
+<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fsmount</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  vfs_create_mount</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    alloc_vfsmnt</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>      mnt_alloc_id <span class="co">// 分配mnt_id</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  mnt_add_to_ns</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>move_mount</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  do_move_mount</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    attach_recursive_mnt</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>      commit_tree</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        mnt_add_to_ns <span class="co">// 加到红黑树中</span></span></code></pre></div>
+<h1 data-number="4" id="openeuler-overlayfs"><span
+class="header-section-number">4</span> openeuler overlayfs</h1>
 <ul>
-<li>TODO: 挂载第二次时，<code>ovl_free_fs() -&gt; wait_for_completion()</code>发生空指针解引用</li>
-<li><a href="https://summer-ospp.ac.cn/2022/#/org/prodetail/22b970207">overlayfs 添加sysfs文件显示载挂载信息</a></li>
-<li><a href="https://gitee.com/openeuler/kernel/issues/I5WIS5">issue</a></li>
-<li><a href="https://gitee.com/openeuler/kernel/pulls/149/commits"><code>a5c8655cfb97 overlayfs: add sysfs file for OverlayFS</code></a></li>
+<li>TODO:
+挂载第二次时，<code>ovl_free_fs() -&gt; wait_for_completion()</code>发生空指针解引用</li>
+<li><a
+href="https://summer-ospp.ac.cn/2022/#/org/prodetail/22b970207">overlayfs
+添加sysfs文件显示载挂载信息</a></li>
+<li><a
+href="https://gitee.com/openeuler/kernel/issues/I5WIS5">issue</a></li>
+<li><a
+href="https://gitee.com/openeuler/kernel/pulls/149/commits"><code>a5c8655cfb97 overlayfs: add sysfs file for OverlayFS</code></a></li>
 </ul>
 <p><code>openEuler-22.09</code>分支要回退<code>c1ad2f078e89 sign-file: Support SM signature</code>，还需要关闭配置<code>CONFIG_DEBUG_INFO_BTF</code>。</p>
-<h2 data-number="4.1" id="使用"><span class="header-section-number">4.1</span> 使用</h2>
+<h2 data-number="4.1" id="使用"><span
+class="header-section-number">4.1</span> 使用</h2>
 <p>overlayfs我以前没用过，先看看怎么使用:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="fu">mkdir</span> /mnt/lower <span class="co"># 存放只读数据</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a><span class="fu">mkdir</span> /mnt/upper <span class="co"># 存放可写数据。</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a><span class="fu">mkdir</span> /mnt/work  # 用于存储合并过程中的元数据</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a><span class="fu">mkdir</span> /mnt/merged <span class="co"># 合并后的结果挂载点</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a><span class="fu">mount</span> -t overlay ovl-name -o lowerdir=/mnt/lower,upperdir=/mnt/upper,workdir=/mnt/work /mnt/merged</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&quot;This is a file in lower&quot;</span> <span class="op">&gt;</span> /mnt/lower/lower_file.txt</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&quot;This is a file in upper&quot;</span> <span class="op">&gt;</span> /mnt/upper/upper_file.txt</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true"></a><span class="fu">ls</span> /mnt/merged</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&quot;Lower file is changed in merged&quot;</span> <span class="op">&gt;</span> /mnt/merged/lower_file.txt</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true"></a><span class="fu">cat</span> /mnt/lower/lower_file.txt <span class="co"># 没变</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true"></a><span class="fu">cat</span> /mnt/merged/lower_file.txt <span class="co"># 变了</span></span></code></pre></div>
-<p>再来看<a href="https://gitee.com/openeuler/kernel/issues/I5WIS5">overlayfs 添加sysfs文件显示载挂载信息</a>的测试:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="ex">tree</span> /sys/fs/overlayfs/</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a><span class="co"># /sys/fs/overlayfs/</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a><span class="co"># └── merge_0_36</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a><span class="co">#     ├── lower</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a><span class="co">#     ├── merge</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true"></a><span class="co">#     ├── upper</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true"></a><span class="co">#     └── work</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true"></a><span class="fu">cat</span> /sys/fs/overlayfs/merge_0_36/lower <span class="co"># /mnt/lower</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true"></a><span class="fu">cat</span> /sys/fs/overlayfs/merge_0_36/upper <span class="co"># /mnt/upper</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true"></a><span class="fu">cat</span> /sys/fs/overlayfs/merge_0_36/work <span class="co"># /mnt/work</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true"></a><span class="fu">cat</span> /sys/fs/overlayfs/merge_0_36/merge <span class="co"># /mnt/merged</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true"></a><span class="bu">cd</span> /mnt/merged</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true"></a><span class="fu">umount</span> --lazy /mnt/merged</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true"></a><span class="ex">tree</span> /sys/fs/overlayfs/ # 还能看到和原来一样的输出</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true"></a><span class="bu">cd</span></span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true"></a><span class="ex">tree</span> /sys/fs/overlayfs/ # 已经看不到输出</span></code></pre></div>
-<h2 data-number="4.2" id="代码分析-1"><span class="header-section-number">4.2</span> 代码分析</h2>
-<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a>mount</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a>  do_mount</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a>    path_mount</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true"></a>      do_new_mount</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true"></a>        ovl_mount_end</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true"></a>          ovl_register_sysfs</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true"></a>          ovl_mergedir_backup</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true"></a></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true"></a>__cleanup_mnt</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true"></a>  cleanup_mnt</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true"></a>    deactivate_super</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true"></a>      deactivate_locked_super</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true"></a>        kill_anon_super</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true"></a>          generic_shutdown_super</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true"></a>            ovl_put_super</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true"></a>              ovl_free_fs</span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true"></a>                kobject_put</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true"></a>                  kref_put</span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true"></a>                    kobject_release</span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true"></a>                      kobject_cleanup</span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true"></a>                        ovl_kobj_release</span>
-<span id="cb19-22"><a href="#cb19-22" aria-hidden="true"></a>                          complete(&amp;ofs-&gt;kobj_unregister)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /mnt/lower <span class="co"># 存放只读数据</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /mnt/upper <span class="co"># 存放可写数据。</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /mnt/work  <span class="co"># 用于存储合并过程中的元数据</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /mnt/merged <span class="co"># 合并后的结果挂载点</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> overlay ovl-name <span class="at">-o</span> lowerdir=/mnt/lower,upperdir=/mnt/upper,workdir=/mnt/work /mnt/merged</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;This is a file in lower&quot;</span> <span class="op">&gt;</span> /mnt/lower/lower_file.txt</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;This is a file in upper&quot;</span> <span class="op">&gt;</span> /mnt/upper/upper_file.txt</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /mnt/merged</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Lower file is changed in merged&quot;</span> <span class="op">&gt;</span> /mnt/merged/lower_file.txt</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /mnt/lower/lower_file.txt <span class="co"># 没变</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /mnt/merged/lower_file.txt <span class="co"># 变了</span></span></code></pre></div>
+<p>再来看<a
+href="https://gitee.com/openeuler/kernel/issues/I5WIS5">overlayfs
+添加sysfs文件显示载挂载信息</a>的测试:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> /sys/fs/overlayfs/</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># /sys/fs/overlayfs/</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># └── merge_0_36</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     ├── lower</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     ├── merge</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     ├── upper</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#     └── work</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /sys/fs/overlayfs/merge_0_36/lower <span class="co"># /mnt/lower</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /sys/fs/overlayfs/merge_0_36/upper <span class="co"># /mnt/upper</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /sys/fs/overlayfs/merge_0_36/work <span class="co"># /mnt/work</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /sys/fs/overlayfs/merge_0_36/merge <span class="co"># /mnt/merged</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /mnt/merged</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> <span class="at">--lazy</span> /mnt/merged</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> /sys/fs/overlayfs/ <span class="co"># 还能看到和原来一样的输出</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> /sys/fs/overlayfs/ <span class="co"># 已经看不到输出</span></span></code></pre></div>
+<h2 data-number="4.2" id="代码分析-1"><span
+class="header-section-number">4.2</span> 代码分析</h2>
+<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mount</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  do_mount</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    path_mount</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>      do_new_mount</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>        ovl_mount_end</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>          ovl_register_sysfs</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>          ovl_mergedir_backup</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>__cleanup_mnt</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  cleanup_mnt</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    deactivate_super</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>      deactivate_locked_super</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>        kill_anon_super</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>          generic_shutdown_super</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>            ovl_put_super</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>              ovl_free_fs</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>                kobject_put</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>                  kref_put</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>                    kobject_release</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>                      kobject_cleanup</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>                        ovl_kobj_release</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>                          complete<span class="op">(&amp;</span>ofs<span class="op">-&gt;</span>kobj_unregister<span class="op">)</span></span></code></pre></div>
 </body>
 </html>

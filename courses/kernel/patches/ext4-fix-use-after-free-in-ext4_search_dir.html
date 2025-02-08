@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -84,182 +95,199 @@
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
 <li><a href="https://chenxiaosong.com/bili">哔哩哔哩: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程:
+chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献:
+chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
-<h1 class="title">c186f0887fe7 ext4: fix use-after-free in ext4_search_dir</h1>
+<h1 class="title">c186f0887fe7 ext4: fix use-after-free in
+ext4_search_dir</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#复现"><span class="toc-section-number">2</span> 复现</a></li>
-<li><a href="#代码分析"><span class="toc-section-number">3</span> 代码分析</a></li>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#复现" id="toc-复现"><span
+class="toc-section-number">2</span> 复现</a></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">3</span> 代码分析</a></li>
 </ul>
 </nav>
-<p><a href="https://www.bilibili.com/video/BV15C411E7Sm/">点击这里在哔哩哔哩bilibili在线观看配套的教学视频</a>。</p>
-<p><a href="https://www.bilibili.com/video/BV1Tx4y187vg/">点击这里在哔哩哔哩bilibili在线观看配套的加餐视频（就是一些补充）</a>。</p>
-<p><a href="https://chenxiaosong.com/courses/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
-<p><a href="https://lore.kernel.org/all/20220324064816.1209985-1-yebin10@huawei.com/"><code>c186f0887fe7 ext4: fix use-after-free in ext4_search_dir</code></a></p>
-<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">EXT4-fs</span> (loop0)<span class="bu">:</span> mounted filesystem without journal. Opts: ,errors=continue</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>==================================================================</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ex">BUG</span>: KASAN: use-after-free in ext4_search_dir fs/ext4/namei.c:1394 [inline]</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="ex">BUG</span>: KASAN: use-after-free in search_dirblock fs/ext4/namei.c:1199 [inline]</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ex">BUG</span>: KASAN: use-after-free in __ext4_find_entry+0xdca/0x1210 fs/ext4/namei.c:1553</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="ex">Read</span> of size 1 at addr ffff8881317c3005 by task syz-executor117/2331</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="ex">CPU</span>: 1 PID: 2331 Comm: syz-executor117 Not tainted 5.10.0+ #1</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="ex">Hardware</span> name: QEMU Standard PC (i440FX + PIIX, 1996), <span class="ex">BIOS</span> rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="ex">Call</span> Trace:</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a> <span class="ex">__dump_stack</span> lib/dump_stack.c:83 [inline]</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a> <span class="ex">dump_stack+0x144/0x187</span> lib/dump_stack.c:124</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a> <span class="ex">print_address_description+0x7d/0x630</span> mm/kasan/report.c:387</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a> <span class="ex">__kasan_report+0x132/0x190</span> mm/kasan/report.c:547</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a> <span class="ex">kasan_report+0x47/0x60</span> mm/kasan/report.c:564</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a> <span class="ex">ext4_search_dir</span> fs/ext4/namei.c:1394 [inline]</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a> <span class="ex">search_dirblock</span> fs/ext4/namei.c:1199 [inline]</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a> <span class="ex">__ext4_find_entry+0xdca/0x1210</span> fs/ext4/namei.c:1553</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a> <span class="ex">ext4_lookup_entry</span> fs/ext4/namei.c:1622 [inline]</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a> <span class="ex">ext4_lookup+0xb8/0x3a0</span> fs/ext4/namei.c:1690</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a> <span class="ex">__lookup_hash+0xc5/0x190</span> fs/namei.c:1451</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a> <span class="ex">do_rmdir+0x19e/0x310</span> fs/namei.c:3760</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a> <span class="ex">do_syscall_64+0x33/0x40</span> arch/x86/entry/common.c:46</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a> <span class="ex">entry_SYSCALL_64_after_hwframe+0x44/0xa9</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a><span class="ex">RIP</span>: 0033:0x445e59</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a><span class="ex">Code</span>: 4d c7 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <span class="op">&lt;48&gt;</span> 3d 01 f0 ff ff 0f 83 1b c7 fb ff c3 66 2e 0f 1f 84 00 00 00 00</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a><span class="ex">RSP</span>: 002b:00007fff2277fac8 EFLAGS: 00000246 ORIG_RAX: 0000000000000054</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a><span class="ex">RAX</span>: ffffffffffffffda RBX: 0000000000400280 RCX: 0000000000445e59</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a><span class="ex">RDX</span>: 0000000000000000 RSI: 0000000000000000 RDI: 00000000200000c0</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a><span class="ex">RBP</span>: 0000000000000000 R08: 0000000000000000 R09: 0000000000000002</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a><span class="ex">R10</span>: 00007fff2277f990 R11: 0000000000000246 R12: 0000000000000000</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a><span class="ex">R13</span>: 431bde82d7b634db R14: 0000000000000000 R15: 0000000000000000</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a><span class="ex">The</span> buggy address belongs to the page:</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a><span class="ex">page</span>:0000000048cd3304 refcount:0 mapcount:0 mapping:0000000000000000 index:0x1 pfn:0x1317c3</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a><span class="ex">flags</span>: 0x200000000000000()</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a><span class="ex">raw</span>: 0200000000000000 ffffea0004526588 ffffea0004528088 0000000000000000</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a><span class="ex">raw</span>: 0000000000000001 0000000000000000 00000000ffffffff 0000000000000000</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a><span class="ex">page</span> dumped because: kasan: bad access detected</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a><span class="ex">Memory</span> state around the buggy address:</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a> <span class="ex">ffff8881317c2f00</span>: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a> <span class="ex">ffff8881317c2f80</span>: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a><span class="op">&gt;</span><span class="ex">ffff8881317c3000</span>: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>                   ^</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a> <span class="ex">ffff8881317c3080</span>: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a> <span class="ex">ffff8881317c3100</span>: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a>==================================================================</span></code></pre></div>
-<h1 data-number="2" id="复现"><span class="header-section-number">2</span> 复现</h1>
+<p><a
+href="https://www.bilibili.com/video/BV15C411E7Sm/">点击这里在哔哩哔哩bilibili在线观看配套的教学视频</a>。</p>
+<p><a
+href="https://www.bilibili.com/video/BV1Tx4y187vg/">点击这里在哔哩哔哩bilibili在线观看配套的加餐视频（就是一些补充）</a>。</p>
+<p><a
+href="https://chenxiaosong.com/courses/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a
+href="https://lore.kernel.org/all/20220324064816.1209985-1-yebin10@huawei.com/"><code>c186f0887fe7 ext4: fix use-after-free in ext4_search_dir</code></a></p>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">EXT4-fs</span> <span class="er">(</span><span class="ex">loop0</span><span class="kw">)</span><span class="bu">:</span> mounted filesystem without journal. Opts: ,errors=continue</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">==================================================================</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">BUG:</span> KASAN: use-after-free in ext4_search_dir fs/ext4/namei.c:1394 <span class="pp">[</span><span class="ss">inline</span><span class="pp">]</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">BUG:</span> KASAN: use-after-free in search_dirblock fs/ext4/namei.c:1199 <span class="pp">[</span><span class="ss">inline</span><span class="pp">]</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">BUG:</span> KASAN: use-after-free in __ext4_find_entry+0xdca/0x1210 fs/ext4/namei.c:1553</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Read</span> of size 1 at addr ffff8881317c3005 by task syz-executor117/2331</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">CPU:</span> 1 PID: 2331 Comm: syz-executor117 Not tainted 5.10.0+ <span class="co">#1</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">Hardware</span> name: QEMU Standard PC <span class="er">(</span><span class="ex">i440FX</span> + PIIX, 1996<span class="kw">)</span><span class="ex">,</span> BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">Call</span> Trace:</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a> <span class="ex">__dump_stack</span> lib/dump_stack.c:83 <span class="pp">[</span><span class="ss">inline</span><span class="pp">]</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a> <span class="ex">dump_stack+0x144/0x187</span> lib/dump_stack.c:124</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a> <span class="ex">print_address_description+0x7d/0x630</span> mm/kasan/report.c:387</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a> <span class="ex">__kasan_report+0x132/0x190</span> mm/kasan/report.c:547</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a> <span class="ex">kasan_report+0x47/0x60</span> mm/kasan/report.c:564</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a> <span class="ex">ext4_search_dir</span> fs/ext4/namei.c:1394 <span class="pp">[</span><span class="ss">inline</span><span class="pp">]</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a> <span class="ex">search_dirblock</span> fs/ext4/namei.c:1199 <span class="pp">[</span><span class="ss">inline</span><span class="pp">]</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a> <span class="ex">__ext4_find_entry+0xdca/0x1210</span> fs/ext4/namei.c:1553</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a> <span class="ex">ext4_lookup_entry</span> fs/ext4/namei.c:1622 <span class="pp">[</span><span class="ss">inline</span><span class="pp">]</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a> <span class="ex">ext4_lookup+0xb8/0x3a0</span> fs/ext4/namei.c:1690</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a> <span class="ex">__lookup_hash+0xc5/0x190</span> fs/namei.c:1451</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a> <span class="ex">do_rmdir+0x19e/0x310</span> fs/namei.c:3760</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a> <span class="ex">do_syscall_64+0x33/0x40</span> arch/x86/entry/common.c:46</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a> <span class="ex">entry_SYSCALL_64_after_hwframe+0x44/0xa9</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="ex">RIP:</span> 0033:0x445e59</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="ex">Code:</span> 4d c7 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <span class="op">&lt;</span>48<span class="op">&gt;</span> 3d 01 f0 ff ff 0f 83 1b c7 fb ff c3 66 2e 0f 1f 84 00 00 00 00</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ex">RSP:</span> 002b:00007fff2277fac8 EFLAGS: 00000246 ORIG_RAX: 0000000000000054</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="ex">RAX:</span> ffffffffffffffda RBX: 0000000000400280 RCX: 0000000000445e59</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ex">RDX:</span> 0000000000000000 RSI: 0000000000000000 RDI: 00000000200000c0</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="ex">RBP:</span> 0000000000000000 R08: 0000000000000000 R09: 0000000000000002</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="ex">R10:</span> 00007fff2277f990 R11: 0000000000000246 R12: 0000000000000000</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ex">R13:</span> 431bde82d7b634db R14: 0000000000000000 R15: 0000000000000000</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ex">The</span> buggy address belongs to the page:</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ex">page:0000000048cd3304</span> refcount:0 mapcount:0 mapping:0000000000000000 index:0x1 pfn:0x1317c3</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ex">flags:</span> 0x200000000000000<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ex">raw:</span> 0200000000000000 ffffea0004526588 ffffea0004528088 0000000000000000</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ex">raw:</span> 0000000000000001 0000000000000000 00000000ffffffff 0000000000000000</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ex">page</span> dumped because: kasan: bad access detected</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ex">Memory</span> state around the buggy address:</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a> <span class="ex">ffff8881317c2f00:</span> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a> <span class="ex">ffff8881317c2f80:</span> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span>ffff8881317c3000: <span class="ex">ff</span> ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>                   <span class="ex">^</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a> <span class="ex">ffff8881317c3080:</span> ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a> <span class="ex">ffff8881317c3100:</span> ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ex">==================================================================</span></span></code></pre></div>
+<h1 data-number="2" id="复现"><span
+class="header-section-number">2</span> 复现</h1>
 <p>内核构造补丁:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">From</span> 98cdf4ec2c2bb5fe2ab8654f52c48f906c1829b8 Mon Sep 17 00:00:00 2001</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">From</span>: ChenXiaoSong <span class="op">&lt;</span>chenxiaosongemail@foxmail.com<span class="op">&gt;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ex">Date</span>: Sun, 1 May 2022 02:35:04 +0800</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="ex">Subject</span>: [PATCH] reproduce uaf in ext4_search_dir()</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="ex">Signed-off-by</span>: ChenXiaoSong <span class="op">&lt;</span>chenxiaosongemail@foxmail.com<span class="op">&gt;</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="ex">---</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a> <span class="ex">fs/ext4/namei.c</span> <span class="kw">|</span> <span class="ex">3</span> +++</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a> <span class="ex">1</span> file changed, 3 insertions(+)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="fu">diff</span> --git a/fs/ext4/namei.c b/fs/ext4/namei.c</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="ex">index</span> e37da8d5cd0c..94e022e4ab9c 100644</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="ex">---</span> a/fs/ext4/namei.c</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="ex">+++</span> b/fs/ext4/namei.c</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="ex">@@</span> -1485,6 +1485,7 @@ int ext4_search_dir(struct buffer_head *bh, char *search_buf, int buf_size,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>        <span class="kw">if</span> <span class="kw">(</span><span class="ex">de_len</span> <span class="op">&lt;</span>= 0<span class="kw">)</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>            <span class="bu">return</span> -1<span class="kw">;</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>        <span class="ex">offset</span> += de_len<span class="kw">;</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a><span class="ex">+</span>       printk(<span class="st">&quot;%s:%d,search_buf:%px,dlimit:%px,de:%px,rec_len:%d,s_blocksize:%ld,de_len:%d,offset:%d\n&quot;</span>, __func__, __LINE__, search_buf, dlimit, de, de-<span class="op">&gt;</span>rec_len, dir-<span class="op">&gt;</span>i_sb-<span class="op">&gt;</span>s_blocksize, de_len, offset);</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a>        <span class="ex">de</span> = (struct ext4_dir_entry_2 *) <span class="kw">((</span>char *) de + de_len);</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>    }</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a>    return 0;</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a>@@ -2076,6 +2077,8 @@ void ext4_insert_dentry(struct inode *dir,</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>    ext4_set_de_type(inode-&gt;i_sb, de, inode-&gt;i_mode);</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a>    de-&gt;name_len = fname_len(fname);</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a>    memcpy(de-&gt;name, fname_name(fname), fname_len(fname));</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a>+   if (strcmp(current-&gt;comm, <span class="st">&quot;touch&quot;</span>) == 0)</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a>+       de-&gt;rec_len = 4071;</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a>    if (ext4_hash_in_dirent(dir)) {</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a>        struct dx_hash_info *hinfo = &amp;fname-&gt;hinfo;</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a> </span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true"></a>-- </span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true"></a>2.25.1</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">From</span> 98cdf4ec2c2bb5fe2ab8654f52c48f906c1829b8 Mon Sep 17 00:00:00 2001</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">From:</span> ChenXiaoSong <span class="op">&lt;</span>chenxiaosongemail@foxmail.com<span class="op">&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Date:</span> Sun, 1 May 2022 02:35:04 +0800</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Subject:</span> <span class="pp">[</span><span class="ss">PATCH</span><span class="pp">]</span> reproduce uaf in ext4_search_dir<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Signed-off-by:</span> ChenXiaoSong <span class="op">&lt;</span>chenxiaosongemail@foxmail.com<span class="op">&gt;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a> <span class="ex">fs/ext4/namei.c</span> <span class="kw">|</span> <span class="ex">3</span> +++</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a> <span class="ex">1</span> file changed, 3 insertions<span class="er">(</span><span class="ex">+</span><span class="kw">)</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">diff</span> <span class="at">--git</span> a/fs/ext4/namei.c b/fs/ext4/namei.c</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">index</span> e37da8d5cd0c..94e022e4ab9c 100644</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/fs/ext4/namei.c</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/fs/ext4/namei.c</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-1485,6</span> +1485,7 @@ int ext4_search_dir<span class="er">(</span><span class="ex">struct</span> buffer_head <span class="pp">*</span>bh, char <span class="pp">*</span>search_buf, int buf_size,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">(</span><span class="ex">de_len</span> <span class="op">&lt;</span>= 0<span class="kw">)</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="ex">-1</span><span class="kw">;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="ex">offset</span> += de_len<span class="kw">;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       printk<span class="er">(</span><span class="st">&quot;%s:%d,search_buf:%px,dlimit:%px,de:%px,rec_len:%d,s_blocksize:%ld,de_len:%d,offset:%d\n&quot;</span><span class="ex">,</span> __func__, __LINE__, search_buf, dlimit, de, de-<span class="op">&gt;</span>rec_len, dir-<span class="op">&gt;</span>i_sb-<span class="op">&gt;</span>s_blocksize, de_len, offset<span class="kw">);</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="ex">de</span> = <span class="er">(</span><span class="ex">struct</span> ext4_dir_entry_2 <span class="pp">*</span><span class="kw">)</span> <span class="kw">((</span><span class="ex">char</span> <span class="pp">*</span><span class="kw">)</span> <span class="ex">de</span> + de_len<span class="kw">);</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="kw">;</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-2076,6</span> +2077,8 @@ void ext4_insert_dentry<span class="er">(</span><span class="ex">struct</span> inode <span class="pp">*</span>dir,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ext4_set_de_type</span><span class="er">(</span><span class="ex">inode-</span><span class="op">&gt;</span>i_sb, de, inode-<span class="op">&gt;</span>i_mode<span class="kw">);</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="ex">de-</span><span class="op">&gt;</span>name_len = fname_len<span class="er">(</span><span class="ex">fname</span><span class="kw">);</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="ex">memcpy</span><span class="er">(</span><span class="ex">de-</span><span class="op">&gt;</span>name, fname_name<span class="er">(</span><span class="ex">fname</span><span class="kw">)</span><span class="ex">,</span> fname_len<span class="er">(</span><span class="ex">fname</span><span class="kw">));</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>   if <span class="er">(</span><span class="ex">strcmp</span><span class="er">(</span><span class="ex">current-</span><span class="op">&gt;</span>comm, <span class="st">&quot;touch&quot;</span><span class="kw">)</span> <span class="ex">==</span> 0<span class="kw">)</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       de-<span class="op">&gt;</span>rec_len = 4071<span class="kw">;</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">(</span><span class="ex">ext4_hash_in_dirent</span><span class="er">(</span><span class="fu">dir</span><span class="kw">))</span> <span class="kw">{</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        <span class="ex">struct</span> dx_hash_info <span class="pp">*</span>hinfo = <span class="kw">&amp;</span><span class="ex">fname-</span><span class="op">&gt;</span>hinfo<span class="kw">;</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> </span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="ex">2.25.1</span></span></code></pre></div>
 <p>构造:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">mkfs.ext4</span> -E lazy_itable_init=0,lazy_journal_init=0 -b 4096 -F /dev/sda</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="fu">mount</span> /dev/sda /mnt</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="fu">mkdir</span> /mnt/dir</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="fu">dd</span> if=/dev/zero of=/mnt/dd_file bs=1M count=10240 <span class="co"># 把空间全部填满</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="fu">rm</span> /mnt/dd_file -rf</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="fu">touch</span> /mnt/dir/file</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="fu">rmdir</span> /mnt/dir/dir</span></code></pre></div>
-<h1 data-number="3" id="代码分析"><span class="header-section-number">3</span> 代码分析</h1>
-<p>修复补丁: <a href="https://lore.kernel.org/all/20220324064816.1209985-1-yebin10@huawei.com/"><code>c186f0887fe7 ext4: fix use-after-free in ext4_search_dir</code></a></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co">// mkdir dir</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>mkdir</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>  do_mkdirat</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    filename_create</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>      __lookup_hash</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>        ext4_lookup</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>          ext4_lookup_entry</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>            __ext4_find_entry</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>              search_dirblock</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>                ext4_search_dir</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>    vfs_mkdir</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>      ext4_mkdir</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>        ext4_init_new_dir</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>          ext4_init_dot_dotdot</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="co">// rmdir dir</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>rmdir</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>  do_rmdir</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>    vfs_rmdir</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>      ext4_rmdir</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>        ext4_find_entry</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a>          __ext4_find_entry</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a>            search_dirblock</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>              ext4_search_dir</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>                de = (<span class="kw">struct</span> ext4_dir_entry_2 *)search_buf <span class="co">// 第一个目录项的开始地址</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a>                dlimit = search_buf + buf_size <span class="co">// 最后一个目录项的结束地址</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a>                <span class="co">// 注意 EXT4_BASE_DIR_LEN 的值为 9, 考虑到内存对齐</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a>                <span class="cf">while</span> ((<span class="dt">char</span> *) de &lt; dlimit + EXT4_BASE_DIR_LEN) {</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a>                }</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a><span class="co">// rm dir -rf</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a>unlinkat</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a>  do_rmdir</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true"></a>    vfs_rmdir</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true"></a>      ext4_rmdir</span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true"></a>        ext4_find_entry</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true"></a>          __ext4_find_entry</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true"></a>            search_dirblock</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true"></a>              ext4_search_dir</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true"></a></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true"></a><span class="co">// 删除文件夹中的文件: rm dir/file</span></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true"></a>unlinkat</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true"></a>  do_unlinkat</span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true"></a>    vfs_unlink</span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true"></a>      ext4_unlink</span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true"></a>        __ext4_unlink</span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true"></a>          ext4_delete_entry</span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true"></a>            ext4_generic_delete_entry</span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true"></a></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true"></a><span class="co">// touch dir/file</span></span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true"></a>open</span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true"></a>  do_sys_open</span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true"></a>    do_sys_openat2</span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true"></a>      do_filp_open</span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true"></a>        path_openat</span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true"></a>          open_last_lookups</span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true"></a>            lookup_open</span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true"></a>              ext4_create</span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true"></a>                ext4_add_nondir</span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true"></a>                  ext4_add_entry</span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true"></a>                    <span class="cf">for</span> (block = <span class="dv">0</span>; block &lt; blocks; block++) {</span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true"></a>                    add_dirent_to_buf</span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true"></a>                      ext4_insert_dentry</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext4</span> <span class="at">-E</span> lazy_itable_init=0,lazy_journal_init=0 <span class="at">-b</span> 4096 <span class="at">-F</span> /dev/sda</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> /dev/sda /mnt</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /mnt/dir</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/dev/zero of=/mnt/dd_file bs=1M count=10240 <span class="co"># 把空间全部填满</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> /mnt/dd_file <span class="at">-rf</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> /mnt/dir/file</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rmdir</span> /mnt/dir/dir</span></code></pre></div>
+<h1 data-number="3" id="代码分析"><span
+class="header-section-number">3</span> 代码分析</h1>
+<p>修复补丁: <a
+href="https://lore.kernel.org/all/20220324064816.1209985-1-yebin10@huawei.com/"><code>c186f0887fe7 ext4: fix use-after-free in ext4_search_dir</code></a></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// mkdir dir</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>mkdir</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  do_mkdirat</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    filename_create</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      __lookup_hash</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        ext4_lookup</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>          ext4_lookup_entry</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>            __ext4_find_entry</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>              search_dirblock</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                ext4_search_dir</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    vfs_mkdir</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>      ext4_mkdir</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        ext4_init_new_dir</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>          ext4_init_dot_dotdot</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">// rmdir dir</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>rmdir</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  do_rmdir</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    vfs_rmdir</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>      ext4_rmdir</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        ext4_find_entry</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>          __ext4_find_entry</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>            search_dirblock</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>              ext4_search_dir</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>                de <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> ext4_dir_entry_2 <span class="op">*)</span>search_buf <span class="co">// 第一个目录项的开始地址</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>                dlimit <span class="op">=</span> search_buf <span class="op">+</span> buf_size <span class="co">// 最后一个目录项的结束地址</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 注意 EXT4_BASE_DIR_LEN 的值为 9, 考虑到内存对齐</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>                <span class="cf">while</span> <span class="op">((</span><span class="dt">char</span> <span class="op">*)</span> de <span class="op">&lt;</span> dlimit <span class="op">+</span> EXT4_BASE_DIR_LEN<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>                <span class="op">}</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co">// rm dir -rf</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>unlinkat</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  do_rmdir</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    vfs_rmdir</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>      ext4_rmdir</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>        ext4_find_entry</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>          __ext4_find_entry</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>            search_dirblock</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>              ext4_search_dir</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="co">// 删除文件夹中的文件: rm dir/file</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>unlinkat</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>  do_unlinkat</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>    vfs_unlink</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>      ext4_unlink</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>        __ext4_unlink</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>          ext4_delete_entry</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>            ext4_generic_delete_entry</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="co">// touch dir/file</span></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>open</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>  do_sys_open</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>    do_sys_openat2</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>      do_filp_open</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>        path_openat</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>          open_last_lookups</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>            lookup_open</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>              ext4_create</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>                ext4_add_nondir</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>                  ext4_add_entry</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> <span class="op">(</span>block <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> block <span class="op">&lt;</span> blocks<span class="op">;</span> block<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>                    add_dirent_to_buf</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>                      ext4_insert_dentry</span></code></pre></div>
 </body>
 </html>
