@@ -117,8 +117,24 @@ class="toc-section-number">1</span> 简介</a></li>
 class="toc-section-number">2</span> 缓冲区和缓冲区头</a></li>
 <li><a href="#bio" id="toc-bio"><span
 class="toc-section-number">3</span> bio</a></li>
-<li><a href="#io调试器介绍" id="toc-io调试器介绍"><span
-class="toc-section-number">4</span> I/O调试器介绍</a></li>
+<li><a href="#io调度器介绍" id="toc-io调度器介绍"><span
+class="toc-section-number">4</span> I/O调度器介绍</a></li>
+<li><a href="#已淘汰的io调度器" id="toc-已淘汰的io调度器"><span
+class="toc-section-number">5</span> 已淘汰的I/O调度器</a>
+<ul>
+<li><a href="#linus-elevator" id="toc-linus-elevator"><span
+class="toc-section-number">5.1</span> Linus Elevator</a></li>
+<li><a href="#deadline" id="toc-deadline"><span
+class="toc-section-number">5.2</span> Deadline</a></li>
+<li><a href="#anticipatory" id="toc-anticipatory"><span
+class="toc-section-number">5.3</span> Anticipatory</a></li>
+<li><a href="#cfqcomplete-fair-queuing"
+id="toc-cfqcomplete-fair-queuing"><span
+class="toc-section-number">5.4</span> CFQ(Complete Fair
+Queuing)</a></li>
+<li><a href="#noop" id="toc-noop"><span
+class="toc-section-number">5.5</span> Noop</a></li>
+</ul></li>
 </ul>
 </nav>
 <p><a
@@ -271,14 +287,68 @@ class="header-section-number">3</span> bio</h1>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">int</span>    bv_len<span class="op">;</span></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">int</span>    bv_offset<span class="op">;</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
-<h1 data-number="4" id="io调试器介绍"><span
-class="header-section-number">4</span> I/O调试器介绍</h1>
+<h1 data-number="4" id="io调度器介绍"><span
+class="header-section-number">4</span> I/O调度器介绍</h1>
 <p>用于保存挂起的块I/O请求的请求队列结构体是<code>struct request_queue</code>，队列中的每项请求用<code>struct request</code>（<code>include/linux/blk-mq.h</code>）表示，每个请求可以包含多个<code>bio</code>。</p>
 <p>磁盘寻址是计算机中最慢的操作之一，为了优化，内核在将I/O请求提交给磁盘之前，会先执行合并与排序的预操作，我们将负责提交I/O请求的子系统称为I/O调度器（I/O
 Schedulers），注意有些书籍翻译成“I/O调度程序“。
 I/O调度器将磁盘I/O资源分配给挂起的块I/O请求。</p>
 <p>I/O调度器管理块设备的请求队列，减少磁盘寻址时间，提高全局吞吐量，注意提高“全局“意味着可能对某些请求不公平。</p>
 <p>合并是将多个请求结合成一个请求，原本要执行的多次磁盘寻址就变成只需要一次磁盘寻址。排序是将请求按磁盘上扇区的排列顺序尽可能的有序排列，从而让磁盘头以直线方向移动，和电梯调度类似。</p>
-<p>https://github.com/torvalds/linux/blob/master/Documentation/block/switching-sched.rst</p>
+<p><a
+href="https://github.com/torvalds/linux/blob/master/Documentation/block/switching-sched.rst">参考内核文档</a>，用以下命令查看和切换I/O调度器:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /sys/block/sda/queue/scheduler <span class="co"># 查看</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># [mq-deadline] kyber bfq none</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> none <span class="op">&gt;</span>/sys/block/sda/queue/scheduler <span class="co"># 切换</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /sys/block/sda/queue/scheduler</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># [none] mq-deadline kyber bfq # 已经切换了</span></span></code></pre></div>
+<h1 data-number="5" id="已淘汰的io调度器"><span
+class="header-section-number">5</span> 已淘汰的I/O调度器</h1>
+<p>我们先介绍几个现在最新的内核代码中已经淘汰了的I/O调度器，第一是因为资料多，第二是比较适合作为入门学习。</p>
+<h2 data-number="5.1" id="linus-elevator"><span
+class="header-section-number">5.1</span> Linus Elevator</h2>
+<p>Linus电梯在2.6版本中已经被取代了，但我们还是介绍一下，因为它足够简单。</p>
+<p>当有新的I/O请求时，先检查挂起的请求是否可以和新请求合并:</p>
+<ul>
+<li>向前合并: 新请求连在一个现存的挂起的请求前。</li>
+<li>向后合并:
+新请求连在一个现存的挂起的请求后。是概率比较大的合并类型，因为文件是以扇区号增长分布。</li>
+</ul>
+<p>如果合并失败，就尝试按扇区方向为序插入。如果队列中存在一个驻留很久的请求，则新请求插入到队列尾部。</p>
+<h2 data-number="5.2" id="deadline"><span
+class="header-section-number">5.2</span> Deadline</h2>
+<p>deadline
+I/O调度器被mq-deadline延续了，在最新的代码中已经没有了，是为了解决Linus
+Elevator的饥饿问题提出的。</p>
+<p>Linus
+Elevator可能因为对某个磁盘区域的操作，让较远位置的其他请求永远得不到机会。
+还可能造成writes starving
+reads的问题，写操作是异步的，读请求是同步的。</p>
+<p>deadline
+I/O调度器的每个请求都有一个超时时间，写请求的超时时间比读请求长，写5s，读500ms。</p>
+<p>涉及的几个队列:</p>
+<pre><code>Read FIFO queue
+----------------&gt; =========+
+                           |
+Write FIFO queue           v   dispatch queue    +----+
+----------------&gt; =========&gt;   ---------------&gt;  |disk|
+                           ^                     +----+
+Sorted queue               |
+----------------&gt; =========+</code></pre>
+<p>请求除了插入排序队列，还会插入写请求队列或读请求队列，如果写请求队列或读请求队列的最前面的请求快超时了，就会立刻得到执行。
+这样就避免了请求饥饿的发生。</p>
+<h2 data-number="5.3" id="anticipatory"><span
+class="header-section-number">5.3</span> Anticipatory</h2>
+<p>最新的代码中已经没有这个I/O调度器了。 Anticipatory
+I/O调度器在deadline基础之上增加预测启发，调度器跟踪并统计每个应用程序块I/O操作的习惯行为，然后预测应用程序的未来行为。
+读请求提交后等待6ms左右，如果有其他读请求到来，节省寻址次数。</p>
+<h2 data-number="5.4" id="cfqcomplete-fair-queuing"><span
+class="header-section-number">5.4</span> CFQ(Complete Fair Queuing)</h2>
+<p>CFQ
+I/O调度器已经被BFQ取代。CFQ是给每个进程维护一个请求队列，然后每个队列按扇区方向排序，以时间片轮转调度队列，从每个队列选取4个请求数。</p>
+<h2 data-number="5.5" id="noop"><span
+class="header-section-number">5.5</span> Noop</h2>
+<p>最新的代码中已经没有这个I/O调度器了，已经被多队列版本的none取代了。</p>
+<p>Noop只做了合并的操作，适用于“寻址”代价小或没有代价的块设备。</p>
 </body>
 </html>
