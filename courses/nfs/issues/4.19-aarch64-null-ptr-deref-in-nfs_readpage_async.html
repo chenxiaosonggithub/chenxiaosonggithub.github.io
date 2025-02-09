@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -95,156 +84,139 @@
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
 <li><a href="https://chenxiaosong.com/bili">哔哩哔哩: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程:
-chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献:
-chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
-<h1 class="title">aarch64架构 4.19
-nfs_readpage_async()空指针解引用问题</h1>
+<h1 class="title">aarch64架构 4.19 nfs_readpage_async()空指针解引用问题</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#问题描述" id="toc-问题描述"><span
-class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#vmcore解析" id="toc-vmcore解析"><span
-class="toc-section-number">2</span> vmcore解析</a></li>
-<li><a href="#分析与解决方案" id="toc-分析与解决方案"><span
-class="toc-section-number">3</span> 分析与解决方案</a></li>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#vmcore解析"><span class="toc-section-number">2</span> vmcore解析</a></li>
+<li><a href="#分析与解决方案"><span class="toc-section-number">3</span> 分析与解决方案</a></li>
 </ul>
 </nav>
-<p><a
-href="https://www.bilibili.com/video/BV1hm421g7T8/">点击这里在哔哩哔哩bilibili在线观看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/courses/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<h1 data-number="1" id="问题描述"><span
-class="header-section-number">1</span> 问题描述</h1>
+<p><a href="https://www.bilibili.com/video/BV1hm421g7T8/">点击这里在哔哩哔哩bilibili在线观看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/courses/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
 <p>环境信息:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> sys</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>      <span class="ex">KERNEL:</span> vmlinux</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">DUMPFILE:</span> vmcore  [PARTIAL DUMP]</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">CPUS:</span> 128</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">DATE:</span> Sat Nov  4 17:05:14 CST 2023</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      <span class="ex">UPTIME:</span> 16 days, 19:08:18</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">LOAD</span> AVERAGE: 5.32, 5.21, 5.04</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>       <span class="ex">TASKS:</span> 25391</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">NODENAME:</span> kc-fz02-node-arm-5</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>     <span class="ex">RELEASE:</span> 4.19.90-25.26.1.v2101.fortest.ky10.aarch64</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>     <span class="ex">VERSION:</span> <span class="co">#1 SMP Sun Oct 1 09:43:19 CST 2023</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>     <span class="ex">MACHINE:</span> aarch64  <span class="er">(</span><span class="ex">unknown</span> Mhz<span class="kw">)</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      <span class="ex">MEMORY:</span> 512 GB</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>       <span class="ex">PANIC:</span> <span class="st">&quot;Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> sys</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>      <span class="ex">KERNEL</span>: vmlinux</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    <span class="ex">DUMPFILE</span>: vmcore  [PARTIAL DUMP]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>        <span class="ex">CPUS</span>: 128</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>        <span class="ex">DATE</span>: Sat Nov  4 17:05:14 CST 2023</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>      <span class="ex">UPTIME</span>: 16 days, 19:08:18</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="ex">LOAD</span> AVERAGE: 5.32, 5.21, 5.04</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>       <span class="ex">TASKS</span>: 25391</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    <span class="ex">NODENAME</span>: kc-fz02-node-arm-5</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>     <span class="ex">RELEASE</span>: 4.19.90-25.26.1.v2101.fortest.ky10.aarch64</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>     <span class="ex">VERSION</span>: #1 SMP Sun Oct 1 09:43:19 CST 2023</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>     <span class="ex">MACHINE</span>: aarch64  (unknown Mhz)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>      <span class="ex">MEMORY</span>: 512 GB</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>       <span class="ex">PANIC</span>: <span class="st">&quot;Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000&quot;</span></span></code></pre></div>
 <p>日志:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dmesg <span class="kw">|</span> <span class="fu">less</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451283.455528]</span> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451283.971377]</span> Call trace:</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451283.977098]</span>  nfs_readpage_async+0x54/0x258 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451283.984942]</span>  nfs_readpage+0x164/0x220 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451283.992230]</span>  generic_file_buffered_read+0x3cc/0x718</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451284.000159]</span>  generic_file_read_iter+0x114/0x190</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451284.007680]</span>  nfs_file_read+0x8c/0x100 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451284.014750]</span>  new_sync_read+0xcc/0x128</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451284.021192]</span>  __vfs_read+0x74/0x80</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451284.027187]</span>  vfs_read+0x94/0x150</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451284.032998]</span>  ksys_read+0x5c/0xc8</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451284.038714]</span>  __arm64_sys_read+0x24/0x30</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451284.045009]</span>  el0_svc_common+0x78/0x130</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451284.051191]</span>  el0_svc_handler+0x38/0x78</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[1451284.057363]</span>  el0_svc+0x8/0x1b0</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dmesg <span class="kw">|</span> <span class="fu">less</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>[<span class="ex">1451283.455528</span>] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>[<span class="ex">1451283.971377</span>] Call trace:</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>[<span class="ex">1451283.977098</span>]  nfs_readpage_async+0x54/0x258 [nfs]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>[<span class="ex">1451283.984942</span>]  nfs_readpage+0x164/0x220 [nfs]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>[<span class="ex">1451283.992230</span>]  generic_file_buffered_read+0x3cc/0x718</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>[<span class="ex">1451284.000159</span>]  generic_file_read_iter+0x114/0x190</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>[<span class="ex">1451284.007680</span>]  nfs_file_read+0x8c/0x100 [nfs]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>[<span class="ex">1451284.014750</span>]  new_sync_read+0xcc/0x128</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>[<span class="ex">1451284.021192</span>]  __vfs_read+0x74/0x80</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>[<span class="ex">1451284.027187</span>]  vfs_read+0x94/0x150</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>[<span class="ex">1451284.032998</span>]  ksys_read+0x5c/0xc8</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>[<span class="ex">1451284.038714</span>]  __arm64_sys_read+0x24/0x30</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>[<span class="ex">1451284.045009</span>]  el0_svc_common+0x78/0x130</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>[<span class="ex">1451284.051191</span>]  el0_svc_handler+0x38/0x78</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>[<span class="ex">1451284.057363</span>]  el0_svc+0x8/0x1b0</span></code></pre></div>
 <p>用<code>faddr2line</code>脚本解析:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./faddr2line</span> 4.19.90-25+/kernel/fs/nfs/nfs.ko nfs_readpage_async+0x54/0x258</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">nfs_readpage_async+0x54/0x258:</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">i_size_read</span> 于 include/linux/fs.h:849</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">已内连入</span><span class="kw">)</span><span class="ex">nfs_page_length</span> 于 fs/nfs/internal.h:681</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">已内连入</span><span class="kw">)</span><span class="ex">nfs_readpage_async</span> 于 fs/nfs/read.c:118</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">./faddr2line</span> 4.19.90-25+/kernel/fs/nfs/nfs.ko nfs_readpage_async+0x54/0x258</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">nfs_readpage_async+0x54</span>/0x258:</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="ex">i_size_read</span> 于 include/linux/fs.h:849</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="kw">(</span>已内连入<span class="kw">)</span><span class="ex">nfs_page_length</span> 于 fs/nfs/internal.h:681</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="kw">(</span>已内连入<span class="kw">)</span><span class="ex">nfs_readpage_async</span> 于 fs/nfs/read.c:118</span></code></pre></div>
 <p>空指针解引用发生在<code>nfs_readpage_async -&gt; nfs_page_length</code>的<code>i_size_read(page_file_mapping(page)-&gt;host)</code>，<code>host</code>成员在<code>struct address_space</code>中的偏移量为0。</p>
-<h1 data-number="2" id="vmcore解析"><span
-class="header-section-number">2</span> vmcore解析</h1>
+<h1 data-number="2" id="vmcore解析"><span class="header-section-number">2</span> vmcore解析</h1>
 <p>加载nfs相关ko文件:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfs 4.19.90-25+/kernel/fs/nfs/nfs.ko</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv3 4.19.90-25+/kernel/fs/nfs/nfsv3.ko</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv4 4.19.90-25+/kernel/fs/nfs/nfsv4.ko</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfs 4.19.90-25+/kernel/fs/nfs/nfs.ko</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfsv3 4.19.90-25+/kernel/fs/nfs/nfsv3.ko</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfsv4 4.19.90-25+/kernel/fs/nfs/nfsv4.ko</span></code></pre></div>
 <p>查看栈的信息:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="at">-FF</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a> <span class="co">#9 [ffffec3216ffbad0] el1_ia at ffff2f770862310c</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>     <span class="ex">PC:</span> ffff2f76d1d9634c  <span class="pp">[</span><span class="ss">nfs_readpage_async+84</span><span class="pp">]</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>     <span class="ex">LR:</span> ffff2f76d1d966b4  <span class="pp">[</span><span class="ss">nfs_readpage+356</span><span class="pp">]</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>     <span class="ex">SP:</span> ffffec3216ffbae0  PSTATE: 40400009</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X29:</span> ffffec3216ffbae0  X28: ffff7ff30a0911c0  X27: ffff7ff30a0911c0</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X26:</span> ffffcc2f3041d790  X25: ffffcc3756c18ee0  X24: ffffec3216ffbd68</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X23:</span> ffffcc2b512d9b00  X22: ffffcc3756c18ee0  X21: ffffcc3756c18ee0</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X20:</span> ffffcc2b512d9b00  X19: ffff7ff30a0911c0  X18: 0000000000000000</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X17:</span> 0000000000000000  X16: ffff2f7708825990  X15: 0000000000000000</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X14:</span> ffffcc27e5ea9d68  X13: ffffcc3756c1905c  X12: 0000000000000007</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X11:</span> ffffcc27e5ea9d90  X10: 0000000000000000   X9: 0000000000000008</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X8:</span> 0000000000000060   X7: ffffcc3681c26b00   X6: ffff7ff30da07080</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X5:</span> 0000000000210d00   X4: ffff7ff30da070a0   X3: 01ffffc000000081</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X2:</span> ffff7ff30a0911c0   X1: dead000000000100   X0: 0000000000000000</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbad0:</span> <span class="pp">[</span><span class="ss">ffffec3216ffbae0:thread_stack</span><span class="pp">]</span> nfs_readpage_async+84 </span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#10 [ffffec3216ffbae0] nfs_readpage_async at ffff2f76d1d96348 [nfs]</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbae0:</span> <span class="pp">[</span><span class="ss">ffffec3216ffbbc0:thread_stack</span><span class="pp">]</span> nfs_readpage+356 </span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbaf0:</span> ffff7ff30a0911c0 0000000000000000 </span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbb00:</span> <span class="pp">[</span><span class="ss">ffffcc3756c18ee0:nfs_inode_cache</span><span class="pp">]</span> 0000000000000000 </span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbb10:</span> <span class="pp">[</span><span class="ss">ffffec3216ffbd40:thread_stack</span><span class="pp">]</span> 0000000000000000 </span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbb20:</span> <span class="pp">[</span><span class="ss">ffffec3216ffbbc0:thread_stack</span><span class="pp">]</span> nfs_readpage+188 </span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbb30:</span> ffff7ff30a0911c0 <span class="pp">[</span><span class="ss">ffffcc2f3041d700:filp</span><span class="pp">]</span> </span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbb40:</span> <span class="pp">[</span><span class="ss">ffffcc3756c18ee0:nfs_inode_cache</span><span class="pp">]</span> activate_task+132 </span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbb50:</span> 0000000000000000 0000000000000000 </span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbb60:</span> 0000000003870000 000000000387ffff </span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbb70:</span> 0000000000000001 0000000000000000 </span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbb80:</span> 0000000000000000 0000000000000000 </span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbb90:</span> 0000000000000000 0000000000000000 </span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbba0:</span> <span class="pp">[</span><span class="ss">ffffec3216ffbbc0:thread_stack</span><span class="pp">]</span> nfs_readpage+284 </span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ffffec3216ffbbb0:</span> ffff7ff30a0911c0 0000000000000000 </span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> bt -FF</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a> <span class="co">#9 [ffffec3216ffbad0] el1_ia at ffff2f770862310c</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>     <span class="ex">PC</span>: ffff2f76d1d9634c  [nfs_readpage_async+84]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>     <span class="ex">LR</span>: ffff2f76d1d966b4  [nfs_readpage+356]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>     <span class="ex">SP</span>: ffffec3216ffbae0  PSTATE: 40400009</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>    <span class="ex">X29</span>: ffffec3216ffbae0  X28: ffff7ff30a0911c0  X27: ffff7ff30a0911c0</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>    <span class="ex">X26</span>: ffffcc2f3041d790  X25: ffffcc3756c18ee0  X24: ffffec3216ffbd68</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>    <span class="ex">X23</span>: ffffcc2b512d9b00  X22: ffffcc3756c18ee0  X21: ffffcc3756c18ee0</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>    <span class="ex">X20</span>: ffffcc2b512d9b00  X19: ffff7ff30a0911c0  X18: 0000000000000000</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>    <span class="ex">X17</span>: 0000000000000000  X16: ffff2f7708825990  X15: 0000000000000000</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>    <span class="ex">X14</span>: ffffcc27e5ea9d68  X13: ffffcc3756c1905c  X12: 0000000000000007</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>    <span class="ex">X11</span>: ffffcc27e5ea9d90  X10: 0000000000000000   X9: 0000000000000008</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>     <span class="ex">X8</span>: 0000000000000060   X7: ffffcc3681c26b00   X6: ffff7ff30da07080</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a>     <span class="ex">X5</span>: 0000000000210d00   X4: ffff7ff30da070a0   X3: 01ffffc000000081</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>     <span class="ex">X2</span>: ffff7ff30a0911c0   X1: dead000000000100   X0: 0000000000000000</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbad0</span>: [ffffec3216ffbae0:thread_stack] nfs_readpage_async+84 </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a><span class="co">#10 [ffffec3216ffbae0] nfs_readpage_async at ffff2f76d1d96348 [nfs]</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbae0</span>: [ffffec3216ffbbc0:thread_stack] nfs_readpage+356 </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbaf0</span>: ffff7ff30a0911c0 0000000000000000 </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbb00</span>: [ffffcc3756c18ee0:nfs_inode_cache] 0000000000000000 </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbb10</span>: [ffffec3216ffbd40:thread_stack] 0000000000000000 </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbb20</span>: [ffffec3216ffbbc0:thread_stack] nfs_readpage+188 </span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbb30</span>: ffff7ff30a0911c0 [ffffcc2f3041d700:filp] </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbb40</span>: [ffffcc3756c18ee0:nfs_inode_cache] activate_task+132 </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbb50</span>: 0000000000000000 0000000000000000 </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbb60</span>: 0000000003870000 000000000387ffff </span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbb70</span>: 0000000000000001 0000000000000000 </span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbb80</span>: 0000000000000000 0000000000000000 </span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbb90</span>: 0000000000000000 0000000000000000 </span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbba0</span>: [ffffec3216ffbbc0:thread_stack] nfs_readpage+284 </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true"></a>    <span class="ex">ffffec3216ffbbb0</span>: ffff7ff30a0911c0 0000000000000000 </span></code></pre></div>
 <p>再结合<code>nfs_readpage_async</code>的汇编代码:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis nfs_readpage_async</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d962f8</span> <span class="op">&lt;</span>nfs_readpage_async<span class="op">&gt;</span>:        stp     x29, x30, <span class="pp">[</span><span class="ss">sp,#</span><span class="pp">-</span><span class="ss">224</span><span class="pp">]</span>!</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d962fc</span> <span class="op">&lt;</span>nfs_readpage_async+4<span class="op">&gt;</span>:      mov     x29, sp</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96300</span> <span class="op">&lt;</span>nfs_readpage_async+8<span class="op">&gt;</span>:      stp     x21, x22, <span class="pp">[</span><span class="ss">sp,#32</span><span class="pp">]</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96304</span> <span class="op">&lt;</span>nfs_readpage_async+12<span class="op">&gt;</span>:     str     x19, <span class="pp">[</span><span class="ss">sp,#16</span><span class="pp">]</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96308</span> <span class="op">&lt;</span>nfs_readpage_async+16<span class="op">&gt;</span>:     str     x23, <span class="pp">[</span><span class="ss">sp,#48</span><span class="pp">]</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d9630c</span> <span class="op">&lt;</span>nfs_readpage_async+20<span class="op">&gt;</span>:     mov     x19, x2 <span class="co"># aarch64下是指x2复制到x19</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96310</span> <span class="op">&lt;</span>nfs_readpage_async+24<span class="op">&gt;</span>:     mov     x22, x1</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96314</span> <span class="op">&lt;</span>nfs_readpage_async+28<span class="op">&gt;</span>:     mov     x23, x0</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96318</span> <span class="op">&lt;</span>nfs_readpage_async+32<span class="op">&gt;</span>:     mov     x0, x30</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d9631c</span> <span class="op">&lt;</span>nfs_readpage_async+36<span class="op">&gt;</span>:     nop</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96320</span> <span class="op">&lt;</span>nfs_readpage_async+40<span class="op">&gt;</span>:     ldr     x1, <span class="pp">[</span><span class="ss">x19,#8</span><span class="pp">]</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96324</span> <span class="op">&lt;</span>nfs_readpage_async+44<span class="op">&gt;</span>:     sub     x0, x1, <span class="co">#0x1</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96328</span> <span class="op">&lt;</span>nfs_readpage_async+48<span class="op">&gt;</span>:     tst     x1, <span class="co">#0x1</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d9632c</span> <span class="op">&lt;</span>nfs_readpage_async+52<span class="op">&gt;</span>:     csel    x0, x0, x19, ne</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96330</span> <span class="op">&lt;</span>nfs_readpage_async+56<span class="op">&gt;</span>:     ldr     x0, <span class="pp">[</span><span class="ss">x0</span><span class="pp">]</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96334</span> <span class="op">&lt;</span>nfs_readpage_async+60<span class="op">&gt;</span>:     tst     w0, <span class="co">#0x40000</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96338</span> <span class="op">&lt;</span>nfs_readpage_async+64<span class="op">&gt;</span>:     b.eq    0xffff2f76d1d96348 <span class="op">&lt;</span>nfs_readpage_async+80<span class="op">&gt;</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d9633c</span> <span class="op">&lt;</span>nfs_readpage_async+68<span class="op">&gt;</span>:     ldr     x0, <span class="pp">[</span><span class="ss">x19</span><span class="pp">]</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96340</span> <span class="op">&lt;</span>nfs_readpage_async+72<span class="op">&gt;</span>:     tst     w0, <span class="co">#0x200</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96344</span> <span class="op">&lt;</span>nfs_readpage_async+76<span class="op">&gt;</span>:     b.ne    0xffff2f76d1d96418 <span class="op">&lt;</span>nfs_readpage_async+288<span class="op">&gt;</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d96348</span> <span class="op">&lt;</span>nfs_readpage_async+80<span class="op">&gt;</span>:     ldr     x0, <span class="pp">[</span><span class="ss">x19,#24</span><span class="pp">]</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff2f76d1d9634c</span> <span class="op">&lt;</span>nfs_readpage_async+84<span class="op">&gt;</span>:     ldr     x0, <span class="pp">[</span><span class="ss">x0</span><span class="pp">]</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
-<p>aarch64架构下整数参数使用的寄存器依次为:
-<code>x0~x7</code>，从栈帧数据中可以看出函数<code>nfs_readpage_async</code>第三个参数<code>page</code>的值为<code>X2: ffff7ff30a0911c0</code>，且<code>x2</code>寄存器的值未被覆盖。</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct page ffff7ff30a0911c0 <span class="at">-x</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> page {</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      <span class="ex">mapping</span> = 0x0, </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">_refcount</span> = {</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">counter</span> = 0x3</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span> </span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dis nfs_readpage_async</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="ex">0xffff2f76d1d962f8</span> <span class="op">&lt;</span>nfs_readpage_async<span class="op">&gt;</span>:        stp     x29, x30, [sp,#-224]!</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="ex">0xffff2f76d1d962fc</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">4&gt;</span>:      mov     x29, sp</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96300</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">8&gt;</span>:      stp     x21, x22, [sp,#32]</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96304</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">12&gt;</span>:     str     x19, [sp,#16]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96308</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">16&gt;</span>:     str     x23, [sp,#48]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="ex">0xffff2f76d1d9630c</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">20&gt;</span>:     mov     x19, x2 # aarch64下是指x2复制到x19</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96310</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">24&gt;</span>:     mov     x22, x1</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96314</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">28&gt;</span>:     mov     x23, x0</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96318</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">32&gt;</span>:     mov     x0, x30</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="ex">0xffff2f76d1d9631c</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">36&gt;</span>:     nop</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96320</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">40&gt;</span>:     ldr     x1, [x19,#8]</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96324</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">44&gt;</span>:     sub     x0, x1, #0x1</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96328</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">48&gt;</span>:     tst     x1, #0x1</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a><span class="ex">0xffff2f76d1d9632c</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">52&gt;</span>:     csel    x0, x0, x19, ne</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96330</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">56&gt;</span>:     ldr     x0, [x0]</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96334</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">60&gt;</span>:     tst     w0, #0x40000</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96338</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">64&gt;</span>:     b.eq    0xffff2f76d1d96348 <span class="op">&lt;</span>nfs_readpage_async+<span class="op">80&gt;</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a><span class="ex">0xffff2f76d1d9633c</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">68&gt;</span>:     ldr     x0, [x19]</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96340</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">72&gt;</span>:     tst     w0, #0x200</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96344</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">76&gt;</span>:     b.ne    0xffff2f76d1d96418 <span class="op">&lt;</span>nfs_readpage_async+<span class="op">288&gt;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true"></a><span class="ex">0xffff2f76d1d96348</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">80&gt;</span>:     ldr     x0, [x19,#24]</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true"></a><span class="ex">0xffff2f76d1d9634c</span> <span class="op">&lt;</span>nfs_readpage_async+<span class="op">84&gt;</span>:     ldr     x0, [x0]</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true"></a><span class="ex">...</span></span></code></pre></div>
+<p>aarch64架构下整数参数使用的寄存器依次为: <code>x0~x7</code>，从栈帧数据中可以看出函数<code>nfs_readpage_async</code>第三个参数<code>page</code>的值为<code>X2: ffff7ff30a0911c0</code>，且<code>x2</code>寄存器的值未被覆盖。</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct page ffff7ff30a0911c0 -x</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="ex">struct</span> page {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>      <span class="ex">mapping</span> = 0x0, </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>  <span class="ex">_refcount</span> = {</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>    <span class="ex">counter</span> = 0x3</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>  }, </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>}</span></code></pre></div>
 <p>可以看到page-&gt;mapping已经为NULL。</p>
-<h1 data-number="3" id="分析与解决方案"><span
-class="header-section-number">3</span> 分析与解决方案</h1>
-<p>具体的分析请查看《<a
-href="https://chenxiaosong.com/courses/nfs/issues/4.19-null-ptr-deref-in-nfs_readpage_async.html">4.19
-nfs_readpage_async()空指针解引用问题</a>。</p>
+<h1 data-number="3" id="分析与解决方案"><span class="header-section-number">3</span> 分析与解决方案</h1>
+<p>具体的分析请查看《<a href="https://chenxiaosong.com/courses/nfs/issues/4.19-null-ptr-deref-in-nfs_readpage_async.html">4.19 nfs_readpage_async()空指针解引用问题</a>。</p>
 </body>
 </html>

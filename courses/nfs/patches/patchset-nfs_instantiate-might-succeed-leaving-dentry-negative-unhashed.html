@@ -8,19 +8,10 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    ul.task-list{list-style: none;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -31,46 +22,25 @@
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
 <li><a href="https://chenxiaosong.com/bili">哔哩哔哩: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程:
-chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献:
-chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
-<h1 class="title">patchset: nfs_instantiate() might succeed leaving
-dentry negative unhashed</h1>
+<h1 class="title">patchset: nfs_instantiate() might succeed leaving dentry negative unhashed</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a
-href="#cd91533dcc-nfs-refactor-nfs_instantiate-for-dentry-referencing-callers"
-id="toc-cd91533dcc-nfs-refactor-nfs_instantiate-for-dentry-referencing-callers"><span
-class="toc-section-number">1</span>
-<code>406cd91533dcc NFS: Refactor nfs_instantiate() for dentry referencing callers</code></a></li>
-<li><a
-href="#fd6e457b30e-nfsv3-use-nfs_add_or_obtain-to-create-and-reference-inodes"
-id="toc-fd6e457b30e-nfsv3-use-nfs_add_or_obtain-to-create-and-reference-inodes"><span
-class="toc-section-number">2</span>
-<code>17fd6e457b30e NFSv3: use nfs_add_or_obtain() to create and reference inodes</code></a></li>
-<li><a href="#c8346b9-nfs-remove-unused-check-for-negative-dentry"
-id="toc-c8346b9-nfs-remove-unused-check-for-negative-dentry"><span
-class="toc-section-number">3</span>
-<code>581057c8346b9 NFS: remove unused check for negative dentry</code></a></li>
+<li><a href="#cd91533dcc-nfs-refactor-nfs_instantiate-for-dentry-referencing-callers"><span class="toc-section-number">1</span> <span><code>406cd91533dcc NFS: Refactor nfs_instantiate() for dentry referencing callers</code></span></a></li>
+<li><a href="#fd6e457b30e-nfsv3-use-nfs_add_or_obtain-to-create-and-reference-inodes"><span class="toc-section-number">2</span> <span><code>17fd6e457b30e NFSv3: use nfs_add_or_obtain() to create and reference inodes</code></span></a></li>
+<li><a href="#c8346b9-nfs-remove-unused-check-for-negative-dentry"><span class="toc-section-number">3</span> <span><code>581057c8346b9 NFS: remove unused check for negative dentry</code></span></a></li>
 </ul>
 </nav>
-<p><a
-href="https://www.bilibili.com/video/BV1hm421g7T8/">点击这里在哔哩哔哩bilibili在线观看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/courses/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<p>相关的问题: <a
-href="https://chenxiaosong.com/courses/nfs/issues/4.19-null-ptr-deref-in-__nfs3_proc_setacls.html">4.19
-__nfs3_proc_setacls()空指针解引用问题</a>。</p>
+<p><a href="https://www.bilibili.com/video/BV1hm421g7T8/">点击这里在哔哩哔哩bilibili在线观看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/courses/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p>相关的问题: <a href="https://chenxiaosong.com/courses/nfs/issues/4.19-null-ptr-deref-in-__nfs3_proc_setacls.html">4.19 __nfs3_proc_setacls()空指针解引用问题</a>。</p>
 <p><code>[PATCH 0/3] nfs_instantiate() might succeed leaving dentry negative unhashed</code>:</p>
 <pre><code>在添加提交 b0c6108ecf64 (&quot;nfs_instantiate(): prevent multiple aliases for directory inode&quot;) 后，我的 NFS 客户端在同时对本地文件系统和通过 knfsd 导出的相同文件系统执行 Lustre 竞争测试时崩溃：
 
@@ -104,17 +74,8 @@ __nfs3_proc_setacls()空指针解引用问题</a>。</p>
 第二个补丁修改了 NFSv3，使其使用后者路径，供需要引用 dentry 的调用者使用。
 
 第三个补丁删除了对正 dentry 的测试，因为这似乎是不可能的——我找不到路径能够触发它，并且在我所有的测试中从未触发过。</code></pre>
-<h1 data-number="1"
-id="cd91533dcc-nfs-refactor-nfs_instantiate-for-dentry-referencing-callers"><span
-class="header-section-number">1</span> <a
-href="https://lore.kernel.org/linux-nfs/5f1de77be01d5729bf246dce8e2fd2d8d191c6bb.1568377101.git.bcodding@redhat.com/"><code>406cd91533dcc NFS: Refactor nfs_instantiate() for dentry referencing callers</code></a></h1>
-<h1 data-number="2"
-id="fd6e457b30e-nfsv3-use-nfs_add_or_obtain-to-create-and-reference-inodes"><span
-class="header-section-number">2</span> <a
-href="https://lore.kernel.org/linux-nfs/157982bc982443f8c675d4269e70da55afa82821.1568377101.git.bcodding@redhat.com/"><code>17fd6e457b30e NFSv3: use nfs_add_or_obtain() to create and reference inodes</code></a></h1>
-<h1 data-number="3"
-id="c8346b9-nfs-remove-unused-check-for-negative-dentry"><span
-class="header-section-number">3</span> <a
-href="https://lore.kernel.org/linux-nfs/34f99243d118543593cf82d5862065fd037c58e7.1568377101.git.bcodding@redhat.com/"><code>581057c8346b9 NFS: remove unused check for negative dentry</code></a></h1>
+<h1 data-number="1" id="cd91533dcc-nfs-refactor-nfs_instantiate-for-dentry-referencing-callers"><span class="header-section-number">1</span> <a href="https://lore.kernel.org/linux-nfs/5f1de77be01d5729bf246dce8e2fd2d8d191c6bb.1568377101.git.bcodding@redhat.com/"><code>406cd91533dcc NFS: Refactor nfs_instantiate() for dentry referencing callers</code></a></h1>
+<h1 data-number="2" id="fd6e457b30e-nfsv3-use-nfs_add_or_obtain-to-create-and-reference-inodes"><span class="header-section-number">2</span> <a href="https://lore.kernel.org/linux-nfs/157982bc982443f8c675d4269e70da55afa82821.1568377101.git.bcodding@redhat.com/"><code>17fd6e457b30e NFSv3: use nfs_add_or_obtain() to create and reference inodes</code></a></h1>
+<h1 data-number="3" id="c8346b9-nfs-remove-unused-check-for-negative-dentry"><span class="header-section-number">3</span> <a href="https://lore.kernel.org/linux-nfs/34f99243d118543593cf82d5862065fd037c58e7.1568377101.git.bcodding@redhat.com/"><code>581057c8346b9 NFS: remove unused check for negative dentry</code></a></h1>
 </body>
 </html>

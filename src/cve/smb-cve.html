@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -95,177 +84,62 @@
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
 <li><a href="https://chenxiaosong.com/bili">哔哩哔哩: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程:
-chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献:
-chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">smb cve</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a
-href="#cve-2024-50047-b0abcd65ec54-smb-client-fix-uaf-in-async-decryption"
-id="toc-cve-2024-50047-b0abcd65ec54-smb-client-fix-uaf-in-async-decryption"><span
-class="toc-section-number">1</span>
-<code>CVE-2024-50047 b0abcd65ec54 smb: client: fix UAF in async decryption</code>。</a></li>
-<li><a
-href="#cve-2024-50106-8dd91e8d31fe-nfsd-fix-race-between-laundromat-and-free_stateid"
-id="toc-cve-2024-50106-8dd91e8d31fe-nfsd-fix-race-between-laundromat-and-free_stateid"><span
-class="toc-section-number">2</span>
-<code>CVE-2024-50106 8dd91e8d31fe nfsd: fix race between laundromat and free_stateid</code></a></li>
-<li><a
-href="#cve-2024-53095-ef7134c7fc48-smb-client-fix-use-after-free-of-network-namespace."
-id="toc-cve-2024-53095-ef7134c7fc48-smb-client-fix-use-after-free-of-network-namespace."><span
-class="toc-section-number">3</span>
-<code>CVE-2024-53095 ef7134c7fc48 smb: client: Fix use-after-free of network namespace.</code></a></li>
-<li><a
-href="#cve-2024-49988-ee426bfb9d09-ksmbd-add-refcnt-to-ksmbd_conn-struct"
-id="toc-cve-2024-49988-ee426bfb9d09-ksmbd-add-refcnt-to-ksmbd_conn-struct"><span
-class="toc-section-number">4</span>
-<code>CVE-2024-49988 ee426bfb9d09 ksmbd: add refcnt to ksmbd_conn struct</code></a></li>
-<li><a
-href="#cve-2024-26952-c6cd2e8d2d9a-ksmbd-fix-potencial-out-of-bounds-when-buffer-offset-is-invalid"
-id="toc-cve-2024-26952-c6cd2e8d2d9a-ksmbd-fix-potencial-out-of-bounds-when-buffer-offset-is-invalid"><span
-class="toc-section-number">5</span>
-<code>CVE-2024-26952 c6cd2e8d2d9a ksmbd: fix potencial out-of-bounds when buffer offset is invalid</code></a></li>
-<li><a
-href="#cve-2024-26954-a80a486d72e2-ksmbd-fix-slab-out-of-bounds-in-smb_strndup_from_utf16"
-id="toc-cve-2024-26954-a80a486d72e2-ksmbd-fix-slab-out-of-bounds-in-smb_strndup_from_utf16"><span
-class="toc-section-number">6</span>
-<code>CVE-2024-26954 a80a486d72e2 ksmbd: fix slab-out-of-bounds in smb_strndup_from_utf16()</code></a></li>
-<li><a
-href="#cve-2024-26936-17cf0c2794bd-ksmbd-validate-request-buffer-size-in-smb2_allocate_rsp_buf"
-id="toc-cve-2024-26936-17cf0c2794bd-ksmbd-validate-request-buffer-size-in-smb2_allocate_rsp_buf"><span
-class="toc-section-number">7</span>
-<code>CVE-2024-26936 17cf0c2794bd ksmbd: validate request buffer size in smb2_allocate_rsp_buf()</code></a></li>
-<li><a
-href="#cve-2023-52442-3df0411e132e-ksmbd-validate-session-id-and-tree-id-in-compound-request"
-id="toc-cve-2023-52442-3df0411e132e-ksmbd-validate-session-id-and-tree-id-in-compound-request"><span
-class="toc-section-number">8</span>
-<code>CVE-2023-52442 3df0411e132e ksmbd: validate session id and tree id in compound request</code></a></li>
-<li><a
-href="#cve-2024-39468-02c418774f76-smb-client-fix-deadlock-in-smb2_find_smb_tcon"
-id="toc-cve-2024-39468-02c418774f76-smb-client-fix-deadlock-in-smb2_find_smb_tcon"><span
-class="toc-section-number">9</span>
-<code>CVE-2024-39468 02c418774f76 smb: client: fix deadlock in smb2_find_smb_tcon()</code></a></li>
-<li><a
-href="#cve-2024-0565-eec04ea11969-smb-client-fix-oob-in-receive_encrypted_standard"
-id="toc-cve-2024-0565-eec04ea11969-smb-client-fix-oob-in-receive_encrypted_standard"><span
-class="toc-section-number">10</span>
-<code>CVE-2024-0565 eec04ea11969 smb: client: fix OOB in receive_encrypted_standard()</code></a>
+<li><a href="#cve-2024-50047-b0abcd65ec54-smb-client-fix-uaf-in-async-decryption"><span class="toc-section-number">1</span> <code>CVE-2024-50047 b0abcd65ec54 smb: client: fix UAF in async decryption</code>。</a></li>
+<li><a href="#cve-2024-50106-8dd91e8d31fe-nfsd-fix-race-between-laundromat-and-free_stateid"><span class="toc-section-number">2</span> <code>CVE-2024-50106 8dd91e8d31fe nfsd: fix race between laundromat and free_stateid</code></a></li>
+<li><a href="#cve-2024-53095-ef7134c7fc48-smb-client-fix-use-after-free-of-network-namespace."><span class="toc-section-number">3</span> <code>CVE-2024-53095 ef7134c7fc48 smb: client: Fix use-after-free of network namespace.</code></a></li>
+<li><a href="#cve-2024-49988-ee426bfb9d09-ksmbd-add-refcnt-to-ksmbd_conn-struct"><span class="toc-section-number">4</span> <code>CVE-2024-49988 ee426bfb9d09 ksmbd: add refcnt to ksmbd_conn struct</code></a></li>
+<li><a href="#cve-2024-26952-c6cd2e8d2d9a-ksmbd-fix-potencial-out-of-bounds-when-buffer-offset-is-invalid"><span class="toc-section-number">5</span> <code>CVE-2024-26952 c6cd2e8d2d9a ksmbd: fix potencial out-of-bounds when buffer offset is invalid</code></a></li>
+<li><a href="#cve-2024-26954-a80a486d72e2-ksmbd-fix-slab-out-of-bounds-in-smb_strndup_from_utf16"><span class="toc-section-number">6</span> <code>CVE-2024-26954 a80a486d72e2 ksmbd: fix slab-out-of-bounds in smb_strndup_from_utf16()</code></a></li>
+<li><a href="#cve-2024-26936-17cf0c2794bd-ksmbd-validate-request-buffer-size-in-smb2_allocate_rsp_buf"><span class="toc-section-number">7</span> <code>CVE-2024-26936 17cf0c2794bd ksmbd: validate request buffer size in smb2_allocate_rsp_buf()</code></a></li>
+<li><a href="#cve-2023-52442-3df0411e132e-ksmbd-validate-session-id-and-tree-id-in-compound-request"><span class="toc-section-number">8</span> <code>CVE-2023-52442 3df0411e132e ksmbd: validate session id and tree id in compound request</code></a></li>
+<li><a href="#cve-2024-39468-02c418774f76-smb-client-fix-deadlock-in-smb2_find_smb_tcon"><span class="toc-section-number">9</span> <code>CVE-2024-39468 02c418774f76 smb: client: fix deadlock in smb2_find_smb_tcon()</code></a></li>
+<li><a href="#cve-2024-0565-eec04ea11969-smb-client-fix-oob-in-receive_encrypted_standard"><span class="toc-section-number">10</span> <span><code>CVE-2024-0565 eec04ea11969 smb: client: fix OOB in receive_encrypted_standard()</code></span></a>
 <ul>
-<li><a href="#合补丁" id="toc-合补丁"><span
-class="toc-section-number">10.1</span> 4.19合补丁</a></li>
+<li><a href="#合补丁"><span class="toc-section-number">10.1</span> 4.19合补丁</a></li>
 </ul></li>
-<li><a
-href="#cve-2023-6606-b35858b3786d-smb-client-fix-oob-in-smbcalcsize"
-id="toc-cve-2023-6606-b35858b3786d-smb-client-fix-oob-in-smbcalcsize"><span
-class="toc-section-number">11</span>
-<code>CVE-2023-6606 b35858b3786d smb: client: fix OOB in smbCalcSize()</code></a></li>
-<li><a
-href="#cve-2023-52757-e6322fd177c6-smb-client-fix-potential-deadlock-when-releasing-mids"
-id="toc-cve-2023-52757-e6322fd177c6-smb-client-fix-potential-deadlock-when-releasing-mids"><span
-class="toc-section-number">12</span>
-<code>CVE-2023-52757 e6322fd177c6 smb: client: fix potential deadlock when releasing mids</code></a></li>
-<li><a
-href="#cve-2023-6610-567320c46a60a3c39b69aa1df802d753817a3f86-smb-client-fix-potential-oob-in-smb2_dump_detail"
-id="toc-cve-2023-6610-567320c46a60a3c39b69aa1df802d753817a3f86-smb-client-fix-potential-oob-in-smb2_dump_detail"><span
-class="toc-section-number">13</span>
-<code>CVE-2023-6610 567320c46a60a3c39b69aa1df802d753817a3f86 smb: client: fix potential OOB in smb2_dump_detail()</code></a>
+<li><a href="#cve-2023-6606-b35858b3786d-smb-client-fix-oob-in-smbcalcsize"><span class="toc-section-number">11</span> <code>CVE-2023-6606 b35858b3786d smb: client: fix OOB in smbCalcSize()</code></a></li>
+<li><a href="#cve-2023-52757-e6322fd177c6-smb-client-fix-potential-deadlock-when-releasing-mids"><span class="toc-section-number">12</span> <code>CVE-2023-52757 e6322fd177c6 smb: client: fix potential deadlock when releasing mids</code></a></li>
+<li><a href="#cve-2023-6610-567320c46a60a3c39b69aa1df802d753817a3f86-smb-client-fix-potential-oob-in-smb2_dump_detail"><span class="toc-section-number">13</span> <span><code>CVE-2023-6610 567320c46a60a3c39b69aa1df802d753817a3f86 smb: client: fix potential OOB in smb2_dump_detail()</code></span></a>
 <ul>
-<li><a href="#合补丁-1" id="toc-合补丁-1"><span
-class="toc-section-number">13.1</span> 4.19合补丁</a></li>
-<li><a href="#合补丁-2" id="toc-合补丁-2"><span
-class="toc-section-number">13.2</span> 4.4合补丁</a></li>
+<li><a href="#合补丁-1"><span class="toc-section-number">13.1</span> 4.19合补丁</a></li>
+<li><a href="#合补丁-2"><span class="toc-section-number">13.2</span> 4.4合补丁</a></li>
 </ul></li>
-<li><a
-href="#cve-2023-52434-af1689a9b770-smb-client-fix-potential-oobs-in-smb2_parse_contexts"
-id="toc-cve-2023-52434-af1689a9b770-smb-client-fix-potential-oobs-in-smb2_parse_contexts"><span
-class="toc-section-number">14</span>
-<code>CVE-2023-52434 af1689a9b770 smb: client: fix potential OOBs in smb2_parse_contexts()</code></a>
+<li><a href="#cve-2023-52434-af1689a9b770-smb-client-fix-potential-oobs-in-smb2_parse_contexts"><span class="toc-section-number">14</span> <code>CVE-2023-52434 af1689a9b770 smb: client: fix potential OOBs in smb2_parse_contexts()</code></a>
 <ul>
-<li><a href="#合补丁-3" id="toc-合补丁-3"><span
-class="toc-section-number">14.1</span> 4.19合补丁</a></li>
+<li><a href="#合补丁-3"><span class="toc-section-number">14.1</span> 4.19合补丁</a></li>
 </ul></li>
-<li><a
-href="#cve-2024-35866-58acd1f49716-smb-client-fix-potential-uaf-in-cifs_dump_full_key"
-id="toc-cve-2024-35866-58acd1f49716-smb-client-fix-potential-uaf-in-cifs_dump_full_key"><span
-class="toc-section-number">15</span>
-<code>CVE-2024-35866 58acd1f49716 smb: client: fix potential UAF in cifs_dump_full_key()</code></a></li>
-<li><a
-href="#cve-2024-35861-e0e50401cc39-smb-client-fix-potential-uaf-in-cifs_signal_cifsd_for_reconnect"
-id="toc-cve-2024-35861-e0e50401cc39-smb-client-fix-potential-uaf-in-cifs_signal_cifsd_for_reconnect"><span
-class="toc-section-number">16</span>
-<code>CVE-2024-35861 e0e50401cc39 smb: client: fix potential UAF in cifs_signal_cifsd_for_reconnect()</code></a>
+<li><a href="#cve-2024-35866-58acd1f49716-smb-client-fix-potential-uaf-in-cifs_dump_full_key"><span class="toc-section-number">15</span> <code>CVE-2024-35866 58acd1f49716 smb: client: fix potential UAF in cifs_dump_full_key()</code></a></li>
+<li><a href="#cve-2024-35861-e0e50401cc39-smb-client-fix-potential-uaf-in-cifs_signal_cifsd_for_reconnect"><span class="toc-section-number">16</span> <code>CVE-2024-35861 e0e50401cc39 smb: client: fix potential UAF in cifs_signal_cifsd_for_reconnect()</code></a>
 <ul>
-<li><a href="#合补丁-4" id="toc-合补丁-4"><span
-class="toc-section-number">16.1</span> 4.19合补丁</a></li>
+<li><a href="#合补丁-4"><span class="toc-section-number">16.1</span> 4.19合补丁</a></li>
 </ul></li>
-<li><a
-href="#cve-2024-35868-d3da25c5ac84-smb-client-fix-potential-uaf-in-cifs_stats_proc_write"
-id="toc-cve-2024-35868-d3da25c5ac84-smb-client-fix-potential-uaf-in-cifs_stats_proc_write"><span
-class="toc-section-number">17</span>
-<code>CVE-2024-35868 d3da25c5ac84 smb: client: fix potential UAF in cifs_stats_proc_write()</code></a></li>
-<li><a
-href="#cve-2024-35863-69ccf040acdd-smb-client-fix-potential-uaf-in-is_valid_oplock_break"
-id="toc-cve-2024-35863-69ccf040acdd-smb-client-fix-potential-uaf-in-is_valid_oplock_break"><span
-class="toc-section-number">18</span>
-<code>CVE-2024-35863 69ccf040acdd smb: client: fix potential UAF in is_valid_oplock_break()</code></a></li>
-<li><a
-href="#cve-2024-35865-22863485a462-smb-client-fix-potential-uaf-in-smb2_is_valid_oplock_break"
-id="toc-cve-2024-35865-22863485a462-smb-client-fix-potential-uaf-in-smb2_is_valid_oplock_break"><span
-class="toc-section-number">19</span>
-<code>CVE-2024-35865 22863485a462 smb: client: fix potential UAF in smb2_is_valid_oplock_break()</code></a></li>
-<li><a
-href="#cve-2024-35870-24a9799aa8ef-smb-client-fix-uaf-in-smb2_reconnect_server"
-id="toc-cve-2024-35870-24a9799aa8ef-smb-client-fix-uaf-in-smb2_reconnect_server"><span
-class="toc-section-number">20</span>
-<code>CVE-2024-35870 24a9799aa8ef smb: client: fix UAF in smb2_reconnect_server()</code></a></li>
-<li><a
-href="#cve-2023-52752-d328c09ee9f1-smb-client-fix-use-after-free-bug-in-cifs_debug_data_proc_show"
-id="toc-cve-2023-52752-d328c09ee9f1-smb-client-fix-use-after-free-bug-in-cifs_debug_data_proc_show"><span
-class="toc-section-number">21</span>
-<code>CVE-2023-52752 d328c09ee9f1 smb: client: fix use-after-free bug in cifs_debug_data_proc_show()</code></a></li>
-<li><a
-href="#cve-2023-52751-5c86919455c1-smb-client-fix-use-after-free-in-smb2_query_info_compound"
-id="toc-cve-2023-52751-5c86919455c1-smb-client-fix-use-after-free-in-smb2_query_info_compound"><span
-class="toc-section-number">22</span>
-<code>CVE-2023-52751 5c86919455c1 smb: client: fix use-after-free in smb2_query_info_compound()</code></a></li>
+<li><a href="#cve-2024-35868-d3da25c5ac84-smb-client-fix-potential-uaf-in-cifs_stats_proc_write"><span class="toc-section-number">17</span> <code>CVE-2024-35868 d3da25c5ac84 smb: client: fix potential UAF in cifs_stats_proc_write()</code></a></li>
+<li><a href="#cve-2024-35863-69ccf040acdd-smb-client-fix-potential-uaf-in-is_valid_oplock_break"><span class="toc-section-number">18</span> <code>CVE-2024-35863 69ccf040acdd smb: client: fix potential UAF in is_valid_oplock_break()</code></a></li>
+<li><a href="#cve-2024-35865-22863485a462-smb-client-fix-potential-uaf-in-smb2_is_valid_oplock_break"><span class="toc-section-number">19</span> <code>CVE-2024-35865 22863485a462 smb: client: fix potential UAF in smb2_is_valid_oplock_break()</code></a></li>
+<li><a href="#cve-2024-35870-24a9799aa8ef-smb-client-fix-uaf-in-smb2_reconnect_server"><span class="toc-section-number">20</span> <code>CVE-2024-35870 24a9799aa8ef smb: client: fix UAF in smb2_reconnect_server()</code></a></li>
+<li><a href="#cve-2023-52752-d328c09ee9f1-smb-client-fix-use-after-free-bug-in-cifs_debug_data_proc_show"><span class="toc-section-number">21</span> <span><code>CVE-2023-52752 d328c09ee9f1 smb: client: fix use-after-free bug in cifs_debug_data_proc_show()</code></span></a></li>
+<li><a href="#cve-2023-52751-5c86919455c1-smb-client-fix-use-after-free-in-smb2_query_info_compound"><span class="toc-section-number">22</span> <code>CVE-2023-52751 5c86919455c1 smb: client: fix use-after-free in smb2_query_info_compound()</code></a></li>
 </ul>
 </nav>
-<h1 data-number="1"
-id="cve-2024-50047-b0abcd65ec54-smb-client-fix-uaf-in-async-decryption"><span
-class="header-section-number">1</span>
-<code>CVE-2024-50047 b0abcd65ec54 smb: client: fix UAF in async decryption</code>。</h1>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/IAYRE5">openeuler的issue</a>。</p>
-<p><a
-href="https://gitee.com/openeuler/kernel/issues/IBC88Z?skip_mobile=true">CVE-2024-50047
-的修复导致出现Oops 复位</a></p>
-<h1 data-number="2"
-id="cve-2024-50106-8dd91e8d31fe-nfsd-fix-race-between-laundromat-and-free_stateid"><span
-class="header-section-number">2</span>
-<code>CVE-2024-50106 8dd91e8d31fe nfsd: fix race between laundromat and free_stateid</code></h1>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/IB2BX2">openeuler
-issue</a></p>
-<h1 data-number="3"
-id="cve-2024-53095-ef7134c7fc48-smb-client-fix-use-after-free-of-network-namespace."><span
-class="header-section-number">3</span>
-<code>CVE-2024-53095 ef7134c7fc48 smb: client: Fix use-after-free of network namespace.</code></h1>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/IB67YB">openeuler
-issue</a></p>
-<p><a href="https://gitee.com/openeuler/kernel/pulls/14249">openeuler
-4.19 补丁</a></p>
+<h1 data-number="1" id="cve-2024-50047-b0abcd65ec54-smb-client-fix-uaf-in-async-decryption"><span class="header-section-number">1</span> <code>CVE-2024-50047 b0abcd65ec54 smb: client: fix UAF in async decryption</code>。</h1>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/IAYRE5">openeuler的issue</a>。</p>
+<p><a href="https://gitee.com/openeuler/kernel/issues/IBC88Z?skip_mobile=true">CVE-2024-50047 的修复导致出现Oops 复位</a></p>
+<h1 data-number="2" id="cve-2024-50106-8dd91e8d31fe-nfsd-fix-race-between-laundromat-and-free_stateid"><span class="header-section-number">2</span> <code>CVE-2024-50106 8dd91e8d31fe nfsd: fix race between laundromat and free_stateid</code></h1>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/IB2BX2">openeuler issue</a></p>
+<h1 data-number="3" id="cve-2024-53095-ef7134c7fc48-smb-client-fix-use-after-free-of-network-namespace."><span class="header-section-number">3</span> <code>CVE-2024-53095 ef7134c7fc48 smb: client: Fix use-after-free of network namespace.</code></h1>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/IB67YB">openeuler issue</a></p>
+<p><a href="https://gitee.com/openeuler/kernel/pulls/14249">openeuler 4.19 补丁</a></p>
 <p>还有后续修复补丁<code>e9f2517a3e18 smb: client: fix TCP timers deadlock after rmmod</code>。</p>
 <pre><code>最近，我们收到客户报告称，在重新连接到服务器时，通用Internet文件系统（CIFS）触发了oops（内核错误）。[0]
 
@@ -291,113 +165,64 @@ CIFS使用内核套接字，而这些套接字并不持有它们所属网络命�
 注意，我们需要将put_net()从cifs_put_tcp_session()中移动到clean_demultiplex_info()；否则，在cifsd尝试从cifs_demultiplex_thread()重新连接时，__sock_create()仍可能访问已被释放的网络命名空间。
 
 此外，不能在__sock_create()之前直接放置maybe_get_net()，因为该代码不在RCU保护之下，存在很小的可能性是，相同的地址可能被重新分配给另一个网络命名空间。</code></pre>
-<h1 data-number="4"
-id="cve-2024-49988-ee426bfb9d09-ksmbd-add-refcnt-to-ksmbd_conn-struct"><span
-class="header-section-number">4</span>
-<code>CVE-2024-49988 ee426bfb9d09 ksmbd: add refcnt to ksmbd_conn struct</code></h1>
+<h1 data-number="4" id="cve-2024-49988-ee426bfb9d09-ksmbd-add-refcnt-to-ksmbd_conn-struct"><span class="header-section-number">4</span> <code>CVE-2024-49988 ee426bfb9d09 ksmbd: add refcnt to ksmbd_conn struct</code></h1>
 <pre><code>ksmbd：在 ksmbd_conn 结构体中添加引用计数
 
 在发送 oplock 中断请求时，使用了 opinfo-&gt;conn，但是在多通道环境下，已经释放的 -&gt;conn 可能会被使用。这个补丁在 ksmbd_conn 结构体中添加了引用计数，以确保只有在不再使用时，ksmbd_conn 结构体才能被释放。</code></pre>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/IAYRCR">openeuler
-issue</a></p>
-<h1 data-number="5"
-id="cve-2024-26952-c6cd2e8d2d9a-ksmbd-fix-potencial-out-of-bounds-when-buffer-offset-is-invalid"><span
-class="header-section-number">5</span>
-<code>CVE-2024-26952 c6cd2e8d2d9a ksmbd: fix potencial out-of-bounds when buffer offset is invalid</code></h1>
-<p>引入问题的补丁:
-<code>0626e6641f6b cifsd: add server handler for central processing and tranport layers</code>。</p>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/I9L5L1">openeuler
-issue</a></p>
-<h1 data-number="6"
-id="cve-2024-26954-a80a486d72e2-ksmbd-fix-slab-out-of-bounds-in-smb_strndup_from_utf16"><span
-class="header-section-number">6</span>
-<code>CVE-2024-26954 a80a486d72e2 ksmbd: fix slab-out-of-bounds in smb_strndup_from_utf16()</code></h1>
-<p>引入问题的补丁:
-<code>0626e6641f6b cifsd: add server handler for central processing and tranport layers</code>。</p>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/I9L5E3">openeuler
-issue</a></p>
-<h1 data-number="7"
-id="cve-2024-26936-17cf0c2794bd-ksmbd-validate-request-buffer-size-in-smb2_allocate_rsp_buf"><span
-class="header-section-number">7</span>
-<code>CVE-2024-26936 17cf0c2794bd ksmbd: validate request buffer size in smb2_allocate_rsp_buf()</code></h1>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/I9L4XI">openeuler
-issue</a></p>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/IAYRCR">openeuler issue</a></p>
+<h1 data-number="5" id="cve-2024-26952-c6cd2e8d2d9a-ksmbd-fix-potencial-out-of-bounds-when-buffer-offset-is-invalid"><span class="header-section-number">5</span> <code>CVE-2024-26952 c6cd2e8d2d9a ksmbd: fix potencial out-of-bounds when buffer offset is invalid</code></h1>
+<p>引入问题的补丁: <code>0626e6641f6b cifsd: add server handler for central processing and tranport layers</code>。</p>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/I9L5L1">openeuler issue</a></p>
+<h1 data-number="6" id="cve-2024-26954-a80a486d72e2-ksmbd-fix-slab-out-of-bounds-in-smb_strndup_from_utf16"><span class="header-section-number">6</span> <code>CVE-2024-26954 a80a486d72e2 ksmbd: fix slab-out-of-bounds in smb_strndup_from_utf16()</code></h1>
+<p>引入问题的补丁: <code>0626e6641f6b cifsd: add server handler for central processing and tranport layers</code>。</p>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/I9L5E3">openeuler issue</a></p>
+<h1 data-number="7" id="cve-2024-26936-17cf0c2794bd-ksmbd-validate-request-buffer-size-in-smb2_allocate_rsp_buf"><span class="header-section-number">7</span> <code>CVE-2024-26936 17cf0c2794bd ksmbd: validate request buffer size in smb2_allocate_rsp_buf()</code></h1>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/I9L4XI">openeuler issue</a></p>
 <pre><code>ksmbd：在 smb2_allocate_rsp_buf() 中验证请求缓冲区大小
 
 响应缓冲区应该在 smb2_allocate_rsp_buf 中分配，随后再验证请求。然而，smb2_allocate_rsp_buf() 中使用了有效负载中的字段以及 smb2 头部的内容。这个补丁在 smb2_allocate_rsp_buf() 中添加了简单的缓冲区大小验证，以避免潜在的请求缓冲区越界问题。</code></pre>
-<h1 data-number="8"
-id="cve-2023-52442-3df0411e132e-ksmbd-validate-session-id-and-tree-id-in-compound-request"><span
-class="header-section-number">8</span>
-<code>CVE-2023-52442 3df0411e132e ksmbd: validate session id and tree id in compound request</code></h1>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/I92OR4">openeuler
-issue</a></p>
-<h1 data-number="9"
-id="cve-2024-39468-02c418774f76-smb-client-fix-deadlock-in-smb2_find_smb_tcon"><span
-class="header-section-number">9</span>
-<code>CVE-2024-39468 02c418774f76 smb: client: fix deadlock in smb2_find_smb_tcon()</code></h1>
+<h1 data-number="8" id="cve-2023-52442-3df0411e132e-ksmbd-validate-session-id-and-tree-id-in-compound-request"><span class="header-section-number">8</span> <code>CVE-2023-52442 3df0411e132e ksmbd: validate session id and tree id in compound request</code></h1>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/I92OR4">openeuler issue</a></p>
+<h1 data-number="9" id="cve-2024-39468-02c418774f76-smb-client-fix-deadlock-in-smb2_find_smb_tcon"><span class="header-section-number">9</span> <code>CVE-2024-39468 02c418774f76 smb: client: fix deadlock in smb2_find_smb_tcon()</code></h1>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，老版本要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-deadlock-in-smb2_find_smb_tcon.patch</span></code></pre></div>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/IA8AFZ">openeuler
-issue</a>。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-deadlock-in-smb2_find_smb_tcon.patch</span></code></pre></div>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/IA8AFZ">openeuler issue</a>。</p>
 <p>在4.19和5.4代码中，<code>smb2_find_smb_tcon()</code>函数中未对<code>smb2_find_smb_sess_tcon_unlocked()</code>的结果进行错误处理，没有相关逻辑，不影响。</p>
-<h1 data-number="10"
-id="cve-2024-0565-eec04ea11969-smb-client-fix-oob-in-receive_encrypted_standard"><span
-class="header-section-number">10</span> <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=eec04ea119691e65227a97ce53c0da6b9b74b0b7"><code>CVE-2024-0565 eec04ea11969 smb: client: fix OOB in receive_encrypted_standard()</code></a></h1>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/I8WEOK">openeuler
-issue</a></p>
-<h2 data-number="10.1" id="合补丁"><span
-class="header-section-number">10.1</span> 4.19合补丁</h2>
+<h1 data-number="10" id="cve-2024-0565-eec04ea11969-smb-client-fix-oob-in-receive_encrypted_standard"><span class="header-section-number">10</span> <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=eec04ea119691e65227a97ce53c0da6b9b74b0b7"><code>CVE-2024-0565 eec04ea11969 smb: client: fix OOB in receive_encrypted_standard()</code></a></h1>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/I8WEOK">openeuler issue</a></p>
+<h2 data-number="10.1" id="合补丁"><span class="header-section-number">10.1</span> 4.19合补丁</h2>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，4.19要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-OOB-in-receive_encrypted_standard.patch</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-OOB-in-receive_encrypted_standard.patch</span></code></pre></div>
 <p>使用<code>git am 0001-smb-client-fix-OOB-in-receive_encrypted_standard.patch --reject</code>命令打上补丁后，会有冲突，不同的地方是:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/fs/cifs/smb2ops.c</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/fs/cifs/smb2ops.c</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-3218,7</span> +3218,7 @@ receive_encrypted_standard<span class="er">(</span><span class="ex">struct</span> TCP_Server_Info <span class="pp">*</span>server,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a> <span class="kw">{</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">int</span> ret, length<span class="kw">;</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">char</span> <span class="pp">*</span>buf = server-<span class="op">&gt;</span>smallbuf<span class="kw">;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>       struct smb2_sync_hdr <span class="pp">*</span>shdr<span class="kw">;</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       struct smb2_hdr <span class="pp">*</span>shdr<span class="kw">;</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="ex">unsigned</span> int pdu_length = server-<span class="op">&gt;</span>pdu_size<span class="kw">;</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="ex">unsigned</span> int buf_size<span class="kw">;</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="ex">struct</span> mid_q_entry <span class="pp">*</span>mid_entry<span class="kw">;</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-3248,7</span> +3248,7 @@ receive_encrypted_standard<span class="er">(</span><span class="ex">struct</span> TCP_Server_Info <span class="pp">*</span>server,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        <span class="ex">next_is_large</span> = server-<span class="op">&gt;</span>large_buf<span class="kw">;</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a> <span class="ex">one_more:</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>       shdr = <span class="er">(</span><span class="ex">struct</span> smb2_sync_hdr <span class="pp">*</span><span class="kw">)</span><span class="ex">buf</span><span class="kw">;</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       shdr = <span class="er">(</span><span class="ex">struct</span> smb2_hdr <span class="pp">*</span><span class="kw">)</span><span class="ex">buf</span><span class="kw">;</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">(</span><span class="ex">shdr-</span><span class="op">&gt;</span>NextCommand<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="kw">(</span><span class="ex">next_is_large</span><span class="kw">)</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>                        <span class="ex">next_buffer</span> = <span class="er">(</span><span class="ex">char</span> <span class="pp">*</span><span class="kw">)</span><span class="fu">cifs_buf_get()</span><span class="kw">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">---</span> a/fs/cifs/smb2ops.c</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="ex">+++</span> b/fs/cifs/smb2ops.c</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="ex">@@</span> -3218,7 +3218,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a> <span class="kw">{</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>        <span class="ex">int</span> ret, length<span class="kw">;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>        <span class="ex">char</span> *buf = server-<span class="op">&gt;</span>smallbuf<span class="kw">;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="ex">-</span>       struct smb2_sync_hdr *shdr<span class="kw">;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="ex">+</span>       struct smb2_hdr *shdr<span class="kw">;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>        <span class="ex">unsigned</span> int pdu_length = server-<span class="op">&gt;</span>pdu_size<span class="kw">;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>        <span class="ex">unsigned</span> int buf_size<span class="kw">;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>        <span class="ex">struct</span> mid_q_entry *mid_entry<span class="kw">;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="ex">@@</span> -3248,7 +3248,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a> </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>        <span class="ex">next_is_large</span> = server-<span class="op">&gt;</span>large_buf<span class="kw">;</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a> <span class="ex">one_more</span>:</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a><span class="ex">-</span>       shdr = (struct smb2_sync_hdr *)<span class="ex">buf</span><span class="kw">;</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a><span class="ex">+</span>       shdr = (struct smb2_hdr *)<span class="ex">buf</span><span class="kw">;</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>        <span class="kw">if</span> <span class="kw">(</span><span class="ex">shdr-</span><span class="op">&gt;</span>NextCommand<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>                <span class="kw">if</span> <span class="kw">(</span><span class="ex">next_is_large</span><span class="kw">)</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a>                        <span class="ex">next_buffer</span> = (char *)<span class="fu">cifs_buf_get()</span>;</span></code></pre></div>
 <p>在主线代码上使用<code>git blame fs/smb/client/smb2ops.c | grep "struct smb2_hdr \*shdr"</code>找到前置补丁<code>0d35e382e4e9 cifs: Create a new shared file holding smb2 pdu definitions</code>才能解决冲突，但此前置补丁与我们修改的内容无关，所以只需要手动处理冲突即可。</p>
-<h1 data-number="11"
-id="cve-2023-6606-b35858b3786d-smb-client-fix-oob-in-smbcalcsize"><span
-class="header-section-number">11</span>
-<code>CVE-2023-6606 b35858b3786d smb: client: fix OOB in smbCalcSize()</code></h1>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/I8MXXW">openeuler
-issue</a></p>
+<h1 data-number="11" id="cve-2023-6606-b35858b3786d-smb-client-fix-oob-in-smbcalcsize"><span class="header-section-number">11</span> <code>CVE-2023-6606 b35858b3786d smb: client: fix OOB in smbCalcSize()</code></h1>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/I8MXXW">openeuler issue</a></p>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，低版本要打上这个修复补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-OOB-in-smbCalcSize.patch</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-OOB-in-smbCalcSize.patch</span></code></pre></div>
 <p>此补丁修复<code>checkSMB()-&gt;smbCalcSize()</code>中访问越界的问题。</p>
-<h1 data-number="12"
-id="cve-2023-52757-e6322fd177c6-smb-client-fix-potential-deadlock-when-releasing-mids"><span
-class="header-section-number">12</span>
-<code>CVE-2023-52757 e6322fd177c6 smb: client: fix potential deadlock when releasing mids</code></h1>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/I9R4KS">openeuler
-issue</a>。</p>
-<p><a href="https://gitee.com/openeuler/kernel/pulls/9825">openeuler
-5.10补丁</a>。</p>
+<h1 data-number="12" id="cve-2023-52757-e6322fd177c6-smb-client-fix-potential-deadlock-when-releasing-mids"><span class="header-section-number">12</span> <code>CVE-2023-52757 e6322fd177c6 smb: client: fix potential deadlock when releasing mids</code></h1>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/I9R4KS">openeuler issue</a>。</p>
+<p><a href="https://gitee.com/openeuler/kernel/pulls/9825">openeuler 5.10补丁</a>。</p>
 <pre><code>smb: 客户端: 修复释放 mids 时的潜在死锁
 
 所有 release_mid() 的调用者似乎都持有 @mid 的引用，因此在 @server-&gt;mid_lock 自旋锁下调用 kref_put(&amp;mid-&gt;refcount, __release_mid) 并不是必要的。如果它们没有持有引用，那么本来就会发生 use-after-free 错误。
@@ -415,218 +240,147 @@ cifs_demultiplex_thread()            cifs_debug_data_proc_show()
    smb2_find_smb_tcon()
     spin_lock(&amp;cifs_tcp_ses_lock) *死锁*</code></pre>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，4.19要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-deadlock-when-releasing-mid.patch</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-deadlock-when-releasing-mid.patch</span></code></pre></div>
 <p><code>git checkout 72bc63f5e23a38b65ff2a201bdc11401d4223fa9</code>回退到之前的记录，<code>git blame fs/smb/client/cifsproto.h | grep release_mid</code>找到<code>70f08f914a37a</code>，这个commit只是把<code>cifs_mid_q_entry_release()</code>重命名成<code>release_mid()</code>。</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fs/cifs/transport.c</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">-void</span> cifs_mid_q_entry_release<span class="er">(</span><span class="ex">struct</span> mid_q_entry <span class="pp">*</span>midEntry<span class="kw">)</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">+void</span> release_mid<span class="er">(</span><span class="ex">struct</span> mid_q_entry <span class="pp">*</span>mid<span class="kw">)</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a> <span class="kw">{</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>       struct TCP_Server_Info <span class="pp">*</span>server = midEntry-<span class="op">&gt;</span>server<span class="kw">;</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       struct TCP_Server_Info <span class="pp">*</span>server = mid-<span class="op">&gt;</span>server<span class="kw">;</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="ex">spin_lock</span><span class="er">(</span><span class="kw">&amp;</span><span class="ex">server-</span><span class="op">&gt;</span>mid_lock<span class="kw">);</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>       kref_put<span class="er">(</span><span class="kw">&amp;</span><span class="ex">midEntry-</span><span class="op">&gt;</span>refcount, _cifs_mid_q_entry_release<span class="kw">);</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       kref_put<span class="er">(</span><span class="kw">&amp;</span><span class="ex">mid-</span><span class="op">&gt;</span>refcount, __release_mid<span class="kw">);</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        <span class="ex">spin_unlock</span><span class="er">(</span><span class="kw">&amp;</span><span class="ex">server-</span><span class="op">&gt;</span>mid_lock<span class="kw">);</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a> <span class="kw">}</span></span></code></pre></div>
-<h1 data-number="13"
-id="cve-2023-6610-567320c46a60a3c39b69aa1df802d753817a3f86-smb-client-fix-potential-oob-in-smb2_dump_detail"><span
-class="header-section-number">13</span> <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=567320c46a60a3c39b69aa1df802d753817a3f86"><code>CVE-2023-6610 567320c46a60a3c39b69aa1df802d753817a3f86 smb: client: fix potential OOB in smb2_dump_detail()</code></a></h1>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/I8MXXY">openeuler
-issue</a></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="co"># fs/cifs/transport.c</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="ex">-void</span> cifs_mid_q_entry_release(struct mid_q_entry *midEntry)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="ex">+void</span> release_mid(struct mid_q_entry *mid)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a> <span class="kw">{</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="ex">-</span>       struct TCP_Server_Info *server = midEntry-<span class="op">&gt;</span>server<span class="kw">;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="ex">+</span>       struct TCP_Server_Info *server = mid-<span class="op">&gt;</span>server<span class="kw">;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>        <span class="ex">spin_lock</span>(<span class="kw">&amp;</span><span class="ex">server-</span><span class="op">&gt;</span>mid_lock);</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a><span class="ex">-</span>       kref_put(<span class="kw">&amp;</span><span class="ex">midEntry-</span><span class="op">&gt;</span>refcount, _cifs_mid_q_entry_release);</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a><span class="ex">+</span>       kref_put(<span class="kw">&amp;</span><span class="ex">mid-</span><span class="op">&gt;</span>refcount, __release_mid);</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>        <span class="ex">spin_unlock</span>(<span class="kw">&amp;</span><span class="ex">server-</span><span class="op">&gt;</span>mid_lock);</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a> <span class="kw">}</span></span></code></pre></div>
+<h1 data-number="13" id="cve-2023-6610-567320c46a60a3c39b69aa1df802d753817a3f86-smb-client-fix-potential-oob-in-smb2_dump_detail"><span class="header-section-number">13</span> <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=567320c46a60a3c39b69aa1df802d753817a3f86"><code>CVE-2023-6610 567320c46a60a3c39b69aa1df802d753817a3f86 smb: client: fix potential OOB in smb2_dump_detail()</code></a></h1>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/I8MXXY">openeuler issue</a></p>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，低版本要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-OOB-in-smb2_dump_detail.patch</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-OOB-in-smb2_dump_detail.patch</span></code></pre></div>
 <p>此修复补丁修复<code>smb2_dump_detail()-&gt;calc_smb_size()</code>的越界问题，调用<code>calc_smb_size()</code>之前要先用<code>check_message()</code>校验。</p>
-<h2 data-number="13.1" id="合补丁-1"><span
-class="header-section-number">13.1</span> 4.19合补丁</h2>
+<h2 data-number="13.1" id="合补丁-1"><span class="header-section-number">13.1</span> 4.19合补丁</h2>
 <p>使用<code>git am 0001-smb-client-fix-potential-OOB-in-smb2_dump_detail.patch --reject</code>命令打上补丁后，会有冲突，不同的地方是:</p>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diff</span> <span class="at">--git</span> a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">index</span> 39ae3baa52a3..790e2e932e68 100644</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/fs/cifs/smb2misc.c</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/fs/cifs/smb2misc.c</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-204,20</span> +204,20 @@ smb2_check_message<span class="er">(</span><span class="ex">char</span> <span class="pp">*</span>buf, unsigned int len, struct TCP_Server_Info <span class="pp">*</span>srvr<span class="kw">)</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="dv">1</span><span class="kw">;</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">(</span><span class="ex">shdr-</span><span class="op">&gt;</span>StructureSize != SMB2_HEADER_STRUCTURE_SIZE<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>               cifs_dbg<span class="er">(</span><span class="ex">VFS,</span> <span class="st">&quot;Illegal structure size %u\n&quot;</span>,</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               cifs_dbg<span class="er">(</span><span class="ex">VFS,</span> <span class="st">&quot;Invalid structure size %u\n&quot;</span>,</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>                         <span class="ex">le16_to_cpu</span><span class="er">(</span><span class="ex">shdr-</span><span class="op">&gt;</span>StructureSize<span class="kw">));</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="dv">1</span><span class="kw">;</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        <span class="er">}</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>        <span class="bu">command</span> = le16_to_cpu<span class="er">(</span><span class="ex">shdr-</span><span class="op">&gt;</span>Command<span class="kw">);</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">(</span><span class="bu">command</span> <span class="op">&gt;</span>= NUMBER_OF_SMB2_COMMANDS<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>               cifs_dbg<span class="er">(</span><span class="ex">VFS,</span> <span class="st">&quot;Illegal SMB2 command %d\n&quot;</span>, command<span class="kw">);</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               cifs_dbg<span class="er">(</span><span class="ex">VFS,</span> <span class="st">&quot;Invalid SMB2 command %d\n&quot;</span>, command<span class="kw">);</span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="dv">1</span><span class="kw">;</span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>        <span class="kw">}</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">(</span><span class="va">smb2_rsp_struct_sizes</span><span class="op">[</span>command<span class="op">]</span> <span class="ex">!=</span> pdu-<span class="op">&gt;</span>StructureSize2<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="kw">(</span><span class="bu">command</span> != SMB2_OPLOCK_BREAK_HE <span class="kw">&amp;&amp;</span> <span class="kw">(</span><span class="ex">shdr-</span><span class="op">&gt;</span>Status == 0 <span class="kw">||</span></span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>                   pdu-<span class="op">&gt;</span>StructureSize2 != SMB2_ERROR_STRUCTURE_SIZE2<span class="kw">))</span> <span class="kw">{</span></span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>                   pdu-<span class="op">&gt;</span>StructureSize2 != SMB2_ERROR_STRUCTURE_SIZE2_LE<span class="er">))</span> <span class="kw">{</span></span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>                        <span class="ex">/*</span> error packets have 9 byte structure size <span class="pp">*</span>/</span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>                        <span class="ex">cifs_dbg</span><span class="er">(</span><span class="ex">VFS,</span> <span class="st">&quot;Illegal response size %u for command %d\n&quot;</span>,</span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>                                 <span class="ex">le16_to_cpu</span><span class="er">(</span><span class="ex">pdu-</span><span class="op">&gt;</span>StructureSize2<span class="kw">)</span><span class="ex">,</span> command<span class="kw">);</span></span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="fu">diff</span> <span class="at">--git</span> a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c</span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="ex">index</span> 813d67b4a1a5..9f2c0733a4ae 100644</span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/fs/cifs/smb2ops.c</span>
-<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/fs/cifs/smb2ops.c</span>
-<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-245,9</span> +245,9 @@ smb2_dump_detail<span class="er">(</span><span class="ex">void</span> <span class="pp">*</span>buf, struct TCP_Server_Info <span class="pp">*</span>server<span class="kw">)</span></span>
-<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a> <span class="co">#ifdef CONFIG_CIFS_DEBUG2</span></span>
-<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>        <span class="ex">struct</span> smb2_sync_hdr <span class="pp">*</span>shdr = <span class="er">(</span><span class="ex">struct</span> smb2_sync_hdr <span class="pp">*</span><span class="kw">)</span><span class="ex">buf</span><span class="kw">;</span></span>
-<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>       cifs_dbg<span class="er">(</span><span class="ex">VFS,</span> <span class="st">&quot;Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n&quot;</span>,</span>
-<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       cifs_server_dbg<span class="er">(</span><span class="ex">VFS,</span> <span class="st">&quot;Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n&quot;</span>,</span>
-<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>                 <span class="ex">shdr-</span><span class="op">&gt;</span>Command, shdr-<span class="op">&gt;</span>Status, shdr-<span class="op">&gt;</span>Flags, shdr-<span class="op">&gt;</span>MessageId,</span>
-<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>                shdr-<span class="op">&gt;</span>ProcessId<span class="kw">);</span></span>
-<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>                shdr-<span class="op">&gt;</span>Id.SyncId.ProcessId<span class="kw">);</span></span>
-<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>        <span class="ex">cifs_dbg</span><span class="er">(</span><span class="ex">VFS,</span> <span class="st">&quot;smb buf %p len %u\n&quot;</span>, buf,</span>
-<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>                 <span class="ex">server-</span><span class="op">&gt;</span>ops-<span class="op">&gt;</span>calc_smb_size<span class="er">(</span><span class="ex">buf,</span> server<span class="kw">));</span></span>
-<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a> <span class="co">#endif</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="fu">diff</span> --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="ex">index</span> 39ae3baa52a3..790e2e932e68 100644</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="ex">---</span> a/fs/cifs/smb2misc.c</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="ex">+++</span> b/fs/cifs/smb2misc.c</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a><span class="ex">@@</span> -204,20 +204,20 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *srvr)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a>                <span class="bu">return</span> 1<span class="kw">;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a> </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true"></a>        <span class="kw">if</span> <span class="kw">(</span><span class="ex">shdr-</span><span class="op">&gt;</span>StructureSize != SMB2_HEADER_STRUCTURE_SIZE<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true"></a><span class="ex">-</span>               cifs_dbg(VFS, <span class="st">&quot;Illegal structure size %u\n&quot;</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true"></a><span class="ex">+</span>               cifs_dbg(VFS, <span class="st">&quot;Invalid structure size %u\n&quot;</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true"></a>                         <span class="ex">le16_to_cpu</span>(shdr-<span class="op">&gt;</span>StructureSize));</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true"></a>                <span class="bu">return</span> 1<span class="kw">;</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true"></a>        <span class="kw">}</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true"></a> </span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true"></a>        <span class="bu">command</span> = le16_to_cpu(shdr-<span class="op">&gt;</span>Command);</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true"></a>        <span class="kw">if</span> <span class="kw">(</span><span class="bu">command</span> <span class="op">&gt;</span>= NUMBER_OF_SMB2_COMMANDS<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true"></a><span class="ex">-</span>               cifs_dbg(VFS, <span class="st">&quot;Illegal SMB2 command %d\n&quot;</span>, command);</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true"></a><span class="ex">+</span>               cifs_dbg(VFS, <span class="st">&quot;Invalid SMB2 command %d\n&quot;</span>, command);</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true"></a>                <span class="bu">return</span> 1<span class="kw">;</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true"></a>        <span class="kw">}</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true"></a> </span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true"></a>        <span class="kw">if</span> <span class="kw">(</span><span class="ex">smb2_rsp_struct_sizes</span>[command] != pdu-<span class="op">&gt;</span>StructureSize2<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true"></a>                <span class="kw">if</span> <span class="kw">(</span><span class="bu">command</span> != SMB2_OPLOCK_BREAK_HE <span class="kw">&amp;&amp;</span> <span class="kw">(</span><span class="ex">shdr-</span><span class="op">&gt;</span>Status == 0 <span class="kw">||</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true"></a><span class="ex">-</span>                   pdu-<span class="op">&gt;</span>StructureSize2 != SMB2_ERROR_STRUCTURE_SIZE2<span class="kw">))</span> <span class="kw">{</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true"></a><span class="ex">+</span>                   pdu-<span class="op">&gt;</span>StructureSize2 != SMB2_ERROR_STRUCTURE_SIZE2_LE)) <span class="kw">{</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true"></a>                        <span class="ex">/*</span> error packets have 9 byte structure size */</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true"></a>                        <span class="ex">cifs_dbg</span>(VFS, <span class="st">&quot;Illegal response size %u for command %d\n&quot;</span>,</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true"></a>                                 <span class="ex">le16_to_cpu</span>(pdu-<span class="op">&gt;</span>StructureSize2), <span class="bu">command</span>);</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true"></a><span class="fu">diff</span> --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true"></a><span class="ex">index</span> 813d67b4a1a5..9f2c0733a4ae 100644</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true"></a><span class="ex">---</span> a/fs/cifs/smb2ops.c</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true"></a><span class="ex">+++</span> b/fs/cifs/smb2ops.c</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true"></a><span class="ex">@@</span> -245,9 +245,9 @@ smb2_dump_detail(void *buf, struct TCP_Server_Info *server)</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true"></a> <span class="co">#ifdef CONFIG_CIFS_DEBUG2</span></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true"></a>        <span class="ex">struct</span> smb2_sync_hdr *shdr = (struct smb2_sync_hdr *)<span class="ex">buf</span><span class="kw">;</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true"></a> </span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true"></a><span class="ex">-</span>       cifs_dbg(VFS, <span class="st">&quot;Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n&quot;</span>,</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true"></a><span class="ex">+</span>       cifs_server_dbg(VFS, <span class="st">&quot;Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n&quot;</span>,</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true"></a>                 <span class="ex">shdr-</span><span class="op">&gt;</span>Command, shdr-<span class="op">&gt;</span>Status, shdr-<span class="op">&gt;</span>Flags, shdr-<span class="op">&gt;</span>MessageId,</span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true"></a><span class="ex">-</span>                shdr-<span class="op">&gt;</span>ProcessId);</span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true"></a><span class="ex">+</span>                shdr-<span class="op">&gt;</span>Id.SyncId.ProcessId);</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true"></a>        <span class="ex">cifs_dbg</span>(VFS, <span class="st">&quot;smb buf %p len %u\n&quot;</span>, buf,</span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true"></a>                 <span class="ex">server-</span><span class="op">&gt;</span>ops-<span class="op">&gt;</span>calc_smb_size(buf, server));</span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true"></a> <span class="co">#endif</span></span></code></pre></div>
 <p>先看<code>fs/cifs/smb2ops.c</code>文件的冲突，在主线代码上使用<code>git blame fs/smb/client/smb2ops.c | grep "cifs_server_dbg"</code>找到前置补丁<code>3175eb9b577e cifs: add a debug macro that prints \\server\share for errors</code>，打上这个前置补丁有很多的冲突，而这里只是涉及到打印相关的，所以不合入此前置补丁，手动处理冲突。再使用<code>git blame fs/smb/client/smb2ops.c | grep "Id.SyncId.ProcessId"</code>找到前置补丁<code>0d35e382e4e9 cifs: Create a new shared file holding smb2 pdu definitions</code>，打上这个前置补丁也会有很多的冲突，也不涉及cve的修复内容，所以不合入这个前置补丁，也手动处理冲突。</p>
 <p>再看<code>fs/cifs/smb2misc.c</code>文件的冲突，在主线代码上使用<code>git blame fs/smb/client/smb2misc.c | grep SMB2_ERROR_STRUCTURE_SIZE2_LE</code>找到前置补丁<code>113be37d8744 [smb3] move more common protocol header definitions to smbfs_common</code>，打上这个前置补丁会有很多冲突，也不涉及cve的修复内容，所以不合入此前置补丁，手动处理冲突。再切换到cve修复补丁的前一个commit，<code>git checkout aa3e193d66db56b3331142509acb4b5bad4e7f4f &amp;&amp; git blame fs/smb/client/smb2misc.c | grep Invalid SMB2 command</code>找到前置补丁<code>a0a3036b81f1 cifs: Standardize logging output</code>，打上这个前置补丁有很多冲突，只涉及打印相关的，所以不合入这个前置补丁，手动处理冲突。</p>
-<h2 data-number="13.2" id="合补丁-2"><span
-class="header-section-number">13.2</span> 4.4合补丁</h2>
+<h2 data-number="13.2" id="合补丁-2"><span class="header-section-number">13.2</span> 4.4合补丁</h2>
 <p>前置补丁有:</p>
 <ul>
-<li><code>93012bf98416 cifs: add server-&gt;vals-&gt;header_preamble_size</code>:
-<code>9ec672bd1713</code>的前置补丁，用<code>header_preamble_size</code>变量取代常数4</li>
-<li><code>c0953f2ed510 cifs: smb2pdu: Fix potential NULL pointer dereference</code>:
-修复<code>93012bf98416</code>导致的空指针解引用</li>
-<li><code>14547f7d74c4 cifs: add server argument to the dump_detail method</code>:
-给函数<code>smb2_dump_detail()</code>增加一个参数</li>
-<li><code>9ec672bd1713 cifs: update calc_size to take a server argument</code>:
-给<code>calc_size()</code>相关的函数增加一个参数，另外用<code>heder_preamble_size</code>变量取代常数4</li>
-<li><code>71992e62b864 cifs: fix build break when CONFIG_CIFS_DEBUG2 enabled</code>:
-修复编译错误,
-<code>dump_detail()</code>和<code>calc_smb_size()</code>增加参数，要把<code>CONFIG_CIFS_DEBUG2</code>配置打开测试才会出现，麒麟的配置默认不打开</li>
+<li><code>93012bf98416 cifs: add server-&gt;vals-&gt;header_preamble_size</code>: <code>9ec672bd1713</code>的前置补丁，用<code>header_preamble_size</code>变量取代常数4</li>
+<li><code>c0953f2ed510 cifs: smb2pdu: Fix potential NULL pointer dereference</code>: 修复<code>93012bf98416</code>导致的空指针解引用</li>
+<li><code>14547f7d74c4 cifs: add server argument to the dump_detail method</code>: 给函数<code>smb2_dump_detail()</code>增加一个参数</li>
+<li><code>9ec672bd1713 cifs: update calc_size to take a server argument</code>: 给<code>calc_size()</code>相关的函数增加一个参数，另外用<code>heder_preamble_size</code>变量取代常数4</li>
+<li><code>71992e62b864 cifs: fix build break when CONFIG_CIFS_DEBUG2 enabled</code>: 修复编译错误, <code>dump_detail()</code>和<code>calc_smb_size()</code>增加参数，要把<code>CONFIG_CIFS_DEBUG2</code>配置打开测试才会出现，麒麟的配置默认不打开</li>
 </ul>
-<h1 data-number="14"
-id="cve-2023-52434-af1689a9b770-smb-client-fix-potential-oobs-in-smb2_parse_contexts"><span
-class="header-section-number">14</span>
-<code>CVE-2023-52434 af1689a9b770 smb: client: fix potential OOBs in smb2_parse_contexts()</code></h1>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/I92HX8">openeuler
-issue</a></p>
-<p>在<code>smb2_parse_contexts()</code>中解引用create
-contexts时如果没有判断offsets和lengths的有效性，会发生访问越界。</p>
-<h2 data-number="14.1" id="合补丁-3"><span
-class="header-section-number">14.1</span> 4.19合补丁</h2>
+<h1 data-number="14" id="cve-2023-52434-af1689a9b770-smb-client-fix-potential-oobs-in-smb2_parse_contexts"><span class="header-section-number">14</span> <code>CVE-2023-52434 af1689a9b770 smb: client: fix potential OOBs in smb2_parse_contexts()</code></h1>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/I92HX8">openeuler issue</a></p>
+<p>在<code>smb2_parse_contexts()</code>中解引用create contexts时如果没有判断offsets和lengths的有效性，会发生访问越界。</p>
+<h2 data-number="14.1" id="合补丁-3"><span class="header-section-number">14.1</span> 4.19合补丁</h2>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，4.19要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-OOBs-in-smb2_parse_contexts.patch</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-OOBs-in-smb2_parse_contexts.patch</span></code></pre></div>
 <p>打上前置补丁<code>89a5bfa350fa smb3: optimize open to not send query file internal info</code>后有冲突，还需要再合入前置补丁<code>b0f6df737a1c cifs: cache FILE_ALL_INFO for the shared root handle</code>。</p>
-<h1 data-number="15"
-id="cve-2024-35866-58acd1f49716-smb-client-fix-potential-uaf-in-cifs_dump_full_key"><span
-class="header-section-number">15</span>
-<code>CVE-2024-35866 58acd1f49716 smb: client: fix potential UAF in cifs_dump_full_key()</code></h1>
-<p><a
-href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-35866&amp;packageName=kernel">openeuler</a></p>
+<h1 data-number="15" id="cve-2024-35866-58acd1f49716-smb-client-fix-potential-uaf-in-cifs_dump_full_key"><span class="header-section-number">15</span> <code>CVE-2024-35866 58acd1f49716 smb: client: fix potential UAF in cifs_dump_full_key()</code></h1>
+<p><a href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-35866&amp;packageName=kernel">openeuler</a></p>
 <p><code>git blame fs/smb/client/ioctl.c | grep "cifs_dump_full_key"</code>找引入<code>cifs_dump_full_key()</code>函数的补丁，找到<code>1bb56810677f2</code>（还不是最终的引入补丁），<code>checkout</code>到之前的<code>eb0688180549e3b72464e9f78df58cb7a5592c7f</code>，再执行<code>git blame fs/cifs/ioctl.c | grep "cifs_dump_full_key"</code>，找到<code>7ba3d1cdb7988ccfbc6e4995dee04510c85fefbc smb3.1.1: allow dumping keys for multiuser mounts</code>，就是最终的引入问题的补丁。</p>
-<h1 data-number="16"
-id="cve-2024-35861-e0e50401cc39-smb-client-fix-potential-uaf-in-cifs_signal_cifsd_for_reconnect"><span
-class="header-section-number">16</span>
-<code>CVE-2024-35861 e0e50401cc39 smb: client: fix potential UAF in cifs_signal_cifsd_for_reconnect()</code></h1>
-<p><a
-href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-35861&amp;packageName=kernel">openeuler</a></p>
-<h2 data-number="16.1" id="合补丁-4"><span
-class="header-section-number">16.1</span> 4.19合补丁</h2>
+<h1 data-number="16" id="cve-2024-35861-e0e50401cc39-smb-client-fix-potential-uaf-in-cifs_signal_cifsd_for_reconnect"><span class="header-section-number">16</span> <code>CVE-2024-35861 e0e50401cc39 smb: client: fix potential UAF in cifs_signal_cifsd_for_reconnect()</code></h1>
+<p><a href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-35861&amp;packageName=kernel">openeuler</a></p>
+<h2 data-number="16.1" id="合补丁-4"><span class="header-section-number">16.1</span> 4.19合补丁</h2>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，4.19要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-UAF-in-cifs_signal_cifsd_fo.patch</span></code></pre></div>
-<p>引入问题的补丁:
-<code>dca65818c80c cifs: use a different reconnect helper for non-cifsd threads</code>。</p>
-<h1 data-number="17"
-id="cve-2024-35868-d3da25c5ac84-smb-client-fix-potential-uaf-in-cifs_stats_proc_write"><span
-class="header-section-number">17</span>
-<code>CVE-2024-35868 d3da25c5ac84 smb: client: fix potential UAF in cifs_stats_proc_write()</code></h1>
-<p><a
-href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-35868&amp;packageName=kernel">openeuler</a></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-UAF-in-cifs_signal_cifsd_fo.patch</span></code></pre></div>
+<p>引入问题的补丁: <code>dca65818c80c cifs: use a different reconnect helper for non-cifsd threads</code>。</p>
+<h1 data-number="17" id="cve-2024-35868-d3da25c5ac84-smb-client-fix-potential-uaf-in-cifs_stats_proc_write"><span class="header-section-number">17</span> <code>CVE-2024-35868 d3da25c5ac84 smb: client: fix potential UAF in cifs_stats_proc_write()</code></h1>
+<p><a href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-35868&amp;packageName=kernel">openeuler</a></p>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，4.19要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb15"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-UAF-in-cifs_stats_proc_writ.patch</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-UAF-in-cifs_stats_proc_writ.patch</span></code></pre></div>
 <p>参考<code>d328c09ee9f1 smb: client: fix use-after-free bug in cifs_debug_data_proc_show()</code></p>
-<h1 data-number="18"
-id="cve-2024-35863-69ccf040acdd-smb-client-fix-potential-uaf-in-is_valid_oplock_break"><span
-class="header-section-number">18</span>
-<code>CVE-2024-35863 69ccf040acdd smb: client: fix potential UAF in is_valid_oplock_break()</code></h1>
-<p><a
-href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-35863&amp;packageName=kernel">openeuler</a></p>
+<h1 data-number="18" id="cve-2024-35863-69ccf040acdd-smb-client-fix-potential-uaf-in-is_valid_oplock_break"><span class="header-section-number">18</span> <code>CVE-2024-35863 69ccf040acdd smb: client: fix potential UAF in is_valid_oplock_break()</code></h1>
+<p><a href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-35863&amp;packageName=kernel">openeuler</a></p>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，4.19要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb16"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-UAF-in-is_valid_oplock_brea.patch</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-UAF-in-is_valid_oplock_brea.patch</span></code></pre></div>
 <p><code>cifs_ses_exiting()</code>函数引入的补丁是<code>ca545b7f0823 smb: client: fix potential UAF in cifs_debug_files_proc_show()</code>，此补丁还有前置补丁<code>d7d7a66aacd6 cifs: avoid use of global locks for high contention data</code>（引入<code>struct cifs_ses</code>中的<code>spinlock_t ses_lock</code>）。</p>
-<p>找引入<code>is_valid_oplock_break()</code>函数的补丁，<code>git blame fs/smb/client/misc.c | grep is_valid_oplock_break</code>找到<code>d4e4854fd1c85</code>，还不是引入补丁，再<code>git checkout 792af7b05b8a78def080ec757a4d4420b9fd0cc2</code>到之前的记录，再使用<code>git blame fs/cifs/misc.c | grep is_valid_oplock_break</code>找到<code>d7c8c94d3e4c1</code>，还不是引入补丁，<code>git checkout 083d3a2cff514c5301f3a043642940d4d5371b22</code>到之前的记录，<code>git blame fs/cifs/misc.c | grep is_valid_oplock_break</code>找到最早的commit
-<code>1da177e4c3f41524e886b7f1b8a0c1fc7321cac2</code>，就是引入问题的补丁。</p>
+<p>找引入<code>is_valid_oplock_break()</code>函数的补丁，<code>git blame fs/smb/client/misc.c | grep is_valid_oplock_break</code>找到<code>d4e4854fd1c85</code>，还不是引入补丁，再<code>git checkout 792af7b05b8a78def080ec757a4d4420b9fd0cc2</code>到之前的记录，再使用<code>git blame fs/cifs/misc.c | grep is_valid_oplock_break</code>找到<code>d7c8c94d3e4c1</code>，还不是引入补丁，<code>git checkout 083d3a2cff514c5301f3a043642940d4d5371b22</code>到之前的记录，<code>git blame fs/cifs/misc.c | grep is_valid_oplock_break</code>找到最早的commit <code>1da177e4c3f41524e886b7f1b8a0c1fc7321cac2</code>，就是引入问题的补丁。</p>
 <p>按如下修改，参考<code>d328c09ee9f1 smb: client: fix use-after-free bug in cifs_debug_data_proc_show()</code>:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>diff <span class="op">--</span>git a<span class="op">/</span>fs<span class="op">/</span>cifs<span class="op">/</span>misc<span class="op">.</span>c b<span class="op">/</span>fs<span class="op">/</span>cifs<span class="op">/</span>misc<span class="op">.</span>c</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>index <span class="fl">00e99</span><span class="er">a4ea023..6d54c0117c73</span> <span class="dv">100644</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>fs<span class="op">/</span>cifs<span class="op">/</span>misc<span class="op">.</span>c</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>fs<span class="op">/</span>cifs<span class="op">/</span>misc<span class="op">.</span>c</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">468</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">468</span><span class="op">,</span><span class="dv">8</span> @@ is_valid_oplock_break<span class="op">(</span><span class="dt">char</span> <span class="op">*</span>buffer<span class="op">,</span> <span class="kw">struct</span> TCP_Server_Info <span class="op">*</span>srv<span class="op">)</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        spin_lock<span class="op">(&amp;</span>cifs_tcp_ses_lock<span class="op">);</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        list_for_each<span class="op">(</span>tmp<span class="op">,</span> <span class="op">&amp;</span>srv<span class="op">-&gt;</span>smb_ses_list<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                ses <span class="op">=</span> list_entry<span class="op">(</span>tmp<span class="op">,</span> <span class="kw">struct</span> cifs_ses<span class="op">,</span> smb_ses_list<span class="op">);</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>               <span class="cf">if</span> <span class="op">(</span>ses<span class="op">-&gt;</span>status <span class="op">==</span> CifsExiting<span class="op">)</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>                       <span class="cf">continue</span><span class="op">;</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                list_for_each<span class="op">(</span>tmp1<span class="op">,</span> <span class="op">&amp;</span>ses<span class="op">-&gt;</span>tcon_list<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>                        tcon <span class="op">=</span> list_entry<span class="op">(</span>tmp1<span class="op">,</span> <span class="kw">struct</span> cifs_tcon<span class="op">,</span> tcon_list<span class="op">);</span></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">if</span> <span class="op">(</span>tcon<span class="op">-&gt;</span>tid <span class="op">!=</span> buf<span class="op">-&gt;</span>Tid<span class="op">)</span></span></code></pre></div>
-<h1 data-number="19"
-id="cve-2024-35865-22863485a462-smb-client-fix-potential-uaf-in-smb2_is_valid_oplock_break"><span
-class="header-section-number">19</span>
-<code>CVE-2024-35865 22863485a462 smb: client: fix potential UAF in smb2_is_valid_oplock_break()</code></h1>
-<p><a
-href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-35865&amp;packageName=kernel">openeuler</a></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>index <span class="fl">00e99</span><span class="er">a4ea023</span>.<span class="fl">.6</span><span class="er">d54c0117c73</span> <span class="dv">100644</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>--- a/fs/cifs/misc.c</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a>+++ b/fs/cifs/misc.c</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a>@@ -<span class="dv">468</span>,<span class="dv">6</span> +<span class="dv">468</span>,<span class="dv">8</span> @@ is_valid_oplock_break(<span class="dt">char</span> *buffer, <span class="kw">struct</span> TCP_Server_Info *srv)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true"></a>        spin_lock(&amp;cifs_tcp_ses_lock);</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true"></a>        list_for_each(tmp, &amp;srv-&gt;smb_ses_list) {</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true"></a>                ses = list_entry(tmp, <span class="kw">struct</span> cifs_ses, smb_ses_list);</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true"></a>+               <span class="cf">if</span> (ses-&gt;status == CifsExiting)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true"></a>+                       <span class="cf">continue</span>;</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true"></a>                list_for_each(tmp1, &amp;ses-&gt;tcon_list) {</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true"></a>                        tcon = list_entry(tmp1, <span class="kw">struct</span> cifs_tcon, tcon_list);</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true"></a>                        <span class="cf">if</span> (tcon-&gt;tid != buf-&gt;Tid)</span></code></pre></div>
+<h1 data-number="19" id="cve-2024-35865-22863485a462-smb-client-fix-potential-uaf-in-smb2_is_valid_oplock_break"><span class="header-section-number">19</span> <code>CVE-2024-35865 22863485a462 smb: client: fix potential UAF in smb2_is_valid_oplock_break()</code></h1>
+<p><a href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-35865&amp;packageName=kernel">openeuler</a></p>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，4.19要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb18"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-UAF-in-smb2_is_valid_oplock.patch</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-potential-UAF-in-smb2_is_valid_oplock.patch</span></code></pre></div>
 <p>参考<code>d328c09ee9f1 smb: client: fix use-after-free bug in cifs_debug_data_proc_show()</code></p>
-<h1 data-number="20"
-id="cve-2024-35870-24a9799aa8ef-smb-client-fix-uaf-in-smb2_reconnect_server"><span
-class="header-section-number">20</span>
-<code>CVE-2024-35870 24a9799aa8ef smb: client: fix UAF in smb2_reconnect_server()</code></h1>
+<h1 data-number="20" id="cve-2024-35870-24a9799aa8ef-smb-client-fix-uaf-in-smb2_reconnect_server"><span class="header-section-number">20</span> <code>CVE-2024-35870 24a9799aa8ef smb: client: fix UAF in smb2_reconnect_server()</code></h1>
 <pre><code>UAF（Use After Free）漏洞是由于 smb2_reconnect_server() 访问了一个已经被另一个执行 __cifs_put_smb_ses() 线程正在销毁的会话（session）。这种情况可能发生在以下情况: (a) 客户端与服务器建立了连接但没有会话，或 (b) 另一个线程再次将 @ses-&gt;ses_status 设置为 SES_EXITING 以外的其他状态。
 
 为了解决这个问题，我们需要确保无条件地将 @ses-&gt;ses_status 设置为 SES_EXITING，并防止在我们仍在销毁会话时，任何其他线程设置新的状态。
 
 在 __cifs_put_smb_ses() 中释放 ipc 之后添加一些延迟可以重现这个问题——这将使 smb2_reconnect_server() 的工作线程有机会运行，然后访问 @ses-&gt;ipc。</code></pre>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，4.19要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb20"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-UAF-in-smb2_reconnect_server.patch</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-UAF-in-smb2_reconnect_server.patch</span></code></pre></div>
 <p><code>git blame fs/smb/client/connect.c | grep cifs_mark_tcp_ses_conns_for_reconnect</code>找到补丁<code>183eea2ee5ba9</code>，再回退到之前的补丁<code>git checkout 2e0fa298d149e07005504350358066f380f72b52</code>，执行<code>git blame fs/cifs/connect.c | grep cifs_mark_tcp_ses_conns_for_reconnect</code>找到<code>43b459aa5e222</code>，回退到之前的补丁<code>git checkout efb21d7b0fa4b1a9a35dcf38b262a314fb3628ea</code>，找到引入<code>cifs_reconnect</code>的补丁<code>1da177e4c3f41524e886b7f1b8a0c1fc7321cac2</code>。</p>
-<p><a
-href="https://gitee.com/src-openeuler/kernel/issues/I9QG1A">openeuler
-issue</a>。</p>
-<h1 data-number="21"
-id="cve-2023-52752-d328c09ee9f1-smb-client-fix-use-after-free-bug-in-cifs_debug_data_proc_show"><span
-class="header-section-number">21</span> <a
-href="https://lore.kernel.org/all/20231030201956.2660-2-pc@manguebit.com/"><code>CVE-2023-52752 d328c09ee9f1 smb: client: fix use-after-free bug in cifs_debug_data_proc_show()</code></a></h1>
-<p><a
-href="https://gitee.com/openeuler/kernel/pulls/8522/files">openeuler的4.19
-pr</a></p>
-<p><a
-href="https://gitee.com/openeuler/kernel/pulls/8605/files">openeuler的5.10
-pr</a></p>
-<p><a
-href="https://gitee.com/openeuler/kernel/pulls/8605#note_30899023_conversation_122811113">openeuler上的代码分析</a></p>
+<p><a href="https://gitee.com/src-openeuler/kernel/issues/I9QG1A">openeuler issue</a>。</p>
+<h1 data-number="21" id="cve-2023-52752-d328c09ee9f1-smb-client-fix-use-after-free-bug-in-cifs_debug_data_proc_show"><span class="header-section-number">21</span> <a href="https://lore.kernel.org/all/20231030201956.2660-2-pc@manguebit.com/"><code>CVE-2023-52752 d328c09ee9f1 smb: client: fix use-after-free bug in cifs_debug_data_proc_show()</code></a></h1>
+<p><a href="https://gitee.com/openeuler/kernel/pulls/8522/files">openeuler的4.19 pr</a></p>
+<p><a href="https://gitee.com/openeuler/kernel/pulls/8605/files">openeuler的5.10 pr</a></p>
+<p><a href="https://gitee.com/openeuler/kernel/pulls/8605#note_30899023_conversation_122811113">openeuler上的代码分析</a></p>
 <p><code>struct cifs_ses</code>的<code>ses_lock</code>成员是在补丁<code>d7d7a66aacd6 cifs: avoid use of global locks for high contention data</code>中引入的。</p>
-<h1 data-number="22"
-id="cve-2023-52751-5c86919455c1-smb-client-fix-use-after-free-in-smb2_query_info_compound"><span
-class="header-section-number">22</span>
-<code>CVE-2023-52751 5c86919455c1 smb: client: fix use-after-free in smb2_query_info_compound()</code></h1>
-<p><a
-href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2023-52751&amp;packageName=kernel">openeuler</a></p>
+<h1 data-number="22" id="cve-2023-52751-5c86919455c1-smb-client-fix-use-after-free-in-smb2_query_info_compound"><span class="header-section-number">22</span> <code>CVE-2023-52751 5c86919455c1 smb: client: fix use-after-free in smb2_query_info_compound()</code></h1>
+<p><a href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2023-52751&amp;packageName=kernel">openeuler</a></p>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，4.19要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
-<div class="sourceCode" id="cb21"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-use-after-free-in-smb2_query_info_com.patch</span></code></pre></div>
-<p><a
-href="https://github.com/torvalds/linux/commits/master/fs/smb/client/cached_dir.c"><code>git log fs/smb/client/cached_dir.c</code></a></p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="fu">sed</span> -i <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-use-after-free-in-smb2_query_info_com.patch</span></code></pre></div>
+<p><a href="https://github.com/torvalds/linux/commits/master/fs/smb/client/cached_dir.c"><code>git log fs/smb/client/cached_dir.c</code></a></p>
 </body>
 </html>
