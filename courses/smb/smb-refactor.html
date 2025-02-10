@@ -109,7 +109,7 @@
 <li><a href="#smb2_lock重构"><span class="toc-section-number">7</span> <code>smb2_lock()</code>重构</a></li>
 </ul>
 </nav>
-<p><a href="https://www.bilibili.com/video/BV1Wx4y1x7Nm/">点击这里在哔哩哔哩bilibili在线观看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/courses/smb/video.html">点击这里查看配套的教学视频</a>。</p>
 <p><a href="https://chenxiaosong.com/courses/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
 <p>最近调研了ksmbd，打算贡献社区补丁，用<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/kernel/src/scripts/calc-func-lines.sh"><code>calc-func-lines.sh</code></a>脚本发现所有的文件系统的函数中排名第二长度（901行, 3714-2810）的是<code>smb2_open()</code>（排名第一的是ntfs3的1470行的<code>log_replay()</code>，但不熟悉就暂时不瞎参与了），就想着先把这个函数给尝试重构了，也先通过这个函数入手深入了解ksmbd。当然除了这个函数也会尝试做一些其他的重构。</p>
 <h1 data-number="1" id="重构参考"><span class="header-section-number">1</span> 重构参考</h1>

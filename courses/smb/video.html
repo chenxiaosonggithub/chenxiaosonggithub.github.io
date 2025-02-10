@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>e28ce90083f0 xprtrdma: kmalloc rpcrdma_ep separate from rpcrdma_xprt</title>
+  <title>smb课程配套视频</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -29,19 +29,20 @@
 <li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
-<h1 class="title">e28ce90083f0 xprtrdma: kmalloc rpcrdma_ep separate from rpcrdma_xprt</h1>
+<h1 class="title">smb课程配套视频</h1>
 </header>
-<p><a href="https://chenxiaosong.com/courses/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a href="https://chenxiaosong.com/courses/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<p><code>e28ce90083f0 xprtrdma: kmalloc rpcrdma_ep separate from rpcrdma_xprt</code>，解决: 存储端口故障后，ip切换要2分钟，2分钟内均归零。</p>
-<pre><code>修改rpcrdma_xprt_disconnect()函数，使其不再等待DISCONNECTED事件。这可以防止在远程无响应时阻塞。
-
-在rpcrdma_xprt_disconnect()中，传输的rpcrdma_ep被分离。返回rpcrdma_xprt_disconnect()后，传输（r_xprt）立即准备好进行新的连接。
-
-现在，RDMA_CM_DEVICE_REMOVAL和RDMA_CM_DISCONNECTED事件几乎以相同的方式处理。
-
-然而，由于rpcrdma_xprt结构和rpcrdma_ep结构的生命周期现在是独立的，创建一个rpcrdma_ep需要增加一个模块引用计数。rpcrdma_ep现在拥有传输的大部分硬件资源。
-
-此外，需要一个kref来确保rpcrdma_ep在cm_event_handler完成之前能够保留足够长的时间。</code></pre>
+<p><a href="https://chenxiaosong.com/courses/smb/smb.html">点击这里跳转到博客的目录</a>。</p>
+<p>哔哩哔哩上的配套视频的目录如下。</p>
+<ul>
+<li><a href="https://www.bilibili.com/video/BV1Wx4y1x7Nm/">001-smb简介</a></li>
+<li><a href="https://www.bilibili.com/video/BV1gi421Y7sp/">002-用户态smb server环境</a></li>
+<li><a href="https://www.bilibili.com/video/BV19b421n7G4/">003-Linux smb client环境</a></li>
+<li><a href="https://www.bilibili.com/video/BV1Yb421n752/">004-Windows和macOS smb client环境</a></li>
+<li><a href="https://www.bilibili.com/video/BV1nz421q7K3/">005-内核态smb server环境</a></li>
+<li><a href="https://www.bilibili.com/video/BV1FgsAecEz1/">006-smb server调试日志开关</a></li>
+<li><a href="https://www.bilibili.com/video/BV1mxsMesEB8/">007-smb client调试日志开关</a></li>
+<li><a href="https://www.bilibili.com/video/BV169HTeiEaw/">008-smb网络数据抓包</a></li>
+<li><a href="https://www.bilibili.com/video/BV1czHyerECS/">009-smb2_open()函数的bugfix补丁</a></li>
+</ul>
 </body>
 </html>
