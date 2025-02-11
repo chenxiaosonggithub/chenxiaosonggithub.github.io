@@ -8,10 +8,19 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -21,16 +30,26 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程:
+chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献:
+chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">dev-tools/gdb-kernel-debugging.rst</h1>
 </header>
-<p>本文档翻译自<a href="https://github.com/torvalds/linux/blob/master/Documentation/dev-tools/gdb-kernel-debugging.rst">gdb-kernel-debugging.rst</a>，翻译时的最新提交是<a href="https://github.com/torvalds/linux/blob/6b219431037bf98c9efd49716aea9b68440477a3/Documentation/dev-tools/gdb-kernel-debugging.rst">6b219431037bf98c9efd49716aea9b68440477a3 docs/scripts/gdb: add necessary make scripts_gdb step</a>。大部分借助于ChatGPT翻译，仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<p>本文档翻译自<a
+href="https://github.com/torvalds/linux/blob/master/Documentation/dev-tools/gdb-kernel-debugging.rst">gdb-kernel-debugging.rst</a>，翻译时的最新提交是<a
+href="https://github.com/torvalds/linux/blob/6b219431037bf98c9efd49716aea9b68440477a3/Documentation/dev-tools/gdb-kernel-debugging.rst">6b219431037bf98c9efd49716aea9b68440477a3
+docs/scripts/gdb: add necessary make scripts_gdb
+step</a>。大部分借助于ChatGPT翻译，仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
 </body>
 </html>
