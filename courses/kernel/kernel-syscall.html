@@ -193,5 +193,11 @@ href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/kernel/src/00
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>用户空间与内核空间数据copy用以下函数:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 从用户空间读取数据，成功返回0，失败返回未完成copy的数据的字节数</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">unsigned</span> <span class="dt">long</span> copy_from_user<span class="op">(</span><span class="dt">void</span> <span class="op">*</span>to<span class="op">,</span> <span class="dt">const</span> <span class="dt">void</span> __user <span class="op">*</span>from<span class="op">,</span> <span class="dt">unsigned</span> <span class="dt">long</span> n<span class="op">)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">// 向用户空间写入数据，成功返回0，失败返回未完成copy的数据的字节数</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="dt">unsigned</span> <span class="dt">long</span> copy_to_user<span class="op">(</span><span class="dt">void</span> __user <span class="op">*</span>to<span class="op">,</span> <span class="dt">const</span> <span class="dt">void</span> <span class="op">*</span>from<span class="op">,</span> <span class="dt">unsigned</span> <span class="dt">long</span> n<span class="op">)</span></span></code></pre></div>
+<p>检查权限用函数<code>capable()</code>，参数传入<code>CAP_CHOWN</code>等宏定义。</p>
 </body>
 </html>
