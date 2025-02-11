@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -94,134 +83,105 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程:
-chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献:
-chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">Docker安装与使用</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#安装docker" id="toc-安装docker"><span
-class="toc-section-number">1</span> 安装docker</a></li>
-<li><a href="#配置docker权限" id="toc-配置docker权限"><span
-class="toc-section-number">2</span> 配置docker权限</a></li>
-<li><a href="#镜像和容器" id="toc-镜像和容器"><span
-class="toc-section-number">3</span> 镜像和容器</a>
+<li><a href="#安装docker"><span class="toc-section-number">1</span> 安装docker</a></li>
+<li><a href="#配置docker权限"><span class="toc-section-number">2</span> 配置docker权限</a></li>
+<li><a href="#镜像和容器"><span class="toc-section-number">3</span> 镜像和容器</a>
 <ul>
-<li><a href="#镜像加速和代理" id="toc-镜像加速和代理"><span
-class="toc-section-number">3.1</span> 镜像加速和代理</a></li>
-<li><a href="#常用命令" id="toc-常用命令"><span
-class="toc-section-number">3.2</span> 常用命令</a></li>
-<li><a href="#更新镜像" id="toc-更新镜像"><span
-class="toc-section-number">3.3</span> 更新镜像</a></li>
-<li><a href="#中文支持" id="toc-中文支持"><span
-class="toc-section-number">3.4</span> 中文支持</a></li>
-<li><a href="#ssh登录" id="toc-ssh登录"><span
-class="toc-section-number">3.5</span> ssh登录</a></li>
-<li><a href="#其他软件" id="toc-其他软件"><span
-class="toc-section-number">3.6</span> 其他软件</a></li>
+<li><a href="#镜像加速和代理"><span class="toc-section-number">3.1</span> 镜像加速和代理</a></li>
+<li><a href="#常用命令"><span class="toc-section-number">3.2</span> 常用命令</a></li>
+<li><a href="#更新镜像"><span class="toc-section-number">3.3</span> 更新镜像</a></li>
+<li><a href="#中文支持"><span class="toc-section-number">3.4</span> 中文支持</a></li>
+<li><a href="#ssh登录"><span class="toc-section-number">3.5</span> ssh登录</a></li>
+<li><a href="#其他软件"><span class="toc-section-number">3.6</span> 其他软件</a></li>
 </ul></li>
-<li><a href="#macos环境" id="toc-macos环境"><span
-class="toc-section-number">4</span> macos环境</a></li>
+<li><a href="#macos环境"><span class="toc-section-number">4</span> macos环境</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/video.html">点击这里查看配套的教学视频</a>。</p>
 <p>这篇文章就是记录一些常用的docker操作命令，方便后续查阅。</p>
-<h1 data-number="1" id="安装docker"><span
-class="header-section-number">1</span> 安装docker</h1>
-<p>参考<a href="https://docs.docker.com/engine/install/ubuntu/">Install
-Docker Engine on Ubuntu</a></p>
+<h1 data-number="1" id="安装docker"><span class="header-section-number">1</span> 安装docker</h1>
+<p>参考<a href="https://docs.docker.com/engine/install/ubuntu/">Install Docker Engine on Ubuntu</a></p>
 <p>ubuntu环境安装docker步骤如下:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get remove docker docker-engine docker.io containerd runc <span class="at">-y</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update <span class="at">-y</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install ca-certificates curl gnupg lsb-release <span class="at">-y</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> mkdir <span class="at">-p</span> /etc/apt/keyrings</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-fsSL</span> https://repo.huaweicloud.com/docker-ce/linux/ubuntu/gpg <span class="kw">|</span> <span class="fu">sudo</span> gpg <span class="at">--dearmor</span> <span class="at">-o</span> /etc/apt/keyrings/docker.gpg</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span>   <span class="st">&quot;deb [arch=</span><span class="va">$(</span><span class="ex">dpkg</span> <span class="at">--print-architecture</span><span class="va">)</span><span class="st"> signed-by=/etc/apt/keyrings/docker.gpg] https://repo.huaweicloud.com/docker-ce/linux/ubuntu </span><span class="va">$(</span><span class="ex">lsb_release</span> <span class="at">-cs</span><span class="va">)</span><span class="st"> stable&quot;</span> <span class="kw">|</span> <span class="fu">sudo</span> tee /etc/apt/sources.list.d/docker.list <span class="op">&gt;</span> /dev/null</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update <span class="at">-y</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin <span class="at">-y</span></span></code></pre></div>
-<h1 data-number="2" id="配置docker权限"><span
-class="header-section-number">2</span> 配置docker权限</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">sudo</span> apt-get remove docker docker-engine docker.io containerd runc -y</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="fu">sudo</span> apt-get update -y</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install ca-certificates curl gnupg lsb-release -y</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="fu">sudo</span> mkdir -p /etc/apt/keyrings</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ex">curl</span> -fsSL https://repo.huaweicloud.com/docker-ce/linux/ubuntu/gpg <span class="kw">|</span> <span class="fu">sudo</span> gpg --dearmor -o /etc/apt/keyrings/docker.gpg</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="bu">echo</span>   <span class="st">&quot;deb [arch=</span><span class="va">$(</span><span class="ex">dpkg</span> --print-architecture<span class="va">)</span><span class="st"> signed-by=/etc/apt/keyrings/docker.gpg] https://repo.huaweicloud.com/docker-ce/linux/ubuntu </span><span class="va">$(</span><span class="ex">lsb_release</span> -cs<span class="va">)</span><span class="st"> stable&quot;</span> <span class="kw">|</span> <span class="fu">sudo</span> tee /etc/apt/sources.list.d/docker.list <span class="op">&gt;</span> /dev/null</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="fu">sudo</span> apt-get update -y</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y</span></code></pre></div>
+<h1 data-number="2" id="配置docker权限"><span class="header-section-number">2</span> 配置docker权限</h1>
 <p>查看是否有<code>docker</code>组:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> cat /etc/group <span class="kw">|</span> <span class="fu">grep</span> docker</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="fu">sudo</span> cat /etc/group <span class="kw">|</span> <span class="fu">grep</span> docker</span></code></pre></div>
 <p>如果没有则创建，如果有就不需要创建:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> groupadd docker</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="fu">sudo</span> groupadd docker</span></code></pre></div>
 <p>查看当前用户是否在组中:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">groups</span> <span class="kw">|</span> <span class="fu">grep</span> docker</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="fu">groups</span> <span class="kw">|</span> <span class="fu">grep</span> docker</span></code></pre></div>
 <p>如果没有则添加到组中:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> usermod <span class="at">-aG</span> docker <span class="va">$USER</span> <span class="co"># 或者使用 sudo gpasswd -a sonvhi docker</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">su</span> <span class="at">-</span> <span class="va">$USER</span> <span class="co"># 或退出shell重新登录, 但在tmux中不起作用</span></span></code></pre></div>
-<h1 data-number="3" id="镜像和容器"><span
-class="header-section-number">3</span> 镜像和容器</h1>
-<h2 data-number="3.1" id="镜像加速和代理"><span
-class="header-section-number">3.1</span> 镜像加速和代理</h2>
-<p>点击<a
-href="https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors">阿里云镜像加速器</a>，登录阿里云账号，按照网页提示操作。我试了，好像没什么卵用。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="fu">sudo</span> usermod -aG docker <span class="va">$USER</span> <span class="co"># 或者使用 sudo gpasswd -a sonvhi docker</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="fu">su</span> - <span class="va">$USER</span> <span class="co"># 或退出shell重新登录, 但在tmux中不起作用</span></span></code></pre></div>
+<h1 data-number="3" id="镜像和容器"><span class="header-section-number">3</span> 镜像和容器</h1>
+<h2 data-number="3.1" id="镜像加速和代理"><span class="header-section-number">3.1</span> 镜像加速和代理</h2>
+<p>点击<a href="https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors">阿里云镜像加速器</a>，登录阿里云账号，按照网页提示操作。我试了，好像没什么卵用。</p>
 <p>配置代理:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> mkdir /etc/systemd/system/docker.service.d/</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> tee /etc/systemd/system/docker.service.d/http-proxy.conf <span class="op">&lt;&lt;-&#39;EOF&#39;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">[Service]</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">Environment=&quot;HTTP_PROXY=http://172.17.0.1:1081/&quot;</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">Environment=&quot;HTTPS_PROXY=http://172.17.0.1:1081/&quot;</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl daemon-reload</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart docker</span></code></pre></div>
-<h2 data-number="3.2" id="常用命令"><span
-class="header-section-number">3.2</span> 常用命令</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="fu">sudo</span> mkdir /etc/systemd/system/docker.service.d/</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="fu">sudo</span> tee /etc/systemd/system/docker.service.d/http-proxy.conf <span class="op">&lt;&lt;-&#39;EOF&#39;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>[Service]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>Environment=&quot;HTTP_PROXY=http://172.17.0.1:1081/&quot;</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>Environment=&quot;HTTPS_PROXY=http://172.17.0.1:1081/&quot;</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="op">EOF</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="fu">sudo</span> systemctl daemon-reload</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="fu">sudo</span> systemctl restart docker</span></code></pre></div>
+<h2 data-number="3.2" id="常用命令"><span class="header-section-number">3.2</span> 常用命令</h2>
 <p>以下是一些常用命令:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull ubuntu:22.04 <span class="co"># 下载镜像</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> image rm ubuntu:22.04 <span class="co"># 删除镜像</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> image ls <span class="co"># 查看镜像</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> ps <span class="at">-a</span> <span class="co"># 查看容器</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> save xxxxxxxxxx <span class="op">&gt;</span> ubuntu-xxxx:22.04.tar <span class="co"># 保存镜像</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> container prune <span class="co"># 删除全部容器</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> restart xxxxxxx <span class="co"># 重启容器</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> attach xxxxxxxx <span class="co"># 退出后会导致容器停止</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> exec <span class="at">-it</span> xxxxxxxx bash <span class="co"># 启动bash，退出bash后不会导致容器停止</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># -i: 交互式操作</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># -t: 终端</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># -d: 后台运行</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># --privileged: 以特权模式运行容器, 容器将拥有对主机系统硬件的完全访问权限, 如kvm</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run ... <span class="co"># 根据镜像启动容器</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ex">docker</span> pull ubuntu:22.04 # 下载镜像</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="ex">docker</span> image rm ubuntu:22.04 # 删除镜像</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="ex">docker</span> image ls # 查看镜像</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="ex">docker</span> ps -a # 查看容器</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="ex">docker</span> save xxxxxxxxxx <span class="op">&gt;</span> ubuntu-xxxx:22.04.tar # 保存镜像</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a><span class="ex">docker</span> container prune # 删除全部容器</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a><span class="ex">docker</span> restart xxxxxxx # 重启容器</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="ex">docker</span> attach xxxxxxxx # 退出后会导致容器停止</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a><span class="ex">docker</span> exec -it xxxxxxxx bash # 启动bash，退出bash后不会导致容器停止</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="co"># -i: 交互式操作</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="co"># -t: 终端</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a><span class="co"># -d: 后台运行</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a><span class="co"># --privileged: 以特权模式运行容器, 容器将拥有对主机系统硬件的完全访问权限, 如kvm</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a><span class="ex">docker</span> run ... # 根据镜像启动容器</span></code></pre></div>
 <p>执行<code>gcc</code>命令后立刻删除容器:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --rm 命令执行完后删除容器</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-v</span> <span class="st">&quot;</span><span class="va">$PWD</span><span class="st">&quot;</span>:/usr/src/myapp <span class="at">-w</span> /usr/src/myapp workspace-ubuntu:22.04 /bin/gcc <span class="at">-v</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="co"># --rm 命令执行完后删除容器</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="ex">docker</span> run --rm -v <span class="st">&quot;</span><span class="va">$PWD</span><span class="st">&quot;</span>:/usr/src/myapp -w /usr/src/myapp workspace-ubuntu:22.04 /bin/gcc -v</span></code></pre></div>
 <p>后台运行，停止后会立即删除容器:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --rm 停止容器后会删除容器</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--name</span> rm-workspace <span class="at">--hostname</span> rm-workspace <span class="at">--rm</span> <span class="at">-itd</span> <span class="at">-v</span> /home/sonvhi/chenxiaosong:/home/sonvhi/chenxiaosong <span class="at">-w</span> /home/sonvhi/chenxiaosong workspace-ubuntu:22.04 bash</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> exec <span class="at">-it</span> rm-workspace bash <span class="co"># 启动bash，退出bash后不会导致容器停止</span></span></code></pre></div>
-<p>启动脚本<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/docker/start.sh"><code>start.sh</code></a>。</p>
-<h2 data-number="3.3" id="更新镜像"><span
-class="header-section-number">3.3</span> 更新镜像</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co"># --rm 停止容器后会删除容器</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="ex">docker</span> run --name rm-workspace --hostname rm-workspace --rm -itd -v /home/sonvhi/chenxiaosong:/home/sonvhi/chenxiaosong -w /home/sonvhi/chenxiaosong workspace-ubuntu:22.04 bash</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="ex">docker</span> exec -it rm-workspace bash # 启动bash，退出bash后不会导致容器停止</span></code></pre></div>
+<p>启动脚本<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/docker/start.sh"><code>start.sh</code></a>。</p>
+<h2 data-number="3.3" id="更新镜像"><span class="header-section-number">3.3</span> 更新镜像</h2>
 <p>当要把一个容器保存成镜像时，执行以下命令:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--name</span> workspace <span class="at">--hostname</span> workspace <span class="at">--privileged</span> <span class="at">-it</span> <span class="at">-v</span> /home/sonvhi/chenxiaosong:/home/sonvhi/chenxiaosong <span class="at">-w</span> /home/sonvhi/chenxiaosong workspace-ubuntu:22.04 bash <span class="co"># 前台运行，停止后不删除容器</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> ps <span class="at">-a</span> <span class="co"># 查看容器</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> stop workspace <span class="co"># 停止容器</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> workspace-ubuntu<span class="dt">\:</span>22.04.tar <span class="co"># 确保当前目录下没有文件</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> export workspace <span class="op">&gt;</span> workspace-ubuntu:22.04.tar <span class="co"># 导出容器</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rm workspace <span class="co"># 删除容器</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> ps <span class="at">-a</span> <span class="co"># 查看容器是否删除成功</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> image rm workspace-ubuntu:22.04 <span class="co"># 删除镜像</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> image ls <span class="co"># 查看镜像是否删除成功</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> workspace-ubuntu<span class="dt">\:</span>22.04.tar <span class="kw">|</span> <span class="ex">docker</span> import <span class="at">-</span> workspace-ubuntu<span class="dt">\:</span>22.04 <span class="co"># 导入镜像</span></span></code></pre></div>
-<p>脚本<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/docker/update-image.sh"><code>update-image.sh</code></a>。</p>
-<h2 data-number="3.4" id="中文支持"><span
-class="header-section-number">3.4</span> 中文支持</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="ex">docker</span> run --name workspace --hostname workspace --privileged -it -v /home/sonvhi/chenxiaosong:/home/sonvhi/chenxiaosong -w /home/sonvhi/chenxiaosong workspace-ubuntu:22.04 bash # 前台运行，停止后不删除容器</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="ex">docker</span> ps -a # 查看容器</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="ex">docker</span> stop workspace # 停止容器</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="fu">rm</span> workspace-ubuntu\:22.04.tar <span class="co"># 确保当前目录下没有文件</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="ex">docker</span> export workspace <span class="op">&gt;</span> workspace-ubuntu:22.04.tar # 导出容器</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="ex">docker</span> rm workspace # 删除容器</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="ex">docker</span> ps -a # 查看容器是否删除成功</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a><span class="ex">docker</span> image rm workspace-ubuntu:22.04 # 删除镜像</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a><span class="ex">docker</span> image ls # 查看镜像是否删除成功</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a><span class="fu">cat</span> workspace-ubuntu\:22.04.tar <span class="kw">|</span> <span class="ex">docker</span> import - workspace-ubuntu\:22.04 # 导入镜像</span></code></pre></div>
+<p>脚本<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/docker/update-image.sh"><code>update-image.sh</code></a>。</p>
+<h2 data-number="3.4" id="中文支持"><span class="header-section-number">3.4</span> 中文支持</h2>
 <p>docker中的ubuntu2204默认不支持中文，需要安装某些软件:</p>
 <pre class="shell"><code>apt install -y language-pack-zh-hans
 apt install -y fonts-wqy-zenhei
@@ -230,8 +190,7 @@ echo &quot;export LANG=zh_CN.UTF-8&quot; &gt;&gt; ~/.bashrc
 echo &quot;export LANGUAGE=zh_CN:zh&quot; &gt;&gt; ~/.bashrc
 echo &quot;export LC_ALL=zh_CN.UTF-8&quot; &gt;&gt; ~/.bashrc
 source ~/.bashrc</code></pre>
-<h2 data-number="3.5" id="ssh登录"><span
-class="header-section-number">3.5</span> ssh登录</h2>
+<h2 data-number="3.5" id="ssh登录"><span class="header-section-number">3.5</span> ssh登录</h2>
 <p>ubuntu中默认不能以root登录，作如下更改:</p>
 <pre class="shell"><code># 先安装一些网络工具包
 apt update -y
@@ -241,30 +200,25 @@ apt install openssh-client -y
 apt install openssh-server -y
 vim /etc/ssh/sshd_config # PermitRootLogin prohibit-password 改为 PermitRootLogin yes
 service ssh restart # docker 中不能使用 systemctl 启动 ssh</code></pre>
-<h2 data-number="3.6" id="其他软件"><span
-class="header-section-number">3.6</span> 其他软件</h2>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apt</span> install bash-completion <span class="at">-y</span> <span class="co"># 为了解决docker 中git不会自动补全, 要执行 source /usr/share/bash-completion/completions/git（一般放到.bash_profile中）</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">apt</span> install sudo <span class="at">-y</span> <span class="co"># 不安装的话会提示bash: sudo: command not found</span></span></code></pre></div>
-<h1 data-number="4" id="macos环境"><span
-class="header-section-number">4</span> macos环境</h1>
+<h2 data-number="3.6" id="其他软件"><span class="header-section-number">3.6</span> 其他软件</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="ex">apt</span> install bash-completion -y # 为了解决docker 中git不会自动补全, 要执行 source /usr/share/bash-completion/completions/git（一般放到.bash_profile中）</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="ex">apt</span> install sudo -y # 不安装的话会提示bash: sudo: command not found</span></code></pre></div>
+<h1 data-number="4" id="macos环境"><span class="header-section-number">4</span> macos环境</h1>
 <p>macos的docker要想与宿主机通信，要进行端口映射，启动时要加选项<code>-p 8888:8888</code>，macos下用docker我个人只是为了看代码（使用code-server）。</p>
 <p>当要把一个容器保存成镜像时，执行以下命令:</p>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># macos 中要进行端口映射，因为没有像 linux 中的 docker0 网络</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-p</span> 8888:8888 <span class="at">--name</span> workspace <span class="at">--hostname</span> workspace <span class="at">-it</span> <span class="at">-v</span> /Users/sonvhi/chenxiaosong:/home/sonvhi/chenxiaosong <span class="at">-w</span> /home/sonvhi/chenxiaosong workspace-ubuntu:22.04 bash <span class="co"># 前台运行</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> ps <span class="at">-a</span> <span class="co"># 查看容器</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> stop workspace <span class="co"># 停止容器</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> workspace-ubuntu<span class="dt">\:</span>22.04.tar <span class="co"># 删除文件</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> export workspace <span class="op">&gt;</span> workspace-ubuntu:22.04.tar <span class="co"># 导出容器</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> rm workspace <span class="co"># 删除容器</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> ps <span class="at">-a</span> <span class="co"># 查看容器是否删除成功</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> image rm workspace-ubuntu:22.04 <span class="co"># 删除镜像</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> image ls <span class="co"># 查看镜像是否删除成功</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> workspace-ubuntu<span class="dt">\:</span>22.04.tar <span class="kw">|</span> <span class="ex">docker</span> import <span class="at">-</span> workspace-ubuntu<span class="dt">\:</span>22.04 <span class="co"># 导入镜像</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="co"># macos 中要进行端口映射，因为没有像 linux 中的 docker0 网络</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="ex">docker</span> run -p 8888:8888 --name workspace --hostname workspace -it -v /Users/sonvhi/chenxiaosong:/home/sonvhi/chenxiaosong -w /home/sonvhi/chenxiaosong workspace-ubuntu:22.04 bash # 前台运行</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a><span class="ex">docker</span> ps -a # 查看容器</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a><span class="ex">docker</span> stop workspace # 停止容器</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a><span class="fu">rm</span> workspace-ubuntu\:22.04.tar <span class="co"># 删除文件</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true"></a><span class="ex">docker</span> export workspace <span class="op">&gt;</span> workspace-ubuntu:22.04.tar # 导出容器</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true"></a><span class="ex">docker</span> rm workspace # 删除容器</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true"></a><span class="ex">docker</span> ps -a # 查看容器是否删除成功</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true"></a><span class="ex">docker</span> image rm workspace-ubuntu:22.04 # 删除镜像</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true"></a><span class="ex">docker</span> image ls # 查看镜像是否删除成功</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true"></a><span class="fu">cat</span> workspace-ubuntu\:22.04.tar <span class="kw">|</span> <span class="ex">docker</span> import - workspace-ubuntu\:22.04 # 导入镜像</span></code></pre></div>
 <p>后台运行，停止后删除容器:</p>
-<div class="sourceCode" id="cb15"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-p</span> 8888:8888 <span class="at">--name</span> rm-workspace <span class="at">--hostname</span> rm-workspace <span class="at">--rm</span> <span class="at">-itd</span> <span class="at">-v</span> /Users/sonvhi/chenxiaosong:/home/sonvhi/chenxiaosong <span class="at">-w</span> /home/sonvhi/chenxiaosong workspace-ubuntu:22.04 bash <span class="co"># 后台运行</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> exec <span class="at">-it</span> rm-workspace bash <span class="co"># 启动bash，退出bash后不会导致容器停止</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="ex">docker</span> run -p 8888:8888 --name rm-workspace --hostname rm-workspace --rm -itd -v /Users/sonvhi/chenxiaosong:/home/sonvhi/chenxiaosong -w /home/sonvhi/chenxiaosong workspace-ubuntu:22.04 bash # 后台运行</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a><span class="ex">docker</span> exec -it rm-workspace bash # 启动bash，退出bash后不会导致容器停止</span></code></pre></div>
 </body>
 </html>
