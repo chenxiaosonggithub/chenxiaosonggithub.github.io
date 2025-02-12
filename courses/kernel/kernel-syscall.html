@@ -116,8 +116,14 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 class="toc-section-number">1</span> 简介</a></li>
 <li><a href="#系统调用处理程序" id="toc-系统调用处理程序"><span
 class="toc-section-number">2</span> 系统调用处理程序</a></li>
-<li><a href="#增加一个系统调用" id="toc-增加一个系统调用"><span
-class="toc-section-number">3</span> 增加一个系统调用</a></li>
+<li><a href="#系统调用的实现" id="toc-系统调用的实现"><span
+class="toc-section-number">3</span> 系统调用的实现</a>
+<ul>
+<li><a href="#接口" id="toc-接口"><span
+class="toc-section-number">3.1</span> 接口</a></li>
+</ul></li>
+<li><a href="#实现" id="toc-实现"><span
+class="toc-section-number">4</span> 实现</a></li>
 </ul>
 </nav>
 <p><a
@@ -172,8 +178,11 @@ Table（中断描述符表），系统调用的中断号是<code>IA32_SYSCALL_VE
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">i386</span>          ebx   ecx   edx   esi   edi   ebp   <span class="at">-</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">riscv</span>         a0    a1    a2    a3    a4    a5    <span class="at">-</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">x86-64</span>        rdi   rsi   rdx   r10   r8    r9    <span class="at">-</span></span></code></pre></div>
-<h1 data-number="3" id="增加一个系统调用"><span
-class="header-section-number">3</span> 增加一个系统调用</h1>
+<h1 data-number="3" id="系统调用的实现"><span
+class="header-section-number">3</span> 系统调用的实现</h1>
+<p>我们通过增加一个新的系统调用的方式来看一下系统调用的代码细节。</p>
+<h2 data-number="3.1" id="接口"><span
+class="header-section-number">3.1</span> 接口</h2>
 <p>内核打上补丁 <a
 href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/kernel/src/0001-add-new-syscall-openat_test.patch"><code>src/0001-add-new-syscall-openat_test.patch</code></a>
 ，用户态程序如下:</p>
@@ -193,11 +202,14 @@ href="https://gitee.com/chenxiaosonggitee/blog/blob/master/courses/kernel/src/00
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h1 data-number="4" id="实现"><span
+class="header-section-number">4</span> 实现</h1>
 <p>用户空间与内核空间数据copy用以下函数:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 从用户空间读取数据，成功返回0，失败返回未完成copy的数据的字节数</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">unsigned</span> <span class="dt">long</span> copy_from_user<span class="op">(</span><span class="dt">void</span> <span class="op">*</span>to<span class="op">,</span> <span class="dt">const</span> <span class="dt">void</span> __user <span class="op">*</span>from<span class="op">,</span> <span class="dt">unsigned</span> <span class="dt">long</span> n<span class="op">)</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">// 向用户空间写入数据，成功返回0，失败返回未完成copy的数据的字节数</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="dt">unsigned</span> <span class="dt">long</span> copy_to_user<span class="op">(</span><span class="dt">void</span> __user <span class="op">*</span>to<span class="op">,</span> <span class="dt">const</span> <span class="dt">void</span> <span class="op">*</span>from<span class="op">,</span> <span class="dt">unsigned</span> <span class="dt">long</span> n<span class="op">)</span></span></code></pre></div>
 <p>检查权限用函数<code>capable()</code>，参数传入<code>CAP_CHOWN</code>等宏定义。</p>
+<p>内核执行系统调用时，处于进程上下文，<code>current</code>指针指向触发系统调用的用户态进程。在进程上下文中，可以休眠，可以被其他进程抢占。</p>
 </body>
 </html>
