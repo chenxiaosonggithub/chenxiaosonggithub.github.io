@@ -8,10 +8,19 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -21,38 +30,79 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程:
+chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献:
+chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">nfs文件系统</h1>
 </header>
 <p>做这个课程的目的是通过整理知识点来找到一些正在开发中或需要完善的特性进行社区贡献。</p>
-<p><a href="https://chenxiaosong.com/courses/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/courses/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
 <p>参考网站:</p>
 <ul>
-<li><a href="http://cn.linux.vbird.org/linux_server/#part3">鸟哥的Linux私房菜 简体 - “NFS服务器”章节</a></li>
-<li><a href="https://linux.vbird.org/linux_server/centos6/0330nfs.php">鸟哥的Linux私房菜 繁体 - “NFS伺服器”</a></li>
-<li><a href="https://linux.vbird.org/linux_server/rocky9/">鸟哥的Linux私房菜 繁体 - 伺服器架設篇目錄 - RockyLinux 9 (開發中)</a></li>
-<li><a href="https://linux-nfs.org/wiki/index.php/Main_Page">Main Page - Linux NFS</a></li>
-<li><a href="https://github.com/torvalds/linux/tree/master/Documentation/filesystems/nfs">kernel Documentation: <code>filesystem/nfs</code></a></li>
-<li><a href="https://github.com/torvalds/linux/tree/master/Documentation/admin-guide/nfs">kernel Documentation: <code>admin-guide/nfs</code></a></li>
-<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/rw/nfs-utils.git">nfs-utils</a></li>
+<li><a
+href="http://cn.linux.vbird.org/linux_server/#part3">鸟哥的Linux私房菜
+简体 - “NFS服务器”章节</a></li>
+<li><a
+href="https://linux.vbird.org/linux_server/centos6/0330nfs.php">鸟哥的Linux私房菜
+繁体 - “NFS伺服器”</a></li>
+<li><a
+href="https://linux.vbird.org/linux_server/rocky9/">鸟哥的Linux私房菜
+繁体 - 伺服器架設篇目錄 - RockyLinux 9 (開發中)</a></li>
+<li><a href="https://linux-nfs.org/wiki/index.php/Main_Page">Main Page -
+Linux NFS</a></li>
+<li><a
+href="https://github.com/torvalds/linux/tree/master/Documentation/filesystems/nfs">kernel
+Documentation: <code>filesystem/nfs</code></a></li>
+<li><a
+href="https://github.com/torvalds/linux/tree/master/Documentation/admin-guide/nfs">kernel
+Documentation: <code>admin-guide/nfs</code></a></li>
+<li><a
+href="https://git.kernel.org/pub/scm/linux/kernel/git/rw/nfs-utils.git">nfs-utils</a></li>
 </ul>
 <p>点击下面的标题跳转。</p>
-<h1 data-number="1" id="nfs简介"><span class="header-section-number">1</span> <a href="https://chenxiaosong.com/courses/nfs/nfs-introduction.html">nfs简介</a></h1>
-<h1 data-number="2" id="nfs环境"><span class="header-section-number">2</span> <a href="https://chenxiaosong.com/courses/nfs/nfs-environment.html">nfs环境</a></h1>
-<h1 data-number="3" id="nfs-client数据结构和函数流程"><span class="header-section-number">3</span> <a href="https://chenxiaosong.com/courses/nfs/nfs-client.html">nfs client数据结构和函数流程</a></h1>
-<h1 data-number="4" id="parallel-nfs-pnfs"><span class="header-section-number">4</span> <a href="https://chenxiaosong.com/courses/nfs/pnfs.html">Parallel NFS (pNFS)</a></h1>
-<h1 data-number="5" id="nfs调试方法"><span class="header-section-number">5</span> <a href="https://chenxiaosong.com/courses/nfs/nfs-debug.html">nfs调试方法</a></h1>
-<h1 data-number="6" id="nfs多路径"><span class="header-section-number">6</span> <a href="https://chenxiaosong.com/courses/nfs/nfs-multipath.html">nfs多路径</a></h1>
-<h1 data-number="7" id="nfs补丁分析"><span class="header-section-number">7</span> <a href="https://chenxiaosong.com/courses/nfs/nfs-patches.html">nfs补丁分析</a></h1>
-<h1 data-number="8" id="nfs问题分析"><span class="header-section-number">8</span> <a href="https://chenxiaosong.com/courses/nfs/nfs-issues.html">nfs问题分析</a></h1>
-<h1 data-number="9" id="nfs社区贡献"><span class="header-section-number">9</span> <a href="https://chenxiaosong.com/courses/nfs/nfs-mailing-lists.html">nfs社区贡献</a></h1>
-<h1 data-number="10" id="nfs未分类的内容"><span class="header-section-number">10</span> <a href="https://chenxiaosong.com/courses/nfs/nfs-others.html">nfs未分类的内容</a></h1>
+<h1 data-number="1" id="nfs简介"><span
+class="header-section-number">1</span> <a
+href="https://chenxiaosong.com/courses/nfs/nfs-introduction.html">nfs简介</a></h1>
+<h1 data-number="2" id="nfs环境"><span
+class="header-section-number">2</span> <a
+href="https://chenxiaosong.com/courses/nfs/nfs-environment.html">nfs环境</a></h1>
+<h1 data-number="3" id="nfs-client数据结构和函数流程"><span
+class="header-section-number">3</span> <a
+href="https://chenxiaosong.com/courses/nfs/nfs-client.html">nfs
+client数据结构和函数流程</a></h1>
+<h1 data-number="4" id="parallel-nfs-pnfs"><span
+class="header-section-number">4</span> <a
+href="https://chenxiaosong.com/courses/nfs/pnfs.html">Parallel NFS
+(pNFS)</a></h1>
+<h1 data-number="5" id="nfs调试方法"><span
+class="header-section-number">5</span> <a
+href="https://chenxiaosong.com/courses/nfs/nfs-debug.html">nfs调试方法</a></h1>
+<h1 data-number="6" id="nfs多路径"><span
+class="header-section-number">6</span> <a
+href="https://chenxiaosong.com/courses/nfs/nfs-multipath.html">nfs多路径</a></h1>
+<h1 data-number="7" id="nfs补丁分析"><span
+class="header-section-number">7</span> <a
+href="https://chenxiaosong.com/courses/nfs/nfs-patches.html">nfs补丁分析</a></h1>
+<h1 data-number="8" id="nfs问题分析"><span
+class="header-section-number">8</span> <a
+href="https://chenxiaosong.com/courses/nfs/nfs-issues.html">nfs问题分析</a></h1>
+<h1 data-number="9" id="nfs社区贡献"><span
+class="header-section-number">9</span> <a
+href="https://chenxiaosong.com/courses/nfs/nfs-mailing-lists.html">nfs社区贡献</a></h1>
+<h1 data-number="10" id="nfs未分类的内容"><span
+class="header-section-number">10</span> <a
+href="https://chenxiaosong.com/courses/nfs/nfs-others.html">nfs未分类的内容</a></h1>
 </body>
 </html>
