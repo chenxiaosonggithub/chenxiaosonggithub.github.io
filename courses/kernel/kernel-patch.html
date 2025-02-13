@@ -8,19 +8,10 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    ul.task-list{list-style: none;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -30,87 +21,50 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程:
-chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献:
-chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">内核补丁分析</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#nfs网络文件系统" id="toc-nfs网络文件系统"><span
-class="toc-section-number">1</span> NFS（网络文件系统）</a></li>
-<li><a href="#smbcifs文件系统" id="toc-smbcifs文件系统"><span
-class="toc-section-number">2</span> SMB(CIFS)文件系统</a></li>
-<li><a href="#我写的补丁" id="toc-我写的补丁"><span
-class="toc-section-number">3</span> 我写的补丁</a></li>
-<li><a href="#调度" id="toc-调度"><span
-class="toc-section-number">4</span> 调度</a></li>
-<li><a href="#ext文件系统" id="toc-ext文件系统"><span
-class="toc-section-number">5</span> EXT文件系统</a></li>
+<li><a href="#nfs网络文件系统"><span class="toc-section-number">1</span> NFS（网络文件系统）</a></li>
+<li><a href="#smbcifs文件系统"><span class="toc-section-number">2</span> SMB(CIFS)文件系统</a></li>
+<li><a href="#我写的补丁"><span class="toc-section-number">3</span> 我写的补丁</a></li>
+<li><a href="#调度"><span class="toc-section-number">4</span> 调度</a></li>
+<li><a href="#ext文件系统"><span class="toc-section-number">5</span> EXT文件系统</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/courses/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
-<p><a
-href="https://chenxiaosong.com/courses/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/courses/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/courses/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
 <p>本文章列出一些内核补丁的分析，有些是我写的，有些是我定位问题时遇到的。</p>
-<h1 data-number="1" id="nfs网络文件系统"><span
-class="header-section-number">1</span> NFS（网络文件系统）</h1>
-<p><a
-href="https://chenxiaosong.com/courses/nfs/nfs-patches.html">点击这里查看NFS相关补丁</a></p>
-<h1 data-number="2" id="smbcifs文件系统"><span
-class="header-section-number">2</span> SMB(CIFS)文件系统</h1>
-<p><a
-href="https://chenxiaosong.com/courses/smb/smb-patches.html">点击这里查看SMB相关补丁</a></p>
-<h1 data-number="3" id="我写的补丁"><span
-class="header-section-number">3</span> 我写的补丁</h1>
-<p><a
-href="https://lore.kernel.org/all/?q=chenxiaosong">点击查看kernel.org网站上我的Linux内核邮件列表</a></p>
-<p><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log/?qt=grep&amp;q=chenxiaosong">点击查看kernel.org网站上我的Linux内核仓库提交记录</a>（加载需要一丢丢时间哈）</p>
+<h1 data-number="1" id="nfs网络文件系统"><span class="header-section-number">1</span> NFS（网络文件系统）</h1>
+<p><a href="https://chenxiaosong.com/courses/nfs/nfs-patches.html">点击这里查看NFS相关补丁</a></p>
+<h1 data-number="2" id="smbcifs文件系统"><span class="header-section-number">2</span> SMB(CIFS)文件系统</h1>
+<p><a href="https://chenxiaosong.com/courses/smb/smb-patches.html">点击这里查看SMB相关补丁</a></p>
+<h1 data-number="3" id="我写的补丁"><span class="header-section-number">3</span> 我写的补丁</h1>
+<p><a href="https://lore.kernel.org/all/?q=chenxiaosong">点击查看kernel.org网站上我的Linux内核邮件列表</a></p>
+<p><a href="https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log/?qt=grep&amp;q=chenxiaosong">点击查看kernel.org网站上我的Linux内核仓库提交记录</a>（加载需要一丢丢时间哈）</p>
 <p>我写的补丁，除了上面的模块外，其他模块还有以下补丁。</p>
-<p><a
-href="https://chenxiaosong.com/courses/kernel/patches/xfs-fix-NULL-pointer-dereference-in-xfs_getbmap.html"><code>001c179c4e26 xfs: fix NULL pointer dereference in xfs_getbmap()</code></a></p>
-<p><a
-href="https://chenxiaosong.com/courses/kernel/patches/configfs-fix-a-race-in-configfs_-un-register_subsyst.html"><code>84ec758fb2daa configfs: fix a race in configfs_{,un}register_subsystem()</code></a></p>
-<p><a
-href="https://lore.kernel.org/all/20221116142354.1228954-3-chenxiaosong2@huawei.com/"><code>f7e942b5bb35d btrfs: qgroup: fix sleep from invalid context bug in btrfs_qgroup_inherit()</code></a></p>
-<p><a
-href="https://lore.kernel.org/all/20221116142354.1228954-2-chenxiaosong2@huawei.com/"><code>a4c853af0c511 btrfs: add might_sleep() annotations</code></a></p>
-<p><a
-href="https://lore.kernel.org/all/20220809064730.2316892-1-chenxiaosong2@huawei.com/"><code>1b513f613731e ntfs: fix BUG_ON in ntfs_lookup_inode_by_name()</code></a></p>
-<p><a
-href="https://nvd.nist.gov/vuln/detail/CVE-2023-26607">CVE-2023-26607</a>:
-<a
-href="https://lore.kernel.org/all/20220709064511.3304299-1-chenxiaosong2@huawei.com/"><code>38c9c22a85aee ntfs: fix use-after-free in ntfs_ucsncmp()</code></a>（还有其他人的修复补丁）</p>
-<h1 data-number="4" id="调度"><span
-class="header-section-number">4</span> 调度</h1>
-<p><a
-href="https://chenxiaosong.com/courses/kernel/patches/sched-EEVDF-and-latency-nice-and-or-slice-attr.html"><code>sched: EEVDF and latency-nice and/or slice-attr</code></a></p>
-<h1 data-number="5" id="ext文件系统"><span
-class="header-section-number">5</span> EXT文件系统</h1>
-<p><a
-href="https://chenxiaosong.com/courses/kernel/patches/jbd2-fix-a-potential-race-while-discarding-reserved-.html"><code>23e3d7f7061f jbd2: fix a potential race while discarding reserved buffers after an abort</code></a></p>
-<p><a
-href="https://chenxiaosong.com/courses/kernel/patches/ext4-fix-bug_on-in-ext4_writepages.html"><code>ef09ed5d37b8 ext4: fix bug_on in ext4_writepages</code></a></p>
-<p><a
-href="https://chenxiaosong.com/courses/kernel/patches/ext4-fix-bug_on-in-start_this_handle-during-umount-f.html"><code>b98535d09179 ext4: fix bug_on in start_this_handle during umount filesystem</code></a></p>
-<p><a
-href="https://chenxiaosong.com/courses/kernel/patches/ext4-fix-symlink-file-size-not-match-to-file-content.html"><code>a2b0b205d125 ext4: fix symlink file size not match to file content</code></a></p>
-<p><a
-href="https://chenxiaosong.com/courses/kernel/patches/ext4-fix-use-after-free-in-ext4_search_dir.html"><code>c186f0887fe7 ext4: fix use-after-free in ext4_search_dir</code></a></p>
-<p><a
-href="https://chenxiaosong.com/courses/kernel/patches/refactor-of-__ext4_fill_super.html"><code>some refactor of __ext4_fill_super()</code></a></p>
+<p><a href="https://chenxiaosong.com/courses/kernel/patches/xfs-fix-NULL-pointer-dereference-in-xfs_getbmap.html"><code>001c179c4e26 xfs: fix NULL pointer dereference in xfs_getbmap()</code></a></p>
+<p><a href="https://chenxiaosong.com/courses/kernel/patches/configfs-fix-a-race-in-configfs_-un-register_subsyst.html"><code>84ec758fb2daa configfs: fix a race in configfs_{,un}register_subsystem()</code></a></p>
+<p><a href="https://lore.kernel.org/all/20221116142354.1228954-3-chenxiaosong2@huawei.com/"><code>f7e942b5bb35d btrfs: qgroup: fix sleep from invalid context bug in btrfs_qgroup_inherit()</code></a></p>
+<p><a href="https://lore.kernel.org/all/20221116142354.1228954-2-chenxiaosong2@huawei.com/"><code>a4c853af0c511 btrfs: add might_sleep() annotations</code></a></p>
+<p><a href="https://lore.kernel.org/all/20220809064730.2316892-1-chenxiaosong2@huawei.com/"><code>1b513f613731e ntfs: fix BUG_ON in ntfs_lookup_inode_by_name()</code></a></p>
+<p><a href="https://nvd.nist.gov/vuln/detail/CVE-2023-26607">CVE-2023-26607</a>: <a href="https://lore.kernel.org/all/20220709064511.3304299-1-chenxiaosong2@huawei.com/"><code>38c9c22a85aee ntfs: fix use-after-free in ntfs_ucsncmp()</code></a>（还有其他人的修复补丁）</p>
+<h1 data-number="4" id="调度"><span class="header-section-number">4</span> 调度</h1>
+<p><a href="https://chenxiaosong.com/courses/kernel/patches/sched-EEVDF-and-latency-nice-and-or-slice-attr.html"><code>sched: EEVDF and latency-nice and/or slice-attr</code></a></p>
+<h1 data-number="5" id="ext文件系统"><span class="header-section-number">5</span> EXT文件系统</h1>
+<p><a href="https://chenxiaosong.com/courses/kernel/patches/jbd2-fix-a-potential-race-while-discarding-reserved-.html"><code>23e3d7f7061f jbd2: fix a potential race while discarding reserved buffers after an abort</code></a></p>
+<p><a href="https://chenxiaosong.com/courses/kernel/patches/ext4-fix-bug_on-in-ext4_writepages.html"><code>ef09ed5d37b8 ext4: fix bug_on in ext4_writepages</code></a></p>
+<p><a href="https://chenxiaosong.com/courses/kernel/patches/ext4-fix-bug_on-in-start_this_handle-during-umount-f.html"><code>b98535d09179 ext4: fix bug_on in start_this_handle during umount filesystem</code></a></p>
+<p><a href="https://chenxiaosong.com/courses/kernel/patches/ext4-fix-symlink-file-size-not-match-to-file-content.html"><code>a2b0b205d125 ext4: fix symlink file size not match to file content</code></a></p>
+<p><a href="https://chenxiaosong.com/courses/kernel/patches/ext4-fix-use-after-free-in-ext4_search_dir.html"><code>c186f0887fe7 ext4: fix use-after-free in ext4_search_dir</code></a></p>
+<p><a href="https://chenxiaosong.com/courses/kernel/patches/refactor-of-__ext4_fill_super.html"><code>some refactor of __ext4_fill_super()</code></a></p>
 </body>
 </html>
