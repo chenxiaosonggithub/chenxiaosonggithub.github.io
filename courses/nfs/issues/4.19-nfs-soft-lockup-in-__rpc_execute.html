@@ -115,11 +115,20 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 <li><a href="#问题描述" id="toc-问题描述"><span
 class="toc-section-number">1</span> 问题描述</a></li>
 <li><a href="#vmcore分析" id="toc-vmcore分析"><span
-class="toc-section-number">2</span> vmcore分析</a></li>
+class="toc-section-number">2</span> vmcore分析</a>
+<ul>
+<li><a href="#准备" id="toc-准备"><span
+class="toc-section-number">2.1</span> 准备</a></li>
+<li><a href="#找到触发rpc任务的进程"
+id="toc-找到触发rpc任务的进程"><span
+class="toc-section-number">2.2</span> 找到触发rpc任务的进程</a></li>
+<li><a href="#解析rpc请求的类型" id="toc-解析rpc请求的类型"><span
+class="toc-section-number">2.3</span> 解析rpc请求的类型</a></li>
+</ul></li>
 <li><a href="#代码分析" id="toc-代码分析"><span
 class="toc-section-number">3</span> 代码分析</a></li>
-<li><a href="#补丁分析" id="toc-补丁分析"><span
-class="toc-section-number">4</span> 补丁分析</a></li>
+<li><a href="#补丁" id="toc-补丁"><span
+class="toc-section-number">4</span> 补丁</a></li>
 </ul>
 </nav>
 <p><a
@@ -129,137 +138,217 @@ href="https://chenxiaosong.com/courses/nfs/nfs.html">点击跳转到nfs课程所
 <h1 data-number="1" id="问题描述"><span
 class="header-section-number">1</span> 问题描述</h1>
 <p>在某个CPU#110上出现大量的软锁报错:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158131.484488]</span> watchdog: BUG: soft lockup <span class="at">-</span> CPU#110 stuck for 22s! <span class="pp">[</span><span class="ss">kworker/u257:2:236027</span><span class="pp">]</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485473]</span> watchdog: BUG: soft lockup <span class="at">-</span> CPU#110 stuck for 22s! <span class="pp">[</span><span class="ss">kworker/u257:2:236027</span><span class="pp">]</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158199.486164]</span> watchdog: BUG: soft lockup <span class="at">-</span> CPU#110 stuck for 23s! <span class="pp">[</span><span class="ss">kworker/u257:2:236027</span><span class="pp">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158131.484488]</span> watchdog: BUG: soft lockup <span class="at">-</span> CPU#110 stuck for 22s! <span class="pp">[</span><span class="ss">kworker/u257:2:236027</span><span class="pp">]</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485473]</span> watchdog: BUG: soft lockup <span class="at">-</span> CPU#110 stuck for 22s! <span class="pp">[</span><span class="ss">kworker/u257:2:236027</span><span class="pp">]</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158199.486164]</span> watchdog: BUG: soft lockup <span class="at">-</span> CPU#110 stuck for 23s! <span class="pp">[</span><span class="ss">kworker/u257:2:236027</span><span class="pp">]</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
+<p>日志中的其中一个堆栈信息如下:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485473]</span> watchdog: BUG: soft lockup <span class="at">-</span> CPU#110 stuck for 22s! <span class="pp">[</span><span class="ss">kworker/u257:2:236027</span><span class="pp">]</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485532]</span> Workqueue: xprtiod rpc_async_schedule <span class="pp">[</span><span class="ss">sunrpc</span><span class="pp">]</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485540]</span> RIP: 0010:kfree+0xb1/0x160</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485553]</span> Call Trace:</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485559]</span>  __kfree_skb+0xe/0x20</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485562]</span>  sk_stream_alloc_skb+0x106/0x1e0</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485565]</span>  tcp_sendmsg_locked+0x515/0xd30</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485573]</span>  tcp_sendmsg+0x27/0x40</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485576]</span>  sock_sendmsg+0x36/0x40</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485586]</span>  xs_send_kvec+0xb7/0xc0 <span class="pp">[</span><span class="ss">sunrpc</span><span class="pp">]</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485597]</span>  xs_sendpages+0x5d/0x200 <span class="pp">[</span><span class="ss">sunrpc</span><span class="pp">]</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485615]</span>  xs_tcp_send_request+0xa7/0x240 <span class="pp">[</span><span class="ss">sunrpc</span><span class="pp">]</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485646]</span>  xprt_transmit+0x68/0x360 <span class="pp">[</span><span class="ss">sunrpc</span><span class="pp">]</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485673]</span>  call_transmit+0x1cb/0x2a0 <span class="pp">[</span><span class="ss">sunrpc</span><span class="pp">]</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485683]</span>  __rpc_execute+0x7f/0x3e0 <span class="pp">[</span><span class="ss">sunrpc</span><span class="pp">]</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485687]</span>  process_one_work+0x195/0x3d0</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485689]</span>  worker_thread+0x30/0x390</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485693]</span>  kthread+0x113/0x130</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="ex">[4158171.485697]</span>  ret_from_fork+0x22/0x40</span></code></pre></div>
+<p>整理了日志中堆栈的代码流程，可以看出是在<code>__rpc_execute()</code>中不断循环。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>__rpc_execute</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  call_transmit</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    xprt_transmit</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      xs_tcp_send_request</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        xs_sendpages</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>          xs_send_kvec</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            sock_sendmsg</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>              tcp_sendmsg</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                tcp_sendmsg_locked</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                  sk_stream_alloc_skb</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                    __kfree_skb</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                      kfree</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                release_sock</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                  tcp_release_cb</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        xs_nospace</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>          spin_unlock_bh</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>            raw_spin_unlock_bh</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>              _raw_spin_unlock_bh</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>                __raw_spin_unlock_bh</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>                  __local_bh_enable_ip</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>                    do_softirq</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>          xs_tcp_write_space</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    xprt_prepare_transmit</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>      spin_unlock_bh</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        raw_spin_unlock_bh</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>          _raw_spin_unlock_bh</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>            __raw_spin_unlock_bh</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>              __local_bh_enable_ip</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>                do_softirq</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  __x86_indirect_thunk_r15<span class="op">+</span><span class="bn">0x3</span><span class="op">/</span><span class="bn">0x11</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  __x86_indirect_thunk_rax<span class="op">+</span><span class="bn">0x3</span><span class="op">/</span><span class="bn">0x20</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  __x86_indirect_thunk_rcx<span class="op">+</span><span class="bn">0x3</span><span class="op">/</span><span class="bn">0x20</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  __x86_indirect_thunk_r15<span class="op">+</span><span class="bn">0x0</span><span class="op">/</span><span class="bn">0x11</span></span></code></pre></div>
 <h1 data-number="2" id="vmcore分析"><span
 class="header-section-number">2</span> vmcore分析</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="kw">|</span> <span class="fu">grep</span> nfs <span class="co"># 可以看出，使用的是nfsv3</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffffffc0397000</span>  nfs_acl                   16384  <span class="er">(</span><span class="ex">not</span> loaded<span class="kw">)</span>  <span class="ex">[CONFIG_KALLSYMS]</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffffffc03ef100</span>  nfsv3                     49152  fs/nfs/nfsv3.ko.debug </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffffffc066dc80</span>  nfs                      311296  fs/nfs/nfs.ko.debug</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 加载调试的ko</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> sunrpc net/sunrpc/sunrpc.ko.debug</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfs fs/nfs/nfs.ko.debug</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv3 fs/nfs/nfsv3.ko.debug</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># crash&gt; mod -s nfsv4 fs/nfs/nfsv4.ko.debug</span></span></code></pre></div>
-<p>执行<code>echo 1 &gt; /proc/sys/kernel/softlockup_panic</code>后导出的vmcore。</p>
+<h2 data-number="2.1" id="准备"><span
+class="header-section-number">2.1</span> 准备</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="kw">|</span> <span class="fu">grep</span> nfs <span class="co"># 可以看出，使用的是nfsv3</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffffffc0397000</span>  nfs_acl                   16384  <span class="er">(</span><span class="ex">not</span> loaded<span class="kw">)</span>  <span class="ex">[CONFIG_KALLSYMS]</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffffffc03ef100</span>  nfsv3                     49152  fs/nfs/nfsv3.ko.debug </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffffffc066dc80</span>  nfs                      311296  fs/nfs/nfs.ko.debug</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 加载调试的ko</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> sunrpc net/sunrpc/sunrpc.ko.debug</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfs fs/nfs/nfs.ko.debug</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv3 fs/nfs/nfsv3.ko.debug</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># crash&gt; mod -s nfsv4 fs/nfs/nfsv4.ko.debug</span></span></code></pre></div>
+<p>注意这个vmcore是执行<code>echo 1 &gt; /proc/sys/kernel/softlockup_panic</code>后导出的。</p>
+<h2 data-number="2.2" id="找到触发rpc任务的进程"><span
+class="header-section-number">2.2</span> 找到触发rpc任务的进程</h2>
 <p>查看崩溃时的堆栈:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 236027  TASK: ffff99b651d44680  CPU: 110  COMMAND: <span class="st">&quot;kworker/u257:2&quot;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a> <span class="co">#0 [ffff9ab03eb83d50] machine_kexec at ffffffff8725a70e</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a> <span class="co">#1 [ffff9ab03eb83da8] __crash_kexec at ffffffff8735b001</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a> <span class="co">#2 [ffff9ab03eb83e68] panic at ffffffff872b310e</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a> <span class="co">#3 [ffff9ab03eb83ef0] watchdog_timer_fn at ffffffff8738f21b</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a> <span class="co">#4 [ffff9ab03eb83f20] __hrtimer_run_queues at ffffffff8733ae98</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a> <span class="co">#5 [ffff9ab03eb83f80] hrtimer_interrupt at ffffffff8733b615</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a> <span class="co">#6 [ffff9ab03eb83fd8] smp_apic_timer_interrupt at ffffffff87c025ba</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a> <span class="co">#7 [ffff9ab03eb83ff0] apic_timer_interrupt at ffffffff87c01b1f</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> <span class="op">&lt;</span>IRQ stack<span class="op">&gt;</span> ---</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a> <span class="co">#8 [ffffaa3eedaebd98] apic_timer_interrupt at ffffffff87c01b1f</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">[exception</span> RIP: __x86_indirect_thunk_r15+3]</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RIP:</span> ffffffff87e031c3  RSP: ffffaa3eedaebe40  RFLAGS: 00000286</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RAX:</span> 0000000000000005  RBX: ffff9a3319bd4a18  RCX: 0000000000000006</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RDX:</span> 0000000000000000  RSI: 0000000000000000  RDI: ffff9a3319bd4a18</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RBP:</span> ffff9ab0343e0400   R8: ffff9a7c2c187a40   R9: ffff9ab035efba60</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R10:</span> ffffe1aa188d9600  R11: ffff9a89fa993440  R12: 0000000000000000</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R13:</span> 0000000000000001  R14: ffffffffc1063860  R15: ffffffffc10597a0</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ORIG_RAX:</span> ffffffffffffff13  CS: 0010  SS: 0018</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a> <span class="co">#9 [ffffaa3eedaebe40] __rpc_execute at ffffffffc1063f6f [sunrpc]</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co">#10 [ffffaa3eedaebe98] process_one_work at ffffffff872d0915</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">#11 [ffffaa3eedaebed8] worker_thread at ffffffff872d0b80</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co">#12 [ffffaa3eedaebf10] kthread at ffffffff872d72f3</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co">#13 [ffffaa3eedaebf50] ret_from_fork at ffffffff87c00202</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-rl</span> ffffffffc1063f6f</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 783</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f67</span> <span class="op">&lt;</span>__rpc_execute+119<span class="op">&gt;</span>: mov    %rbx,%rdi</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f6a</span> <span class="op">&lt;</span>__rpc_execute+122<span class="op">&gt;</span>: callq  0xffffffff87e031c0 <span class="op">&lt;</span>__x86_indirect_thunk_r15<span class="op">&gt;</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm/bitops.h:</span> 318</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f6f</span> <span class="op">&lt;</span>__rpc_execute+127<span class="op">&gt;</span>: mov    0x30<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span><span class="ex">,%rax</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 236027  TASK: ffff99b651d44680  CPU: 110  COMMAND: <span class="st">&quot;kworker/u257:2&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a> <span class="co">#0 [ffff9ab03eb83d50] machine_kexec at ffffffff8725a70e</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a> <span class="co">#1 [ffff9ab03eb83da8] __crash_kexec at ffffffff8735b001</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a> <span class="co">#2 [ffff9ab03eb83e68] panic at ffffffff872b310e</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a> <span class="co">#3 [ffff9ab03eb83ef0] watchdog_timer_fn at ffffffff8738f21b</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a> <span class="co">#4 [ffff9ab03eb83f20] __hrtimer_run_queues at ffffffff8733ae98</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a> <span class="co">#5 [ffff9ab03eb83f80] hrtimer_interrupt at ffffffff8733b615</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a> <span class="co">#6 [ffff9ab03eb83fd8] smp_apic_timer_interrupt at ffffffff87c025ba</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a> <span class="co">#7 [ffff9ab03eb83ff0] apic_timer_interrupt at ffffffff87c01b1f</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> <span class="op">&lt;</span>IRQ stack<span class="op">&gt;</span> ---</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a> <span class="co">#8 [ffffaa3eedaebd98] apic_timer_interrupt at ffffffff87c01b1f</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">[exception</span> RIP: __x86_indirect_thunk_r15+3]</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RIP:</span> ffffffff87e031c3  RSP: ffffaa3eedaebe40  RFLAGS: 00000286</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RAX:</span> 0000000000000005  RBX: ffff9a3319bd4a18  RCX: 0000000000000006</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RDX:</span> 0000000000000000  RSI: 0000000000000000  RDI: ffff9a3319bd4a18</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RBP:</span> ffff9ab0343e0400   R8: ffff9a7c2c187a40   R9: ffff9ab035efba60</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R10:</span> ffffe1aa188d9600  R11: ffff9a89fa993440  R12: 0000000000000000</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R13:</span> 0000000000000001  R14: ffffffffc1063860  R15: ffffffffc10597a0</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ORIG_RAX:</span> ffffffffffffff13  CS: 0010  SS: 0018</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a> <span class="co">#9 [ffffaa3eedaebe40] __rpc_execute at ffffffffc1063f6f [sunrpc]</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co">#10 [ffffaa3eedaebe98] process_one_work at ffffffff872d0915</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co">#11 [ffffaa3eedaebed8] worker_thread at ffffffff872d0b80</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co">#12 [ffffaa3eedaebf10] kthread at ffffffff872d72f3</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co">#13 [ffffaa3eedaebf50] ret_from_fork at ffffffff87c00202</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-rl</span> ffffffffc1063f6f</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 783</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f67</span> <span class="op">&lt;</span>__rpc_execute+119<span class="op">&gt;</span>: mov    %rbx,%rdi</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f6a</span> <span class="op">&lt;</span>__rpc_execute+122<span class="op">&gt;</span>: callq  0xffffffff87e031c0 <span class="op">&lt;</span>__x86_indirect_thunk_r15<span class="op">&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm/bitops.h:</span> 318</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f6f</span> <span class="op">&lt;</span>__rpc_execute+127<span class="op">&gt;</span>: mov    0x30<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span><span class="ex">,%rax</span></span></code></pre></div>
 <p>可以看出<code>__x86_indirect_thunk_r15+3</code>是执行到<code>__rpc_execute()</code>的<code>do_action(task)</code>。</p>
 <p>反汇编<code>__rpc_execute()</code>，重点看<code>%rdi</code>寄存器相关的内容:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> __rpc_execute</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 753</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063efe</span> <span class="op">&lt;</span>__rpc_execute+14<span class="op">&gt;</span>:  push   %rbx</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063eff</span> <span class="op">&lt;</span>__rpc_execute+15<span class="op">&gt;</span>:  mov    %rdi,%rbx <span class="co"># 将寄存器 rdi 中的值复制到寄存器 rbx </span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f02</span> <span class="op">&lt;</span>__rpc_execute+18<span class="op">&gt;</span>:  sub    <span class="va">$0</span>x20,%rsp</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 755</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f06</span> <span class="op">&lt;</span>__rpc_execute+22<span class="op">&gt;</span>:  movzwl 0xdc<span class="er">(</span><span class="ex">%rdi</span><span class="kw">)</span><span class="ex">,%r13d</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm/bitops.h:</span> 318</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f2b</span> <span class="op">&lt;</span>__rpc_execute+59<span class="op">&gt;</span>:  mov    0x30<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span><span class="ex">,%rax</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 761</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm/bitops.h:</span> 318</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f37</span> <span class="op">&lt;</span>__rpc_execute+71<span class="op">&gt;</span>:  mov    0x30<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span><span class="ex">,%rax</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 756</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 776</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f4d</span> <span class="op">&lt;</span>__rpc_execute+93<span class="op">&gt;</span>:  mov    0x18<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span><span class="ex">,%r15</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f51</span> <span class="op">&lt;</span>__rpc_execute+97<span class="op">&gt;</span>:  test   %r15,%r15</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f54</span> <span class="op">&lt;</span>__rpc_execute+100<span class="op">&gt;</span>: je     0xffffffffc106400b <span class="op">&lt;</span>__rpc_execute+283<span class="op">&gt;</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 778</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f5a</span> <span class="op">&lt;</span>__rpc_execute+106<span class="op">&gt;</span>: movq   <span class="va">$0</span>x0,0x18<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span> <span class="co"># 不会改变 %rbx 的值</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f62</span> <span class="op">&lt;</span>__rpc_execute+114<span class="op">&gt;</span>: nopl   0x0<span class="er">(</span><span class="ex">%rax,%rax,1</span><span class="kw">)</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 783</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f67</span> <span class="op">&lt;</span>__rpc_execute+119<span class="op">&gt;</span>: mov    %rbx,%rdi</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f6a</span> <span class="op">&lt;</span>__rpc_execute+122<span class="op">&gt;</span>: callq  0xffffffff87e031c0 <span class="op">&lt;</span>__x86_indirect_thunk_r15<span class="op">&gt;</span></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm/bitops.h:</span> 318</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f6f</span> <span class="op">&lt;</span>__rpc_execute+127<span class="op">&gt;</span>: mov    0x30<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span><span class="ex">,%rax</span></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 788</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> __rpc_execute</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 753</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063efe</span> <span class="op">&lt;</span>__rpc_execute+14<span class="op">&gt;</span>:  push   %rbx</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063eff</span> <span class="op">&lt;</span>__rpc_execute+15<span class="op">&gt;</span>:  mov    %rdi,%rbx <span class="co"># 将寄存器 rdi 中的值复制到寄存器 rbx </span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f02</span> <span class="op">&lt;</span>__rpc_execute+18<span class="op">&gt;</span>:  sub    <span class="va">$0</span>x20,%rsp</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 755</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f06</span> <span class="op">&lt;</span>__rpc_execute+22<span class="op">&gt;</span>:  movzwl 0xdc<span class="er">(</span><span class="ex">%rdi</span><span class="kw">)</span><span class="ex">,%r13d</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm/bitops.h:</span> 318</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f2b</span> <span class="op">&lt;</span>__rpc_execute+59<span class="op">&gt;</span>:  mov    0x30<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span><span class="ex">,%rax</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 761</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm/bitops.h:</span> 318</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f37</span> <span class="op">&lt;</span>__rpc_execute+71<span class="op">&gt;</span>:  mov    0x30<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span><span class="ex">,%rax</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 756</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 776</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f4d</span> <span class="op">&lt;</span>__rpc_execute+93<span class="op">&gt;</span>:  mov    0x18<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span><span class="ex">,%r15</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f51</span> <span class="op">&lt;</span>__rpc_execute+97<span class="op">&gt;</span>:  test   %r15,%r15</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f54</span> <span class="op">&lt;</span>__rpc_execute+100<span class="op">&gt;</span>: je     0xffffffffc106400b <span class="op">&lt;</span>__rpc_execute+283<span class="op">&gt;</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 778</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f5a</span> <span class="op">&lt;</span>__rpc_execute+106<span class="op">&gt;</span>: movq   <span class="va">$0</span>x0,0x18<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span> <span class="co"># 不会改变 %rbx 的值</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f62</span> <span class="op">&lt;</span>__rpc_execute+114<span class="op">&gt;</span>: nopl   0x0<span class="er">(</span><span class="ex">%rax,%rax,1</span><span class="kw">)</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 783</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f67</span> <span class="op">&lt;</span>__rpc_execute+119<span class="op">&gt;</span>: mov    %rbx,%rdi</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f6a</span> <span class="op">&lt;</span>__rpc_execute+122<span class="op">&gt;</span>: callq  0xffffffff87e031c0 <span class="op">&lt;</span>__x86_indirect_thunk_r15<span class="op">&gt;</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm/bitops.h:</span> 318</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc1063f6f</span> <span class="op">&lt;</span>__rpc_execute+127<span class="op">&gt;</span>: mov    0x30<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span><span class="ex">,%rax</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc/sched.c:</span> 788</span></code></pre></div>
 <p>x86_64下整数参数使用的寄存器依次为:
-<code>RDI，RSI，RDX，RCX，R8，R9</code>，所以<code>%rdi</code>的值就是<code>__rpc_execute(struct rpc_task *task)</code>第一个参数的值。</p>
+<code>RDI，RSI，RDX，RCX，R8，R9</code>，所以<code>%rdi</code>（也赋值到了<code>%rbx</code>）的值就是<code>__rpc_execute(struct rpc_task *task)</code>第一个参数的值。</p>
 <p>我们再尝试找到触发rpc任务的进程:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_task ffff9a3319bd4a18 <span class="co"># RDI: ffff9a3319bd4a18</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> rpc_task {</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">tk_owner</span> = 227403,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_task ffff9a3319bd4a18 <span class="co"># RDI: ffff9a3319bd4a18</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> rpc_task {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">tk_owner</span> = 227403,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
 <p>确认一下这个进程的状态信息:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> ps <span class="kw">|</span> <span class="fu">grep</span> 227403</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>   <span class="ex">PID</span>    PPID   CPU       TASK         ST  %MEM      VSZ     RSS  COMM</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">227403</span>  25069  108  ffff9ab00f915e00  IN   0.3 14366732 3565828  dmap_br</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> ps <span class="kw">|</span> <span class="fu">grep</span> 227403</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>   <span class="ex">PID</span>    PPID   CPU       TASK         ST  %MEM      VSZ     RSS  COMM</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">227403</span>  25069  108  ffff9ab00f915e00  IN   0.3 14366732 3565828  dmap_br</span></code></pre></div>
+<p>查看这个进程的栈:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt 227403</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 227403  TASK: ffff9ab00f915e00  CPU: 108  COMMAND: <span class="st">&quot;dmap_br&quot;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a> <span class="co">#0 [ffffaa3edc39fc40] __schedule at ffffffff87a9a4e6</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a> <span class="co">#1 [ffffaa3edc39fce0] schedule at ffffffff87a9ab88</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a> <span class="co">#2 [ffffaa3edc39fce8] futex_wait_queue_me at ffffffff8734cb51</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a> <span class="co">#3 [ffffaa3edc39fd20] futex_wait at ffffffff8734d9db</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a> <span class="co">#4 [ffffaa3edc39fe40] do_futex at ffffffff87350187</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a> <span class="co">#5 [ffffaa3edc39fec0] __x64_sys_futex at ffffffff8735074b</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a> <span class="co">#6 [ffffaa3edc39ff38] do_syscall_64 at ffffffff8720430b</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a> <span class="co">#7 [ffffaa3edc39ff50] entry_SYSCALL_64_after_hwframe at ffffffff87c00088</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RIP:</span> 00007f9182bc310c  RSP: 00007ffdf17cb660  RFLAGS: 00000246</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RAX:</span> ffffffffffffffda  RBX: 00007f918076eb48  RCX: 00007f9182bc310c</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RDX:</span> 0000000000000000  RSI: 0000000000000080  RDI: 00007f918076eb70</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RBP:</span> 0000000000000000   R8: 0000000000000000   R9: 0000000000000000</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R10:</span> 0000000000000000  R11: 0000000000000246  R12: 00007f918076eb20</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R13:</span> 0000000000000000  R14: 0000000000000000  R15: 00007f918076eb70</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ORIG_RAX:</span> 00000000000000ca  CS: 0033  SS: 002b</span></code></pre></div>
+<h2 data-number="2.3" id="解析rpc请求的类型"><span
+class="header-section-number">2.3</span> 解析rpc请求的类型</h2>
+<p>解析rpc任务结构体:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_task ffff9a3319bd4a18 <span class="co"># RDI: ffff9a3319bd4a18</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> rpc_task {</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">tk_msg</span> = {</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_proc</span> = 0xffffffffc03eb8a0 <span class="op">&lt;</span>nfs3_procedures+288<span class="op">&gt;</span>, </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_argp</span> = 0xffff9a3319bd4bd8, </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_resp</span> = 0xffff9a3319bd4c40, </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_cred</span> = 0xffff9ab0283d2e00</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span> </span></code></pre></div>
+<p><code>nfs3_procedures[]</code>是<code>struct rpc_procinfo</code>类型的数组，<code>struct rpc_procinfo</code>结构体的大小如下:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_procinfo</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> rpc_procinfo {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">SIZE:</span> 48</span></code></pre></div>
+<p>从<code>&lt;nfs3_procedures+288&gt;</code>中的偏移量<code>288</code>计算出<code>288/48=6</code>，查看<code>fs/nfs/nfs3xdr.c</code>文件中的以下代码:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> rpc_procinfo nfs3_procedures<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span>                    </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>        PROC<span class="op">(</span>GETATTR<span class="op">,</span>           getattr<span class="op">,</span>        getattr<span class="op">,</span>        <span class="dv">1</span><span class="op">),</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        PROC<span class="op">(</span>SETATTR<span class="op">,</span>           setattr<span class="op">,</span>        setattr<span class="op">,</span>        <span class="dv">0</span><span class="op">),</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        PROC<span class="op">(</span>LOOKUP<span class="op">,</span>            lookup<span class="op">,</span>         lookup<span class="op">,</span>         <span class="dv">2</span><span class="op">),</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        PROC<span class="op">(</span>ACCESS<span class="op">,</span>            access<span class="op">,</span>         access<span class="op">,</span>         <span class="dv">1</span><span class="op">),</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        PROC<span class="op">(</span>READLINK<span class="op">,</span>          readlink<span class="op">,</span>       readlink<span class="op">,</span>       <span class="dv">3</span><span class="op">),</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        PROC<span class="op">(</span>READ<span class="op">,</span>              read<span class="op">,</span>           read<span class="op">,</span>           <span class="dv">3</span><span class="op">),</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        PROC<span class="op">(</span>WRITE<span class="op">,</span>             write<span class="op">,</span>          write<span class="op">,</span>          <span class="dv">4</span><span class="op">),</span></span></code></pre></div>
+<p>可知rpc请求类型是<code>NFS3PROC_WRITE</code>。</p>
 <h1 data-number="3" id="代码分析"><span
 class="header-section-number">3</span> 代码分析</h1>
-<p>整理了日志中堆栈的代码流程，可以看出是在<code>__rpc_execute()</code>中不断循环。</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>__rpc_execute</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  call_transmit</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    xprt_transmit</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      xs_tcp_send_request</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        xs_sendpages</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>          xs_send_kvec</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            sock_sendmsg</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>              tcp_sendmsg</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                tcp_sendmsg_locked</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                  sk_stream_alloc_skb</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                    __kfree_skb</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>                      kfree</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>                release_sock</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                  tcp_release_cb</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        xs_nospace</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>          spin_unlock_bh</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>            raw_spin_unlock_bh</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>              _raw_spin_unlock_bh</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>                __raw_spin_unlock_bh</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>                  __local_bh_enable_ip</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>                    do_softirq</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>          xs_tcp_write_space</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    xprt_prepare_transmit</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>      spin_unlock_bh</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        raw_spin_unlock_bh</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>          _raw_spin_unlock_bh</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>            __raw_spin_unlock_bh</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>              __local_bh_enable_ip</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>                do_softirq</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  __x86_indirect_thunk_r15<span class="op">+</span><span class="bn">0x3</span><span class="op">/</span><span class="bn">0x11</span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  __x86_indirect_thunk_rax<span class="op">+</span><span class="bn">0x3</span><span class="op">/</span><span class="bn">0x20</span></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  __x86_indirect_thunk_rcx<span class="op">+</span><span class="bn">0x3</span><span class="op">/</span><span class="bn">0x20</span></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>  __x86_indirect_thunk_r15<span class="op">+</span><span class="bn">0x0</span><span class="op">/</span><span class="bn">0x11</span></span></code></pre></div>
-<h1 data-number="4" id="补丁分析"><span
-class="header-section-number">4</span> 补丁分析</h1>
-<p><code>ed0172af5d6f SUNRPC: Fix a race to wake a sync task</code></p>
+<p>由vmcore解析可知rpc请求类型是<code>NFS3PROC_WRITE</code>，只有<code>nfs3_proc_write_setup()</code>函数中引用这个宏定义。</p>
+<h1 data-number="4" id="补丁"><span
+class="header-section-number">4</span> 补丁</h1>
+<ul>
+<li><p><code>ed0172af5d6f SUNRPC: Fix a race to wake a sync task</code></p></li>
+<li><p><code>6258cf25d5e3 SUNRPC: avoid soft lockup when transmitting UDP to reachable server.</code></p></li>
+</ul>
 </body>
 </html>

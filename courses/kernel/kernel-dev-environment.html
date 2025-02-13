@@ -496,7 +496,7 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#
 <div class="sourceCode" id="cb24"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> build <span class="at">-rf</span> <span class="kw">&amp;&amp;</span> <span class="fu">mkdir</span> build</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ../tmp/configs/x86_64-config build/.config</span></code></pre></div>
-<p>编译和安装命令如下:</p>
+<p>可以使用<code>make help | less</code>查看帮助，常用编译和安装命令如下:</p>
 <div class="sourceCode" id="cb25"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build menuconfig <span class="co"># 交互式地配置内核的编译选项，.config文件放在build目录下</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build olddefconfig <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
@@ -504,7 +504,9 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build Image <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span> <span class="co"># aarch64，比如2020年末之后的arm芯片的苹果电脑上vmware fusion安装的ubuntu</span></span>
 <span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build modules <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> build/boot <span class="kw">&amp;&amp;</span> <span class="fu">make</span> O=build install INSTALL_PATH=boot <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build modules_install INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=mod <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span></code></pre></div>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># INSTALL_MOD_STRIP=1代表不含调试信息，不写INSTALL_MOD_STRIP=1代表含有调试信息</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build modules_install INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=mod <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build INSTALL_MOD_STRIP=1 tar-pkg <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span> <span class="co"># 将boot/和ko打包成.tar</span></span></code></pre></div>
 <p>在<code>x86_64</code>下，如果是交叉编译其他架构，<code>ARCH</code>的值为<code>arch/</code>目录下相应的架构，编译命令是:</p>
 <div class="sourceCode" id="cb26"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> ARCH=i386 O=build bzImage <span class="co"># x86 32bit</span></span>
