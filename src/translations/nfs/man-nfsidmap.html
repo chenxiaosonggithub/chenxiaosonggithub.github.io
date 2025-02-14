@@ -8,10 +8,19 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -21,25 +30,37 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程:
+chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献:
+chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">nfs idmap相关man手册</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#man-nfsidmap"><span class="toc-section-number">1</span> <code>man nfsidmap</code></a></li>
-<li><a href="#man-idmapd.conf"><span class="toc-section-number">2</span> <code>man idmapd.conf</code></a></li>
-<li><a href="#man-request-key"><span class="toc-section-number">3</span> <code>man request-key</code></a></li>
+<li><a href="#man-nfsidmap" id="toc-man-nfsidmap"><span
+class="toc-section-number">1</span> <code>man nfsidmap</code></a></li>
+<li><a href="#man-idmapd.conf" id="toc-man-idmapd.conf"><span
+class="toc-section-number">2</span>
+<code>man idmapd.conf</code></a></li>
+<li><a href="#man-request-key" id="toc-man-request-key"><span
+class="toc-section-number">3</span>
+<code>man request-key</code></a></li>
 </ul>
 </nav>
 <p>fedora40上nfs idmap相关的一些命令。</p>
-<h1 data-number="1" id="man-nfsidmap"><span class="header-section-number">1</span> <code>man nfsidmap</code></h1>
+<h1 data-number="1" id="man-nfsidmap"><span
+class="header-section-number">1</span> <code>man nfsidmap</code></h1>
 <pre><code>nfsidmap(8)       系统管理手册      nfsidmap(8)
 
 名称
@@ -126,7 +147,8 @@ AUTHOR
        Bryan Schumaker, &lt;bjschuma@netapp.com&gt;
 
 1 October 2010                    nfsidmap(8)</code></pre>
-<h1 data-number="2" id="man-idmapd.conf"><span class="header-section-number">2</span> <code>man idmapd.conf</code></h1>
+<h1 data-number="2" id="man-idmapd.conf"><span
+class="header-section-number">2</span> <code>man idmapd.conf</code></h1>
 <pre><code>idmapd.conf(5)     文件格式手册        idmapd.conf(5)
 
 名称
@@ -342,7 +364,8 @@ BUGS
        Report bugs to &lt;nfsv4@linux-nfs.org&gt;
 
 19 Nov 2008         idmapd.conf(5)</code></pre>
-<h1 data-number="3" id="man-request-key"><span class="header-section-number">3</span> <code>man request-key</code></h1>
+<h1 data-number="3" id="man-request-key"><span
+class="header-section-number">3</span> <code>man request-key</code></h1>
 <pre><code>REQUEST-KEY(8)                Linux 密钥管理工具               REQUEST-KEY(8)
 
 名称

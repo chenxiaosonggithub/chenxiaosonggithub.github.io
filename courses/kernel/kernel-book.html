@@ -8,10 +8,19 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -21,40 +30,88 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程:
+chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献:
+chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">内核书籍推荐</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#四库全书之一linux内核设计与实现-基于2.6.34内核"><span class="toc-section-number">1</span> 四库全书之一<span>《Linux内核设计与实现》</span>-基于2.6.34内核</a></li>
-<li><a href="#四库全书之二深入理解linux内核-基于2.6.11内核"><span class="toc-section-number">2</span> 四库全书之二<span>《深入理解Linux内核》</span>-基于2.6.11内核</a></li>
-<li><a href="#四库全书之三linux设备驱动程序-基于2.6.10内核"><span class="toc-section-number">3</span> 四库全书之三<span>《Linux设备驱动程序》</span>-基于2.6.10内核</a></li>
-<li><a href="#四库全书之四linux内核源代码情景分析上下-基于2.4.0内核"><span class="toc-section-number">4</span> 四库全书之四<span>《Linux内核源代码情景分析（上下）》</span>-基于2.4.0内核</a></li>
-<li><a href="#深入linux内核架构-基于2.6.24内核"><span class="toc-section-number">5</span> <span>《深入Linux内核架构》</span>-基于2.6.24内核</a></li>
-<li><a href="#linux内核完全剖析-基于0.12内核"><span class="toc-section-number">6</span> <span>《LINUX内核完全剖析: 基于0.12内核》</span></a></li>
-<li><a href="#linux设备驱动开发详解-基于最新的linux-4.0内核"><span class="toc-section-number">7</span> <span>《Linux设备驱动开发详解: 基于最新的Linux 4.0内核》</span></a></li>
-<li><a href="#庖丁解牛linux内核分析-基于3.18.6内核"><span class="toc-section-number">8</span> <span>《庖丁解牛Linux内核分析》</span>-基于3.18.6内核</a></li>
-<li><a href="#存储技术原理分析基于linux-2.6内核源代码"><span class="toc-section-number">9</span> <span>《存储技术原理分析:基于Linux 2.6内核源代码》</span></a></li>
-<li><a href="#bpf之巅洞悉linux系统和应用性能"><span class="toc-section-number">10</span> <span>《BPF之巅:洞悉Linux系统和应用性能》</span></a></li>
-<li><a href="#unix环境高级编程第3版"><span class="toc-section-number">11</span> <span>《UNIX环境高级编程（第3版）》</span></a></li>
-<li><a href="#linux程序设计第4版"><span class="toc-section-number">12</span> <span>《Linux程序设计（第4版）》</span></a></li>
+<li><a href="#四库全书之一linux内核设计与实现-基于2.6.34内核"
+id="toc-四库全书之一linux内核设计与实现-基于2.6.34内核"><span
+class="toc-section-number">1</span>
+四库全书之一《Linux内核设计与实现》-基于2.6.34内核</a></li>
+<li><a href="#四库全书之二深入理解linux内核-基于2.6.11内核"
+id="toc-四库全书之二深入理解linux内核-基于2.6.11内核"><span
+class="toc-section-number">2</span>
+四库全书之二《深入理解Linux内核》-基于2.6.11内核</a></li>
+<li><a href="#四库全书之三linux设备驱动程序-基于2.6.10内核"
+id="toc-四库全书之三linux设备驱动程序-基于2.6.10内核"><span
+class="toc-section-number">3</span>
+四库全书之三《Linux设备驱动程序》-基于2.6.10内核</a></li>
+<li><a href="#四库全书之四linux内核源代码情景分析上下-基于2.4.0内核"
+id="toc-四库全书之四linux内核源代码情景分析上下-基于2.4.0内核"><span
+class="toc-section-number">4</span>
+四库全书之四《Linux内核源代码情景分析（上下）》-基于2.4.0内核</a></li>
+<li><a href="#深入linux内核架构-基于2.6.24内核"
+id="toc-深入linux内核架构-基于2.6.24内核"><span
+class="toc-section-number">5</span>
+《深入Linux内核架构》-基于2.6.24内核</a></li>
+<li><a href="#linux内核完全剖析-基于0.12内核"
+id="toc-linux内核完全剖析-基于0.12内核"><span
+class="toc-section-number">6</span> 《LINUX内核完全剖析:
+基于0.12内核》</a></li>
+<li><a href="#linux设备驱动开发详解-基于最新的linux-4.0内核"
+id="toc-linux设备驱动开发详解-基于最新的linux-4.0内核"><span
+class="toc-section-number">7</span> 《Linux设备驱动开发详解:
+基于最新的Linux 4.0内核》</a></li>
+<li><a href="#庖丁解牛linux内核分析-基于3.18.6内核"
+id="toc-庖丁解牛linux内核分析-基于3.18.6内核"><span
+class="toc-section-number">8</span>
+《庖丁解牛Linux内核分析》-基于3.18.6内核</a></li>
+<li><a href="#存储技术原理分析基于linux-2.6内核源代码"
+id="toc-存储技术原理分析基于linux-2.6内核源代码"><span
+class="toc-section-number">9</span> 《存储技术原理分析:基于Linux
+2.6内核源代码》</a></li>
+<li><a href="#bpf之巅洞悉linux系统和应用性能"
+id="toc-bpf之巅洞悉linux系统和应用性能"><span
+class="toc-section-number">10</span>
+《BPF之巅:洞悉Linux系统和应用性能》</a></li>
+<li><a href="#unix环境高级编程第3版"
+id="toc-unix环境高级编程第3版"><span
+class="toc-section-number">11</span>
+《UNIX环境高级编程（第3版）》</a></li>
+<li><a href="#linux程序设计第4版" id="toc-linux程序设计第4版"><span
+class="toc-section-number">12</span> 《Linux程序设计（第4版）》</a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/courses/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
-<p><a href="https://chenxiaosong.com/courses/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/courses/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a
+href="https://chenxiaosong.com/courses/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
 <p>讲完了开发环境的准备，在讲具体内核模块知识点之前，我想先列一下曾经读过的几本书，其中有的书我看过很多遍，当然也有一些只看过一部分。总体来说，这些书是网上推荐比较多的。如果发现有其他好书，我还会继续补充，各位朋友如果有推荐的书也可以告诉我。</p>
-<p>各位朋友可以<a href="https://chenxiaosong.com/baidunetdisk">点击这里从百度网盘下载pdf电子书</a>。电子书请仅作为学习用途，有需要的话建议购买纸质书。</p>
-<p>下面各小节列一下这些书的章节目录，方便自己和各位朋友的搜索。更详细的目录可以查看<a href="https://chenxiaosong.com/courses/book-contents.html">《书籍目录》</a>。</p>
-<p>有好几本书是陈莉君老师翻译的，还可以查看<a href="https://www.kerneltravel.net/">Linux内核之旅网站</a>（还有“Linux内核之旅”微信公众号）。</p>
+<p>各位朋友可以<a
+href="https://chenxiaosong.com/baidunetdisk">点击这里从百度网盘下载pdf电子书</a>。电子书请仅作为学习用途，有需要的话建议购买纸质书。</p>
+<p>下面各小节列一下这些书的章节目录，方便自己和各位朋友的搜索。更详细的目录可以查看<a
+href="https://chenxiaosong.com/courses/book-contents.html">《书籍目录》</a>。</p>
+<p>有好几本书是陈莉君老师翻译的，还可以查看<a
+href="https://www.kerneltravel.net/">Linux内核之旅网站</a>（还有”Linux内核之旅”微信公众号）。</p>
 <p>点击小节标题可以看豆瓣上对这几本书的评价。</p>
-<h1 data-number="1" id="四库全书之一linux内核设计与实现-基于2.6.34内核"><span class="header-section-number">1</span> 四库全书之一<a href="https://book.douban.com/subject/6097773/">《Linux内核设计与实现》</a>-基于2.6.34内核</h1>
+<h1 data-number="1"
+id="四库全书之一linux内核设计与实现-基于2.6.34内核"><span
+class="header-section-number">1</span> 四库全书之一<a
+href="https://book.douban.com/subject/6097773/">《Linux内核设计与实现》</a>-基于2.6.34内核</h1>
 <p>这本书我看过很多很多遍，是我的内核启蒙书，没那么厚，对内核知识概括得很好，看完可以对内核知识有一个总体的掌握，但讲得不那么细，也正是因为这样，第一遍我看的时候有点晕，但第二第三遍再看时很爽。</p>
 <pre><code>第1章 Linux内核简介 
 第2章 从内核出发 
@@ -76,7 +133,10 @@
 第18章 调试 
 第19章 可移植性
 第20章 补丁、开发和社区参考资料</code></pre>
-<h1 data-number="2" id="四库全书之二深入理解linux内核-基于2.6.11内核"><span class="header-section-number">2</span> 四库全书之二<a href="https://book.douban.com/subject/2287506/">《深入理解Linux内核》</a>-基于2.6.11内核</h1>
+<h1 data-number="2"
+id="四库全书之二深入理解linux内核-基于2.6.11内核"><span
+class="header-section-number">2</span> 四库全书之二<a
+href="https://book.douban.com/subject/2287506/">《深入理解Linux内核》</a>-基于2.6.11内核</h1>
 <p>这本书我看过一部分，内容很多很详细，建议作为工具书查阅，当然如果想全部看完也很棒，做这个课程我一定会把这本书看完的。</p>
 <pre><code>第一章 绪论
 第二章 内存寻址
@@ -102,7 +162,10 @@
 附录二 模块
 参考文献
 源代码索引</code></pre>
-<h1 data-number="3" id="四库全书之三linux设备驱动程序-基于2.6.10内核"><span class="header-section-number">3</span> 四库全书之三<a href="https://book.douban.com/subject/1723151/">《Linux设备驱动程序》</a>-基于2.6.10内核</h1>
+<h1 data-number="3"
+id="四库全书之三linux设备驱动程序-基于2.6.10内核"><span
+class="header-section-number">3</span> 四库全书之三<a
+href="https://book.douban.com/subject/1723151/">《Linux设备驱动程序》</a>-基于2.6.10内核</h1>
 <p>这本书只全部看过一次，讲驱动的，一般也只是用于查阅，做这个课程我也一定把这本书看完。</p>
 <pre><code>前言
 第一章 设备驱动程序简介
@@ -124,7 +187,10 @@
 第十七章 网络驱动程序
 第十八章 TTY驱动程序
 参考书目</code></pre>
-<h1 data-number="4" id="四库全书之四linux内核源代码情景分析上下-基于2.4.0内核"><span class="header-section-number">4</span> 四库全书之四<a href="https://search.douban.com/book/subject_search?search_text=Linux%E5%86%85%E6%A0%B8%E6%BA%90%E4%BB%A3%E7%A0%81%E6%83%85%E6%99%AF%E5%88%86%E6%9E%90&amp;cat=1001">《Linux内核源代码情景分析（上下）》</a>-基于2.4.0内核</h1>
+<h1 data-number="4"
+id="四库全书之四linux内核源代码情景分析上下-基于2.4.0内核"><span
+class="header-section-number">4</span> 四库全书之四<a
+href="https://search.douban.com/book/subject_search?search_text=Linux%E5%86%85%E6%A0%B8%E6%BA%90%E4%BB%A3%E7%A0%81%E6%83%85%E6%99%AF%E5%88%86%E6%9E%90&amp;cat=1001">《Linux内核源代码情景分析（上下）》</a>-基于2.4.0内核</h1>
 <p>这本书用的内核比较老，我只看过部分，希望做完这个课程可以把这两本看完。</p>
 <pre><code>1. 预备知识
 2. 存储管理
@@ -136,7 +202,9 @@
 8. 设备驱动
 9. 多处理器SMP系统结构
 10. 系统引导与初始化</code></pre>
-<h1 data-number="5" id="深入linux内核架构-基于2.6.24内核"><span class="header-section-number">5</span> <a href="https://book.douban.com/subject/4843567/">《深入Linux内核架构》</a>-基于2.6.24内核</h1>
+<h1 data-number="5" id="深入linux内核架构-基于2.6.24内核"><span
+class="header-section-number">5</span> <a
+href="https://book.douban.com/subject/4843567/">《深入Linux内核架构》</a>-基于2.6.24内核</h1>
 <p>我也只看过部分，讲得挺详细，值得看。</p>
 <pre><code>第1章 简介和概述
 第2章 进程管理和调度
@@ -163,7 +231,10 @@
 附录D 系统启动
 附录E ELF二进制格式
 附录F 内核开发过程参考文献</code></pre>
-<h1 data-number="6" id="linux内核完全剖析-基于0.12内核"><span class="header-section-number">6</span> <a href="https://book.douban.com/subject/3229243/">《LINUX内核完全剖析: 基于0.12内核》</a></h1>
+<h1 data-number="6" id="linux内核完全剖析-基于0.12内核"><span
+class="header-section-number">6</span> <a
+href="https://book.douban.com/subject/3229243/">《LINUX内核完全剖析:
+基于0.12内核》</a></h1>
 <p>看早期的内核代码真的很棒，只看过一部分，想继续看完。</p>
 <pre><code>序
 第1章 概述
@@ -185,7 +256,11 @@
 第17章 实验环境设置与使用方法
 附录
 参考文献</code></pre>
-<h1 data-number="7" id="linux设备驱动开发详解-基于最新的linux-4.0内核"><span class="header-section-number">7</span> <a href="https://book.douban.com/subject/26600201/">《Linux设备驱动开发详解: 基于最新的Linux 4.0内核》</a></h1>
+<h1 data-number="7"
+id="linux设备驱动开发详解-基于最新的linux-4.0内核"><span
+class="header-section-number">7</span> <a
+href="https://book.douban.com/subject/26600201/">《Linux设备驱动开发详解:
+基于最新的Linux 4.0内核》</a></h1>
 <p>这本书我全部看完了，算是驱动开发的入门书吧，对初学者很友好。</p>
 <pre><code>第１章 Linux设备驱动概述及开发环境构建 1
 第２章 驱动设计的硬件基础 20
@@ -208,7 +283,9 @@
 第19章 Linux电源管理的系统架构和驱动 494
 第20章 Linux芯片级移植及底层驱动 535
 第21章 Linux设备驱动的调试 581</code></pre>
-<h1 data-number="8" id="庖丁解牛linux内核分析-基于3.18.6内核"><span class="header-section-number">8</span> <a href="https://book.douban.com/subject/30350365/">《庖丁解牛Linux内核分析》</a>-基于3.18.6内核</h1>
+<h1 data-number="8" id="庖丁解牛linux内核分析-基于3.18.6内核"><span
+class="header-section-number">8</span> <a
+href="https://book.douban.com/subject/30350365/">《庖丁解牛Linux内核分析》</a>-基于3.18.6内核</h1>
 <p>这本书我全看完了，讲得比较底层。</p>
 <pre><code>第1章 计算机工作原理 1
 第2章 操作系统是如何工作的 29
@@ -218,7 +295,10 @@
 第6章 进程的描述和进程的创建 93
 第7章 可执行程序工作原理 122
 第8章 进程的切换和系统的一般执行过程 158</code></pre>
-<h1 data-number="9" id="存储技术原理分析基于linux-2.6内核源代码"><span class="header-section-number">9</span> <a href="https://book.douban.com/subject/6822367/">《存储技术原理分析:基于Linux 2.6内核源代码》</a></h1>
+<h1 data-number="9" id="存储技术原理分析基于linux-2.6内核源代码"><span
+class="header-section-number">9</span> <a
+href="https://book.douban.com/subject/6822367/">《存储技术原理分析:基于Linux
+2.6内核源代码》</a></h1>
 <pre><code>第一部分 存储技术
 第1章 存储技术概论 2
 第二部分 设备
@@ -231,7 +311,9 @@
 第7章 Device Mapper模块 509
 第8章 文件系统 593
 主要参考文献 769</code></pre>
-<h1 data-number="10" id="bpf之巅洞悉linux系统和应用性能"><span class="header-section-number">10</span> <a href="https://book.douban.com/subject/35273652/">《BPF之巅:洞悉Linux系统和应用性能》</a></h1>
+<h1 data-number="10" id="bpf之巅洞悉linux系统和应用性能"><span
+class="header-section-number">10</span> <a
+href="https://book.douban.com/subject/35273652/">《BPF之巅:洞悉Linux系统和应用性能》</a></h1>
 <pre><code>第1章 引 言1
 第2章 技术背景16
 第3章 性能分析71
@@ -255,8 +337,11 @@
 附录C BCC工具的开发778
 附录D C.BPF. 793
 附录E BPF指令812</code></pre>
-<h1 data-number="11" id="unix环境高级编程第3版"><span class="header-section-number">11</span> <a href="https://book.douban.com/subject/25900403/">《UNIX环境高级编程（第3版）》</a></h1>
-<p>这本书是介绍用户态的，属于介绍得比较详细的。<a href="http://www.apuebook.com/code3e.html">在这里下载源代码</a>。</p>
+<h1 data-number="11" id="unix环境高级编程第3版"><span
+class="header-section-number">11</span> <a
+href="https://book.douban.com/subject/25900403/">《UNIX环境高级编程（第3版）》</a></h1>
+<p>这本书是介绍用户态的，属于介绍得比较详细的。<a
+href="http://www.apuebook.com/code3e.html">在这里下载源代码</a>。</p>
 <pre><code>Chapter 1. UNIX System Overview / UNIX基础知识 1
 Chapter 2. UNIX Standardization and Implementations / UNIX标准及实现 25
 Chapter 3. File I/O / 文件I/O 61
@@ -284,8 +369,11 @@ B.1 Our Header File / 本书使用的头文件 895
 B.2 Standard Error Routines / 标准出错例程 898
 Appendix C. Solutions to Selected Exercises / 部分习题答案 905
 Bibliography / 参考书目 947</code></pre>
-<h1 data-number="12" id="linux程序设计第4版"><span class="header-section-number">12</span> <a href="https://book.douban.com/subject/4831448/">《Linux程序设计（第4版）》</a></h1>
-<p>这本书是介绍用户态的，算是比较基础的。<a href="https://www.wiley.com/en-us/Beginning+Linux+Programming%2C+4th+Edition-p-9781118058619#downloadstab-section">在这里下载源代码</a>。</p>
+<h1 data-number="12" id="linux程序设计第4版"><span
+class="header-section-number">12</span> <a
+href="https://book.douban.com/subject/4831448/">《Linux程序设计（第4版）》</a></h1>
+<p>这本书是介绍用户态的，算是比较基础的。<a
+href="https://www.wiley.com/en-us/Beginning+Linux+Programming%2C+4th+Edition-p-9781118058619#downloadstab-section">在这里下载源代码</a>。</p>
 <pre><code>第1章 入门 1
 第2章 shell程序设计 15
 第3章 文件操作 78
