@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -94,68 +83,44 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程:
-chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献:
-chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">smb client数据结构</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#超级块" id="toc-超级块"><span
-class="toc-section-number">1</span> 超级块</a></li>
-<li><a href="#超级块操作" id="toc-超级块操作"><span
-class="toc-section-number">2</span> 超级块操作</a></li>
-<li><a href="#索引节点" id="toc-索引节点"><span
-class="toc-section-number">3</span> 索引节点</a></li>
-<li><a href="#索引节点操作" id="toc-索引节点操作"><span
-class="toc-section-number">4</span> 索引节点操作</a>
+<li><a href="#超级块"><span class="toc-section-number">1</span> 超级块</a></li>
+<li><a href="#超级块操作"><span class="toc-section-number">2</span> 超级块操作</a></li>
+<li><a href="#索引节点"><span class="toc-section-number">3</span> 索引节点</a></li>
+<li><a href="#索引节点操作"><span class="toc-section-number">4</span> 索引节点操作</a>
 <ul>
-<li><a href="#常规文件" id="toc-常规文件"><span
-class="toc-section-number">4.1</span> 常规文件</a></li>
-<li><a href="#目录" id="toc-目录"><span
-class="toc-section-number">4.2</span> 目录</a></li>
-<li><a href="#符号链接" id="toc-符号链接"><span
-class="toc-section-number">4.3</span> 符号链接</a></li>
-<li><a href="#其他" id="toc-其他"><span
-class="toc-section-number">4.4</span> 其他</a></li>
+<li><a href="#常规文件"><span class="toc-section-number">4.1</span> 常规文件</a></li>
+<li><a href="#目录"><span class="toc-section-number">4.2</span> 目录</a></li>
+<li><a href="#符号链接"><span class="toc-section-number">4.3</span> 符号链接</a></li>
+<li><a href="#其他"><span class="toc-section-number">4.4</span> 其他</a></li>
 </ul></li>
-<li><a href="#dentry操作" id="toc-dentry操作"><span
-class="toc-section-number">5</span> <code>dentry</code>操作</a></li>
-<li><a href="#file操作" id="toc-file操作"><span
-class="toc-section-number">6</span> <code>file</code>操作</a>
+<li><a href="#dentry操作"><span class="toc-section-number">5</span> <code>dentry</code>操作</a></li>
+<li><a href="#file操作"><span class="toc-section-number">6</span> <code>file</code>操作</a>
 <ul>
-<li><a href="#常规文件-1" id="toc-常规文件-1"><span
-class="toc-section-number">6.1</span> 常规文件</a></li>
-<li><a href="#目录-1" id="toc-目录-1"><span
-class="toc-section-number">6.2</span> 目录</a></li>
+<li><a href="#常规文件-1"><span class="toc-section-number">6.1</span> 常规文件</a></li>
+<li><a href="#目录-1"><span class="toc-section-number">6.2</span> 目录</a></li>
 </ul></li>
-<li><a href="#address_space操作" id="toc-address_space操作"><span
-class="toc-section-number">7</span> <code>address_space</code>操作</a>
+<li><a href="#address_space操作"><span class="toc-section-number">7</span> <code>address_space</code>操作</a>
 <ul>
-<li><a href="#常规文件-2" id="toc-常规文件-2"><span
-class="toc-section-number">7.1</span> 常规文件</a></li>
+<li><a href="#常规文件-2"><span class="toc-section-number">7.1</span> 常规文件</a></li>
 </ul></li>
-<li><a href="#文件系统类型" id="toc-文件系统类型"><span
-class="toc-section-number">8</span> 文件系统类型</a></li>
-<li><a href="#模块加载卸载方法" id="toc-模块加载卸载方法"><span
-class="toc-section-number">9</span> 模块加载卸载方法</a></li>
+<li><a href="#文件系统类型"><span class="toc-section-number">8</span> 文件系统类型</a></li>
+<li><a href="#模块加载卸载方法"><span class="toc-section-number">9</span> 模块加载卸载方法</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/courses/smb/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/courses/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/courses/smb/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/courses/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
 <p>我们通过开发一个新操作系统需要的步骤，来切入学习smb client。</p>
 <ol type="1">
 <li>定义磁盘和内存的超级块结构。</li>
@@ -169,351 +134,333 @@ href="https://chenxiaosong.com/courses/smb/smb.html">点击跳转到smb课程所
 <li>模块加载卸载方法。</li>
 </ol>
 <p>注意，我只会列出结构体的代码，会在结构的成员加些中文注释（也可能以后再加），不会贴整段的函数代码，因为函数的实现要自己去看，看具体问题时再看函数实现才有意义。</p>
-<h1 data-number="1" id="超级块"><span
-class="header-section-number">1</span> 超级块</h1>
-<p>由于smb
-client没有磁盘超级块，所以只有内存超级块结构体，在<code>cifs_set_super()</code>函数中赋值<code>sb-&gt;s_fs_info = mnt_data-&gt;cifs_sb</code>。</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> cifs_sb_info <span class="op">{</span>                                                </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> rb_root tlink_tree<span class="op">;</span>               <span class="co">// tlink 树</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        spinlock_t tlink_tree_lock<span class="op">;</span>              <span class="co">// tlink 树锁</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> tcon_link <span class="op">*</span>master_tlink<span class="op">;</span>          <span class="co">// 主 tlink</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> nls_table <span class="op">*</span>local_nls<span class="op">;</span>             <span class="co">// 本地 nls 表</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> smb3_fs_context <span class="op">*</span>ctx<span class="op">;</span>             <span class="co">// smb3 文件系统上下文</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        atomic_t active<span class="op">;</span>                         <span class="co">// 活跃计数</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">int</span> mnt_cifs_flags<span class="op">;</span>             <span class="co">// 挂载标志</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> delayed_work prune_tlinks<span class="op">;</span>        <span class="co">// 延迟清理 tlinks</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> rcu_head rcu<span class="op">;</span>                     <span class="co">// RCU 头</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                                                                     </span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">/* 只有当 CIFS_MOUNT_USE_PREFIX_PATH 被设置时使用 */</span>       </span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="dt">char</span> <span class="op">*</span>prepath<span class="op">;</span>                           <span class="co">// 预路径</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                                                                     </span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="co">/*                                                           </span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">         * 指示是否在以后关闭了 serverino 选项</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">         * (cifs_autodisable_serverino) 以匹配新挂载点。</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">         */</span>                                                          </span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="dt">bool</span> mnt_cifs_serverino_autodisabled<span class="op">;</span>    <span class="co">// serverino 自动禁用标志</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="co">/*                                                           </span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">         * 挂载完成后可用。                   </span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">         */</span>                                                          </span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> dentry <span class="op">*</span>root<span class="op">;</span>                     <span class="co">// 根目录 dentry</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="op">};</span> </span></code></pre></div>
-<h1 data-number="2" id="超级块操作"><span
-class="header-section-number">2</span> 超级块操作</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">const</span> <span class="kw">struct</span> super_operations cifs_super_ops <span class="op">=</span> <span class="op">{</span>                         </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>statfs <span class="op">=</span> cifs_statfs<span class="op">,</span>                                                  </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>alloc_inode <span class="op">=</span> cifs_alloc_inode<span class="op">,</span>                                        </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>write_inode    <span class="op">=</span> cifs_write_inode<span class="op">,</span>                                     </span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>free_inode <span class="op">=</span> cifs_free_inode<span class="op">,</span>                                          </span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>drop_inode     <span class="op">=</span> cifs_drop_inode<span class="op">,</span>                                      </span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>evict_inode    <span class="op">=</span> cifs_evict_inode<span class="op">,</span>  </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">/*      .show_path      = cifs_show_path, */</span> <span class="co">/* 我们是否需要显示路径？ */</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>show_devname   <span class="op">=</span> cifs_show_devname<span class="op">,</span>                                    </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">/*      .delete_inode   = cifs_delete_inode,  */</span>  <span class="co">/* 除非以后我们添加惰性关闭</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">        索引节点的功能，或者内核忘记在关闭时调用我们与打开次数相同的</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">        释放次数，否则不需要上述函数 */</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>show_options <span class="op">=</span> cifs_show_options<span class="op">,</span>                                      </span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>umount_begin   <span class="op">=</span> cifs_umount_begin<span class="op">,</span>                                    </span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>freeze_fs      <span class="op">=</span> cifs_freeze<span class="op">,</span>                                          </span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="pp">#ifdef CONFIG_CIFS_STATS2                                                       </span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>show_stats <span class="op">=</span> cifs_show_stats<span class="op">,</span>                                          </span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif                                                                          </span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                                              </span></code></pre></div>
-<h1 data-number="3" id="索引节点"><span
-class="header-section-number">3</span> 索引节点</h1>
+<h1 data-number="1" id="超级块"><span class="header-section-number">1</span> 超级块</h1>
+<p>由于smb client没有磁盘超级块，所以只有内存超级块结构体，在<code>cifs_set_super()</code>函数中赋值<code>sb-&gt;s_fs_info = mnt_data-&gt;cifs_sb</code>。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">struct</span> cifs_sb_info {                                                </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>        <span class="kw">struct</span> rb_root tlink_tree;               <span class="co">// tlink 树</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>        spinlock_t tlink_tree_lock;              <span class="co">// tlink 树锁</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>        <span class="kw">struct</span> tcon_link *master_tlink;          <span class="co">// 主 tlink</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>        <span class="kw">struct</span> nls_table *local_nls;             <span class="co">// 本地 nls 表</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>        <span class="kw">struct</span> smb3_fs_context *ctx;             <span class="co">// smb3 文件系统上下文</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>        atomic_t active;                         <span class="co">// 活跃计数</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>        <span class="dt">unsigned</span> <span class="dt">int</span> mnt_cifs_flags;             <span class="co">// 挂载标志</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>        <span class="kw">struct</span> delayed_work prune_tlinks;        <span class="co">// 延迟清理 tlinks</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>        <span class="kw">struct</span> rcu_head rcu;                     <span class="co">// RCU 头</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>                                                                     </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>        <span class="co">/* 只有当 CIFS_MOUNT_USE_PREFIX_PATH 被设置时使用 */</span>       </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>        <span class="dt">char</span> *prepath;                           <span class="co">// 预路径</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>                                                                     </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>        <span class="co">/*                                                           </span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="co">         * 指示是否在以后关闭了 serverino 选项</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="co">         * (cifs_autodisable_serverino) 以匹配新挂载点。</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="co">         */</span>                                                          </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>        <span class="dt">bool</span> mnt_cifs_serverino_autodisabled;    <span class="co">// serverino 自动禁用标志</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>        <span class="co">/*                                                           </span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="co">         * 挂载完成后可用。                   </span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="co">         */</span>                                                          </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>        <span class="kw">struct</span> dentry *root;                     <span class="co">// 根目录 dentry</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>}; </span></code></pre></div>
+<h1 data-number="2" id="超级块操作"><span class="header-section-number">2</span> 超级块操作</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="dt">static</span> <span class="dt">const</span> <span class="kw">struct</span> super_operations cifs_super_ops = {                         </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>        .statfs = cifs_statfs,                                                  </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>        .alloc_inode = cifs_alloc_inode,                                        </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>        .write_inode    = cifs_write_inode,                                     </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>        .free_inode = cifs_free_inode,                                          </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>        .drop_inode     = cifs_drop_inode,                                      </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>        .evict_inode    = cifs_evict_inode,  </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">/*      .show_path      = cifs_show_path, */</span> <span class="co">/* 我们是否需要显示路径？ */</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>        .show_devname   = cifs_show_devname,                                    </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="co">/*      .delete_inode   = cifs_delete_inode,  */</span>  <span class="co">/* 除非以后我们添加惰性关闭</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="co">        索引节点的功能，或者内核忘记在关闭时调用我们与打开次数相同的</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="co">        释放次数，否则不需要上述函数 */</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>        .show_options = cifs_show_options,                                      </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>        .umount_begin   = cifs_umount_begin,                                    </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>        .freeze_fs      = cifs_freeze,                                          </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="pp">#ifdef CONFIG_CIFS_STATS2                                                       </span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>        .show_stats = cifs_show_stats,                                          </span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a><span class="pp">#endif                                                                          </span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>};                                                                              </span></code></pre></div>
+<h1 data-number="3" id="索引节点"><span class="header-section-number">3</span> 索引节点</h1>
 <p>smb没有磁盘索引节点，只有内存索引节点。</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*                                 </span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * 每个文件 inode 的结构体</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span>                                </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> cifsInodeInfo <span class="op">{</span>                                                                          </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> netfs_inode netfs<span class="op">;</span>       <span class="co">/* Netfslib 上下文和 vfs inode */</span>                          </span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">bool</span> can_cache_brlcks<span class="op">;</span>          <span class="co">// 是否可以缓存字节范围锁</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> list_head llist<span class="op">;</span>         <span class="co">/* 该 inode 持有的锁列表 */</span>                                  </span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="co">/*                                                                                      </span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">         * 注意: 有些代码路径会两次调用 down_read(lock_sem)，所以                             </span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">         * 我们必须始终使用 cifs_down_write() 而不是 down_write()                         </span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">         * 来避免此信号量的死锁。                                               </span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">         */</span>                                                                                     </span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> rw_semaphore lock_sem<span class="op">;</span>   <span class="co">/* 保护上面的字段 */</span>                          </span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="co">/* BB 添加用于脏页列表，即 oplock 的写缓存信息 */</span>                </span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> list_head openFileList<span class="op">;</span>  <span class="co">// 打开文件列表</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        spinlock_t      open_file_lock<span class="op">;</span> <span class="co">/* 保护 openFileList */</span>                             </span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>        __u32 cifsAttrs<span class="op">;</span>                <span class="co">/* 例如 DOS 归档位、稀疏、压缩、系统等属性 */</span>                 </span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">int</span> oplock<span class="op">;</span>            <span class="co">/* 我们拥有的 oplock/lease 级别 */</span>                        </span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">int</span> epoch<span class="op">;</span>             <span class="co">/* 用于跟踪租约状态变化 */</span>                 </span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CIFS_INODE_PENDING_OPLOCK_BREAK   </span><span class="op">(</span><span class="dv">0</span><span class="op">)</span><span class="pp"> </span><span class="co">/* 正在进行 oplock 断裂 */</span><span class="pp">                    </span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CIFS_INODE_PENDING_WRITERS        </span><span class="op">(</span><span class="dv">1</span><span class="op">)</span><span class="pp"> </span><span class="co">/* 正在进行写操作 */</span><span class="pp">                          </span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CIFS_INODE_FLAG_UNUSED            </span><span class="op">(</span><span class="dv">2</span><span class="op">)</span><span class="pp"> </span><span class="co">/* 未使用的标志 */</span><span class="pp">                                 </span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CIFS_INO_DELETE_PENDING           </span><span class="op">(</span><span class="dv">3</span><span class="op">)</span><span class="pp"> </span><span class="co">/* 服务器上待删除 */</span><span class="pp">                    </span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CIFS_INO_INVALID_MAPPING          </span><span class="op">(</span><span class="dv">4</span><span class="op">)</span><span class="pp"> </span><span class="co">/* pagecache 无效 */</span><span class="pp">                        </span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CIFS_INO_LOCK                     </span><span class="op">(</span><span class="dv">5</span><span class="op">)</span><span class="pp"> </span><span class="co">/* 同步锁位 */</span><span class="pp">                </span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CIFS_INO_MODIFIED_ATTR            </span><span class="op">(</span><span class="dv">6</span><span class="op">)</span><span class="pp"> </span><span class="co">/* 指示 mtime/ctime 的变化 */</span><span class="pp">              </span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CIFS_INO_CLOSE_ON_LOCK            </span><span class="op">(</span><span class="dv">7</span><span class="op">)</span><span class="pp"> </span><span class="co">/* 不要在设置锁时延迟关闭 */</span><span class="pp">     </span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">long</span> flags<span class="op">;</span>             <span class="co">// 标志字段</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        spinlock_t writers_lock<span class="op">;</span>          <span class="co">// 写入锁</span></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">int</span> writers<span class="op">;</span>             <span class="co">/* 此 inode 的写入者数量 */</span>                   </span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">long</span> time<span class="op">;</span>               <span class="co">/* inode 最后更新的 jiffies */</span>                   </span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>        u64  server_eof<span class="op">;</span>                  <span class="co">/* 服务器上的当前文件大小 - 由 i_lock 保护 */</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        u64  uniqueid<span class="op">;</span>                    <span class="co">/* 服务器 inode 编号 */</span>                               </span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>        u64  createtime<span class="op">;</span>                  <span class="co">/* 服务器上的创建时间 */</span>                           </span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        __u8 lease_key<span class="op">[</span>SMB2_LEASE_KEY_SIZE<span class="op">];</span>    <span class="co">/* 此 inode 的租约密钥 */</span>                  </span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> list_head deferred_closes<span class="op">;</span> <span class="co">/* 延迟关闭列表 */</span>                         </span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        spinlock_t deferred_lock<span class="op">;</span>         <span class="co">/* 保护延迟列表 */</span>                             </span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        <span class="dt">bool</span> lease_granted<span class="op">;</span>               <span class="co">/* 标志指示是否授予租约或 oplock。 */</span>          </span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        <span class="dt">char</span> <span class="op">*</span>symlink_target<span class="op">;</span>             <span class="co">// 符号链接目标</span></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="op">};</span> </span></code></pre></div>
-<h1 data-number="4" id="索引节点操作"><span
-class="header-section-number">4</span> 索引节点操作</h1>
-<h2 data-number="4.1" id="常规文件"><span
-class="header-section-number">4.1</span> 常规文件</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_file_inode_ops <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setattr <span class="op">=</span> cifs_setattr<span class="op">,</span>                     </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>getattr <span class="op">=</span> cifs_getattr<span class="op">,</span>                     </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>permission <span class="op">=</span> cifs_permission<span class="op">,</span>               </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>listxattr <span class="op">=</span> cifs_listxattr<span class="op">,</span>                 </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fiemap <span class="op">=</span> cifs_fiemap<span class="op">,</span>                       </span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>get_acl <span class="op">=</span> cifs_get_acl<span class="op">,</span>                     </span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>set_acl <span class="op">=</span> cifs_set_acl<span class="op">,</span>                     </span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                   </span></code></pre></div>
-<h2 data-number="4.2" id="目录"><span
-class="header-section-number">4.2</span> 目录</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_dir_inode_ops <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>create <span class="op">=</span> cifs_create<span class="op">,</span>                      </span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>atomic_open <span class="op">=</span> cifs_atomic_open<span class="op">,</span>            </span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>lookup <span class="op">=</span> cifs_lookup<span class="op">,</span>                      </span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>getattr <span class="op">=</span> cifs_getattr<span class="op">,</span>                    </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>unlink <span class="op">=</span> cifs_unlink<span class="op">,</span>                      </span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>link <span class="op">=</span> cifs_hardlink<span class="op">,</span>                      </span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>mkdir <span class="op">=</span> cifs_mkdir<span class="op">,</span>                        </span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>rmdir <span class="op">=</span> cifs_rmdir<span class="op">,</span>                        </span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>rename <span class="op">=</span> cifs_rename2<span class="op">,</span>                     </span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>permission <span class="op">=</span> cifs_permission<span class="op">,</span>              </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setattr <span class="op">=</span> cifs_setattr<span class="op">,</span>                    </span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>symlink <span class="op">=</span> cifs_symlink<span class="op">,</span>                    </span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>mknod   <span class="op">=</span> cifs_mknod<span class="op">,</span>                      </span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>listxattr <span class="op">=</span> cifs_listxattr<span class="op">,</span>                </span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>get_acl <span class="op">=</span> cifs_get_acl<span class="op">,</span>                    </span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>set_acl <span class="op">=</span> cifs_set_acl<span class="op">,</span>                    </span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                  </span></code></pre></div>
-<h2 data-number="4.3" id="符号链接"><span
-class="header-section-number">4.3</span> 符号链接</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_symlink_inode_ops <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>get_link <span class="op">=</span> cifs_get_link<span class="op">,</span>                      </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>permission <span class="op">=</span> cifs_permission<span class="op">,</span>                  </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>listxattr <span class="op">=</span> cifs_listxattr<span class="op">,</span>                    </span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                      </span></code></pre></div>
-<h2 data-number="4.4" id="其他"><span
-class="header-section-number">4.4</span> 其他</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_ipc_inode_ops <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>lookup <span class="op">=</span> cifs_lookup<span class="op">,</span>                             </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                         </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_namespace_inode_operations <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                               </span></code></pre></div>
-<h1 data-number="5" id="dentry操作"><span
-class="header-section-number">5</span> <code>dentry</code>操作</h1>
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> dentry_operations cifs_dentry_ops <span class="op">=</span> <span class="op">{</span>                             </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>d_revalidate <span class="op">=</span> cifs_d_revalidate<span class="op">,</span>                                     </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>d_automount <span class="op">=</span> cifs_d_automount<span class="op">,</span>                                       </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">/* d_delete:       cifs_d_delete,      */</span> <span class="co">/* 除了调试之外不需要 */</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                                             </span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> dentry_operations cifs_ci_dentry_ops <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>d_revalidate <span class="op">=</span> cifs_d_revalidate<span class="op">,</span>           </span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>d_hash <span class="op">=</span> cifs_ci_hash<span class="op">,</span>                      </span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>d_compare <span class="op">=</span> cifs_ci_compare<span class="op">,</span>                </span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>d_automount <span class="op">=</span> cifs_d_automount<span class="op">,</span>             </span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                   </span></code></pre></div>
-<h1 data-number="6" id="file操作"><span
-class="header-section-number">6</span> <code>file</code>操作</h1>
-<h2 data-number="6.1" id="常规文件-1"><span
-class="header-section-number">6.1</span> 常规文件</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_ops <span class="op">=</span> <span class="op">{</span>    </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>read_iter <span class="op">=</span> cifs_loose_read_iter<span class="op">,</span>        </span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>write_iter <span class="op">=</span> cifs_file_write_iter<span class="op">,</span>       </span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>open <span class="op">=</span> cifs_open<span class="op">,</span>                        </span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>release <span class="op">=</span> cifs_close<span class="op">,</span>                    </span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>lock <span class="op">=</span> cifs_lock<span class="op">,</span>                        </span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>flock <span class="op">=</span> cifs_flock<span class="op">,</span>                      </span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fsync <span class="op">=</span> cifs_fsync<span class="op">,</span>                      </span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>flush <span class="op">=</span> cifs_flush<span class="op">,</span>                      </span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>mmap  <span class="op">=</span> cifs_file_mmap<span class="op">,</span>                  </span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_read <span class="op">=</span> filemap_splice_read<span class="op">,</span>       </span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_write <span class="op">=</span> iter_file_splice_write<span class="op">,</span>   </span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>llseek <span class="op">=</span> cifs_llseek<span class="op">,</span>                    </span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>unlocked_ioctl <span class="op">=</span> cifs_ioctl<span class="op">,</span>             </span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>copy_file_range <span class="op">=</span> cifs_copy_file_range<span class="op">,</span>  </span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>remap_file_range <span class="op">=</span> cifs_remap_file_range<span class="op">,</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setlease <span class="op">=</span> cifs_setlease<span class="op">,</span>                </span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fallocate <span class="op">=</span> cifs_fallocate<span class="op">,</span>              </span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                </span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_strict_ops <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>read_iter <span class="op">=</span> cifs_strict_readv<span class="op">,</span>              </span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>write_iter <span class="op">=</span> cifs_strict_writev<span class="op">,</span>            </span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>open <span class="op">=</span> cifs_open<span class="op">,</span>                           </span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>release <span class="op">=</span> cifs_close<span class="op">,</span>                       </span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>lock <span class="op">=</span> cifs_lock<span class="op">,</span>                           </span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>flock <span class="op">=</span> cifs_flock<span class="op">,</span>                         </span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fsync <span class="op">=</span> cifs_strict_fsync<span class="op">,</span>                  </span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>flush <span class="op">=</span> cifs_flush<span class="op">,</span>                         </span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>mmap <span class="op">=</span> cifs_file_strict_mmap<span class="op">,</span>               </span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_read <span class="op">=</span> filemap_splice_read<span class="op">,</span>          </span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_write <span class="op">=</span> iter_file_splice_write<span class="op">,</span>      </span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>llseek <span class="op">=</span> cifs_llseek<span class="op">,</span>                       </span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>unlocked_ioctl <span class="op">=</span> cifs_ioctl<span class="op">,</span>                </span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>copy_file_range <span class="op">=</span> cifs_copy_file_range<span class="op">,</span>     </span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>remap_file_range <span class="op">=</span> cifs_remap_file_range<span class="op">,</span>   </span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setlease <span class="op">=</span> cifs_setlease<span class="op">,</span>                   </span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fallocate <span class="op">=</span> cifs_fallocate<span class="op">,</span>                 </span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                   </span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_direct_ops <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>read_iter <span class="op">=</span> cifs_direct_readv<span class="op">,</span>              </span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>write_iter <span class="op">=</span> cifs_direct_writev<span class="op">,</span>            </span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>open <span class="op">=</span> cifs_open<span class="op">,</span>                           </span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>release <span class="op">=</span> cifs_close<span class="op">,</span>                       </span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>lock <span class="op">=</span> cifs_lock<span class="op">,</span>                           </span>
-<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>flock <span class="op">=</span> cifs_flock<span class="op">,</span>                         </span>
-<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fsync <span class="op">=</span> cifs_fsync<span class="op">,</span>                         </span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>flush <span class="op">=</span> cifs_flush<span class="op">,</span>                         </span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>mmap <span class="op">=</span> cifs_file_mmap<span class="op">,</span>                      </span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_read <span class="op">=</span> copy_splice_read<span class="op">,</span>             </span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_write <span class="op">=</span> iter_file_splice_write<span class="op">,</span>      </span>
-<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>unlocked_ioctl  <span class="op">=</span> cifs_ioctl<span class="op">,</span>               </span>
-<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>copy_file_range <span class="op">=</span> cifs_copy_file_range<span class="op">,</span>     </span>
-<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>remap_file_range <span class="op">=</span> cifs_remap_file_range<span class="op">,</span>   </span>
-<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>llseek <span class="op">=</span> cifs_llseek<span class="op">,</span>                       </span>
-<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setlease <span class="op">=</span> cifs_setlease<span class="op">,</span>                   </span>
-<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fallocate <span class="op">=</span> cifs_fallocate<span class="op">,</span>                 </span>
-<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                   </span>
-<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_nobrl_ops <span class="op">=</span> <span class="op">{</span> </span>
-<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>read_iter <span class="op">=</span> cifs_loose_read_iter<span class="op">,</span>           </span>
-<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>write_iter <span class="op">=</span> cifs_file_write_iter<span class="op">,</span>          </span>
-<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>open <span class="op">=</span> cifs_open<span class="op">,</span>                           </span>
-<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>release <span class="op">=</span> cifs_close<span class="op">,</span>                       </span>
-<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fsync <span class="op">=</span> cifs_fsync<span class="op">,</span>                         </span>
-<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>flush <span class="op">=</span> cifs_flush<span class="op">,</span>                         </span>
-<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>mmap  <span class="op">=</span> cifs_file_mmap<span class="op">,</span>                     </span>
-<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_read <span class="op">=</span> filemap_splice_read<span class="op">,</span>          </span>
-<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_write <span class="op">=</span> iter_file_splice_write<span class="op">,</span>      </span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>llseek <span class="op">=</span> cifs_llseek<span class="op">,</span>                       </span>
-<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>unlocked_ioctl <span class="op">=</span> cifs_ioctl<span class="op">,</span>                </span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>copy_file_range <span class="op">=</span> cifs_copy_file_range<span class="op">,</span>     </span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>remap_file_range <span class="op">=</span> cifs_remap_file_range<span class="op">,</span>   </span>
-<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setlease <span class="op">=</span> cifs_setlease<span class="op">,</span>                   </span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fallocate <span class="op">=</span> cifs_fallocate<span class="op">,</span>                 </span>
-<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                   </span>
-<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_strict_nobrl_ops <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>read_iter <span class="op">=</span> cifs_strict_readv<span class="op">,</span>                    </span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>write_iter <span class="op">=</span> cifs_strict_writev<span class="op">,</span>                  </span>
-<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>open <span class="op">=</span> cifs_open<span class="op">,</span>                                 </span>
-<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>release <span class="op">=</span> cifs_close<span class="op">,</span>                             </span>
-<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fsync <span class="op">=</span> cifs_strict_fsync<span class="op">,</span>                        </span>
-<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>flush <span class="op">=</span> cifs_flush<span class="op">,</span>                               </span>
-<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>mmap <span class="op">=</span> cifs_file_strict_mmap<span class="op">,</span>                     </span>
-<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_read <span class="op">=</span> filemap_splice_read<span class="op">,</span>                </span>
-<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_write <span class="op">=</span> iter_file_splice_write<span class="op">,</span>            </span>
-<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>llseek <span class="op">=</span> cifs_llseek<span class="op">,</span>                             </span>
-<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>unlocked_ioctl <span class="op">=</span> cifs_ioctl<span class="op">,</span>                      </span>
-<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>copy_file_range <span class="op">=</span> cifs_copy_file_range<span class="op">,</span>           </span>
-<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>remap_file_range <span class="op">=</span> cifs_remap_file_range<span class="op">,</span>         </span>
-<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setlease <span class="op">=</span> cifs_setlease<span class="op">,</span>                         </span>
-<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fallocate <span class="op">=</span> cifs_fallocate<span class="op">,</span>                       </span>
-<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                         </span>
-<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_direct_nobrl_ops <span class="op">=</span> <span class="op">{</span> </span>
-<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>read_iter <span class="op">=</span> cifs_direct_readv<span class="op">,</span>                     </span>
-<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>write_iter <span class="op">=</span> cifs_direct_writev<span class="op">,</span>                   </span>
-<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>open <span class="op">=</span> cifs_open<span class="op">,</span>                                  </span>
-<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>release <span class="op">=</span> cifs_close<span class="op">,</span>                              </span>
-<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fsync <span class="op">=</span> cifs_fsync<span class="op">,</span>                                </span>
-<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>flush <span class="op">=</span> cifs_flush<span class="op">,</span>                                </span>
-<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>mmap <span class="op">=</span> cifs_file_mmap<span class="op">,</span>                             </span>
-<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_read <span class="op">=</span> copy_splice_read<span class="op">,</span>                    </span>
-<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>splice_write <span class="op">=</span> iter_file_splice_write<span class="op">,</span>             </span>
-<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>unlocked_ioctl  <span class="op">=</span> cifs_ioctl<span class="op">,</span>                      </span>
-<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>copy_file_range <span class="op">=</span> cifs_copy_file_range<span class="op">,</span>            </span>
-<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>remap_file_range <span class="op">=</span> cifs_remap_file_range<span class="op">,</span>          </span>
-<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>llseek <span class="op">=</span> cifs_llseek<span class="op">,</span>                              </span>
-<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setlease <span class="op">=</span> cifs_setlease<span class="op">,</span>                          </span>
-<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fallocate <span class="op">=</span> cifs_fallocate<span class="op">,</span>                        </span>
-<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                          </span></code></pre></div>
-<h2 data-number="6.2" id="目录-1"><span
-class="header-section-number">6.2</span> 目录</h2>
-<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_dir_ops <span class="op">=</span> <span class="op">{</span>     </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>iterate_shared <span class="op">=</span> cifs_readdir<span class="op">,</span>           </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>release <span class="op">=</span> cifs_closedir<span class="op">,</span>                 </span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>read    <span class="op">=</span> generic_read_dir<span class="op">,</span>              </span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>unlocked_ioctl  <span class="op">=</span> cifs_ioctl<span class="op">,</span>            </span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>copy_file_range <span class="op">=</span> cifs_copy_file_range<span class="op">,</span>  </span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>remap_file_range <span class="op">=</span> cifs_remap_file_range<span class="op">,</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>llseek <span class="op">=</span> generic_file_llseek<span class="op">,</span>            </span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fsync <span class="op">=</span> cifs_dir_fsync<span class="op">,</span>                  </span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                </span></code></pre></div>
-<h1 data-number="7" id="address_space操作"><span
-class="header-section-number">7</span>
-<code>address_space</code>操作</h1>
-<h2 data-number="7.1" id="常规文件-2"><span
-class="header-section-number">7.1</span> 常规文件</h2>
-<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> address_space_operations cifs_addr_ops <span class="op">=</span> <span class="op">{</span>                      </span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>read_folio <span class="op">=</span> cifs_read_folio<span class="op">,</span>                                       </span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>readahead <span class="op">=</span> cifs_readahead<span class="op">,</span>                                         </span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>writepages <span class="op">=</span> cifs_writepages<span class="op">,</span>                                       </span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>write_begin <span class="op">=</span> cifs_write_begin<span class="op">,</span>                                     </span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>write_end <span class="op">=</span> cifs_write_end<span class="op">,</span>                                         </span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>dirty_folio <span class="op">=</span> cifs_dirty_folio<span class="op">,</span>                                     </span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>release_folio <span class="op">=</span> cifs_release_folio<span class="op">,</span>                                 </span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>direct_IO <span class="op">=</span> cifs_direct_io<span class="op">,</span>                                         </span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>invalidate_folio <span class="op">=</span> cifs_invalidate_folio<span class="op">,</span>                           </span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>launder_folio <span class="op">=</span> cifs_launder_folio<span class="op">,</span>                                 </span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>migrate_folio <span class="op">=</span> filemap_migrate_folio<span class="op">,</span>       </span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">/*                                                                   </span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">        * </span><span class="al">TODO</span><span class="co">: 调查一下，如果有用，我们可以添加一个 is_dirty_writeback</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">        * 辅助函数（如果需要的话）                                                  </span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">        */</span>                        </span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>swap_activate <span class="op">=</span> cifs_swap_activate<span class="op">,</span>                                 </span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>swap_deactivate <span class="op">=</span> cifs_swap_deactivate<span class="op">,</span>                             </span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                                           </span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">/*                                                                       </span></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co"> * cifs_readahead 需要服务器支持一个足够大的缓冲区，以容纳</span></span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co"> * 头部加上一个完整的数据页。否则，我们需要在地址空间操作中</span></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co"> * 省略 cifs_readahead 。          </span></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span>                                                                       </span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> address_space_operations cifs_addr_ops_smallbuf <span class="op">=</span> <span class="op">{</span>         </span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>read_folio <span class="op">=</span> cifs_read_folio<span class="op">,</span>                                   </span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>writepages <span class="op">=</span> cifs_writepages<span class="op">,</span>                                   </span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>write_begin <span class="op">=</span> cifs_write_begin<span class="op">,</span>                                 </span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>write_end <span class="op">=</span> cifs_write_end<span class="op">,</span>                                     </span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>dirty_folio <span class="op">=</span> cifs_dirty_folio<span class="op">,</span>                                 </span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>release_folio <span class="op">=</span> cifs_release_folio<span class="op">,</span>                             </span>
-<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>invalidate_folio <span class="op">=</span> cifs_invalidate_folio<span class="op">,</span>                       </span>
-<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>launder_folio <span class="op">=</span> cifs_launder_folio<span class="op">,</span>                             </span>
-<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>migrate_folio <span class="op">=</span> filemap_migrate_folio<span class="op">,</span>                          </span>
-<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                                       </span></code></pre></div>
-<h1 data-number="8" id="文件系统类型"><span
-class="header-section-number">8</span> 文件系统类型</h1>
-<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> file_system_type cifs_fs_type <span class="op">=</span> <span class="op">{</span>        </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>owner <span class="op">=</span> THIS_MODULE<span class="op">,</span>                   </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>name <span class="op">=</span> <span class="st">&quot;cifs&quot;</span><span class="op">,</span>                         </span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>init_fs_context <span class="op">=</span> smb3_init_fs_context<span class="op">,</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>parameters <span class="op">=</span> smb3_fs_parameters<span class="op">,</span>       </span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>kill_sb <span class="op">=</span> cifs_kill_sb<span class="op">,</span>                </span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fs_flags <span class="op">=</span> FS_RENAME_DOES_D_MOVE<span class="op">,</span>      </span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="op">};</span> </span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> file_system_type smb3_fs_type <span class="op">=</span> <span class="op">{</span>        </span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>owner <span class="op">=</span> THIS_MODULE<span class="op">,</span>                   </span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>name <span class="op">=</span> <span class="st">&quot;smb3&quot;</span><span class="op">,</span>                         </span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>init_fs_context <span class="op">=</span> smb3_init_fs_context<span class="op">,</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>parameters <span class="op">=</span> smb3_fs_parameters<span class="op">,</span>       </span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>kill_sb <span class="op">=</span> cifs_kill_sb<span class="op">,</span>                </span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fs_flags <span class="op">=</span> FS_RENAME_DOES_D_MOVE<span class="op">,</span>      </span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                              </span></code></pre></div>
-<h1 data-number="9" id="模块加载卸载方法"><span
-class="header-section-number">9</span> 模块加载卸载方法</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co">/*                                 </span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co"> * 每个文件 inode 的结构体</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co"> */</span>                                </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="kw">struct</span> cifsInodeInfo {                                                                          </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>        <span class="kw">struct</span> netfs_inode netfs;       <span class="co">/* Netfslib 上下文和 vfs inode */</span>                          </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>        <span class="dt">bool</span> can_cache_brlcks;          <span class="co">// 是否可以缓存字节范围锁</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>        <span class="kw">struct</span> list_head llist;         <span class="co">/* 该 inode 持有的锁列表 */</span>                                  </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>        <span class="co">/*                                                                                      </span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="co">         * 注意: 有些代码路径会两次调用 down_read(lock_sem)，所以                             </span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="co">         * 我们必须始终使用 cifs_down_write() 而不是 down_write()                         </span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="co">         * 来避免此信号量的死锁。                                               </span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="co">         */</span>                                                                                     </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>        <span class="kw">struct</span> rw_semaphore lock_sem;   <span class="co">/* 保护上面的字段 */</span>                          </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>        <span class="co">/* BB 添加用于脏页列表，即 oplock 的写缓存信息 */</span>                </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>        <span class="kw">struct</span> list_head openFileList;  <span class="co">// 打开文件列表</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>        spinlock_t      open_file_lock; <span class="co">/* 保护 openFileList */</span>                             </span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>        __u32 cifsAttrs;                <span class="co">/* 例如 DOS 归档位、稀疏、压缩、系统等属性 */</span>                 </span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>        <span class="dt">unsigned</span> <span class="dt">int</span> oplock;            <span class="co">/* 我们拥有的 oplock/lease 级别 */</span>                        </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>        <span class="dt">unsigned</span> <span class="dt">int</span> epoch;             <span class="co">/* 用于跟踪租约状态变化 */</span>                 </span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a><span class="pp">#define CIFS_INODE_PENDING_OPLOCK_BREAK   (0) </span><span class="co">/* 正在进行 oplock 断裂 */</span><span class="pp">                    </span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a><span class="pp">#define CIFS_INODE_PENDING_WRITERS        (1) </span><span class="co">/* 正在进行写操作 */</span><span class="pp">                          </span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a><span class="pp">#define CIFS_INODE_FLAG_UNUSED            (2) </span><span class="co">/* 未使用的标志 */</span><span class="pp">                                 </span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a><span class="pp">#define CIFS_INO_DELETE_PENDING           (3) </span><span class="co">/* 服务器上待删除 */</span><span class="pp">                    </span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a><span class="pp">#define CIFS_INO_INVALID_MAPPING          (4) </span><span class="co">/* pagecache 无效 */</span><span class="pp">                        </span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a><span class="pp">#define CIFS_INO_LOCK                     (5) </span><span class="co">/* 同步锁位 */</span><span class="pp">                </span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a><span class="pp">#define CIFS_INO_MODIFIED_ATTR            (6) </span><span class="co">/* 指示 mtime/ctime 的变化 */</span><span class="pp">              </span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a><span class="pp">#define CIFS_INO_CLOSE_ON_LOCK            (7) </span><span class="co">/* 不要在设置锁时延迟关闭 */</span><span class="pp">     </span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>        <span class="dt">unsigned</span> <span class="dt">long</span> flags;             <span class="co">// 标志字段</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a>        spinlock_t writers_lock;          <span class="co">// 写入锁</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a>        <span class="dt">unsigned</span> <span class="dt">int</span> writers;             <span class="co">/* 此 inode 的写入者数量 */</span>                   </span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a>        <span class="dt">unsigned</span> <span class="dt">long</span> time;               <span class="co">/* inode 最后更新的 jiffies */</span>                   </span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a>        u64  server_eof;                  <span class="co">/* 服务器上的当前文件大小 - 由 i_lock 保护 */</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a>        u64  uniqueid;                    <span class="co">/* 服务器 inode 编号 */</span>                               </span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a>        u64  createtime;                  <span class="co">/* 服务器上的创建时间 */</span>                           </span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a>        __u8 lease_key[SMB2_LEASE_KEY_SIZE];    <span class="co">/* 此 inode 的租约密钥 */</span>                  </span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true"></a>        <span class="kw">struct</span> list_head deferred_closes; <span class="co">/* 延迟关闭列表 */</span>                         </span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true"></a>        spinlock_t deferred_lock;         <span class="co">/* 保护延迟列表 */</span>                             </span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true"></a>        <span class="dt">bool</span> lease_granted;               <span class="co">/* 标志指示是否授予租约或 oplock。 */</span>          </span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true"></a>        <span class="dt">char</span> *symlink_target;             <span class="co">// 符号链接目标</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true"></a>}; </span></code></pre></div>
+<h1 data-number="4" id="索引节点操作"><span class="header-section-number">4</span> 索引节点操作</h1>
+<h2 data-number="4.1" id="常规文件"><span class="header-section-number">4.1</span> 常规文件</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_file_inode_ops = {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>        .setattr = cifs_setattr,                     </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>        .getattr = cifs_getattr,                     </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>        .permission = cifs_permission,               </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>        .listxattr = cifs_listxattr,                 </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>        .fiemap = cifs_fiemap,                       </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>        .get_acl = cifs_get_acl,                     </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>        .set_acl = cifs_set_acl,                     </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>};                                                   </span></code></pre></div>
+<h2 data-number="4.2" id="目录"><span class="header-section-number">4.2</span> 目录</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_dir_inode_ops = {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>        .create = cifs_create,                      </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>        .atomic_open = cifs_atomic_open,            </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>        .lookup = cifs_lookup,                      </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>        .getattr = cifs_getattr,                    </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>        .unlink = cifs_unlink,                      </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>        .link = cifs_hardlink,                      </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>        .mkdir = cifs_mkdir,                        </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>        .rmdir = cifs_rmdir,                        </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>        .rename = cifs_rename2,                     </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>        .permission = cifs_permission,              </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>        .setattr = cifs_setattr,                    </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>        .symlink = cifs_symlink,                    </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a>        .mknod   = cifs_mknod,                      </span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>        .listxattr = cifs_listxattr,                </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a>        .get_acl = cifs_get_acl,                    </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a>        .set_acl = cifs_set_acl,                    </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a>};                                                  </span></code></pre></div>
+<h2 data-number="4.3" id="符号链接"><span class="header-section-number">4.3</span> 符号链接</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_symlink_inode_ops = {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>        .get_link = cifs_get_link,                      </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>        .permission = cifs_permission,                  </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>        .listxattr = cifs_listxattr,                    </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>};                                                      </span></code></pre></div>
+<h2 data-number="4.4" id="其他"><span class="header-section-number">4.4</span> 其他</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="dt">static</span> <span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_ipc_inode_ops = {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>        .lookup = cifs_lookup,                             </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>};                                                         </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_namespace_inode_operations = {</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>};                                                               </span></code></pre></div>
+<h1 data-number="5" id="dentry操作"><span class="header-section-number">5</span> <code>dentry</code>操作</h1>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> dentry_operations cifs_dentry_ops = {                             </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>        .d_revalidate = cifs_d_revalidate,                                     </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>        .d_automount = cifs_d_automount,                                       </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="co">/* d_delete:       cifs_d_delete,      */</span> <span class="co">/* 除了调试之外不需要 */</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>};                                                                             </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> dentry_operations cifs_ci_dentry_ops = {</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>        .d_revalidate = cifs_d_revalidate,           </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>        .d_hash = cifs_ci_hash,                      </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a>        .d_compare = cifs_ci_compare,                </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a>        .d_automount = cifs_d_automount,             </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true"></a>};                                                   </span></code></pre></div>
+<h1 data-number="6" id="file操作"><span class="header-section-number">6</span> <code>file</code>操作</h1>
+<h2 data-number="6.1" id="常规文件-1"><span class="header-section-number">6.1</span> 常规文件</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_ops = {    </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>        .read_iter = cifs_loose_read_iter,        </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>        .write_iter = cifs_file_write_iter,       </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>        .open = cifs_open,                        </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>        .release = cifs_close,                    </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>        .lock = cifs_lock,                        </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>        .flock = cifs_flock,                      </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>        .fsync = cifs_fsync,                      </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>        .flush = cifs_flush,                      </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>        .mmap  = cifs_file_mmap,                  </span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>        .splice_read = filemap_splice_read,       </span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>        .splice_write = iter_file_splice_write,   </span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>        .llseek = cifs_llseek,                    </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a>        .unlocked_ioctl = cifs_ioctl,             </span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a>        .copy_file_range = cifs_copy_file_range,  </span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true"></a>        .remap_file_range = cifs_remap_file_range,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true"></a>        .setlease = cifs_setlease,                </span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true"></a>        .fallocate = cifs_fallocate,              </span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true"></a>};                                                </span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_strict_ops = {</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true"></a>        .read_iter = cifs_strict_readv,              </span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true"></a>        .write_iter = cifs_strict_writev,            </span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true"></a>        .open = cifs_open,                           </span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true"></a>        .release = cifs_close,                       </span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true"></a>        .lock = cifs_lock,                           </span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true"></a>        .flock = cifs_flock,                         </span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true"></a>        .fsync = cifs_strict_fsync,                  </span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true"></a>        .flush = cifs_flush,                         </span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true"></a>        .mmap = cifs_file_strict_mmap,               </span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true"></a>        .splice_read = filemap_splice_read,          </span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true"></a>        .splice_write = iter_file_splice_write,      </span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true"></a>        .llseek = cifs_llseek,                       </span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true"></a>        .unlocked_ioctl = cifs_ioctl,                </span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true"></a>        .copy_file_range = cifs_copy_file_range,     </span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true"></a>        .remap_file_range = cifs_remap_file_range,   </span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true"></a>        .setlease = cifs_setlease,                   </span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true"></a>        .fallocate = cifs_fallocate,                 </span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true"></a>};                                                   </span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true"></a></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_direct_ops = {</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true"></a>        .read_iter = cifs_direct_readv,              </span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true"></a>        .write_iter = cifs_direct_writev,            </span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true"></a>        .open = cifs_open,                           </span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true"></a>        .release = cifs_close,                       </span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true"></a>        .lock = cifs_lock,                           </span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true"></a>        .flock = cifs_flock,                         </span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true"></a>        .fsync = cifs_fsync,                         </span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true"></a>        .flush = cifs_flush,                         </span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true"></a>        .mmap = cifs_file_mmap,                      </span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true"></a>        .splice_read = copy_splice_read,             </span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true"></a>        .splice_write = iter_file_splice_write,      </span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true"></a>        .unlocked_ioctl  = cifs_ioctl,               </span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true"></a>        .copy_file_range = cifs_copy_file_range,     </span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true"></a>        .remap_file_range = cifs_remap_file_range,   </span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true"></a>        .llseek = cifs_llseek,                       </span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true"></a>        .setlease = cifs_setlease,                   </span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true"></a>        .fallocate = cifs_fallocate,                 </span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true"></a>};                                                   </span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true"></a></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_nobrl_ops = { </span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true"></a>        .read_iter = cifs_loose_read_iter,           </span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true"></a>        .write_iter = cifs_file_write_iter,          </span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true"></a>        .open = cifs_open,                           </span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true"></a>        .release = cifs_close,                       </span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true"></a>        .fsync = cifs_fsync,                         </span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true"></a>        .flush = cifs_flush,                         </span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true"></a>        .mmap  = cifs_file_mmap,                     </span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true"></a>        .splice_read = filemap_splice_read,          </span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true"></a>        .splice_write = iter_file_splice_write,      </span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true"></a>        .llseek = cifs_llseek,                       </span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true"></a>        .unlocked_ioctl = cifs_ioctl,                </span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true"></a>        .copy_file_range = cifs_copy_file_range,     </span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true"></a>        .remap_file_range = cifs_remap_file_range,   </span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true"></a>        .setlease = cifs_setlease,                   </span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true"></a>        .fallocate = cifs_fallocate,                 </span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true"></a>};                                                   </span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true"></a></span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_strict_nobrl_ops = {</span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true"></a>        .read_iter = cifs_strict_readv,                    </span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true"></a>        .write_iter = cifs_strict_writev,                  </span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true"></a>        .open = cifs_open,                                 </span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true"></a>        .release = cifs_close,                             </span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true"></a>        .fsync = cifs_strict_fsync,                        </span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true"></a>        .flush = cifs_flush,                               </span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true"></a>        .mmap = cifs_file_strict_mmap,                     </span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true"></a>        .splice_read = filemap_splice_read,                </span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true"></a>        .splice_write = iter_file_splice_write,            </span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true"></a>        .llseek = cifs_llseek,                             </span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true"></a>        .unlocked_ioctl = cifs_ioctl,                      </span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true"></a>        .copy_file_range = cifs_copy_file_range,           </span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true"></a>        .remap_file_range = cifs_remap_file_range,         </span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true"></a>        .setlease = cifs_setlease,                         </span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true"></a>        .fallocate = cifs_fallocate,                       </span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true"></a>};                                                         </span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true"></a></span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_direct_nobrl_ops = { </span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true"></a>        .read_iter = cifs_direct_readv,                     </span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true"></a>        .write_iter = cifs_direct_writev,                   </span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true"></a>        .open = cifs_open,                                  </span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true"></a>        .release = cifs_close,                              </span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true"></a>        .fsync = cifs_fsync,                                </span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true"></a>        .flush = cifs_flush,                                </span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true"></a>        .mmap = cifs_file_mmap,                             </span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true"></a>        .splice_read = copy_splice_read,                    </span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true"></a>        .splice_write = iter_file_splice_write,             </span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true"></a>        .unlocked_ioctl  = cifs_ioctl,                      </span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true"></a>        .copy_file_range = cifs_copy_file_range,            </span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true"></a>        .remap_file_range = cifs_remap_file_range,          </span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true"></a>        .llseek = cifs_llseek,                              </span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true"></a>        .setlease = cifs_setlease,                          </span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true"></a>        .fallocate = cifs_fallocate,                        </span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true"></a>};                                                          </span></code></pre></div>
+<h2 data-number="6.2" id="目录-1"><span class="header-section-number">6.2</span> 目录</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_dir_ops = {     </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>        .iterate_shared = cifs_readdir,           </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>        .release = cifs_closedir,                 </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>        .read    = generic_read_dir,              </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>        .unlocked_ioctl  = cifs_ioctl,            </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>        .copy_file_range = cifs_copy_file_range,  </span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>        .remap_file_range = cifs_remap_file_range,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>        .llseek = generic_file_llseek,            </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>        .fsync = cifs_dir_fsync,                  </span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>};                                                </span></code></pre></div>
+<h1 data-number="7" id="address_space操作"><span class="header-section-number">7</span> <code>address_space</code>操作</h1>
+<h2 data-number="7.1" id="常规文件-2"><span class="header-section-number">7.1</span> 常规文件</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> address_space_operations cifs_addr_ops = {                      </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>        .read_folio = cifs_read_folio,                                       </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>        .readahead = cifs_readahead,                                         </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a>        .writepages = cifs_writepages,                                       </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a>        .write_begin = cifs_write_begin,                                     </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>        .write_end = cifs_write_end,                                         </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a>        .dirty_folio = cifs_dirty_folio,                                     </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true"></a>        .release_folio = cifs_release_folio,                                 </span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true"></a>        .direct_IO = cifs_direct_io,                                         </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true"></a>        .invalidate_folio = cifs_invalidate_folio,                           </span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true"></a>        .launder_folio = cifs_launder_folio,                                 </span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true"></a>        .migrate_folio = filemap_migrate_folio,       </span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true"></a>        <span class="co">/*                                                                   </span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true"></a><span class="co">        * </span><span class="al">TODO</span><span class="co">: 调查一下，如果有用，我们可以添加一个 is_dirty_writeback</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true"></a><span class="co">        * 辅助函数（如果需要的话）                                                  </span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true"></a><span class="co">        */</span>                        </span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true"></a>        .swap_activate = cifs_swap_activate,                                 </span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true"></a>        .swap_deactivate = cifs_swap_deactivate,                             </span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true"></a>};                                                                           </span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true"></a></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true"></a><span class="co">/*                                                                       </span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true"></a><span class="co"> * cifs_readahead 需要服务器支持一个足够大的缓冲区，以容纳</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true"></a><span class="co"> * 头部加上一个完整的数据页。否则，我们需要在地址空间操作中</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true"></a><span class="co"> * 省略 cifs_readahead 。          </span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true"></a><span class="co"> */</span>                                                                       </span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true"></a><span class="dt">const</span> <span class="kw">struct</span> address_space_operations cifs_addr_ops_smallbuf = {         </span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true"></a>        .read_folio = cifs_read_folio,                                   </span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true"></a>        .writepages = cifs_writepages,                                   </span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true"></a>        .write_begin = cifs_write_begin,                                 </span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true"></a>        .write_end = cifs_write_end,                                     </span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true"></a>        .dirty_folio = cifs_dirty_folio,                                 </span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true"></a>        .release_folio = cifs_release_folio,                             </span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true"></a>        .invalidate_folio = cifs_invalidate_folio,                       </span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true"></a>        .launder_folio = cifs_launder_folio,                             </span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true"></a>        .migrate_folio = filemap_migrate_folio,                          </span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true"></a>};                                                                       </span></code></pre></div>
+<h1 data-number="8" id="文件系统类型"><span class="header-section-number">8</span> 文件系统类型</h1>
+<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="kw">struct</span> file_system_type cifs_fs_type = {        </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a>        .owner = THIS_MODULE,                   </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a>        .name = <span class="st">&quot;cifs&quot;</span>,                         </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a>        .init_fs_context = smb3_init_fs_context,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a>        .parameters = smb3_fs_parameters,       </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a>        .kill_sb = cifs_kill_sb,                </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a>        .fs_flags = FS_RENAME_DOES_D_MOVE,      </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true"></a>}; </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true"></a><span class="kw">struct</span> file_system_type smb3_fs_type = {        </span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true"></a>        .owner = THIS_MODULE,                   </span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true"></a>        .name = <span class="st">&quot;smb3&quot;</span>,                         </span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true"></a>        .init_fs_context = smb3_init_fs_context,</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true"></a>        .parameters = smb3_fs_parameters,       </span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true"></a>        .kill_sb = cifs_kill_sb,                </span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true"></a>        .fs_flags = FS_RENAME_DOES_D_MOVE,      </span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true"></a>};                                              </span></code></pre></div>
+<h1 data-number="9" id="模块加载卸载方法"><span class="header-section-number">9</span> 模块加载卸载方法</h1>
 <p><code>init_cifs()</code>和<code>exit_cifs()</code>。</p>
 </body>
 </html>

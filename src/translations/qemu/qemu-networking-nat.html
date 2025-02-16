@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -94,62 +83,45 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/courses.html">课程:
-chenxiaosong.com/courses</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contributions.html">贡献:
-chenxiaosong.com/contributions</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/courses.html">课程: chenxiaosong.com/courses</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contributions.html">贡献: chenxiaosong.com/contributions</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">QEMU Documentation/Networking/NAT</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#概述" id="toc-概述"><span
-class="toc-section-number">1</span> 概述</a></li>
-<li><a href="#使用" id="toc-使用"><span
-class="toc-section-number">2</span> 使用</a></li>
-<li><a href="#故障处理" id="toc-故障处理"><span
-class="toc-section-number">3</span> 故障处理</a></li>
-<li><a href="#脚本" id="toc-脚本"><span
-class="toc-section-number">4</span> 脚本</a></li>
+<li><a href="#概述"><span class="toc-section-number">1</span> 概述</a></li>
+<li><a href="#使用"><span class="toc-section-number">2</span> 使用</a></li>
+<li><a href="#故障处理"><span class="toc-section-number">3</span> 故障处理</a></li>
+<li><a href="#脚本"><span class="toc-section-number">4</span> 脚本</a></li>
 </ul>
 </nav>
-<p>本文档翻译自<a
-href="https://wiki.qemu.org/Documentation/Networking/NAT">Documentation/Networking/NAT</a>，大部分借助于ChatGPT。仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
-<p>配置网络地址转换（NAT）是在桌面环境中网络虚拟机的一种有用方法（特别是在使用无线网络时）。
-NAT网络将允许您的虚拟机完全访问网络，允许主机和虚拟机之间的网络通信，但防止虚拟机直接出现在物理网络上。</p>
-<h1 data-number="1" id="概述"><span
-class="header-section-number">1</span> 概述</h1>
+<p>本文档翻译自<a href="https://wiki.qemu.org/Documentation/Networking/NAT">Documentation/Networking/NAT</a>，大部分借助于ChatGPT。仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<p>配置网络地址转换（NAT）是在桌面环境中网络虚拟机的一种有用方法（特别是在使用无线网络时）。 NAT网络将允许您的虚拟机完全访问网络，允许主机和虚拟机之间的网络通信，但防止虚拟机直接出现在物理网络上。</p>
+<h1 data-number="1" id="概述"><span class="header-section-number">1</span> 概述</h1>
 <p>要配置NAT网络，首先创建一个<code>/etc/qemu-ifup</code>脚本，该脚本创建一个没有任何物理端口的桥接。将该桥接配置为虚拟网络的网关，使用静态IP地址。使用<code>iptables</code>创建规则，将来自该桥接的流量伪装为主机网络。最后，在该桥接口上运行<code>dnsmasq</code>，充当虚拟网络的DHCP和DNS服务器。</p>
 <p>请参阅下面的示例脚本。</p>
-<h1 data-number="2" id="使用"><span
-class="header-section-number">2</span> 使用</h1>
+<h1 data-number="2" id="使用"><span class="header-section-number">2</span> 使用</h1>
 <p>首先，安装桥接工具、<code>iptables</code>和<code>dnsmasq</code>:</p>
 <p>在Fedora上:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">yum</span> install bridge-utils iptables dnsmasq net-tools <span class="at">-y</span> <span class="co"># 陈孝松修改，添加net-tools</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">apt</span> install bridge-utils iptables dnsmasq net-tools <span class="at">-y</span> <span class="co"># 陈孝松添加</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">yum</span> install bridge-utils iptables dnsmasq net-tools -y # 陈孝松修改，添加net-tools</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ex">apt</span> install bridge-utils iptables dnsmasq net-tools -y # 陈孝松添加</span></code></pre></div>
 <p>注意要安装<code>net-tools</code>，否则虚拟机启动无法获取ip。</p>
 <p>将<code>qemu-ifup</code>脚本从此wiki复制到<code>/etc/qemu-ifup</code>，并确保该文件具有执行权限。</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> 755 /etc/qemu-ifup</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="fu">chmod</span> 755 /etc/qemu-ifup</span></code></pre></div>
 <p>现在使用tap网络配置启动qemu，并将您的虚拟机配置为使用DHCP。它们应该获得有效的IP地址并能够访问网络。</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qemu</span> <span class="at">-net</span> tap <span class="at">-net</span> nic linux.img</span></code></pre></div>
-<h1 data-number="3" id="故障处理"><span
-class="header-section-number">3</span> 故障处理</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">qemu</span> -net tap -net nic linux.img</span></code></pre></div>
+<h1 data-number="3" id="故障处理"><span class="header-section-number">3</span> 故障处理</h1>
 <ul>
 <li>遇到了关于/dev/net/tun权限的错误。</li>
 </ul>
 <p>目前，您需要以root权限运行qemu才能使用tun/tap网络。</p>
-<h1 data-number="4" id="脚本"><span
-class="header-section-number">4</span> 脚本</h1>
-<p><a
-href="https://wiki.qemu.org/Documentation/Networking/NAT#Script">脚本</a></p>
+<h1 data-number="4" id="脚本"><span class="header-section-number">4</span> 脚本</h1>
+<p><a href="https://wiki.qemu.org/Documentation/Networking/NAT#Script">脚本</a></p>
 </body>
 </html>
