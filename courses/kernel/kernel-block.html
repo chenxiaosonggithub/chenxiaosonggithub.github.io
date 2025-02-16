@@ -116,7 +116,7 @@
 <p>对块设备和块设备的请求进行管理的子系统叫“块I/O层”（block I/O layer）。</p>
 <p>块设备（又叫硬扇区、设备块）最小可寻址单元是扇区（sector），扇区大小最常见的是512字节。 块（block，又叫文件块、I/O块）是文件系统的一种抽象，是文件系统的最小寻址单元，块大小不能超过一个page大小， 只能是扇区的整数倍，通常是512B、1KB或4KB。</p>
 <h1 data-number="2" id="缓冲区和缓冲区头"><span class="header-section-number">2</span> 缓冲区和缓冲区头</h1>
-<p>一个块与一个缓冲区对应，一个page可以包含一个或多个块，缓存区用缓冲区头结构体表示:</p>
+<p>一个块（block）与一个缓冲区（buffer）对应，一个page可以包含一个或多个块，缓存区用缓冲区头结构体表示:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">/*</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co"> * 在历史上，buffer_head 用于映射页面中的单个块，当然也是通过文件系统和块层进行 I/O 的单位。</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co"> * 如今，基本的 I/O 单位是 bio，而 buffer_head 则用于提取块映射（通过 get_block_t 调用）、</span></span>
