@@ -147,14 +147,16 @@ class="toc-section-number">3</span> 代码编译</a>
 class="toc-section-number">3.1</span> 获取代码</a></li>
 <li><a href="#编译步骤" id="toc-编译步骤"><span
 class="toc-section-number">3.2</span> 编译步骤</a></li>
+<li><a href="#可能的编译问题" id="toc-可能的编译问题"><span
+class="toc-section-number">3.3</span> 可能的编译问题</a></li>
 <li><a href="#独立模块编译" id="toc-独立模块编译"><span
-class="toc-section-number">3.3</span> 独立模块编译</a></li>
+class="toc-section-number">3.4</span> 独立模块编译</a></li>
 <li><a href="#内核文档编译" id="toc-内核文档编译"><span
-class="toc-section-number">3.4</span> 内核文档编译</a></li>
+class="toc-section-number">3.5</span> 内核文档编译</a></li>
 <li><a href="#一些额外的补丁" id="toc-一些额外的补丁"><span
-class="toc-section-number">3.5</span> 一些额外的补丁</a></li>
+class="toc-section-number">3.6</span> 一些额外的补丁</a></li>
 <li><a href="#发行版替换内核" id="toc-发行版替换内核"><span
-class="toc-section-number">3.6</span> 发行版替换内核</a></li>
+class="toc-section-number">3.7</span> 发行版替换内核</a></li>
 </ul></li>
 <li><a href="#使用qemu测试内核代码" id="toc-使用qemu测试内核代码"><span
 class="toc-section-number">4</span> 使用QEMU测试内核代码</a>
@@ -537,9 +539,14 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb28-1"><a href="#
 <span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- O=aarch64-build modules <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> aarch64-build/boot <span class="kw">&amp;&amp;</span> <span class="fu">make</span> ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- O=aarch64-build install INSTALL_PATH=boot <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- O=aarch64-build modules_install INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=mod <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span></code></pre></div>
-<p>老版本（如v5.17）编译如果报错<code>FAILED: load BTF from vmlinux: Invalid argument</code>，可以尝试关闭<code>CONFIG_DEBUG_INFO_BTF</code>配置。</p>
-<h2 data-number="3.3" id="独立模块编译"><span
-class="header-section-number">3.3</span> 独立模块编译</h2>
+<h2 data-number="3.3" id="可能的编译问题"><span
+class="header-section-number">3.3</span> 可能的编译问题</h2>
+<ul>
+<li>老版本（如v5.17）编译如果报错<code>FAILED: load BTF from vmlinux: Invalid argument</code>，可以尝试关闭<code>CONFIG_DEBUG_INFO_BTF</code>配置。</li>
+<li>如果报错<code>arch/x86/entry/.tmp_thunk_64.o: warning: objtool: missing symbol table</code>，可以尝试合入补丁<code>1d489151e9f9 objtool: Don't fail on missing symbol table</code>。</li>
+</ul>
+<h2 data-number="3.4" id="独立模块编译"><span
+class="header-section-number">3.4</span> 独立模块编译</h2>
 <p>举个例子，把Linux内核仓库下的<code>fs/ext2</code>复制出来，修改<code>Makefile</code>文件:</p>
 <div class="sourceCode" id="cb29"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ex">CONFIG_EXT2_FS</span> := m</span>
@@ -578,8 +585,8 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb29-1"><a href="#
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="co"># 生成ko文件</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> clean <span class="co"># 清除编译结果</span></span></code></pre></div>
 <p>注意minix文件系统的<code>Makefile</code>中的<code>minix-objs</code>要改成<code>minix-y</code>。</p>
-<h2 data-number="3.4" id="内核文档编译"><span
-class="header-section-number">3.4</span> 内核文档编译</h2>
+<h2 data-number="3.5" id="内核文档编译"><span
+class="header-section-number">3.5</span> 内核文档编译</h2>
 <p>参考<a
 href="https://www.kernel.org/doc/html/latest/translations/zh_CN/doc-guide/sphinx.html">简介
 — The Linux Kernel documentation</a>。</p>
@@ -634,8 +641,8 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb32-1"><a href="#
 <div class="sourceCode" id="cb33"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build SPHINXOPTS=-v htmldocs <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span> <span class="co"># -v 获得更详细的输出。</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co"># make O=build cleandocs # 删除生成的文档</span></span></code></pre></div>
-<h2 data-number="3.5" id="一些额外的补丁"><span
-class="header-section-number">3.5</span> 一些额外的补丁</h2>
+<h2 data-number="3.6" id="一些额外的补丁"><span
+class="header-section-number">3.6</span> 一些额外的补丁</h2>
 <p>如果你要更方便的使用一些调试的功能，就要加一些额外的补丁。</p>
 <ul>
 <li>降低编译优化等级，默认的内核编译优化等级太高，用GDB调试时不太方便，有些函数语句被优化了，无法打断点，这时就要降低编译优化等级。做好的虚拟机中已经打上了降低编译优化等级的补丁。
@@ -648,8 +655,8 @@ revert:
 <code>230db82413c0 x86/unwind/orc: Fix unreliable stack dump with gcov</code>。</li>
 <li>肯定还有一些其他有用的补丁，后面再补充哈。</li>
 </ul>
-<h2 data-number="3.6" id="发行版替换内核"><span
-class="header-section-number">3.6</span> 发行版替换内核</h2>
+<h2 data-number="3.7" id="发行版替换内核"><span
+class="header-section-number">3.7</span> 发行版替换内核</h2>
 <p>用发行版<code>/boot/config-`uname -r`</code>配置文件，删除<code>CONFIG_SYSTEM_TRUSTED_KEYS</code>和<code>CONFIG_SYSTEM_REVOCATION_KEYS</code>配置值，在编译环境上编译安装后，删除<code>build/mod/lib/modules/xxx/build</code>和<code>build/mod/lib/modules/xxx/source</code>链接文件，然后压缩（文件太多，不压缩复制会很慢）打包复制到待测环境上。</p>
 <p>把<code>build/mod/lib/modules/xxx/</code>复制到待测环境上的<code>/lib/modules/</code>路径，把<code>build/boot/</code>目录下的文件复制到待测环境上的<code>/boot/</code>路径下。</p>
 <div class="sourceCode" id="cb34"><pre

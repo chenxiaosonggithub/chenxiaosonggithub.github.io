@@ -290,64 +290,74 @@ class="header-section-number">2.2</span> 找到触发rpc任务的进程</h2>
 <div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_task ffff9a3319bd4a18 <span class="co"># RDI: ffff9a3319bd4a18</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> rpc_task {</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">tk_owner</span> = 227403,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">tk_owner</span> = 227403, <span class="co"># 线程组中主线程的pid</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
-<p>确认一下这个进程的状态信息:</p>
+<p>查看这个线程组中所有的线程:</p>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> ps <span class="kw">|</span> <span class="fu">grep</span> 227403</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>   <span class="ex">PID</span>    PPID   CPU       TASK         ST  %MEM      VSZ     RSS  COMM</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">227403</span>  25069  108  ffff9ab00f915e00  IN   0.3 14366732 3565828  dmap_br</span></code></pre></div>
-<p>查看这个进程的栈:</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt 227403</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 227403  TASK: ffff9ab00f915e00  CPU: 108  COMMAND: <span class="st">&quot;dmap_br&quot;</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a> <span class="co">#0 [ffffaa3edc39fc40] __schedule at ffffffff87a9a4e6</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a> <span class="co">#1 [ffffaa3edc39fce0] schedule at ffffffff87a9ab88</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a> <span class="co">#2 [ffffaa3edc39fce8] futex_wait_queue_me at ffffffff8734cb51</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a> <span class="co">#3 [ffffaa3edc39fd20] futex_wait at ffffffff8734d9db</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a> <span class="co">#4 [ffffaa3edc39fe40] do_futex at ffffffff87350187</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a> <span class="co">#5 [ffffaa3edc39fec0] __x64_sys_futex at ffffffff8735074b</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a> <span class="co">#6 [ffffaa3edc39ff38] do_syscall_64 at ffffffff8720430b</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a> <span class="co">#7 [ffffaa3edc39ff50] entry_SYSCALL_64_after_hwframe at ffffffff87c00088</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RIP:</span> 00007f9182bc310c  RSP: 00007ffdf17cb660  RFLAGS: 00000246</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RAX:</span> ffffffffffffffda  RBX: 00007f918076eb48  RCX: 00007f9182bc310c</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RDX:</span> 0000000000000000  RSI: 0000000000000080  RDI: 00007f918076eb70</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RBP:</span> 0000000000000000   R8: 0000000000000000   R9: 0000000000000000</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R10:</span> 0000000000000000  R11: 0000000000000246  R12: 00007f918076eb20</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R13:</span> 0000000000000000  R14: 0000000000000000  R15: 00007f918076eb70</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ORIG_RAX:</span> 00000000000000ca  CS: 0033  SS: 002b</span></code></pre></div>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> ps <span class="at">-g</span> 227403</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="at">-g</span> 227403 <span class="co"># 打印出所有的栈</span></span></code></pre></div>
+<p><a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/nfs-soft-lockup-in-__rpc_execute-crash-vmcore-bt-g-227403.txt">点击这里查看<code>bt -g 227403</code>的输出</a>。</p>
 <h2 data-number="2.3" id="找到rpc请求的类型"><span
 class="header-section-number">2.3</span> 找到rpc请求的类型</h2>
 <p>解析rpc任务结构体:</p>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_task ffff9a3319bd4a18 <span class="co"># RDI: ffff9a3319bd4a18</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> rpc_task {</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">tk_msg</span> = {</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_proc</span> = 0xffffffffc03eb8a0 <span class="op">&lt;</span>nfs3_procedures+288<span class="op">&gt;</span>, </span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_argp</span> = 0xffff9a3319bd4bd8, </span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_resp</span> = 0xffff9a3319bd4c40, </span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_cred</span> = 0xffff9ab0283d2e00</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span> </span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_task ffff9a3319bd4a18 <span class="co"># RDI: ffff9a3319bd4a18</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> rpc_task {</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">tk_msg</span> = {</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_proc</span> = 0xffffffffc03eb8a0 <span class="op">&lt;</span>nfs3_procedures+288<span class="op">&gt;</span>, </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_argp</span> = 0xffff9a3319bd4bd8, </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_resp</span> = 0xffff9a3319bd4c40, </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rpc_cred</span> = 0xffff9ab0283d2e00</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span> </span></code></pre></div>
 <p><code>nfs3_procedures[]</code>是<code>struct rpc_procinfo</code>类型的数组，<code>struct rpc_procinfo</code>结构体的大小如下:</p>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_procinfo</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> rpc_procinfo {</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">SIZE:</span> 48</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_procinfo</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> rpc_procinfo {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">SIZE:</span> 48</span></code></pre></div>
 <p>从<code>&lt;nfs3_procedures+288&gt;</code>中的偏移量<code>288</code>计算出<code>288/48=6</code>，所以rpc请求类型是<code>NFS3PROC_READ</code>。</p>
 <h1 data-number="3" id="调试"><span
 class="header-section-number">3</span> 调试</h1>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> rw,relatime,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountvers=3,mountproto=udp,local_lock=none,_netdev localhost:/tmp/s_test /mnt <span class="co"># mountport=2050</span></span></code></pre></div>
+<p>挂载参数如下:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> rw,relatime,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountvers=3,mountproto=udp,local_lock=none,_netdev localhost:/tmp/s_test /mnt <span class="co"># mountport=2050</span></span></code></pre></div>
 <h1 data-number="4" id="代码分析"><span
 class="header-section-number">4</span> 代码分析</h1>
 <p>由vmcore解析可知rpc请求类型是<code>NFS3PROC_WRITE</code>，只有<code>nfs3_proc_write_setup()</code>函数中引用这个宏定义。</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>read</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  ksys_read</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    vfs_read</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>      __vfs_read</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        new_sync_read</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>          nfs_file_read</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>            generic_file_read_iter</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>              generic_file_buffered_read</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                page_cache_sync_readahead</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>                  ondemand_readahead</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>                    __do_page_cache_readahead</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>                      read_pages</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>                        nfs_readpages</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>                          nfs_pageio_complete</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>                            nfs_pageio_doio</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>                              nfs_generic_pg_pgios</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>                                nfs_initiate_pgio</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>                                  nfs_initiate_read</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>                                    nfs3_proc_read_setup</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>                                      <span class="co">// 设置请求类型</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="op">&amp;</span>nfs3_procedures<span class="op">[</span>NFS3PROC_READ<span class="op">]</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>                wait_on_page_locked_killable</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>                  wait_on_page_bit_killable <span class="co">// rpc读任务返回时通过unlock_page()唤醒</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>                    wait_on_page_bit_common</span></code></pre></div>
+<p><a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/nfs-soft-lockup-in-__rpc_execute-crash-vmcore-bt-g-227403.txt">从vmcore的解析<code>bt -g 227403</code>的输出</a>可以看到所有的进程线里没有进程在等待异步rpc读的回复。</p>
 <h1 data-number="5" id="补丁"><span
 class="header-section-number">5</span> 补丁</h1>
 <ul>
-<li><p><code>ed0172af5d6f SUNRPC: Fix a race to wake a sync task</code></p></li>
+<li><p><code>ed0172af5d6f SUNRPC: Fix a race to wake a sync task</code>
+（修复的是同步rpc任务相关的问题，与此问题无关）</p></li>
 <li><p><code>6258cf25d5e3 SUNRPC: avoid soft lockup when transmitting UDP to reachable server.</code></p></li>
 </ul>
 </body>

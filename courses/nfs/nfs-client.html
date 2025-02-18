@@ -931,7 +931,7 @@ class="header-section-number">2.4</span> read</h2>
 <span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>                  page_cache_sync_ra</span>
 <span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>                    page_cache_ra_order</span>
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>                      read_pages</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>                        nfs_readahead</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>                        nfs_readahead <span class="co">// 低版本是 nfs_readpages</span></span>
 <span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>                          nfs_pageio_complete_read</span>
 <span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                            nfs_pageio_complete</span>
 <span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>                              nfs_pageio_complete_mirror</span>
@@ -952,7 +952,7 @@ class="header-section-number">2.4</span> read</h2>
 <span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>                                          rpc_make_runnable</span>
 <span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>                                            INIT_WORK<span class="op">(&amp;</span>task<span class="op">-&gt;</span>u<span class="op">.</span>tk_work<span class="op">,</span> rpc_async_schedule<span class="op">)</span></span>
 <span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>                filemap_update_page</span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>                  folio_put_wait_locked</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>                  folio_put_wait_locked <span class="co">// folio_unlock()唤醒？</span></span>
 <span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>                    folio_wait_bit_common</span></code></pre></div>
 </body>
 </html>
