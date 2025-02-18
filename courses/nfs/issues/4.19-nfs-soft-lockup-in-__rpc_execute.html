@@ -131,6 +131,8 @@ class="toc-section-number">3</span> 调试</a></li>
 class="toc-section-number">4</span> 代码分析</a></li>
 <li><a href="#补丁" id="toc-补丁"><span
 class="toc-section-number">5</span> 补丁</a></li>
+<li><a href="#下一步计划" id="toc-下一步计划"><span
+class="toc-section-number">6</span> 下一步计划</a></li>
 </ul>
 </nav>
 <p><a
@@ -321,12 +323,12 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#
 <p>从<code>&lt;nfs3_procedures+288&gt;</code>中的偏移量<code>288</code>计算出<code>288/48=6</code>，所以rpc请求类型是<code>NFS3PROC_READ</code>。</p>
 <h1 data-number="3" id="调试"><span
 class="header-section-number">3</span> 调试</h1>
-<p>挂载参数如下:</p>
+<p>挂载命令如下:</p>
 <div class="sourceCode" id="cb13"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> rw,relatime,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountvers=3,mountproto=udp,local_lock=none,_netdev localhost:/tmp/s_test /mnt <span class="co"># mountport=2050</span></span></code></pre></div>
 <h1 data-number="4" id="代码分析"><span
 class="header-section-number">4</span> 代码分析</h1>
-<p>由vmcore解析可知rpc请求类型是<code>NFS3PROC_WRITE</code>，只有<code>nfs3_proc_write_setup()</code>函数中引用这个宏定义。</p>
+<p>由vmcore解析可知rpc请求类型是<code>NFS3PROC_READ</code>，只有<code>nfs3_proc_read_setup()</code>函数中引用这个宏定义。</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>read</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  ksys_read</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    vfs_read</span>
@@ -352,7 +354,7 @@ class="header-section-number">4</span> 代码分析</h1>
 <span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>                  wait_on_page_bit_killable <span class="co">// rpc读任务返回时通过unlock_page()唤醒</span></span>
 <span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>                    wait_on_page_bit_common</span></code></pre></div>
 <p><a
-href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/nfs-soft-lockup-in-__rpc_execute-crash-vmcore-bt-g-227403.txt">从vmcore的解析<code>bt -g 227403</code>的输出</a>可以看到所有的进程线里没有进程在等待异步rpc读的回复。</p>
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/nfs-soft-lockup-in-__rpc_execute-crash-vmcore-bt-g-227403.txt">从vmcore的解析<code>bt -g 227403</code>的输出</a>可以看到进程组里没有一个进程在等待异步rpc读的回复。</p>
 <h1 data-number="5" id="补丁"><span
 class="header-section-number">5</span> 补丁</h1>
 <ul>
@@ -360,5 +362,11 @@ class="header-section-number">5</span> 补丁</h1>
 （修复的是同步rpc任务相关的问题，与此问题无关）</p></li>
 <li><p><code>6258cf25d5e3 SUNRPC: avoid soft lockup when transmitting UDP to reachable server.</code></p></li>
 </ul>
+<h1 data-number="6" id="下一步计划"><span
+class="header-section-number">6</span> 下一步计划</h1>
+<p>下次再复现出soft lockup后，打开调试开头收集更多的nfs和rpc的日志:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_ALL</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_ALL</span></span></code></pre></div>
 </body>
 </html>
