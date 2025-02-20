@@ -142,7 +142,7 @@ class="header-section-number">2</span> 内存消耗</h1>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>               <span class="ex">total</span>        used        free      shared  buff/cache   available</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Mem:</span>           3.8Gi       3.6Gi        71Mi       2.9Gi       3.2Gi       169Mi</span></code></pre></div>
 <p><code>qemu</code>虚拟机中导出<code>vmcore</code>的方法请参考<a
-href="https://chenxiaosong.com/courses/kernel/kernel-debug.html">《内核调试方法》</a>，虚拟机导出<code>vmcore</code>对比，用<code>crash</code>解析。</p>
+href="https://chenxiaosong.com/courses/kernel/debug.html">《内核调试方法》</a>，虚拟机导出<code>vmcore</code>对比，用<code>crash</code>解析。</p>
 <p>总内存<code>3.8G</code>，通过<code>crash</code>的命令<code>kmem -i</code>对比看出，发生oom时，大幅增加的内存有<code>USED</code>（增加约<code>3.33G</code>）和<code>CACHED</code>（增加约<code>2.76G</code>），小幅增加的有<code>SLAB</code>（增加约<code>660M</code>）。</p>
 <p>mainline刚挂载tmpfs时:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">free</span> <span class="at">-h</span></span>
