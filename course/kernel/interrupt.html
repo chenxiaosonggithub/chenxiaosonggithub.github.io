@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -94,360 +83,296 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">中断</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#几个概念" id="toc-几个概念"><span
-class="toc-section-number">1</span> 几个概念</a></li>
-<li><a href="#中断简介" id="toc-中断简介"><span
-class="toc-section-number">2</span> 中断简介</a></li>
-<li><a href="#中断处理程序" id="toc-中断处理程序"><span
-class="toc-section-number">3</span> 中断处理程序</a>
+<li><a href="#几个概念"><span class="toc-section-number">1</span> 几个概念</a></li>
+<li><a href="#中断简介"><span class="toc-section-number">2</span> 中断简介</a></li>
+<li><a href="#中断处理程序"><span class="toc-section-number">3</span> 中断处理程序</a>
 <ul>
-<li><a href="#注册中断处理程序" id="toc-注册中断处理程序"><span
-class="toc-section-number">3.1</span> 注册中断处理程序</a></li>
-<li><a href="#释放中断处理程序" id="toc-释放中断处理程序"><span
-class="toc-section-number">3.2</span> 释放中断处理程序</a></li>
-<li><a href="#编写中断处理程序" id="toc-编写中断处理程序"><span
-class="toc-section-number">3.3</span> 编写中断处理程序</a></li>
-<li><a href="#中断处理程序的实现" id="toc-中断处理程序的实现"><span
-class="toc-section-number">3.4</span> 中断处理程序的实现</a></li>
+<li><a href="#注册中断处理程序"><span class="toc-section-number">3.1</span> 注册中断处理程序</a></li>
+<li><a href="#释放中断处理程序"><span class="toc-section-number">3.2</span> 释放中断处理程序</a></li>
+<li><a href="#编写中断处理程序"><span class="toc-section-number">3.3</span> 编写中断处理程序</a></li>
+<li><a href="#中断处理程序的实现"><span class="toc-section-number">3.4</span> 中断处理程序的实现</a></li>
 </ul></li>
-<li><a href="#procinterrupts" id="toc-procinterrupts"><span
-class="toc-section-number">4</span>
-<code>/proc/interrupts</code></a></li>
-<li><a href="#中断控制" id="toc-中断控制"><span
-class="toc-section-number">5</span> 中断控制</a></li>
-<li><a href="#下半部" id="toc-下半部"><span
-class="toc-section-number">6</span> 下半部</a>
+<li><a href="#procinterrupts"><span class="toc-section-number">4</span> <code>/proc/interrupts</code></a></li>
+<li><a href="#中断控制"><span class="toc-section-number">5</span> 中断控制</a></li>
+<li><a href="#下半部"><span class="toc-section-number">6</span> 下半部</a>
 <ul>
-<li><a href="#软中断" id="toc-软中断"><span
-class="toc-section-number">6.1</span> 软中断</a></li>
-<li><a href="#tasklet" id="toc-tasklet"><span
-class="toc-section-number">6.2</span> tasklet</a></li>
-<li><a href="#工作队列" id="toc-工作队列"><span
-class="toc-section-number">6.3</span> 工作队列</a></li>
-<li><a href="#threaded_irq" id="toc-threaded_irq"><span
-class="toc-section-number">6.4</span> <code>threaded_irq</code></a></li>
+<li><a href="#软中断"><span class="toc-section-number">6.1</span> 软中断</a></li>
+<li><a href="#tasklet"><span class="toc-section-number">6.2</span> tasklet</a></li>
+<li><a href="#工作队列"><span class="toc-section-number">6.3</span> 工作队列</a></li>
+<li><a href="#threaded_irq"><span class="toc-section-number">6.4</span> <code>threaded_irq</code></a></li>
 </ul></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
-<p><a
-href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
-<h1 data-number="1" id="几个概念"><span
-class="header-section-number">1</span> 几个概念</h1>
+<p><a href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<h1 data-number="1" id="几个概念"><span class="header-section-number">1</span> 几个概念</h1>
 <ul>
-<li>中断（interrupt）:
-定义为一个事件，该事件改变cpu执行的指令顺序，分为同步中断和异步中断。同步（synchronous）中断:
-只有在一条指令终止执行后cpu才会发出中断，同步中断称为异常。异步（asynchronous）中断:
-由其他硬件设备随机产生的，如间隔定时器或I/O设备。一般我们所说的中断特指异步中断，也叫硬中断(hardirq)。
+<li>中断（interrupt）: 定义为一个事件，该事件改变cpu执行的指令顺序，分为同步中断和异步中断。同步（synchronous）中断: 只有在一条指令终止执行后cpu才会发出中断，同步中断称为异常。异步（asynchronous）中断: 由其他硬件设备随机产生的，如间隔定时器或I/O设备。一般我们所说的中断特指异步中断，也叫硬中断(hardirq)。
 <ul>
-<li>可屏蔽中断（maskable interrupt）:
-I/O设备发出的所有中断请求都产生可屏蔽中断，控制单元忽略处理屏蔽状态（masked）的中断。</li>
-<li>不可屏蔽中断（nonmaskable interrupt）:
-只有几个危急事件（如硬件故障）才引起不可屏蔽中断。</li>
+<li>可屏蔽中断（maskable interrupt）: I/O设备发出的所有中断请求都产生可屏蔽中断，控制单元忽略处理屏蔽状态（masked）的中断。</li>
+<li>不可屏蔽中断（nonmaskable interrupt）: 只有几个危急事件（如硬件故障）才引起不可屏蔽中断。</li>
 </ul></li>
-<li>异常（exception）:
-由程序的错误（处理器本身）产生，或由内核必须处理的异常（如缺页）条件产生的。
+<li>异常（exception）: 由程序的错误（处理器本身）产生，或由内核必须处理的异常（如缺页）条件产生的。
 <ul>
-<li>处理器探测异常（processor-detected exception）:
-cpu执行指令时探测到的反常条件所产生的异常。根据cpu产生异常时保存在x86的<code>eip</code>寄存器或arm64的<code>pc</code>寄存器中的值，可以分为3组:
+<li>处理器探测异常（processor-detected exception）: cpu执行指令时探测到的反常条件所产生的异常。根据cpu产生异常时保存在x86的<code>eip</code>寄存器或arm64的<code>pc</code>寄存器中的值，可以分为3组:
 <ul>
-<li>故障（fault）:
-保存在x86的<code>eip</code>寄存器或arm64的<code>pc</code>寄存器中的值是引起故障的指令地址，异常处理程序执行完后，那条指令重新执行，如缺页异常，纠正引起缺页异常的反常条件后重新执行同一指令。</li>
-<li>陷阱（trap）:
-保存在x86的<code>eip</code>寄存器或arm64的<code>pc</code>寄存器中的值是随后要执行的指令地址，只有当没有必要重新执行已终止的指令时，才触发陷阱，陷阱的主要用途是为了调试程序。</li>
-<li>异常中止（abort）:
-x86的<code>eip</code>寄存器或arm64的<code>pc</code>寄存器中不能保存引起异常的指令所在的确切位置，用于报告严重的错误，如硬件故障或系统表中无效的值或不一致的值。异常终止处理程序只能终止进程，别无选择。</li>
+<li>故障（fault）: 保存在x86的<code>eip</code>寄存器或arm64的<code>pc</code>寄存器中的值是引起故障的指令地址，异常处理程序执行完后，那条指令重新执行，如缺页异常，纠正引起缺页异常的反常条件后重新执行同一指令。</li>
+<li>陷阱（trap）: 保存在x86的<code>eip</code>寄存器或arm64的<code>pc</code>寄存器中的值是随后要执行的指令地址，只有当没有必要重新执行已终止的指令时，才触发陷阱，陷阱的主要用途是为了调试程序。</li>
+<li>异常中止（abort）: x86的<code>eip</code>寄存器或arm64的<code>pc</code>寄存器中不能保存引起异常的指令所在的确切位置，用于报告严重的错误，如硬件故障或系统表中无效的值或不一致的值。异常终止处理程序只能终止进程，别无选择。</li>
 </ul></li>
-<li>编程异常（programmed exception）:
-编程者发出请求时发生。以下几种情况会发生编程异常:
-x86下<code>int</code>（用于触发中断）和<code>int3</code>（触发特定的中断3，用于断点），arm64的<code>SVC</code>（对应x86的<code>int</code>）和<code>BRK</code>（对应x86的<code>int3</code>），以及x86下的<code>into</code>（检查溢出）和<code>bound</code>（检查地址出界）指令检查的条件不为真时。控制单元把编程异常作为陷阱来处理，也叫软件中断（software
-interrupt），注意软件中断和中断下半部的软中断（softirq）不是一个概念，编程异常有两种用途:
-执行系统调用和给调试程序通报一个特定的事件。</li>
+<li>编程异常（programmed exception）: 编程者发出请求时发生。以下几种情况会发生编程异常: x86下<code>int</code>（用于触发中断）和<code>int3</code>（触发特定的中断3，用于断点），arm64的<code>SVC</code>（对应x86的<code>int</code>）和<code>BRK</code>（对应x86的<code>int3</code>），以及x86下的<code>into</code>（检查溢出）和<code>bound</code>（检查地址出界）指令检查的条件不为真时。控制单元把编程异常作为陷阱来处理，也叫软件中断（software interrupt），注意软件中断和中断下半部的软中断（softirq）不是一个概念，编程异常有两种用途: 执行系统调用和给调试程序通报一个特定的事件。</li>
 </ul></li>
 </ul>
-<h1 data-number="2" id="中断简介"><span
-class="header-section-number">2</span> 中断简介</h1>
-<p>连接到计算机的硬件有很多，如硬盘、鼠标、键盘等，cpu的速度比这些外围硬件设备高出几个数量级，轮询（polling）会让内核做很多无用功，所以需要中断这种机制让硬件在需要时通知内核。中断本质上是一种电信号，硬件设备在生成中断时不考虑与cpu的时钟同步，也就是中断随时可以产生，内核随时可能会被新来的中断打断。硬件设备产生的电信号直接送入中断控制器（interrupt
-controller
-unit，简单的电子芯片）的输入引脚。不同设备对应的中断不同，每个中断对应一个中断号，又叫中断请求（Interrupt
-ReQuest，IRQ）线，但有些中断号是动态分配的，如连接在PCI（Peripheral
-Component Interconnect）总线上的设备。</p>
-<p>进程上下文（process
-context）是一种内核所处的操作模式，此时内核代表进程执行，如执行系统调用或运行内核线程，可以通过<code>current</code>宏关联当前进程，进程上下文中可以睡眠，也可以调用调度器。</p>
-<p>响应中断时，内核会执行一个函数，这个函数叫中断处理程序（interrupt
-handler）或中断服务例程（interrupt service
-routine，ISR），中断处理程序处理要非常快。执行中断处理程序时，内核处于中断上下文（interrupt
-context），又叫原子上下文中，不可阻塞，<code>current</code>宏指向被中断的进程，中断上下文中不可睡眠，中断栈的大小定义在<code>IRQ_STACK_SIZE</code>。</p>
-<p>中断处理程序中要处理得快，完成的工作量就受限，所以把中断处理分为上半部（top
-half）和下半部（bottom
-half）。上半部做有严格时限的工作，如对中断应答或复位硬件，这时所有中断都被禁止。能稍后完成的工作推迟到下半部。</p>
-<h1 data-number="3" id="中断处理程序"><span
-class="header-section-number">3</span> 中断处理程序</h1>
-<h2 data-number="3.1" id="注册中断处理程序"><span
-class="header-section-number">3.1</span> 注册中断处理程序</h2>
+<h1 data-number="2" id="中断简介"><span class="header-section-number">2</span> 中断简介</h1>
+<p>连接到计算机的硬件有很多，如硬盘、鼠标、键盘等，cpu的速度比这些外围硬件设备高出几个数量级，轮询（polling）会让内核做很多无用功，所以需要中断这种机制让硬件在需要时通知内核。中断本质上是一种电信号，硬件设备在生成中断时不考虑与cpu的时钟同步，也就是中断随时可以产生，内核随时可能会被新来的中断打断。硬件设备产生的电信号直接送入中断控制器（interrupt controller unit，简单的电子芯片）的输入引脚。不同设备对应的中断不同，每个中断对应一个中断号，又叫中断请求（Interrupt ReQuest，IRQ）线，但有些中断号是动态分配的，如连接在PCI（Peripheral Component Interconnect）总线上的设备。</p>
+<p>进程上下文（process context）是一种内核所处的操作模式，此时内核代表进程执行，如执行系统调用或运行内核线程，可以通过<code>current</code>宏关联当前进程，进程上下文中可以睡眠，也可以调用调度器。</p>
+<p>响应中断时，内核会执行一个函数，这个函数叫中断处理程序（interrupt handler）或中断服务例程（interrupt service routine，ISR），中断处理程序处理要非常快。执行中断处理程序时，内核处于中断上下文（interrupt context），又叫原子上下文中，不可阻塞，<code>current</code>宏指向被中断的进程，中断上下文中不可睡眠，中断栈的大小定义在<code>IRQ_STACK_SIZE</code>。</p>
+<p>中断处理程序中要处理得快，完成的工作量就受限，所以把中断处理分为上半部（top half）和下半部（bottom half）。上半部做有严格时限的工作，如对中断应答或复位硬件，这时所有中断都被禁止。能稍后完成的工作推迟到下半部。</p>
+<h1 data-number="3" id="中断处理程序"><span class="header-section-number">3</span> 中断处理程序</h1>
+<h2 data-number="3.1" id="注册中断处理程序"><span class="header-section-number">3.1</span> 注册中断处理程序</h2>
 <p>通过<code>request_irq()</code>注册一个中断处理程序，注意<code>request_irq()</code>函数会睡眠:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * request_irq - 为中断线添加处理程序</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@irq:</span><span class="co">        要分配的中断线（中断号）</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@handler:</span><span class="co">    当IRQ发生时调用的函数。</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"> *              线程中断的主要处理程序</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"> *              如果为NULL，将安装默认的主要处理程序</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@flags:</span><span class="co">      处理标志</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@name</span><span class="do">:</span><span class="co">       </span><span class="do">产生此中断的设备名称，会被/proc/irq/和/proc/interrupts使用</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@dev:</span><span class="co">        传递给处理函数的cookie，用于共享中断线，一般会传递驱动程序的设备结构</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"> * 此调用分配一个中断并建立一个处理程序；有关详细信息，请参见</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"> * request_threaded_irq()的文档。</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"> * Return: 成功时返回0，常见错误为-EBUSY，表示给定中断线已经在使用，或没有指定IRQF_SHARED</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">inline</span> <span class="dt">int</span> __must_check</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>request_irq<span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span> irq<span class="op">,</span> irq_handler_t handler<span class="op">,</span> <span class="dt">unsigned</span> <span class="dt">long</span> flags<span class="op">,</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>name<span class="op">,</span> <span class="dt">void</span> <span class="op">*</span>dev<span class="op">)</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">// devm: managed device</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">// 类似垃圾回收机制，不需要调用free_irq()</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">// 请参考补丁[at86rf230: use devm_request_irq](https://lore.kernel.org/all/1398359358-11085-5-git-send-email-alex.aring@gmail.com/)</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">inline</span> <span class="dt">int</span> __must_check</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>devm_request_irq<span class="op">(</span><span class="kw">struct</span> device <span class="op">*</span>dev<span class="op">,</span> <span class="dt">unsigned</span> <span class="dt">int</span> irq<span class="op">,</span> irq_handler_t handler<span class="op">,</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>                 <span class="dt">unsigned</span> <span class="dt">long</span> irqflags<span class="op">,</span> <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>devname<span class="op">,</span> <span class="dt">void</span> <span class="op">*</span>dev_id<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">/**</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co"> * request_irq - 为中断线添加处理程序</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co"> * </span><span class="an">@irq:</span><span class="co">        要分配的中断线（中断号）</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="co"> * </span><span class="an">@handler:</span><span class="co">    当IRQ发生时调用的函数。</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co"> *              线程中断的主要处理程序</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="co"> *              如果为NULL，将安装默认的主要处理程序</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="co"> * </span><span class="an">@flags:</span><span class="co">      处理标志</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="co"> * </span><span class="an">@name</span><span class="do">:</span><span class="co">       </span><span class="do">产生此中断的设备名称，会被/proc/irq/和/proc/interrupts使用</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co"> * </span><span class="an">@dev:</span><span class="co">        传递给处理函数的cookie，用于共享中断线，一般会传递驱动程序的设备结构</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="co"> * 此调用分配一个中断并建立一个处理程序；有关详细信息，请参见</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="co"> * request_threaded_irq()的文档。</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="co"> * Return: 成功时返回0，常见错误为-EBUSY，表示给定中断线已经在使用，或没有指定IRQF_SHARED</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="dt">static</span> <span class="kw">inline</span> <span class="dt">int</span> __must_check</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>request_irq(<span class="dt">unsigned</span> <span class="dt">int</span> irq, irq_handler_t handler, <span class="dt">unsigned</span> <span class="dt">long</span> flags,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>            <span class="dt">const</span> <span class="dt">char</span> *name, <span class="dt">void</span> *dev)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="co">// devm: managed device</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="co">// 类似垃圾回收机制，不需要调用free_irq()</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="co">// 请参考补丁[at86rf230: use devm_request_irq](https://lore.kernel.org/all/1398359358-11085-5-git-send-email-alex.aring@gmail.com/)</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="dt">static</span> <span class="kw">inline</span> <span class="dt">int</span> __must_check</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>devm_request_irq(<span class="kw">struct</span> device *dev, <span class="dt">unsigned</span> <span class="dt">int</span> irq, irq_handler_t handler,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>                 <span class="dt">unsigned</span> <span class="dt">long</span> irqflags, <span class="dt">const</span> <span class="dt">char</span> *devname, <span class="dt">void</span> *dev_id)</span></code></pre></div>
 <p><code>irq_handler_t handler</code>参数的的定义如下:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// include/linux/interrupt.h</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> irqreturn_t <span class="op">(*</span>irq_handler_t<span class="op">)(</span><span class="dt">int</span><span class="op">,</span> <span class="dt">void</span> <span class="op">*);</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co">// include/linux/interrupt.h</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">typedef</span> irqreturn_t (*irq_handler_t)(<span class="dt">int</span>, <span class="dt">void</span> *);</span></code></pre></div>
 <p><code>flags</code>参数可以为<code>0</code>，也可能是以下值:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * 这些对应于 linux/ioport.h 中的 IORESOURCE_IRQ_*(IORESOURCE_IRQ_HIGHEDGE等) 定义，</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * 用于选择中断线行为。当请求一个中断而未指定 IRQF_TRIGGER 时，</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"> * 应假定设置为“已配置”，这可能是根据机器或固件初始化。</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_TRIGGER_NONE       </span><span class="bn">0x00000000</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_TRIGGER_RISING     </span><span class="bn">0x00000001</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_TRIGGER_FALLING    </span><span class="bn">0x00000002</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_TRIGGER_HIGH       </span><span class="bn">0x00000004</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_TRIGGER_LOW        </span><span class="bn">0x00000008</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_TRIGGER_MASK       </span><span class="op">(</span><span class="pp">IRQF_TRIGGER_HIGH </span><span class="op">|</span><span class="pp"> IRQF_TRIGGER_LOW </span><span class="op">|</span><span class="pp"> </span><span class="op">\</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="pp">                                 IRQF_TRIGGER_RISING </span><span class="op">|</span><span class="pp"> IRQF_TRIGGER_FALLING</span><span class="op">)</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_TRIGGER_PROBE      </span><span class="bn">0x00000010</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"> * 这些标志仅由内核作为中断处理例程的一部分使用。</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_SHARED - 允许多个设备共享中断</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_PROBE_SHARED - 当调用者预计会发生共享不匹配时设置</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_TIMER - 标记此中断为定时器中断的标志</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_PERCPU - 中断是每个 CPU 的</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_NOBALANCING - 排除此中断进行中断平衡的标志</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_IRQPOLL - 中断用于轮询（在共享中断中，仅第一个注册的中断</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"> *                出于性能原因被考虑）</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_ONESHOT - 硬中断处理程序完成后不会重新使能中断。</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co"> *                用于需要保持中断线禁用的线程中断，直到</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co"> *                线程处理程序运行。</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_NO_SUSPEND - 在挂起期间不禁用此中断。并不保证</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"> *                   此中断会唤醒系统从挂起状态。见 Documentation/power/suspend-and-interrupts.rst</span></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_FORCE_RESUME - 在恢复时强制启用，即使设置了 IRQF_NO_SUSPEND</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_NO_THREAD - 中断不能被线程化</span></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_EARLY_RESUME - 在 syscore 期间尽早恢复 IRQ，而不是在设备</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co"> *                恢复时。</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_COND_SUSPEND - 如果 IRQ 与 NO_SUSPEND 用户共享，在挂起中断后执行此</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co"> *                中断处理程序。对于系统唤醒设备，用户需要在</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co"> *                他们的中断处理程序中实现唤醒检测。</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_NO_AUTOEN - 用户请求时不要自动启用 IRQ 或 NMI。</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="co"> *                用户稍后将通过 enable_irq() 或 enable_nmi()</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="co"> *                显式启用它。</span></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="co"> * IRQF_NO_DEBUG - 在逃逸检测中排除 IPI 和类似处理程序，</span></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="co"> *                 取决于 IRQF_PERCPU。</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_SHARED             </span><span class="bn">0x00000080</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_PROBE_SHARED       </span><span class="bn">0x00000100</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="pp">#define __IRQF_TIMER            </span><span class="bn">0x00000200</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_PERCPU             </span><span class="bn">0x00000400</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_NOBALANCING        </span><span class="bn">0x00000800</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_IRQPOLL            </span><span class="bn">0x00001000</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_ONESHOT            </span><span class="bn">0x00002000</span></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_NO_SUSPEND         </span><span class="bn">0x00004000</span></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_FORCE_RESUME       </span><span class="bn">0x00008000</span></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_NO_THREAD          </span><span class="bn">0x00010000</span></span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_EARLY_RESUME       </span><span class="bn">0x00020000</span></span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_COND_SUSPEND       </span><span class="bn">0x00040000</span></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_NO_AUTOEN          </span><span class="bn">0x00080000</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_NO_DEBUG           </span><span class="bn">0x00100000</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="pp">#define IRQF_TIMER              </span><span class="op">(</span><span class="pp">__IRQF_TIMER </span><span class="op">|</span><span class="pp"> IRQF_NO_SUSPEND </span><span class="op">|</span><span class="pp"> IRQF_NO_THREAD</span><span class="op">)</span></span></code></pre></div>
-<h2 data-number="3.2" id="释放中断处理程序"><span
-class="header-section-number">3.2</span> 释放中断处理程序</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"> *      free_irq - 释放通过 request_irq 分配的中断</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@irq:</span><span class="co"> 要释放的中断线</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@dev_id:</span><span class="co"> 设备标识以释放</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"> *      移除中断处理程序。如果中断线不再被任何驱动程序使用，</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"> *      则将其禁用。在共享 IRQ 的情况下，调用者必须确保在调用</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"> *      此函数之前，在其驱动的卡上禁用中断。该函数在此 IRQ</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"> *      的任何正在执行的中断完成之前不会返回。</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"> *      此函数不得在中断上下文中调用。必须从进程上下文中调用。</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"> *      返回传递给 request_irq 的 devname 参数。</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="dt">void</span> <span class="op">*</span>free_irq<span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span> irq<span class="op">,</span> <span class="dt">void</span> <span class="op">*</span>dev_id<span class="op">)</span></span></code></pre></div>
-<h2 data-number="3.3" id="编写中断处理程序"><span
-class="header-section-number">3.3</span> 编写中断处理程序</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co">/*</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co"> * 这些对应于 linux/ioport.h 中的 IORESOURCE_IRQ_*(IORESOURCE_IRQ_HIGHEDGE等) 定义，</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co"> * 用于选择中断线行为。当请求一个中断而未指定 IRQF_TRIGGER 时，</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co"> * 应假定设置为“已配置”，这可能是根据机器或固件初始化。</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="pp">#define IRQF_TRIGGER_NONE       0x00000000</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="pp">#define IRQF_TRIGGER_RISING     0x00000001</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="pp">#define IRQF_TRIGGER_FALLING    0x00000002</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="pp">#define IRQF_TRIGGER_HIGH       0x00000004</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="pp">#define IRQF_TRIGGER_LOW        0x00000008</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="pp">#define IRQF_TRIGGER_MASK       (IRQF_TRIGGER_HIGH | IRQF_TRIGGER_LOW | \</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="pp">                                 IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING)</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a><span class="pp">#define IRQF_TRIGGER_PROBE      0x00000010</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a><span class="co">/*</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a><span class="co"> * 这些标志仅由内核作为中断处理例程的一部分使用。</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a><span class="co"> * IRQF_SHARED - 允许多个设备共享中断</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a><span class="co"> * IRQF_PROBE_SHARED - 当调用者预计会发生共享不匹配时设置</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a><span class="co"> * IRQF_TIMER - 标记此中断为定时器中断的标志</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a><span class="co"> * IRQF_PERCPU - 中断是每个 CPU 的</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a><span class="co"> * IRQF_NOBALANCING - 排除此中断进行中断平衡的标志</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a><span class="co"> * IRQF_IRQPOLL - 中断用于轮询（在共享中断中，仅第一个注册的中断</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a><span class="co"> *                出于性能原因被考虑）</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a><span class="co"> * IRQF_ONESHOT - 硬中断处理程序完成后不会重新使能中断。</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a><span class="co"> *                用于需要保持中断线禁用的线程中断，直到</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a><span class="co"> *                线程处理程序运行。</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a><span class="co"> * IRQF_NO_SUSPEND - 在挂起期间不禁用此中断。并不保证</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a><span class="co"> *                   此中断会唤醒系统从挂起状态。见 Documentation/power/suspend-and-interrupts.rst</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a><span class="co"> * IRQF_FORCE_RESUME - 在恢复时强制启用，即使设置了 IRQF_NO_SUSPEND</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a><span class="co"> * IRQF_NO_THREAD - 中断不能被线程化</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a><span class="co"> * IRQF_EARLY_RESUME - 在 syscore 期间尽早恢复 IRQ，而不是在设备</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a><span class="co"> *                恢复时。</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a><span class="co"> * IRQF_COND_SUSPEND - 如果 IRQ 与 NO_SUSPEND 用户共享，在挂起中断后执行此</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a><span class="co"> *                中断处理程序。对于系统唤醒设备，用户需要在</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true"></a><span class="co"> *                他们的中断处理程序中实现唤醒检测。</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true"></a><span class="co"> * IRQF_NO_AUTOEN - 用户请求时不要自动启用 IRQ 或 NMI。</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true"></a><span class="co"> *                用户稍后将通过 enable_irq() 或 enable_nmi()</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true"></a><span class="co"> *                显式启用它。</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true"></a><span class="co"> * IRQF_NO_DEBUG - 在逃逸检测中排除 IPI 和类似处理程序，</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true"></a><span class="co"> *                 取决于 IRQF_PERCPU。</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true"></a><span class="pp">#define IRQF_SHARED             0x00000080</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true"></a><span class="pp">#define IRQF_PROBE_SHARED       0x00000100</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true"></a><span class="pp">#define __IRQF_TIMER            0x00000200</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true"></a><span class="pp">#define IRQF_PERCPU             0x00000400</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true"></a><span class="pp">#define IRQF_NOBALANCING        0x00000800</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true"></a><span class="pp">#define IRQF_IRQPOLL            0x00001000</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true"></a><span class="pp">#define IRQF_ONESHOT            0x00002000</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true"></a><span class="pp">#define IRQF_NO_SUSPEND         0x00004000</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true"></a><span class="pp">#define IRQF_FORCE_RESUME       0x00008000</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true"></a><span class="pp">#define IRQF_NO_THREAD          0x00010000</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true"></a><span class="pp">#define IRQF_EARLY_RESUME       0x00020000</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true"></a><span class="pp">#define IRQF_COND_SUSPEND       0x00040000</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true"></a><span class="pp">#define IRQF_NO_AUTOEN          0x00080000</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true"></a><span class="pp">#define IRQF_NO_DEBUG           0x00100000</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true"></a><span class="pp">#define IRQF_TIMER              (__IRQF_TIMER | IRQF_NO_SUSPEND | IRQF_NO_THREAD)</span></span></code></pre></div>
+<h2 data-number="3.2" id="释放中断处理程序"><span class="header-section-number">3.2</span> 释放中断处理程序</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co">/**</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co"> *      free_irq - 释放通过 request_irq 分配的中断</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@irq:</span><span class="co"> 要释放的中断线</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@dev_id:</span><span class="co"> 设备标识以释放</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co"> *      移除中断处理程序。如果中断线不再被任何驱动程序使用，</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="co"> *      则将其禁用。在共享 IRQ 的情况下，调用者必须确保在调用</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="co"> *      此函数之前，在其驱动的卡上禁用中断。该函数在此 IRQ</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="co"> *      的任何正在执行的中断完成之前不会返回。</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="co"> *      此函数不得在中断上下文中调用。必须从进程上下文中调用。</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="co"> *      返回传递给 request_irq 的 devname 参数。</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="dt">const</span> <span class="dt">void</span> *free_irq(<span class="dt">unsigned</span> <span class="dt">int</span> irq, <span class="dt">void</span> *dev_id)</span></code></pre></div>
+<h2 data-number="3.3" id="编写中断处理程序"><span class="header-section-number">3.3</span> 编写中断处理程序</h2>
 <p>举个例子:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> irqreturn_t tg3_test_isr<span class="op">(</span><span class="dt">int</span> irq<span class="op">,</span> <span class="dt">void</span> <span class="op">*</span>dev_id<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="dt">static</span> irqreturn_t tg3_test_isr(<span class="dt">int</span> irq, <span class="dt">void</span> *dev_id)</span></code></pre></div>
 <p>返回值定义如下:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * enum irqreturn - irqreturn 类型值，可以使用IRQ_RETVAL(x)将其他值转换为枚举值</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@IRQ_NONE:</span><span class="co">           中断不是来自此设备或未被处理</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@IRQ_HANDLED:</span><span class="co">        中断已被此设备处理</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@IRQ_WAKE_THREAD:</span><span class="co">    处理程序请求唤醒处理程序线程</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="kw">enum</span> irqreturn <span class="op">{</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        IRQ_NONE                <span class="op">=</span> <span class="op">(</span><span class="dv">0</span> <span class="op">&lt;&lt;</span> <span class="dv">0</span><span class="op">),</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        IRQ_HANDLED             <span class="op">=</span> <span class="op">(</span><span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="dv">0</span><span class="op">),</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        IRQ_WAKE_THREAD         <span class="op">=</span> <span class="op">(</span><span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="dv">1</span><span class="op">),</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co">/**</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co"> * enum irqreturn - irqreturn 类型值，可以使用IRQ_RETVAL(x)将其他值转换为枚举值</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co"> * </span><span class="an">@IRQ_NONE:</span><span class="co">           中断不是来自此设备或未被处理</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co"> * </span><span class="an">@IRQ_HANDLED:</span><span class="co">        中断已被此设备处理</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co"> * </span><span class="an">@IRQ_WAKE_THREAD:</span><span class="co">    处理程序请求唤醒处理程序线程</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="kw">enum</span> irqreturn {</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>        IRQ_NONE                = (<span class="dv">0</span> &lt;&lt; <span class="dv">0</span>),</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>        IRQ_HANDLED             = (<span class="dv">1</span> &lt;&lt; <span class="dv">0</span>),</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>        IRQ_WAKE_THREAD         = (<span class="dv">1</span> &lt;&lt; <span class="dv">1</span>),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>};</span></code></pre></div>
 <p>中断处理程序在执行时，相应的中断线在所有cpu上都会被屏幕，但其他中断都是打开的。</p>
 <p>共享的中断处理程序如下:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 共享的中断处理程序的dev参数不能传NULL，一般传设备结构的指针</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>err <span class="op">=</span> request_irq<span class="op">(</span>tnapi<span class="op">-&gt;</span>irq_vec<span class="op">,</span> tg3_test_isr<span class="op">,</span>  </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                  IRQF_SHARED<span class="op">,</span> dev<span class="op">-&gt;</span>name<span class="op">,</span> tnapi<span class="op">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co">// 共享的中断处理程序的dev参数不能传NULL，一般传设备结构的指针</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>err = request_irq(tnapi-&gt;irq_vec, tg3_test_isr,  </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>                  IRQF_SHARED, dev-&gt;name, tnapi);</span></code></pre></div>
 <p>非共享的中断处理程序如下:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>retval <span class="op">=</span> request_irq<span class="op">(</span>rtc_irq<span class="op">,</span> efw<span class="op">,</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                <span class="dv">0</span><span class="op">,</span> dev_name<span class="op">(&amp;</span>cmos_rtc<span class="op">.</span>rtc<span class="op">-&gt;</span>dev<span class="op">),</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                cmos_rtc<span class="op">.</span>rtc<span class="op">);</span></span></code></pre></div>
-<h2 data-number="3.4" id="中断处理程序的实现"><span
-class="header-section-number">3.4</span> 中断处理程序的实现</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>retval = request_irq(rtc_irq, efw,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>                <span class="dv">0</span>, dev_name(&amp;cmos_rtc.rtc-&gt;dev),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>                cmos_rtc.rtc);</span></code></pre></div>
+<h2 data-number="3.4" id="中断处理程序的实现"><span class="header-section-number">3.4</span> 中断处理程序的实现</h2>
 <p>中断处理系统的实现依赖于cpu、中断控制器的类型、体系结构的设计、机器本身。</p>
 <p>中断从硬件到内核的路径:</p>
 <ul>
-<li>硬件产生一个中断，通过总线把电信号发给中断控制器（interrupt
-controller unit）。</li>
+<li>硬件产生一个中断，通过总线把电信号发给中断控制器（interrupt controller unit）。</li>
 <li>中断控制器把中断发给cpu。</li>
 <li>cpu中断内核。</li>
 </ul>
 <p>x86系统结构下函数流程如下:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>common_interrupt</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  __common_interrupt</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    handle_irq</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>      generic_handle_irq_desc</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        handle_edge_irq</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>          handle_irq_event</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>            handle_irq_event_percpu</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>              __handle_irq_event_percpu</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>              add_interrupt_randomness</span></code></pre></div>
-<h1 data-number="4" id="procinterrupts"><span
-class="header-section-number">4</span>
-<code>/proc/interrupts</code></h1>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>common_interrupt</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>  __common_interrupt</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>    handle_irq</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>      generic_handle_irq_desc</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>        handle_edge_irq</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>          handle_irq_event</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>            handle_irq_event_percpu</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>              __handle_irq_event_percpu</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>              add_interrupt_randomness</span></code></pre></div>
+<h1 data-number="4" id="procinterrupts"><span class="header-section-number">4</span> <code>/proc/interrupts</code></h1>
 <p>为了便于观察，我们以单核cpu为例:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>           <span class="ex">CPU0</span>       </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">0:</span>         56   IO-APIC   2-edge      timer</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">1:</span>          9   IO-APIC   1-edge      i8042</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">4:</span>        546   IO-APIC   4-edge      ttyS0</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">8:</span>          1   IO-APIC   8-edge      rtc0</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">9:</span>          0   IO-APIC   9-fasteoi   acpi</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a> <span class="ex">12:</span>         15   IO-APIC  12-edge      i8042</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a> <span class="ex">24:</span>          0  PCI-MSIX-0000:00:05.0   0-edge      virtio3-config</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a> <span class="ex">25:</span>       1710  PCI-MSIX-0000:00:05.0   1-edge      virtio3-req.0</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a> <span class="ex">26:</span>          0  PCI-MSIX-0000:00:04.0   0-edge      virtio2-config</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a> <span class="ex">27:</span>          0  PCI-MSIX-0000:00:04.0   1-edge      virtio2-control</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a> <span class="ex">28:</span>          0  PCI-MSIX-0000:00:04.0   2-edge      virtio2-event</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a> <span class="ex">29:</span>        322  PCI-MSIX-0000:00:04.0   3-edge      virtio2-request</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a> <span class="ex">30:</span>          0  PCI-MSIX-0000:00:02.0   0-edge      virtio0-config</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a> <span class="ex">31:</span>         54  PCI-MSIX-0000:00:02.0   1-edge      virtio0-input.0</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a> <span class="ex">32:</span>         81  PCI-MSIX-0000:00:02.0   2-edge      virtio0-output.0</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a> <span class="ex">33:</span>          0  PCI-MSIX-0000:00:03.0   0-edge      virtio1-config</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a> <span class="ex">34:</span>          0  PCI-MSIX-0000:00:03.0   1-edge      virtio1-requests</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="ex">NMI:</span>          0   Non-maskable interrupts</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="ex">LOC:</span>       2937   Local timer interrupts</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="ex">SPU:</span>          0   Spurious interrupts</span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="ex">PMI:</span>          0   Performance monitoring interrupts</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="ex">IWI:</span>          0   IRQ work interrupts</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="ex">RTR:</span>          0   APIC ICR read retries</span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="ex">RES:</span>          0   Rescheduling interrupts</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="ex">CAL:</span>          0   Function call interrupts</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="ex">TLB:</span>          0   TLB shootdowns</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="ex">TRM:</span>          0   Thermal event interrupts</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="ex">THR:</span>          0   Threshold APIC interrupts</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="ex">DFR:</span>          0   Deferred Error APIC interrupts</span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="ex">MCE:</span>          0   Machine check exceptions</span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="ex">MCP:</span>          1   Machine check polls</span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="ex">HYP:</span>          1   Hypervisor callback interrupts</span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="ex">ERR:</span>          0</span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a><span class="ex">MIS:</span>          0</span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a><span class="ex">PIN:</span>          0   Posted-interrupt notification event</span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a><span class="ex">NPI:</span>          0   Nested posted-interrupt event</span>
-<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a><span class="ex">PIW:</span>          0   Posted-interrupt wakeup event</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>           <span class="ex">CPU0</span>       </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>  <span class="ex">0</span>:         56   IO-APIC   2-edge      timer</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>  <span class="ex">1</span>:          9   IO-APIC   1-edge      i8042</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>  <span class="ex">4</span>:        546   IO-APIC   4-edge      ttyS0</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>  <span class="ex">8</span>:          1   IO-APIC   8-edge      rtc0</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>  <span class="ex">9</span>:          0   IO-APIC   9-fasteoi   acpi</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a> <span class="ex">12</span>:         15   IO-APIC  12-edge      i8042</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a> <span class="ex">24</span>:          0  PCI-MSIX-0000:00:05.0   0-edge      virtio3-config</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a> <span class="ex">25</span>:       1710  PCI-MSIX-0000:00:05.0   1-edge      virtio3-req.0</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a> <span class="ex">26</span>:          0  PCI-MSIX-0000:00:04.0   0-edge      virtio2-config</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a> <span class="ex">27</span>:          0  PCI-MSIX-0000:00:04.0   1-edge      virtio2-control</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a> <span class="ex">28</span>:          0  PCI-MSIX-0000:00:04.0   2-edge      virtio2-event</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a> <span class="ex">29</span>:        322  PCI-MSIX-0000:00:04.0   3-edge      virtio2-request</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a> <span class="ex">30</span>:          0  PCI-MSIX-0000:00:02.0   0-edge      virtio0-config</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true"></a> <span class="ex">31</span>:         54  PCI-MSIX-0000:00:02.0   1-edge      virtio0-input.0</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true"></a> <span class="ex">32</span>:         81  PCI-MSIX-0000:00:02.0   2-edge      virtio0-output.0</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true"></a> <span class="ex">33</span>:          0  PCI-MSIX-0000:00:03.0   0-edge      virtio1-config</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true"></a> <span class="ex">34</span>:          0  PCI-MSIX-0000:00:03.0   1-edge      virtio1-requests</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true"></a><span class="ex">NMI</span>:          0   Non-maskable interrupts</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true"></a><span class="ex">LOC</span>:       2937   Local timer interrupts</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true"></a><span class="ex">SPU</span>:          0   Spurious interrupts</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true"></a><span class="ex">PMI</span>:          0   Performance monitoring interrupts</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true"></a><span class="ex">IWI</span>:          0   IRQ work interrupts</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true"></a><span class="ex">RTR</span>:          0   APIC ICR read retries</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true"></a><span class="ex">RES</span>:          0   Rescheduling interrupts</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true"></a><span class="ex">CAL</span>:          0   Function call interrupts</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true"></a><span class="ex">TLB</span>:          0   TLB shootdowns</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true"></a><span class="ex">TRM</span>:          0   Thermal event interrupts</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true"></a><span class="ex">THR</span>:          0   Threshold APIC interrupts</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true"></a><span class="ex">DFR</span>:          0   Deferred Error APIC interrupts</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true"></a><span class="ex">MCE</span>:          0   Machine check exceptions</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true"></a><span class="ex">MCP</span>:          1   Machine check polls</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true"></a><span class="ex">HYP</span>:          1   Hypervisor callback interrupts</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true"></a><span class="ex">ERR</span>:          0</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true"></a><span class="ex">MIS</span>:          0</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true"></a><span class="ex">PIN</span>:          0   Posted-interrupt notification event</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true"></a><span class="ex">NPI</span>:          0   Nested posted-interrupt event</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true"></a><span class="ex">PIW</span>:          0   Posted-interrupt wakeup event</span></code></pre></div>
 <ul>
 <li>第一列: 中断线。</li>
 <li>第二列: 接收中断数目的计数器。</li>
 <li>第三列: 中断控制器。</li>
-<li>第四列:
-设备名称，也就是<code>request_irq()</code>的<code>name</code>参数。如果中断是共享的，则所有设备名都会列出来，以逗号分隔。</li>
+<li>第四列: 设备名称，也就是<code>request_irq()</code>的<code>name</code>参数。如果中断是共享的，则所有设备名都会列出来，以逗号分隔。</li>
 </ul>
 <p>相关函数流程:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>call_read_iter</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  proc_reg_read_iter</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    seq_read_iter</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      show_interrupts</span></code></pre></div>
-<h1 data-number="5" id="中断控制"><span
-class="header-section-number">5</span> 中断控制</h1>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>call_read_iter</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>  proc_reg_read_iter</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>    seq_read_iter</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a>      show_interrupts</span></code></pre></div>
+<h1 data-number="5" id="中断控制"><span class="header-section-number">5</span> 中断控制</h1>
 <p>控制中断系统是为了提供同步，通过禁止中断，可以确保某个中断处理程序不会抢占当前代码，还可以禁止内核抢占，但不能防止其他cpu的并发访问，禁止中断只能防止其他中断处理程序的并发访问。</p>
 <p>禁止和激活当前处理器的本地中断，可以在中断上下文和进程上下文中使用:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>local_irq_disable<span class="op">();</span> <span class="co">// 禁止当前cpu本地中断</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>local_irq_enable<span class="op">();</span> <span class="co">// 激活当前cpu本地中断</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>local_irq_disable(); <span class="co">// 禁止当前cpu本地中断</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a>local_irq_enable(); <span class="co">// 激活当前cpu本地中断</span></span></code></pre></div>
 <p>激活时恢复到原来的状态，可以在中断上下文和进程上下文中使用:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">unsigned</span> <span class="dt">long</span> flags<span class="op">;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>local_irq_save<span class="op">(</span>flags<span class="op">);</span> <span class="co">// 禁止中断</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>local_irq_restore<span class="op">(</span>flags<span class="op">);</span> <span class="co">// 中断恢复到原来的状态</span></span></code></pre></div>
-<p>禁止（屏蔽掉，masking
-out）指定中断线，可以在中断上下文和进程上下文中使用，多个中断处理程序共享的中断线，不能用这些接口禁止中断。:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 禁止所有处理器指定的中断线，等待当前中断处理程序执行完</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> disable_irq<span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span> irq<span class="op">)</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">// 禁止所有处理器指定的中断线，不会等待当前中断处理程序执行完</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> disable_irq_nosync<span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span> irq<span class="op">)</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">// 激活所有处理器指定的中断线，嵌套时最后一次调用enable_irq时才真正激活中断线</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> enable_irq<span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span> irq<span class="op">)</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">// 等待特定的中断处理程序的退出</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> synchronize_irq<span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span> irq<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="dt">unsigned</span> <span class="dt">long</span> flags;</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a>local_irq_save(flags); <span class="co">// 禁止中断</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a>local_irq_restore(flags); <span class="co">// 中断恢复到原来的状态</span></span></code></pre></div>
+<p>禁止（屏蔽掉，masking out）指定中断线，可以在中断上下文和进程上下文中使用，多个中断处理程序共享的中断线，不能用这些接口禁止中断。:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="co">// 禁止所有处理器指定的中断线，等待当前中断处理程序执行完</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="dt">void</span> disable_irq(<span class="dt">unsigned</span> <span class="dt">int</span> irq)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a><span class="co">// 禁止所有处理器指定的中断线，不会等待当前中断处理程序执行完</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a><span class="dt">void</span> disable_irq_nosync(<span class="dt">unsigned</span> <span class="dt">int</span> irq)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a><span class="co">// 激活所有处理器指定的中断线，嵌套时最后一次调用enable_irq时才真正激活中断线</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true"></a><span class="dt">void</span> enable_irq(<span class="dt">unsigned</span> <span class="dt">int</span> irq)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true"></a><span class="co">// 等待特定的中断处理程序的退出</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true"></a><span class="dt">void</span> synchronize_irq(<span class="dt">unsigned</span> <span class="dt">int</span> irq)</span></code></pre></div>
 <p>查询中断系统的状态:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 本地cpu上的中断系统被禁止返回非0，否则返回0</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>irqs_disabled<span class="op">()</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"> * 宏用于检索当前执行上下文：</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"> * in_nmi()             - 我们处于 NMI 上下文，Non-Maskable Interrupt 非屏蔽中断，一种高优先级中断，通常用于处理紧急事件，如硬件故障或性能监控</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"> * in_hardirq()         - 我们处于硬 IRQ 上下文</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"> * in_serving_softirq() - 我们处于 softirq 上下文</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co"> * in_task()            - 我们处于任务上下文</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="pp">#define in_nmi</span><span class="op">()</span><span class="pp">                </span><span class="op">(</span><span class="pp">nmi_count</span><span class="op">())</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="pp">#define in_hardirq</span><span class="op">()</span><span class="pp">            </span><span class="op">(</span><span class="pp">hardirq_count</span><span class="op">())</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="pp">#define in_serving_softirq</span><span class="op">()</span><span class="pp">    </span><span class="op">(</span><span class="pp">softirq_count</span><span class="op">()</span><span class="pp"> </span><span class="op">&amp;</span><span class="pp"> SOFTIRQ_OFFSET</span><span class="op">)</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="pp">#define in_task</span><span class="op">()</span><span class="pp">               </span><span class="op">(!(</span><span class="pp">in_nmi</span><span class="op">()</span><span class="pp"> </span><span class="op">|</span><span class="pp"> in_hardirq</span><span class="op">()</span><span class="pp"> </span><span class="op">|</span><span class="pp"> in_serving_softirq</span><span class="op">()))</span></span></code></pre></div>
-<h1 data-number="6" id="下半部"><span
-class="header-section-number">6</span> 下半部</h1>
-<p>中断处理程序（又叫上半部，top
-half）执行时，最好的情况下，与该中断同级的中断（当然包括当前的中断线）会被屏蔽，中断处理程序要执行得越快越好，中断处理程序所做的事情越少越好，但至少要操作硬件对中断进行确认、有时要从硬件copy数据等，中断处理程序只能作为整个硬件处理流程的一部分，下半部（bottom
-half）执行与中断处理密切相关但中断处理程序本身不处理的工作。上半部和下半部的工作划分:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="co">// 本地cpu上的中断系统被禁止返回非0，否则返回0</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>irqs_disabled()</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a><span class="co">/*</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a><span class="co"> * 宏用于检索当前执行上下文：</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a><span class="co"> * in_nmi()             - 我们处于 NMI 上下文，Non-Maskable Interrupt 非屏蔽中断，一种高优先级中断，通常用于处理紧急事件，如硬件故障或性能监控</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a><span class="co"> * in_hardirq()         - 我们处于硬 IRQ 上下文</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a><span class="co"> * in_serving_softirq() - 我们处于 softirq 上下文</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true"></a><span class="co"> * in_task()            - 我们处于任务上下文</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true"></a><span class="pp">#define in_nmi()                (nmi_count())</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true"></a><span class="pp">#define in_hardirq()            (hardirq_count())</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true"></a><span class="pp">#define in_serving_softirq()    (softirq_count() &amp; SOFTIRQ_OFFSET)</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true"></a><span class="pp">#define in_task()               (!(in_nmi() | in_hardirq() | in_serving_softirq()))</span></span></code></pre></div>
+<h1 data-number="6" id="下半部"><span class="header-section-number">6</span> 下半部</h1>
+<p>中断处理程序（又叫上半部，top half）执行时，最好的情况下，与该中断同级的中断（当然包括当前的中断线）会被屏蔽，中断处理程序要执行得越快越好，中断处理程序所做的事情越少越好，但至少要操作硬件对中断进行确认、有时要从硬件copy数据等，中断处理程序只能作为整个硬件处理流程的一部分，下半部（bottom half）执行与中断处理密切相关但中断处理程序本身不处理的工作。上半部和下半部的工作划分:</p>
 <ul>
 <li>如果任务对时间敏感，放在上半部。</li>
 <li>如果任务与硬件相关，放在上半部。</li>
@@ -456,34 +381,27 @@ half）执行与中断处理密切相关但中断处理程序本身不处理的�
 </ul>
 <p>一般下半部在中断处理程序一返回就会马上执行，下半部执行的时候，允许响应所有中断。有以下几种下半部机制:</p>
 <ul>
-<li>已经废弃的BH:
-接口简单，提供一个静态创建的链表，每个BH在全局范围内同步，永远不允许两个BH同时执行，有性能瓶颈。在v2.5放弃。</li>
-<li>已经废弃的任务队列（task queues）:
-当时是用来取代BH的，定义一组队列，每个队列包含一个由等待调用的函数组成的链表，对性能要求较高的子系统（如网络）不能胜任。在v2.5放弃。</li>
-<li>软中断（softirq）:
-静态定义的下半部接口，可以在所有cpu上同时执行，即使类型相同也可以。对性能要求较高的场景（如网络）使用软中断。</li>
-<li>tasklet:
-基于软中断实现的灵活性强、动态创建的下半部实现机制，不同类型的tasklet可以在不同cpu上同时执行。</li>
+<li>已经废弃的BH: 接口简单，提供一个静态创建的链表，每个BH在全局范围内同步，永远不允许两个BH同时执行，有性能瓶颈。在v2.5放弃。</li>
+<li>已经废弃的任务队列（task queues）: 当时是用来取代BH的，定义一组队列，每个队列包含一个由等待调用的函数组成的链表，对性能要求较高的子系统（如网络）不能胜任。在v2.5放弃。</li>
+<li>软中断（softirq）: 静态定义的下半部接口，可以在所有cpu上同时执行，即使类型相同也可以。对性能要求较高的场景（如网络）使用软中断。</li>
+<li>tasklet: 基于软中断实现的灵活性强、动态创建的下半部实现机制，不同类型的tasklet可以在不同cpu上同时执行。</li>
 <li>工作队列（work queues）: 取代任务队列，在进程上下文中执行。</li>
-<li><code>threaded_irq</code>:
-除了中断处理函数执行完，还会执行一个进程上下文的函数。</li>
-<li>内核定时器:
-也是软中断的一种（<code>TIMER_SOFTIRQ</code>），如果需要在确定的时间点运行某个操作，可以尝试使用定时器。</li>
+<li><code>threaded_irq</code>: 除了中断处理函数执行完，还会执行一个进程上下文的函数。</li>
+<li>内核定时器: 也是软中断的一种（<code>TIMER_SOFTIRQ</code>），如果需要在确定的时间点运行某个操作，可以尝试使用定时器。</li>
 </ul>
 <p>软中断和tasklet处于中断上下文中（所以不能休眠），工作队列和<code>threaded_irq</code>处于进程上下文中。</p>
-<h2 data-number="6.1" id="软中断"><span
-class="header-section-number">6.1</span> 软中断</h2>
+<h2 data-number="6.1" id="软中断"><span class="header-section-number">6.1</span> 软中断</h2>
 <p>软中断（softirq）使用得比较少，网络和scsi子系统直接使用了软中断，内核定时器和tasklet都是基于软中断的。一个软中断不会抢占另一个软中断，软中断只能被中断处理程序抢占，软中断处理程序执行时当前cpu上的软中断被禁止，但其他软中断可以（相同类型的软中断也可以）在其他cpu上同时执行，所以要有严格的锁保护。</p>
 <p>用以下结构表示:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">/* softirq 掩码和活动字段已移动到 irq_cpustat_t 中</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * asm/hardirq.h 以获得更好的缓存使用。  KAO</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> softirq_action</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">void</span>    <span class="op">(*</span>action<span class="op">)(</span><span class="kw">struct</span> softirq_action <span class="op">*);</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="co">/* softirq 掩码和活动字段已移动到 irq_cpustat_t 中</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="co"> * asm/hardirq.h 以获得更好的缓存使用。  KAO</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="kw">struct</span> softirq_action</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a>{</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a>        <span class="dt">void</span>    (*action)(<span class="kw">struct</span> softirq_action *);</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a>};</span></code></pre></div>
 <p>定义含有<code>NR_SOFTIRQS</code>个软中断的数组，目前<code>HI_SOFTIRQ</code>优先级最高，<code>RCU_SOFTIRQ</code>优先级最低:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">struct</span> softirq_action softirq_vec<span class="op">[</span>NR_SOFTIRQS<span class="op">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="dt">static</span> <span class="kw">struct</span> softirq_action softirq_vec[NR_SOFTIRQS]</span></code></pre></div>
 <p>待处理的软中断在以下地方被检查和执行:</p>
 <ul>
 <li>硬件中断代码处返回时。</li>
@@ -491,204 +409,199 @@ class="header-section-number">6.1</span> 软中断</h2>
 <li>显式检查和执行待处理软中断的代码中，如网络子系统。</li>
 </ul>
 <p>软中断处理程序的一个例子是:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> net_tx_action<span class="op">(</span><span class="kw">struct</span> softirq_action <span class="op">*</span>h<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="dt">void</span> net_tx_action(<span class="kw">struct</span> softirq_action *h)</span></code></pre></div>
 <p>注册软中断处理程序:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>open_softirq<span class="op">(</span>NET_TX_SOFTIRQ<span class="op">,</span> net_tx_action<span class="op">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a>open_softirq(NET_TX_SOFTIRQ, net_tx_action);</span></code></pre></div>
 <p>在<code>__do_softirq()</code>中调用软中断处理程序:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>__u32 pending <span class="op">=</span> local_softirq_pending<span class="op">();</span> <span class="co">// 读取待处理的位图</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>set_softirq_pending<span class="op">(</span><span class="dv">0</span><span class="op">);</span> <span class="co">// 将位图清0</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">((</span>softirq_bit <span class="op">=</span> ffs<span class="op">(</span>pending<span class="op">)))</span> <span class="op">{</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        h <span class="op">=</span> softirq_vec<span class="op">;</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>        h<span class="op">-&gt;</span>action<span class="op">(</span>h<span class="op">);</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        h<span class="op">++;</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        pending <span class="op">&gt;&gt;=</span> softirq_bit<span class="op">;</span> <span class="co">// 找到下一个待处理的位</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a>__u32 pending = local_softirq_pending(); <span class="co">// 读取待处理的位图</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true"></a>set_softirq_pending(<span class="dv">0</span>); <span class="co">// 将位图清0</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true"></a><span class="cf">while</span> ((softirq_bit = ffs(pending))) {</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true"></a>        h = softirq_vec;</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true"></a>        h-&gt;action(h);</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true"></a>        h++;</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true"></a>        pending &gt;&gt;= softirq_bit; <span class="co">// 找到下一个待处理的位</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true"></a>}</span></code></pre></div>
 <p>触发软中断:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 会禁止中断，然后恢复原来的状态</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>raise_softirq<span class="op">(</span>TIMER_SOFTIRQ<span class="op">);</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">// 如果中断已经被禁止，用这个函数会优化性能</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>raise_softirq_irqoff<span class="op">(</span>NET_TX_SOFTIRQ<span class="op">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="co">// 会禁止中断，然后恢复原来的状态</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a>raise_softirq(TIMER_SOFTIRQ);</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true"></a><span class="co">// 如果中断已经被禁止，用这个函数会优化性能</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true"></a>raise_softirq_irqoff(NET_TX_SOFTIRQ);</span></code></pre></div>
 <p>内核中不会立刻处理重新触发的软中断，大量软中断出现时，内核会唤醒每个处理器上的<code>ksoftirqd/n</code>（<code>n</code>是处理器编号）来处理，这些线程优先级最低（<code>nice</code>值是<code>19</code>），具体请查看<code>struct smp_hotplug_thread softirq_threads</code>。</p>
 <p>禁止和激活本地处理器的软中断和tasklet（tasklet基于软中断）用以下函数，可以嵌套使用:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> local_bh_disable<span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">// 嵌套使用时最后一个local_bh_enable激活下半部</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> local_bh_enable<span class="op">(</span><span class="dt">void</span><span class="op">)</span></span></code></pre></div>
-<h2 data-number="6.2" id="tasklet"><span
-class="header-section-number">6.2</span> tasklet</h2>
+<div class="sourceCode" id="cb22"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a><span class="dt">void</span> local_bh_disable(<span class="dt">void</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true"></a><span class="co">// 嵌套使用时最后一个local_bh_enable激活下半部</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true"></a><span class="dt">void</span> local_bh_enable(<span class="dt">void</span>)</span></code></pre></div>
+<h2 data-number="6.2" id="tasklet"><span class="header-section-number">6.2</span> tasklet</h2>
 <p>tasklet是用软中断实现的下半部机制（<code>HI_SOFTIRQ</code>和<code>TASKLET_SOFTIRQ</code>），注意名字中虽然有task，但和进程（任务）没有任何关系。</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">/* Tasklets --- BH的多线程类比。</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">   此API已弃用。请考虑使用线程IRQ：</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">   https://lore.kernel.org/lkml/20200716081538.2sivhkj4hcyrusem@linutronix.de</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co">   与通用softirqs的主要区别：tasklet   同时只在一个CPU上运行。</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co">   与BH的主要区别：不同的tasklet</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co">   可以在不同的CPU上同时运行。</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="co">   属性：</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="co">   * 如果调用tasklet_schedule()，则保证该tasklet将在此后至少在某个CPU上执行一次。</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="co">   * 如果tasklet已经被调度，但其执行尚未开始，它将仅执行一次。</span></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="co">   * 如果该tasklet已在另一个CPU上运行（或从tasklet本身调用调度），它将被重新调度以便稍后执行。</span></span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="co">   * tasklet在自身方面是严格序列化的，但不与其他tasklet序列化。如果客户端需要某种任务间同步，则需使用自旋锁。</span></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> tasklet_struct</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> tasklet_struct <span class="op">*</span>next<span class="op">;</span></span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">long</span> state<span class="op">;</span> <span class="co">// TASKLET_STATE_SCHED或TASKLET_STATE_RUN</span></span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>        atomic_t count<span class="op">;</span> <span class="co">// 引用计数</span></span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>        <span class="dt">bool</span> use_callback<span class="op">;</span></span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>        <span class="kw">union</span> <span class="op">{</span></span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>                <span class="dt">void</span> <span class="op">(*</span>func<span class="op">)(</span><span class="dt">unsigned</span> <span class="dt">long</span> data<span class="op">);</span> <span class="co">// 处理函数</span></span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>                <span class="dt">void</span> <span class="op">(*</span>callback<span class="op">)(</span><span class="kw">struct</span> tasklet_struct <span class="op">*</span>t<span class="op">);</span></span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>        <span class="op">};</span></span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">long</span> data<span class="op">;</span> <span class="co">// 处理函数的参数</span></span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a><span class="co">/* Tasklets --- BH的多线程类比。</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true"></a><span class="co">   此API已弃用。请考虑使用线程IRQ：</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true"></a><span class="co">   https://lore.kernel.org/lkml/20200716081538.2sivhkj4hcyrusem@linutronix.de</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true"></a><span class="co">   与通用softirqs的主要区别：tasklet   同时只在一个CPU上运行。</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true"></a><span class="co">   与BH的主要区别：不同的tasklet</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true"></a><span class="co">   可以在不同的CPU上同时运行。</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true"></a><span class="co">   属性：</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true"></a><span class="co">   * 如果调用tasklet_schedule()，则保证该tasklet将在此后至少在某个CPU上执行一次。</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true"></a><span class="co">   * 如果tasklet已经被调度，但其执行尚未开始，它将仅执行一次。</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true"></a><span class="co">   * 如果该tasklet已在另一个CPU上运行（或从tasklet本身调用调度），它将被重新调度以便稍后执行。</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true"></a><span class="co">   * tasklet在自身方面是严格序列化的，但不与其他tasklet序列化。如果客户端需要某种任务间同步，则需使用自旋锁。</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true"></a><span class="kw">struct</span> tasklet_struct</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true"></a>{</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true"></a>        <span class="kw">struct</span> tasklet_struct *next;</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true"></a>        <span class="dt">unsigned</span> <span class="dt">long</span> state; <span class="co">// TASKLET_STATE_SCHED或TASKLET_STATE_RUN</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true"></a>        atomic_t count; <span class="co">// 引用计数</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true"></a>        <span class="dt">bool</span> use_callback;</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true"></a>        <span class="kw">union</span> {</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true"></a>                <span class="dt">void</span> (*func)(<span class="dt">unsigned</span> <span class="dt">long</span> data); <span class="co">// 处理函数</span></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true"></a>                <span class="dt">void</span> (*callback)(<span class="kw">struct</span> tasklet_struct *t);</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true"></a>        };</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true"></a>        <span class="dt">unsigned</span> <span class="dt">long</span> data; <span class="co">// 处理函数的参数</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true"></a>};</span></code></pre></div>
 <p>已调度的tasklet存放在下面两个链表:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> DEFINE_PER_CPU<span class="op">(</span><span class="kw">struct</span> tasklet_head<span class="op">,</span> tasklet_vec<span class="op">);</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> DEFINE_PER_CPU<span class="op">(</span><span class="kw">struct</span> tasklet_head<span class="op">,</span> tasklet_hi_vec<span class="op">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true"></a><span class="dt">static</span> DEFINE_PER_CPU(<span class="kw">struct</span> tasklet_head, tasklet_vec);</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true"></a><span class="dt">static</span> DEFINE_PER_CPU(<span class="kw">struct</span> tasklet_head, tasklet_hi_vec);</span></code></pre></div>
 <p>由<code>tasklet_schedule()</code>（对应<code>TASKLET_SOFTIRQ</code>）和<code>tasklet_hi_schedule()</code>（对应<code>HI_SOFTIRQ</code>）调度，处理程序是<code>tasklet_action()</code>和<code>tasklet_hi_action()</code>。</p>
 <p>静态创建tasklet:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">// .count初始化为0，激活状态</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> DECLARE_TASKLET<span class="op">(</span>fst_tx_task<span class="op">,</span> fst_process_tx_work_q<span class="op">);</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">// .count初始化为1，禁止状态</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> DECLARE_TASKLET_DISABLED<span class="op">(</span>keyboard_tasklet<span class="op">,</span> kbd_bh<span class="op">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a><span class="co">// .count初始化为0，激活状态</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true"></a><span class="dt">static</span> DECLARE_TASKLET(fst_tx_task, fst_process_tx_work_q);</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true"></a><span class="co">// .count初始化为1，禁止状态</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true"></a><span class="dt">static</span> DECLARE_TASKLET_DISABLED(keyboard_tasklet, kbd_bh);</span></code></pre></div>
 <p>动态创建tasklet:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>tasklet_init<span class="op">(&amp;</span>ic<span class="op">-&gt;</span>i_send_tasklet<span class="op">,</span> rds_ib_tasklet_fn_send<span class="op">,</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>             <span class="op">(</span><span class="dt">unsigned</span> <span class="dt">long</span><span class="op">)</span>ic<span class="op">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true"></a>tasklet_init(&amp;ic-&gt;i_send_tasklet, rds_ib_tasklet_fn_send,</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true"></a>             (<span class="dt">unsigned</span> <span class="dt">long</span>)ic);</span></code></pre></div>
 <p>tasklet处理函数的一个例子:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> rds_ib_tasklet_fn_send<span class="op">(</span><span class="dt">unsigned</span> <span class="dt">long</span> data<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true"></a><span class="dt">static</span> <span class="dt">void</span> rds_ib_tasklet_fn_send(<span class="dt">unsigned</span> <span class="dt">long</span> data)</span></code></pre></div>
 <p>禁止或激活tasklet:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> tasklet_disable<span class="op">(</span><span class="kw">struct</span> tasklet_struct <span class="op">*</span>t<span class="op">)</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">// tasklet_disable_nosync不太安全，一般不用</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> tasklet_disable_nosync<span class="op">(</span><span class="kw">struct</span> tasklet_struct <span class="op">*</span>t<span class="op">)</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">// DECLARE_TASKLET_DISABLED创建的，也得用tasklet_enable激活</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> tasklet_enable<span class="op">(</span><span class="kw">struct</span> tasklet_struct <span class="op">*</span>t<span class="op">)</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">// 从挂起的队列中移去已调度的tasklet，先等待tasklet执行完成再移去，只能在进程上下文中使用（会休眠）</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> tasklet_kill<span class="op">(</span><span class="kw">struct</span> tasklet_struct <span class="op">*</span>t<span class="op">)</span></span></code></pre></div>
-<h2 data-number="6.3" id="工作队列"><span
-class="header-section-number">6.3</span> 工作队列</h2>
-<p>工作队列（work
-queue）把工作交给内核线程执行，在进程上下文中，允许重新调度和休眠。</p>
-<p>工作队列子系统提供了默认的工作者线程（worker
-thread），在<code>workqueue_init_early()</code>中创建了<code>system_wq</code>等工作队列，如果需要任务也可以创建自己的工作者列队，用以下结构表示:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * 外部可见的工作队列。它将发出的工作项通过其 pool_workqueues 转发到适当的 worker_pool。</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> workqueue_struct</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true"></a><span class="dt">void</span> tasklet_disable(<span class="kw">struct</span> tasklet_struct *t)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true"></a><span class="co">// tasklet_disable_nosync不太安全，一般不用</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true"></a><span class="dt">void</span> tasklet_disable_nosync(<span class="kw">struct</span> tasklet_struct *t)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true"></a><span class="co">// DECLARE_TASKLET_DISABLED创建的，也得用tasklet_enable激活</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true"></a><span class="dt">void</span> tasklet_enable(<span class="kw">struct</span> tasklet_struct *t)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true"></a><span class="co">// 从挂起的队列中移去已调度的tasklet，先等待tasklet执行完成再移去，只能在进程上下文中使用（会休眠）</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true"></a><span class="dt">void</span> tasklet_kill(<span class="kw">struct</span> tasklet_struct *t)</span></code></pre></div>
+<h2 data-number="6.3" id="工作队列"><span class="header-section-number">6.3</span> 工作队列</h2>
+<p>工作队列（work queue）把工作交给内核线程执行，在进程上下文中，允许重新调度和休眠。</p>
+<p>工作队列子系统提供了默认的工作者线程（worker thread），在<code>workqueue_init_early()</code>中创建了<code>system_wq</code>等工作队列，如果需要任务也可以创建自己的工作者列队，用以下结构表示:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a><span class="co">/*</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true"></a><span class="co"> * 外部可见的工作队列。它将发出的工作项通过其 pool_workqueues 转发到适当的 worker_pool。</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true"></a><span class="kw">struct</span> workqueue_struct</span></code></pre></div>
 <p>所有的工作者线程都要执行<code>worker_thread()</code>，初始化后死循环并开始休眠，当有操作插入到队列中，线程唤醒执行。表示工作的数据结构如下:</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> work_struct <span class="op">{</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>        atomic_long_t data<span class="op">;</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> list_head entry<span class="op">;</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>        work_func_t func<span class="op">;</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#ifdef CONFIG_LOCKDEP</span></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> lockdep_map lockdep_map<span class="op">;</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true"></a><span class="kw">struct</span> work_struct {</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true"></a>        atomic_long_t data;</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true"></a>        <span class="kw">struct</span> list_head entry;</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true"></a>        work_func_t func;</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true"></a><span class="pp">#ifdef CONFIG_LOCKDEP</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true"></a>        <span class="kw">struct</span> lockdep_map lockdep_map;</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true"></a><span class="pp">#endif</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true"></a>};</span></code></pre></div>
 <p>还有以下几个相关的结构体:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * 做实际繁重工作的可怜家伙。所有在职工人要么担任经理角色，要么在空闲列表中，或在忙碌哈希中。</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * 有关锁注释（L、I、X...）的详细信息，请参阅 workqueue.c。</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co"> * 仅在工作队列和异步中使用。</span></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> worker</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> worker_pool</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true"></a><span class="co">/*</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true"></a><span class="co"> * 做实际繁重工作的可怜家伙。所有在职工人要么担任经理角色，要么在空闲列表中，或在忙碌哈希中。</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true"></a><span class="co"> * 有关锁注释（L、I、X...）的详细信息，请参阅 workqueue.c。</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true"></a><span class="co"> * 仅在工作队列和异步中使用。</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true"></a><span class="kw">struct</span> worker</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true"></a><span class="kw">struct</span> worker_pool</span></code></pre></div>
 <p><code>struct work_struct</code>对象在<code>worker_thread()</code>中用<code>worker_pool *pool</code>的<code>worklist</code>链表连接。</p>
 <p>创建推后的工作:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 编译时静态创建</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>DECLARE_WORK<span class="op">(</span>p9_poll_work<span class="op">,</span> p9_poll_workfn<span class="op">);</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>DECLARE_DELAYED_WORK<span class="op">(</span>name<span class="op">,</span> func<span class="op">)</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co">// 运行时动态创建</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>INIT_WORK<span class="op">(&amp;</span>priv<span class="op">-&gt;</span>tx_onestep_tstamp<span class="op">,</span> enetc_tx_onestep_tstamp<span class="op">);</span></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>INIT_DELAYED_WORK<span class="op">(</span>_work<span class="op">,</span> _func<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true"></a><span class="co">// 编译时静态创建</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true"></a>DECLARE_WORK(p9_poll_work, p9_poll_workfn);</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true"></a>DECLARE_DELAYED_WORK(name, func)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true"></a><span class="co">// 运行时动态创建</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true"></a>INIT_WORK(&amp;priv-&gt;tx_onestep_tstamp, enetc_tx_onestep_tstamp);</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true"></a>INIT_DELAYED_WORK(_work, _func)</span></code></pre></div>
 <p>工作队列处理函数的一个例子是:</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> p9_poll_workfn<span class="op">(</span><span class="kw">struct</span> work_struct <span class="op">*</span>work<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true"></a><span class="dt">void</span> p9_poll_workfn(<span class="kw">struct</span> work_struct *work)</span></code></pre></div>
 <p>工作队列处理函数由工作者线程执行，运行在进程上下文中，但不能访问用户空间，因为内核线程在用户空间没有相关的内存映射（系统调用时内核代表用户空间进程运行，会映射用户空间内存）。</p>
 <p>使用默认的工作队列进行调度:</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> schedule_work<span class="op">(</span><span class="kw">struct</span> work_struct <span class="op">*</span>work<span class="op">)</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co">// 经过一段时间再执行</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> schedule_delayed_work<span class="op">(</span><span class="kw">struct</span> delayed_work <span class="op">*</span>dwork<span class="op">,</span> <span class="dt">unsigned</span> <span class="dt">long</span> delay<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true"></a><span class="dt">bool</span> schedule_work(<span class="kw">struct</span> work_struct *work)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true"></a><span class="co">// 经过一段时间再执行</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true"></a><span class="dt">bool</span> schedule_delayed_work(<span class="kw">struct</span> delayed_work *dwork, <span class="dt">unsigned</span> <span class="dt">long</span> delay)</span></code></pre></div>
 <p>刷新工作队列和取消延迟执行的工作:</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 直到队列中所有对象执行完成，注意不会取消延迟执行的工作</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>flush_scheduled_work<span class="op">()</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co">// 取消延迟执行的工作</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> cancel_delayed_work<span class="op">(</span><span class="kw">struct</span> delayed_work <span class="op">*</span>dwork<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true"></a><span class="co">// 直到队列中所有对象执行完成，注意不会取消延迟执行的工作</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true"></a>flush_scheduled_work()</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true"></a><span class="co">// 取消延迟执行的工作</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true"></a><span class="dt">bool</span> cancel_delayed_work(<span class="kw">struct</span> delayed_work *dwork)</span></code></pre></div>
 <p>创建新的工作队列:</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>create_workqueue<span class="op">(</span>name<span class="op">)</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co">// 调度执行工作, include/linux/workqueue.h</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> queue_work<span class="op">(</span><span class="kw">struct</span> workqueue_struct <span class="op">*</span>wq<span class="op">,</span> <span class="kw">struct</span> work_struct <span class="op">*</span>work<span class="op">)</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co">// 经过一段时间再执行</span></span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> queue_delayed_work<span class="op">(</span><span class="kw">struct</span> workqueue_struct <span class="op">*</span>wq<span class="op">,</span> <span class="kw">struct</span> delayed_work <span class="op">*</span>dwork<span class="op">,</span> <span class="dt">unsigned</span> <span class="dt">long</span> delay<span class="op">)</span></span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co">// 刷新指定的工作队列</span></span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>flush_workqueue<span class="op">(</span>wq<span class="op">)</span></span></code></pre></div>
-<h2 data-number="6.4" id="threaded_irq"><span
-class="header-section-number">6.4</span> <code>threaded_irq</code></h2>
+<div class="sourceCode" id="cb36"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true"></a>create_workqueue(name)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true"></a><span class="co">// 调度执行工作, include/linux/workqueue.h</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true"></a><span class="dt">bool</span> queue_work(<span class="kw">struct</span> workqueue_struct *wq, <span class="kw">struct</span> work_struct *work)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true"></a><span class="co">// 经过一段时间再执行</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true"></a><span class="dt">bool</span> queue_delayed_work(<span class="kw">struct</span> workqueue_struct *wq, <span class="kw">struct</span> delayed_work *dwork, <span class="dt">unsigned</span> <span class="dt">long</span> delay)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true"></a><span class="co">// 刷新指定的工作队列</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true"></a>flush_workqueue(wq)</span></code></pre></div>
+<h2 data-number="6.4" id="threaded_irq"><span class="header-section-number">6.4</span> <code>threaded_irq</code></h2>
 <p>以下两个函数中，<code>handler</code>函数执行于中断上下文，<code>thread_fn</code>函数执行于内核线程（进程上下文），如果<code>handler</code>函数返回<code>IRQ_WAKE_THREAD</code>，<code>thread_fn</code>函数会被执行。</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co"> *      request_threaded_irq - 分配一个中断线</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@irq:</span><span class="co"> 要分配的中断线</span></span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@handler:</span><span class="co"> 当 IRQ 发生时调用的函数。</span></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co"> *                线程中断的主要处理程序。</span></span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="co"> *                如果 handler 为 NULL 且 thread_fn != NULL，</span></span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="co"> *                则安装默认的主要处理程序 irq_default_primary_handler。</span></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@thread_fn:</span><span class="co"> 从 irq 处理程序线程中调用的函数</span></span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="co"> *                  如果为 NULL，则不创建 irq 线程</span></span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@irqflags:</span><span class="co"> 中断类型标志</span></span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@devname:</span><span class="co"> 设备的 ASCII 名称</span></span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@dev_id:</span><span class="co"> 传递回处理程序函数的 cookie</span></span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="co"> *      此调用分配中断资源并启用中断线和 IRQ 处理。从此调用开始，</span></span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="co"> *      您的处理程序函数可能会被调用。由于您的处理程序函数必须清除</span></span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="co"> *      电路板引发的任何中断，因此您必须注意初始化硬件并按照正确的</span></span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a><span class="co"> *      顺序设置中断处理程序。</span></span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a><span class="co"> *      如果您想为设备设置线程化 irq 处理程序，则需要提供 </span><span class="an">@handler</span><span class="co"> 和 </span></span>
-<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@thread_fn。@handler</span><span class="co"> 仍在硬中断上下文中调用，并且必须检查中断</span></span>
-<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a><span class="co"> *      是否来自该设备。如果是，它需要禁用设备上的中断并返回 </span></span>
-<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a><span class="co"> *      IRQ_WAKE_THREAD，这将唤醒处理程序线程并运行 </span><span class="an">@thread_fn。</span></span>
-<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a><span class="co"> *      这种分离的处理程序设计是支持共享中断所必需的。</span></span>
-<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a><span class="co"> *      dev_id 必须是全局唯一的。通常使用设备数据结构的地址作为 cookie。</span></span>
-<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a><span class="co"> *      由于处理程序接收此值，因此使用它是有意义的。</span></span>
-<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a><span class="co"> *      如果您的中断是共享的，您必须传递非 NULL dev_id，因为这在释放</span></span>
-<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a><span class="co"> *      中断时是必需的。</span></span>
-<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a><span class="co"> *      标志：</span></span>
-<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a><span class="co"> *      IRQF_SHARED             中断是共享的</span></span>
-<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a><span class="co"> *      IRQF_TRIGGER_*          指定活动边缘或电平</span></span>
-<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a><span class="co"> *      IRQF_ONESHOT            运行 thread_fn 时屏蔽中断线，thread_fn执行后重新使能中断线</span></span>
-<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb37-37"><a href="#cb37-37" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> request_threaded_irq<span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span> irq<span class="op">,</span> irq_handler_t handler<span class="op">,</span></span>
-<span id="cb37-38"><a href="#cb37-38" aria-hidden="true" tabindex="-1"></a>                         irq_handler_t thread_fn<span class="op">,</span> <span class="dt">unsigned</span> <span class="dt">long</span> irqflags<span class="op">,</span></span>
-<span id="cb37-39"><a href="#cb37-39" aria-hidden="true" tabindex="-1"></a>                         <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>devname<span class="op">,</span> <span class="dt">void</span> <span class="op">*</span>dev_id<span class="op">)</span></span>
-<span id="cb37-40"><a href="#cb37-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-41"><a href="#cb37-41" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb37-42"><a href="#cb37-42" aria-hidden="true" tabindex="-1"></a><span class="co"> *      devm_request_threaded_irq - 为受管设备分配中断线</span></span>
-<span id="cb37-43"><a href="#cb37-43" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@dev:</span><span class="co"> 请求中断的设备</span></span>
-<span id="cb37-44"><a href="#cb37-44" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@irq:</span><span class="co"> 要分配的中断线</span></span>
-<span id="cb37-45"><a href="#cb37-45" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@handler:</span><span class="co"> 当 IRQ 发生时调用的函数，如果 handler 为 NULL 且 thread_fn != NULL，</span></span>
-<span id="cb37-46"><a href="#cb37-46" aria-hidden="true" tabindex="-1"></a><span class="co"> *            则安装默认的主要处理程序 irq_default_primary_handler。</span></span>
-<span id="cb37-47"><a href="#cb37-47" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@thread_fn:</span><span class="co"> 在线程中断上下文中调用的函数。如果设备在 </span><span class="an">@handler</span><span class="co"> 中处理所有内容，则为 NULL</span></span>
-<span id="cb37-48"><a href="#cb37-48" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@irqflags:</span><span class="co"> 中断类型标志</span></span>
-<span id="cb37-49"><a href="#cb37-49" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@devname:</span><span class="co"> 设备的 ASCII 名称，如果为 NULL，则使用 dev_name(dev)</span></span>
-<span id="cb37-50"><a href="#cb37-50" aria-hidden="true" tabindex="-1"></a><span class="co"> *      </span><span class="an">@dev_id:</span><span class="co"> 传递回处理程序函数的 cookie</span></span>
-<span id="cb37-51"><a href="#cb37-51" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb37-52"><a href="#cb37-52" aria-hidden="true" tabindex="-1"></a><span class="co"> *      除了额外的 </span><span class="an">@dev</span><span class="co"> 参数外，此函数接受相同的参数并执行与</span></span>
-<span id="cb37-53"><a href="#cb37-53" aria-hidden="true" tabindex="-1"></a><span class="co"> *      request_threaded_irq() 相同的功能。使用此函数请求的 IRQ 将在</span></span>
-<span id="cb37-54"><a href="#cb37-54" aria-hidden="true" tabindex="-1"></a><span class="co"> *      驱动程序卸载时自动释放。</span></span>
-<span id="cb37-55"><a href="#cb37-55" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb37-56"><a href="#cb37-56" aria-hidden="true" tabindex="-1"></a><span class="co"> *      如果使用此函数分配的 IRQ 需要单独释放，则必须使用 devm_free_irq()。</span></span>
-<span id="cb37-57"><a href="#cb37-57" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb37-58"><a href="#cb37-58" aria-hidden="true" tabindex="-1"></a><span class="co">// devm: managed device</span></span>
-<span id="cb37-59"><a href="#cb37-59" aria-hidden="true" tabindex="-1"></a><span class="co">// 类似垃圾回收机制，不需要调用free_irq()</span></span>
-<span id="cb37-60"><a href="#cb37-60" aria-hidden="true" tabindex="-1"></a><span class="co">// 请参考补丁[at86rf230: use devm_request_irq](https://lore.kernel.org/all/1398359358-11085-5-git-send-email-alex.aring@gmail.com/)</span></span>
-<span id="cb37-61"><a href="#cb37-61" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> devm_request_threaded_irq<span class="op">(</span><span class="kw">struct</span> device <span class="op">*</span>dev<span class="op">,</span> <span class="dt">unsigned</span> <span class="dt">int</span> irq<span class="op">,</span></span>
-<span id="cb37-62"><a href="#cb37-62" aria-hidden="true" tabindex="-1"></a>                              irq_handler_t handler<span class="op">,</span> irq_handler_t thread_fn<span class="op">,</span></span>
-<span id="cb37-63"><a href="#cb37-63" aria-hidden="true" tabindex="-1"></a>                              <span class="dt">unsigned</span> <span class="dt">long</span> irqflags<span class="op">,</span> <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>devname<span class="op">,</span></span>
-<span id="cb37-64"><a href="#cb37-64" aria-hidden="true" tabindex="-1"></a>                              <span class="dt">void</span> <span class="op">*</span>dev_id<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true"></a><span class="co">/**</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true"></a><span class="co"> *      request_threaded_irq - 分配一个中断线</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@irq:</span><span class="co"> 要分配的中断线</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@handler:</span><span class="co"> 当 IRQ 发生时调用的函数。</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true"></a><span class="co"> *                线程中断的主要处理程序。</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true"></a><span class="co"> *                如果 handler 为 NULL 且 thread_fn != NULL，</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true"></a><span class="co"> *                则安装默认的主要处理程序 irq_default_primary_handler。</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@thread_fn:</span><span class="co"> 从 irq 处理程序线程中调用的函数</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true"></a><span class="co"> *                  如果为 NULL，则不创建 irq 线程</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@irqflags:</span><span class="co"> 中断类型标志</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@devname:</span><span class="co"> 设备的 ASCII 名称</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@dev_id:</span><span class="co"> 传递回处理程序函数的 cookie</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true"></a><span class="co"> *      此调用分配中断资源并启用中断线和 IRQ 处理。从此调用开始，</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true"></a><span class="co"> *      您的处理程序函数可能会被调用。由于您的处理程序函数必须清除</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true"></a><span class="co"> *      电路板引发的任何中断，因此您必须注意初始化硬件并按照正确的</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true"></a><span class="co"> *      顺序设置中断处理程序。</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true"></a><span class="co"> *      如果您想为设备设置线程化 irq 处理程序，则需要提供 </span><span class="an">@handler</span><span class="co"> 和 </span></span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@thread_fn。@handler</span><span class="co"> 仍在硬中断上下文中调用，并且必须检查中断</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true"></a><span class="co"> *      是否来自该设备。如果是，它需要禁用设备上的中断并返回 </span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true"></a><span class="co"> *      IRQ_WAKE_THREAD，这将唤醒处理程序线程并运行 </span><span class="an">@thread_fn。</span></span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true"></a><span class="co"> *      这种分离的处理程序设计是支持共享中断所必需的。</span></span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true"></a><span class="co"> *      dev_id 必须是全局唯一的。通常使用设备数据结构的地址作为 cookie。</span></span>
+<span id="cb37-26"><a href="#cb37-26" aria-hidden="true"></a><span class="co"> *      由于处理程序接收此值，因此使用它是有意义的。</span></span>
+<span id="cb37-27"><a href="#cb37-27" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb37-28"><a href="#cb37-28" aria-hidden="true"></a><span class="co"> *      如果您的中断是共享的，您必须传递非 NULL dev_id，因为这在释放</span></span>
+<span id="cb37-29"><a href="#cb37-29" aria-hidden="true"></a><span class="co"> *      中断时是必需的。</span></span>
+<span id="cb37-30"><a href="#cb37-30" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb37-31"><a href="#cb37-31" aria-hidden="true"></a><span class="co"> *      标志：</span></span>
+<span id="cb37-32"><a href="#cb37-32" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb37-33"><a href="#cb37-33" aria-hidden="true"></a><span class="co"> *      IRQF_SHARED             中断是共享的</span></span>
+<span id="cb37-34"><a href="#cb37-34" aria-hidden="true"></a><span class="co"> *      IRQF_TRIGGER_*          指定活动边缘或电平</span></span>
+<span id="cb37-35"><a href="#cb37-35" aria-hidden="true"></a><span class="co"> *      IRQF_ONESHOT            运行 thread_fn 时屏蔽中断线，thread_fn执行后重新使能中断线</span></span>
+<span id="cb37-36"><a href="#cb37-36" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb37-37"><a href="#cb37-37" aria-hidden="true"></a><span class="dt">int</span> request_threaded_irq(<span class="dt">unsigned</span> <span class="dt">int</span> irq, irq_handler_t handler,</span>
+<span id="cb37-38"><a href="#cb37-38" aria-hidden="true"></a>                         irq_handler_t thread_fn, <span class="dt">unsigned</span> <span class="dt">long</span> irqflags,</span>
+<span id="cb37-39"><a href="#cb37-39" aria-hidden="true"></a>                         <span class="dt">const</span> <span class="dt">char</span> *devname, <span class="dt">void</span> *dev_id)</span>
+<span id="cb37-40"><a href="#cb37-40" aria-hidden="true"></a></span>
+<span id="cb37-41"><a href="#cb37-41" aria-hidden="true"></a><span class="co">/**</span></span>
+<span id="cb37-42"><a href="#cb37-42" aria-hidden="true"></a><span class="co"> *      devm_request_threaded_irq - 为受管设备分配中断线</span></span>
+<span id="cb37-43"><a href="#cb37-43" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@dev:</span><span class="co"> 请求中断的设备</span></span>
+<span id="cb37-44"><a href="#cb37-44" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@irq:</span><span class="co"> 要分配的中断线</span></span>
+<span id="cb37-45"><a href="#cb37-45" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@handler:</span><span class="co"> 当 IRQ 发生时调用的函数，如果 handler 为 NULL 且 thread_fn != NULL，</span></span>
+<span id="cb37-46"><a href="#cb37-46" aria-hidden="true"></a><span class="co"> *            则安装默认的主要处理程序 irq_default_primary_handler。</span></span>
+<span id="cb37-47"><a href="#cb37-47" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@thread_fn:</span><span class="co"> 在线程中断上下文中调用的函数。如果设备在 </span><span class="an">@handler</span><span class="co"> 中处理所有内容，则为 NULL</span></span>
+<span id="cb37-48"><a href="#cb37-48" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@irqflags:</span><span class="co"> 中断类型标志</span></span>
+<span id="cb37-49"><a href="#cb37-49" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@devname:</span><span class="co"> 设备的 ASCII 名称，如果为 NULL，则使用 dev_name(dev)</span></span>
+<span id="cb37-50"><a href="#cb37-50" aria-hidden="true"></a><span class="co"> *      </span><span class="an">@dev_id:</span><span class="co"> 传递回处理程序函数的 cookie</span></span>
+<span id="cb37-51"><a href="#cb37-51" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb37-52"><a href="#cb37-52" aria-hidden="true"></a><span class="co"> *      除了额外的 </span><span class="an">@dev</span><span class="co"> 参数外，此函数接受相同的参数并执行与</span></span>
+<span id="cb37-53"><a href="#cb37-53" aria-hidden="true"></a><span class="co"> *      request_threaded_irq() 相同的功能。使用此函数请求的 IRQ 将在</span></span>
+<span id="cb37-54"><a href="#cb37-54" aria-hidden="true"></a><span class="co"> *      驱动程序卸载时自动释放。</span></span>
+<span id="cb37-55"><a href="#cb37-55" aria-hidden="true"></a><span class="co"> *</span></span>
+<span id="cb37-56"><a href="#cb37-56" aria-hidden="true"></a><span class="co"> *      如果使用此函数分配的 IRQ 需要单独释放，则必须使用 devm_free_irq()。</span></span>
+<span id="cb37-57"><a href="#cb37-57" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb37-58"><a href="#cb37-58" aria-hidden="true"></a><span class="co">// devm: managed device</span></span>
+<span id="cb37-59"><a href="#cb37-59" aria-hidden="true"></a><span class="co">// 类似垃圾回收机制，不需要调用free_irq()</span></span>
+<span id="cb37-60"><a href="#cb37-60" aria-hidden="true"></a><span class="co">// 请参考补丁[at86rf230: use devm_request_irq](https://lore.kernel.org/all/1398359358-11085-5-git-send-email-alex.aring@gmail.com/)</span></span>
+<span id="cb37-61"><a href="#cb37-61" aria-hidden="true"></a><span class="dt">int</span> devm_request_threaded_irq(<span class="kw">struct</span> device *dev, <span class="dt">unsigned</span> <span class="dt">int</span> irq,</span>
+<span id="cb37-62"><a href="#cb37-62" aria-hidden="true"></a>                              irq_handler_t handler, irq_handler_t thread_fn,</span>
+<span id="cb37-63"><a href="#cb37-63" aria-hidden="true"></a>                              <span class="dt">unsigned</span> <span class="dt">long</span> irqflags, <span class="dt">const</span> <span class="dt">char</span> *devname,</span>
+<span id="cb37-64"><a href="#cb37-64" aria-hidden="true"></a>                              <span class="dt">void</span> *dev_id)</span></code></pre></div>
 </body>
 </html>
