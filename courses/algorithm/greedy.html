@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>深度优先搜索</title>
+  <title>贪心</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -108,44 +108,39 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
-<h1 class="title">深度优先搜索</h1>
+<h1 class="title">贪心</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#leetcode-100.-相同的树"
-id="toc-leetcode-100.-相同的树"><span
-class="toc-section-number">1</span> leetcode 100. 相同的树</a></li>
+<li><a href="#leetcode-409.-最长回文串"
+id="toc-leetcode-409.-最长回文串"><span
+class="toc-section-number">1</span> leetcode 409. 最长回文串</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/courses/algorithms/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/courses/algorithms/algorithms.html">点击跳转到算法课程所有目录</a>。</p>
-<h1 data-number="1" id="leetcode-100.-相同的树"><span
-class="header-section-number">1</span> leetcode 100. 相同的树</h1>
+<h1 data-number="1" id="leetcode-409.-最长回文串"><span
+class="header-section-number">1</span> leetcode 409. 最长回文串</h1>
 <ul>
 <li><a
-href="https://leetcode.cn/problems/same-tree/description/">点击这里查看题目</a></li>
+href="https://leetcode.cn/problems/longest-palindrome/description/">点击这里查看题目</a></li>
 </ul>
 <p>c语言实现:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * Definition for a binary tree node.</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * struct TreeNode {</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"> *     int val;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"> *     struct TreeNode *left;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"> *     struct TreeNode *right;</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"> * };</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> isSameTree<span class="op">(</span><span class="kw">struct</span> TreeNode<span class="op">*</span> p<span class="op">,</span> <span class="kw">struct</span> TreeNode<span class="op">*</span> q<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>p <span class="op">==</span> NULL <span class="op">&amp;&amp;</span> q <span class="op">==</span> NULL<span class="op">)</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>p <span class="op">==</span> NULL <span class="op">||</span> q <span class="op">==</span> NULL<span class="op">)</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>p<span class="op">-&gt;</span>val <span class="op">!=</span> q<span class="op">-&gt;</span>val<span class="op">)</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> isSameTree<span class="op">(</span>p<span class="op">-&gt;</span>left<span class="op">,</span> q<span class="op">-&gt;</span>left<span class="op">)</span> <span class="op">&amp;&amp;</span> isSameTree<span class="op">(</span>p<span class="op">-&gt;</span>right<span class="op">,</span> q<span class="op">-&gt;</span>right<span class="op">);</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> longestPalindrome<span class="op">(</span><span class="dt">char</span> <span class="op">*</span> s<span class="op">){</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> str_len <span class="op">=</span> strlen<span class="op">(</span>s<span class="op">);</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> ret <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> char_count<span class="op">[</span><span class="dv">255</span><span class="op">]</span> <span class="op">=</span> <span class="op">{</span><span class="dv">0</span><span class="op">};</span> <span class="co">// 这种方式初始化为0不够保险</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    memset<span class="op">(</span>char_count<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>char_count<span class="op">));</span> <span class="co">// 这种方式初始化为0肯定没问题</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> str_len<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        char_count<span class="op">[</span>s<span class="op">[</span>i<span class="op">]]++;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">255</span><span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        ret <span class="op">+=</span> char_count<span class="op">[</span>i<span class="op">]</span> <span class="op">/</span> <span class="dv">2</span> <span class="op">*</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">// 如果出现次数为奇数，且返回值是偶数，则返回值加1</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>char_count<span class="op">[</span>i<span class="op">]</span> <span class="op">%</span> <span class="dv">2</span> <span class="op">&amp;&amp;</span> ret <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>            ret<span class="op">++;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ret<span class="op">;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>

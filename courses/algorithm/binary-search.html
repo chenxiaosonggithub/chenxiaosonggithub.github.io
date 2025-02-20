@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>回溯</title>
+  <title>二分查找</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -108,49 +108,37 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
-<h1 class="title">回溯</h1>
+<h1 class="title">二分查找</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#leetcode-1863.-找出所有子集的异或总和再求和"
-id="toc-leetcode-1863.-找出所有子集的异或总和再求和"><span
-class="toc-section-number">1</span> leetcode 1863.
-找出所有子集的异或总和再求和</a></li>
+<li><a href="#leetcode-69.-x-的平方根"
+id="toc-leetcode-69.-x-的平方根"><span
+class="toc-section-number">1</span> leetcode 69. x 的平方根</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/courses/algorithms/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/courses/algorithms/algorithms.html">点击跳转到算法课程所有目录</a>。</p>
-<h1 data-number="1"
-id="leetcode-1863.-找出所有子集的异或总和再求和"><span
-class="header-section-number">1</span> leetcode 1863.
-找出所有子集的异或总和再求和</h1>
+<h1 data-number="1" id="leetcode-69.-x-的平方根"><span
+class="header-section-number">1</span> leetcode 69. x 的平方根</h1>
 <ul>
 <li><a
-href="https://leetcode.cn/problems/sum-of-all-subset-xor-totals/description/">点击这里查看题目</a></li>
+href="https://leetcode.cn/problems/sqrtx/description/">点击这里查看题目</a></li>
 </ul>
 <p>c语言实现:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">int</span> <span class="op">*</span>g_nums<span class="op">;</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">int</span> g_sum<span class="op">;</span> <span class="co">// 不能在这里初始化为0，否则用例失败，只能在函数中赋值</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">int</span> g_nums_size<span class="op">;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> backtrack<span class="op">(</span><span class="dt">int</span> value<span class="op">,</span> <span class="dt">int</span> index<span class="op">)</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>index <span class="op">==</span> g_nums_size<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        g_sum <span class="op">+=</span> value<span class="op">;</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        backtrack<span class="op">(</span>value<span class="op">,</span> index <span class="op">+</span> <span class="dv">1</span><span class="op">);</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        backtrack<span class="op">(</span>value <span class="op">^</span> g_nums<span class="op">[</span>index<span class="op">],</span> index <span class="op">+</span> <span class="dv">1</span><span class="op">);</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> subsetXORSum<span class="op">(</span><span class="dt">int</span><span class="op">*</span> nums<span class="op">,</span> <span class="dt">int</span> numsSize<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    g_nums <span class="op">=</span> nums<span class="op">;</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    g_nums_size <span class="op">=</span> numsSize<span class="op">;</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    g_sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="co">// 只能在函数中赋值，只在全局变量初始化的时候赋值用例失败</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    backtrack<span class="op">(</span>g_sum<span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g_sum<span class="op">;</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> mySqrt<span class="op">(</span><span class="dt">int</span> x<span class="op">)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> small <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> big <span class="op">=</span> x<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> ret <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>small <span class="op">&lt;=</span> big<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> mid <span class="op">=</span> <span class="op">(</span>small<span class="op">+</span>big<span class="op">)/</span><span class="dv">2</span><span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">((</span><span class="dt">long</span> <span class="dt">long</span><span class="op">)</span>mid <span class="op">*</span> mid <span class="op">&lt;=</span> x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>            ret <span class="op">=</span> mid<span class="op">;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            small <span class="op">=</span> mid<span class="op">+</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>            big <span class="op">=</span> mid<span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ret<span class="op">;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>
