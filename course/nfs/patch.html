@@ -8,19 +8,10 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    ul.task-list{list-style: none;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -30,66 +21,39 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">nfs补丁分析</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#我写的补丁" id="toc-我写的补丁"><span
-class="toc-section-number">1</span> 我写的补丁</a></li>
-<li><a href="#其他人的补丁" id="toc-其他人的补丁"><span
-class="toc-section-number">2</span> 其他人的补丁</a></li>
+<li><a href="#我写的补丁"><span class="toc-section-number">1</span> 我写的补丁</a></li>
+<li><a href="#其他人的补丁"><span class="toc-section-number">2</span> 其他人的补丁</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<h1 data-number="1" id="我写的补丁"><span
-class="header-section-number">1</span> 我写的补丁</h1>
-<p><a
-href="https://lore.kernel.org/all/?q=chenxiaosong">点击查看kernel.org网站上我的Linux内核邮件列表</a></p>
-<p><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log/?qt=grep&amp;q=chenxiaosong">点击查看kernel.org网站上我的Linux内核仓库提交记录</a>（加载需要一丢丢时间哈）</p>
-<p>补丁集: <a
-href="https://chenxiaosong.com/course/nfs/patch/CVE-2022-24448.html">CVE-2022-24448</a></p>
-<p>补丁集: <a
-href="https://chenxiaosong.com/course/nfs/patch/nfs-handle-writeback-errors-incorrectly.html">NFS回写错误处理不正确的问题</a></p>
-<p>补丁集: <a
-href="https://lore.kernel.org/all/20220923054015.2890271-1-chenxiaosong2@huawei.com/"><code>NFS: check FMODE_EXEC from open context mode</code></a></p>
-<p><a
-href="https://lore.kernel.org/all/20241209085410.601489-1-chenxiaosong@chenxiaosong.com/">[PATCH
-4.19] NFS: fix null-ptr-deref in nfs_inode_add_request()</a></p>
-<h1 data-number="2" id="其他人的补丁"><span
-class="header-section-number">2</span> 其他人的补丁</h1>
-<p><a
-href="https://chenxiaosong.com/course/nfs/patch/xprtrdma-kmalloc-rpcrdma_ep-separate-from-rpcrdma_xp.html"><code>e28ce90083f0 xprtrdma: kmalloc rpcrdma_ep separate from rpcrdma_xprt</code></a></p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/patch/patchset-nfs_instantiate-might-succeed-leaving-dentry-negative-unhashed.html"><code>patchset: nfs_instantiate() might succeed leaving dentry negative unhashed</code></a></p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/patch/nfsd4-use-reference-count-to-free-client.html"><code>59f8e91b75ec nfsd4: use reference count to free client</code></a></p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/patch/nfsd-Fix-races-between-nfsd4_cb_release-and-nfsd4_sh.html"><code>2bbfed98a4d8 nfsd: Fix races between nfsd4_cb_release() and nfsd4_shutdown_callback()</code></a></p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/patch/nfsd-minor-4.1-callback-cleanup.html"><code>12357f1b2c8e nfsd: minor 4.1 callback cleanup</code></a></p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/patch/NFSD-Reschedule-CB-operations-when-backchannel-rpc_c.html"><code>c1ccfcf1a9bf NFSD: Reschedule CB operations when backchannel rpc_clnt is shut down</code></a></p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/patch/NFS-Improve-warning-message-when-locks-are-lost.html"><code>3e2910c7e23b NFS: Improve warning message when locks are lost.</code></a></p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/patch/nfsd-Remove-incorrect-check-in-nfsd4_validate_statei.html"><code>600df3856f0b nfsd: Remove incorrect check in nfsd4_validate_stateid</code></a></p>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 data-number="1" id="我写的补丁"><span class="header-section-number">1</span> 我写的补丁</h1>
+<p><a href="https://lore.kernel.org/all/?q=chenxiaosong">点击查看kernel.org网站上我的Linux内核邮件列表</a></p>
+<p><a href="https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log/?qt=grep&amp;q=chenxiaosong">点击查看kernel.org网站上我的Linux内核仓库提交记录</a>（加载需要一丢丢时间哈）</p>
+<p>补丁集: <a href="https://chenxiaosong.com/course/nfs/patch/CVE-2022-24448.html">CVE-2022-24448</a></p>
+<p>补丁集: <a href="https://chenxiaosong.com/course/nfs/patch/nfs-handle-writeback-errors-incorrectly.html">NFS回写错误处理不正确的问题</a></p>
+<p>补丁集: <a href="https://lore.kernel.org/all/20220923054015.2890271-1-chenxiaosong2@huawei.com/"><code>NFS: check FMODE_EXEC from open context mode</code></a></p>
+<p><a href="https://lore.kernel.org/all/20241209085410.601489-1-chenxiaosong@chenxiaosong.com/">[PATCH 4.19] NFS: fix null-ptr-deref in nfs_inode_add_request()</a></p>
+<h1 data-number="2" id="其他人的补丁"><span class="header-section-number">2</span> 其他人的补丁</h1>
+<p><a href="https://chenxiaosong.com/course/nfs/patch/xprtrdma-kmalloc-rpcrdma_ep-separate-from-rpcrdma_xp.html"><code>e28ce90083f0 xprtrdma: kmalloc rpcrdma_ep separate from rpcrdma_xprt</code></a></p>
+<p><a href="https://chenxiaosong.com/course/nfs/patch/patchset-nfs_instantiate-might-succeed-leaving-dentry-negative-unhashed.html"><code>patchset: nfs_instantiate() might succeed leaving dentry negative unhashed</code></a></p>
+<p><a href="https://chenxiaosong.com/course/nfs/patch/nfsd4-use-reference-count-to-free-client.html"><code>59f8e91b75ec nfsd4: use reference count to free client</code></a></p>
+<p><a href="https://chenxiaosong.com/course/nfs/patch/nfsd-Fix-races-between-nfsd4_cb_release-and-nfsd4_sh.html"><code>2bbfed98a4d8 nfsd: Fix races between nfsd4_cb_release() and nfsd4_shutdown_callback()</code></a></p>
+<p><a href="https://chenxiaosong.com/course/nfs/patch/nfsd-minor-4.1-callback-cleanup.html"><code>12357f1b2c8e nfsd: minor 4.1 callback cleanup</code></a></p>
+<p><a href="https://chenxiaosong.com/course/nfs/patch/NFSD-Reschedule-CB-operations-when-backchannel-rpc_c.html"><code>c1ccfcf1a9bf NFSD: Reschedule CB operations when backchannel rpc_clnt is shut down</code></a></p>
+<p><a href="https://chenxiaosong.com/course/nfs/patch/NFS-Improve-warning-message-when-locks-are-lost.html"><code>3e2910c7e23b NFS: Improve warning message when locks are lost.</code></a></p>
+<p><a href="https://chenxiaosong.com/course/nfs/patch/nfsd-Remove-incorrect-check-in-nfsd4_validate_statei.html"><code>600df3856f0b nfsd: Remove incorrect check in nfsd4_validate_stateid</code></a></p>
 </body>
 </html>
