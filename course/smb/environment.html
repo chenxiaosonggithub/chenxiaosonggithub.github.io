@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,103 +94,128 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">smb环境</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#内核server搭建"><span class="toc-section-number">1</span> 内核server搭建</a></li>
-<li><a href="#用户态server搭建"><span class="toc-section-number">2</span> 用户态server搭建</a></li>
-<li><a href="#smb客户端环境"><span class="toc-section-number">3</span> smb客户端环境</a>
+<li><a href="#内核server搭建" id="toc-内核server搭建"><span
+class="toc-section-number">1</span> 内核server搭建</a></li>
+<li><a href="#用户态server搭建" id="toc-用户态server搭建"><span
+class="toc-section-number">2</span> 用户态server搭建</a></li>
+<li><a href="#smb客户端环境" id="toc-smb客户端环境"><span
+class="toc-section-number">3</span> smb客户端环境</a>
 <ul>
-<li><a href="#linux客户端"><span class="toc-section-number">3.1</span> Linux客户端</a></li>
-<li><a href="#windows和macos客户端"><span class="toc-section-number">3.2</span> Windows和macOS客户端</a></li>
+<li><a href="#linux客户端" id="toc-linux客户端"><span
+class="toc-section-number">3.1</span> Linux客户端</a></li>
+<li><a href="#windows和macos客户端" id="toc-windows和macos客户端"><span
+class="toc-section-number">3.2</span> Windows和macOS客户端</a></li>
 </ul></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/smb/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a href="https://chenxiaosong.com/course/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
-<h1 data-number="1" id="内核server搭建"><span class="header-section-number">1</span> 内核server搭建</h1>
-<p>请查看<a href="https://chenxiaosong.com/course/smb/ksmbd.html">smb server (ksmbd)</a>。</p>
-<h1 data-number="2" id="用户态server搭建"><span class="header-section-number">2</span> 用户态server搭建</h1>
+<p><a
+href="https://chenxiaosong.com/course/smb/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
+<h1 data-number="1" id="内核server搭建"><span
+class="header-section-number">1</span> 内核server搭建</h1>
+<p>请查看<a href="https://chenxiaosong.com/course/smb/ksmbd.html">smb
+server (ksmbd)</a>。</p>
+<h1 data-number="2" id="用户态server搭建"><span
+class="header-section-number">2</span> 用户态server搭建</h1>
 <p>安装用户态工具:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">apt-get</span> install samba -y # debian</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ex">dnf</span> install samba -y # fedora</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apt-get</span> install samba <span class="at">-y</span> <span class="co"># debian</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> install samba <span class="at">-y</span> <span class="co"># fedora</span></span></code></pre></div>
 <p>用户操作（优先用<code>pdbedit</code>而不是<code>smbpasswd</code>）:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">pdbedit</span> -L # 查看cifs用户</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">pdbedit</span> -Lw # -w: 使用旧版的 smbpasswd 格式显示</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ex">pdbedit</span> -a -u root # -a: 新增，这里的用户名必须是系统用户名（在/etc/passwd中有）</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="ex">smbpasswd</span> -a root # 添加用户，这里的用户名必须是系统用户名（在/etc/passwd中有）</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="co"># 如果 smbpasswd -a 添加用户test失败，就要先创建系统用户test</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="ex">useradd</span> -s /bin/bash -d /home/test -m test</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="ex">pdbedit</span> -x -u root # 删除用户</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="ex">smbpasswd</span> -x root # 删除用户</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="ex">smbpasswd</span> -s root # 修改密码，显示密码</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="ex">smbpasswd</span> root # 修改密码，不显示密码</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="ex">smbpasswd</span> -n root # 设置成没密码, 但挂载时好像还是需要密码，以后再看为什么吧</span></code></pre></div>
-<p>编辑<a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/smb/smb.conf"><code>/etc/samba/smb.conf</code></a>配置文件（不区分大小写），具体参数用法查看<code>man 5 smb.conf</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>[<span class="ex">global</span>]</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co"># 注意注释要单独一行，不能加在配置内容后面</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co"># 通过 man smb.conf 查看</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="ex">server</span> min protocol = NT1</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="co"># 以下3行表示用smbpasswd修改密码时也会修改/etc/shadow密码</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="ex">unix</span> password sync  = yes</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="fu">passwd</span> program      = /usr/bin/passwd %u</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="ex">pam</span> password change = yes</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>[<span class="ex">TEST</span>]</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>    <span class="co"># browseable = yes</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>    <span class="co"># 如果无法访问，create mask可以设置为0770或0777（但不建议）</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>    <span class="co"># create mask = 0700</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>    <span class="co"># 如果无法访问，directory mask设置为0770或0777（但不建议）</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>    <span class="co"># directory mask = 0700</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>    <span class="co"># valid users = sonvhi</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>    <span class="co"># available = yes</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>    <span class="co"># guest ok = no</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>    <span class="ex">comment</span> = xfstests test dir</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>    <span class="ex">path</span> = /tmp/s_test</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>    <span class="ex">public</span> = yes</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a>    <span class="bu">read</span> <span class="va">only</span> <span class="va">=</span> <span class="va">no</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a>    <span class="ex">writeable</span> = yes</span></code></pre></div>
-<p>执行脚本<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/smb/samba-svr-setup.sh">samba-svr-setup.sh</a>启动用户态的samba server。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pdbedit</span> <span class="at">-L</span> <span class="co"># 查看cifs用户</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pdbedit</span> <span class="at">-Lw</span> <span class="co"># -w: 使用旧版的 smbpasswd 格式显示</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pdbedit</span> <span class="at">-a</span> <span class="at">-u</span> root <span class="co"># -a: 新增，这里的用户名必须是系统用户名（在/etc/passwd中有）</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">smbpasswd</span> <span class="at">-a</span> root <span class="co"># 添加用户，这里的用户名必须是系统用户名（在/etc/passwd中有）</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 如果 smbpasswd -a 添加用户test失败，就要先创建系统用户test</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">useradd</span> <span class="at">-s</span> /bin/bash <span class="at">-d</span> /home/test <span class="at">-m</span> test</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pdbedit</span> <span class="at">-x</span> <span class="at">-u</span> root <span class="co"># 删除用户</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">smbpasswd</span> <span class="at">-x</span> root <span class="co"># 删除用户</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">smbpasswd</span> <span class="at">-s</span> root <span class="co"># 修改密码，显示密码</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">smbpasswd</span> root <span class="co"># 修改密码，不显示密码</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">smbpasswd</span> <span class="at">-n</span> root <span class="co"># 设置成没密码, 但挂载时好像还是需要密码，以后再看为什么吧</span></span></code></pre></div>
+<p>编辑<a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/smb/smb.conf"><code>/etc/samba/smb.conf</code></a>配置文件（不区分大小写），具体参数用法查看<code>man 5 smb.conf</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[global]</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 注意注释要单独一行，不能加在配置内容后面</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 通过 man smb.conf 查看</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">server</span> min protocol = NT1</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 以下3行表示用smbpasswd修改密码时也会修改/etc/shadow密码</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">unix</span> password sync  = yes</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">passwd</span> program      = /usr/bin/passwd %u</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pam</span> password change = yes</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[TEST]</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># browseable = yes</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 如果无法访问，create mask可以设置为0770或0777（但不建议）</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># create mask = 0700</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 如果无法访问，directory mask设置为0770或0777（但不建议）</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># directory mask = 0700</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># valid users = sonvhi</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># available = yes</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># guest ok = no</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">comment</span> = xfstests test dir</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="ex">path</span> = /tmp/s_test</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="ex">public</span> = yes</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">read</span> <span class="va">only</span> <span class="op">=</span> <span class="va">no</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="ex">writeable</span> = yes</span></code></pre></div>
+<p>执行脚本<a
+href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/smb/samba-svr-setup.sh">samba-svr-setup.sh</a>启动用户态的samba
+server。</p>
 <ul>
-<li><code>nmbd</code>用于管理工作组和NetBIOS name，通过UDP开启端口137和138解析名称。</li>
-<li><code>smbd</code>权限管理, 用于管理SAMBA主机共享的目录、文件和打印机等，通过TCP来传输数据，端口为139和445(445不一定存在)。</li>
-<li><code>tdbdump,tdbtool</code>: TDB (Trivial DataBase)数据库, <code>tdb-tools</code>软件包。</li>
+<li><code>nmbd</code>用于管理工作组和NetBIOS
+name，通过UDP开启端口137和138解析名称。</li>
+<li><code>smbd</code>权限管理,
+用于管理SAMBA主机共享的目录、文件和打印机等，通过TCP来传输数据，端口为139和445(445不一定存在)。</li>
+<li><code>tdbdump,tdbtool</code>: TDB (Trivial DataBase)数据库,
+<code>tdb-tools</code>软件包。</li>
 <li><code>smbstatus</code>: 联机状况。</li>
-<li><code>smbpasswd,pdbedit</code>: 账号密码，早期<code>smbpasswd</code>，使用TDB后用<code>pdbedit</code>。</li>
+<li><code>smbpasswd,pdbedit</code>:
+账号密码，早期<code>smbpasswd</code>，使用TDB后用<code>pdbedit</code>。</li>
 <li><code>testparm</code>: 检查<code>/etc/samba/smb.conf</code>。</li>
 <li><code>smbstatus</code>: 观察状态。</li>
 </ul>
 <p>文档查看<code>/usr/share/doc/samba*</code>。</p>
 <p>如果windows和macOS客户端无法访问Linux的文件夹，Linux可能需要再进行以下步骤:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="fu">sudo</span> firewall-cmd --permanent --add-service=samba   #（允许samba服务）</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="fu">sudo</span> firewall-cmd --permanent --add-service=samba-dc    #（允许samba-dc服务，可能不需要操作）</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="fu">sudo</span> setsebool -P samba_enable_home_dirs on     #（把用户目录的samba功能使能，可读写）</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="fu">sudo</span> firewall-cmd --reload      #（防火墙重新加载配置）</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="fu">sudo</span> systemctl stop firewalld.service   #（关闭防火墙）</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="fu">sudo</span> systemctl disable firewalld.service    #（开机不启动防火墙）</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="fu">sudo</span> firewall-cmd --get-services <span class="co"># 查看所有的service</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="fu">sudo</span> firewall-cmd --list-services <span class="co"># 查看已添加的service</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="fu">sudo</span> systemctl restart smb.service      #（重启samba服务）</span></code></pre></div>
-<h1 data-number="3" id="smb客户端环境"><span class="header-section-number">3</span> smb客户端环境</h1>
-<h2 data-number="3.1" id="linux客户端"><span class="header-section-number">3.1</span> Linux客户端</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> firewall-cmd <span class="at">--permanent</span> <span class="at">--add-service</span><span class="op">=</span>samba   <span class="co">#（允许samba服务）</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> firewall-cmd <span class="at">--permanent</span> <span class="at">--add-service</span><span class="op">=</span>samba-dc    <span class="co">#（允许samba-dc服务，可能不需要操作）</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> setsebool <span class="at">-P</span> samba_enable_home_dirs on     <span class="co">#（把用户目录的samba功能使能，可读写）</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> firewall-cmd <span class="at">--reload</span>      <span class="co">#（防火墙重新加载配置）</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl stop firewalld.service   <span class="co">#（关闭防火墙）</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl disable firewalld.service    <span class="co">#（开机不启动防火墙）</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> firewall-cmd <span class="at">--get-services</span> <span class="co"># 查看所有的service</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> firewall-cmd <span class="at">--list-services</span> <span class="co"># 查看已添加的service</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart smb.service      <span class="co">#（重启samba服务）</span></span></code></pre></div>
+<h1 data-number="3" id="smb客户端环境"><span
+class="header-section-number">3</span> smb客户端环境</h1>
+<h2 data-number="3.1" id="linux客户端"><span
+class="header-section-number">3.1</span> Linux客户端</h2>
 <p>安装所需工具:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">apt</span> install cifs-utils -y # 安装 cifs 客户端, 否则无法挂载</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">dnf</span> install cifs-utils -y # fedora</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">apt</span> install smbclient -y # 查询服务器共享了哪些目录</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apt</span> install cifs-utils <span class="at">-y</span> <span class="co"># 安装 cifs 客户端, 否则无法挂载</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> install cifs-utils <span class="at">-y</span> <span class="co"># fedora</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">apt</span> install smbclient <span class="at">-y</span> <span class="co"># 查询服务器共享了哪些目录</span></span></code></pre></div>
 <p>测试:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">smbclient</span> -L //127.0.0.1 -U root</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="ex">smbclient</span> //127.0.0.1/TEST -U root # 然后用help查看帮助，ftp的语法</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="ex">nmblookup</span> -U 192.168.53.209 netbios_name</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="ex">nmblookup</span> -S netbios_name</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">smbclient</span> <span class="at">-L</span> //127.0.0.1 <span class="at">-U</span> root</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">smbclient</span> //127.0.0.1/TEST <span class="at">-U</span> root <span class="co"># 然后用help查看帮助，ftp的语法</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">nmblookup</span> <span class="at">-U</span> 192.168.53.209 netbios_name</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">nmblookup</span> <span class="at">-S</span> netbios_name</span></code></pre></div>
 <p>挂载命令:</p>
 <pre class="shell"><code>getsebool -a | grep samba
 setsebool -P samba_enable_home_dirs=1
@@ -196,8 +232,11 @@ mount -t cifs -o username=root,mfsymlinks,vers=3.0 //localhost/TEST /mnt</code><
 <li><code>smbtree</code>: 查树状目录分布图。</li>
 </ul>
 <p>错误日志请查看<code>/var/log/samba/log*</code>。</p>
-<h2 data-number="3.2" id="windows和macos客户端"><span class="header-section-number">3.2</span> Windows和macOS客户端</h2>
-<p>Windows系统下，在Windows资源管理器中输入 <code>\\192.168.122.1\TEST</code>就可访问Linux系统的文件。</p>
-<p>macOS系统下，在Finder中按快捷键<code>cmd+k</code>，跳出Connect to Server窗口，输入<code>smb://192.168.122.1/TEST</code>就可访问Linux系统的文件。</p>
+<h2 data-number="3.2" id="windows和macos客户端"><span
+class="header-section-number">3.2</span> Windows和macOS客户端</h2>
+<p>Windows系统下，在Windows资源管理器中输入
+<code>\\192.168.122.1\TEST</code>就可访问Linux系统的文件。</p>
+<p>macOS系统下，在Finder中按快捷键<code>cmd+k</code>，跳出Connect to
+Server窗口，输入<code>smb://192.168.122.1/TEST</code>就可访问Linux系统的文件。</p>
 </body>
 </html>
