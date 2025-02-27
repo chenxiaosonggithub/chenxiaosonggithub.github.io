@@ -177,9 +177,10 @@ class="header-section-number">2</span> QEMU+VNC安装系统</h1>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>-kernel tmp/casper/vmlinuz <span class="dt">\</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>-initrd tmp/casper/initrd.lz <span class="dt">\</span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>-vnc :1</span></code></pre></div>
-<p>vnc客户端可以使用ubuntu自带的Remmina（当然也可以使用其他vnc客户端），连接<code>${server_ip}:5901</code>，端口<code>5901</code>是由<code>-vnc :1</code>决定的（<code>5900 + 1</code>）。macOS要使用<a
+<p>vnc客户端可以使用ubuntu自带的Remmina（当然也可以使用其他vnc客户端），连接<code>${server_ip}:5901</code>，端口<code>5901</code>是由<code>-vnc :1</code>决定的（<code>5900 + 1</code>）。
+macOS除了使用macOS自带的<code>Screen Sharing</code>（屏幕共享），还可以使用<a
 href="https://remoteripple.com/download/">appstore安装的Remote
-Ripple</a>，好像无法使用macOS自带的vnc客户端。</p>
+Ripple</a>。</p>
 <p>安装完成后，再运行:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qemu-system-x86_64</span> <span class="dt">\</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>-enable-kvm <span class="dt">\</span></span>
@@ -192,7 +193,7 @@ Ripple</a>，好像无法使用macOS自带的vnc客户端。</p>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>-net nic,model=virtio,macaddr=00:11:22:33:44:55 <span class="dt">\</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>-net bridge,br=virbr0 <span class="dt">\</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>-vnc :1</span></code></pre></div>
-<p>但arm64的麒麟桌面系统没法这样安装，暂时还没找到原因。</p>
+<p>但arm64的麒麟桌面系统没法这样安装（但可在virt-manager中安装），暂时还没找到原因。</p>
 <p>可以在arm芯片的mac电脑中用vmware fusion安装arm64的ubuntu。</p>
 </body>
 </html>
