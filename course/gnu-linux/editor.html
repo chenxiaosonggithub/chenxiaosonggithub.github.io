@@ -363,6 +363,7 @@ evil 配置: M-x customize-group RET evil RET， 参考: https://evil.readthedoc
 暂时通过复制上一行的方式来实现</p>
 <h1 data-number="3" id="cscope"><span
 class="header-section-number">3</span> cscope</h1>
+<p>现在我使用的代码浏览插件是gtags，但很早以前用过cscope，这里也记录一下。</p>
 <p>安装cscope:
 <code>sudo apt install cscope -y</code>，但有很多bug，建议使用<a
 href="https://sourceforge.net/p/cscope/cscope/ci/master/tree/">源码</a>安装，可以使用<a
@@ -370,7 +371,7 @@ href="https://sourceforge.net/p/cscope/cscope/ci/configure/tree/"><code>configur
 <a
 href="https://sourceforge.net/p/cscope/cscope/ci/master/tree/"><code>master(eaea31cb93ec)</code></a>和<a
 href="https://sourceforge.net/p/cscope/cscope/ci/no_generated_files_in_repo/tree/">`no_generated_files_in_repo(9c49a74d7ac1)</a>分支，再合入<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/editor/0001-cscope-emacs-change-cscope-select-entry-other-window.patch">更改cscope快捷键的补丁</a>。</p>
+href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/0001-cscope-emacs-change-cscope-select-entry-other-window.patch">更改cscope快捷键的补丁</a>。</p>
 <div class="sourceCode" id="cb13"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ubuntu/raspberry-pi build environment</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install autoconf <span class="at">-y</span></span>
@@ -387,7 +388,7 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#
 <span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="ex">../configure</span> <span class="at">--prefix</span><span class="op">=</span>/path/to/install</span>
 <span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span></span></code></pre></div>
 <p>将脚本文件<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/editor/cscope_maps.vim">cscope_maps.vim</a>放到<code>~/.vim/plugin/</code>路径下，即可使用快捷键（快捷键种类查看
+href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/cscope_maps.vim">cscope_maps.vim</a>放到<code>~/.vim/plugin/</code>路径下，即可使用快捷键（快捷键种类查看
 <code>:cs help</code>），如<code>:cs find s word</code>查找word引用可使用快捷键<code>ctrl加\加s</code>（按顺序依次按3个键）。</p>
 <p>使用<code>cscope -Rqbk</code>（当需要包含<code>/usr/include</code>头文件时，不使用<code>-k</code>选项）编译代码生成<code>cscope.out</code>文件，在<code>cscope.out</code>文件所在目录打开<code>vim</code>即可加载<code>cscope.out</code>文件。Linux内核代码使用<code>make cscope</code>命令生成索引文件。</p>
 </body>

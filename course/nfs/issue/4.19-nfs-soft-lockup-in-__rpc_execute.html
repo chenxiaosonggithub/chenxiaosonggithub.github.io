@@ -434,17 +434,18 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">17787</span>   0.494499755 22.14.64.15 22.14.23.3  TCP 78  2049 → 766 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=20323137 Ack=13577 Win=5623 Len=0 TSval=4228514640 TSecr=255410915</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20323137, Ack: 13577, Len: 0</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="ex">17788</span>   0.503423525 22.14.64.15 22.14.23.3  TCP 174 [TCP Retransmission] 2049 → 766 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=20323041 Ack=13577 Win=5623 Len=96 TSval=4228514649 TSecr=255410915</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20323041, Ack: 13577, Len: 96</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="ex">17789</span>   0.711405976 22.14.64.15 22.14.23.3  TCP 1526    [TCP Retransmission] 2049 → 766 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=20317249 Ack=13577 Win=5623 Len=1448 TSval=4228514857 TSecr=255410915</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20317249, Ack: 13577, Len: 1448</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="ex">17790</span>   1.139363629 22.14.64.15 22.14.23.3  TCP 1526    [TCP Retransmission] 2049 → 766 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=20317249 Ack=13577 Win=5623 Len=1448 TSval=4228515285 TSecr=255410915</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20317249, Ack: 13577, Len: 1448</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="ex">17791</span>   1.971276412 22.14.64.15 22.14.23.3  TCP 1526    [TCP Retransmission] 2049 → 766 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=20317249 Ack=13577 Win=5623 Len=1448 TSval=4228516117 TSecr=255410915</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20317249, Ack: 13577, Len: 1448</span></code></pre></div>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 用 tcp.seq == 20323041 找到序号一样的包，但用 tcp.ack == 20323041 找不到客户端发的请求包</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="ex">17788</span>   0.503423525 22.14.64.15 22.14.23.3  TCP 174 [TCP Retransmission] 2049 → 766 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=20323041 Ack=13577 Win=5623 Len=96 TSval=4228514649 TSecr=255410915</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20323041, Ack: 13577, Len: 96</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="ex">17789</span>   0.711405976 22.14.64.15 22.14.23.3  TCP 1526    [TCP Retransmission] 2049 → 766 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=20317249 Ack=13577 Win=5623 Len=1448 TSval=4228514857 TSecr=255410915</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20317249, Ack: 13577, Len: 1448</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="ex">17790</span>   1.139363629 22.14.64.15 22.14.23.3  TCP 1526    [TCP Retransmission] 2049 → 766 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=20317249 Ack=13577 Win=5623 Len=1448 TSval=4228515285 TSecr=255410915</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20317249, Ack: 13577, Len: 1448</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="ex">17791</span>   1.971276412 22.14.64.15 22.14.23.3  TCP 1526    [TCP Retransmission] 2049 → 766 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=20317249 Ack=13577 Win=5623 Len=1448 TSval=4228516117 TSecr=255410915</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20317249, Ack: 13577, Len: 1448</span></code></pre></div>
 <h1 data-number="6" id="补丁"><span
 class="header-section-number">6</span> 补丁</h1>
 <ul>
