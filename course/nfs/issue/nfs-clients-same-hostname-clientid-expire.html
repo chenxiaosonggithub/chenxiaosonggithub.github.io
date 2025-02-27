@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -94,143 +83,115 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">多个NFS客户端使用相同的hostname导致clientid过期</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#问题描述" id="toc-问题描述"><span
-class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#分析" id="toc-分析"><span
-class="toc-section-number">2</span> 分析</a></li>
-<li><a href="#调试" id="toc-调试"><span
-class="toc-section-number">3</span> 调试</a></li>
-<li><a href="#结论" id="toc-结论"><span
-class="toc-section-number">4</span> 结论</a></li>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#分析"><span class="toc-section-number">2</span> 分析</a></li>
+<li><a href="#调试"><span class="toc-section-number">3</span> 调试</a></li>
+<li><a href="#结论"><span class="toc-section-number">4</span> 结论</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<h1 data-number="1" id="问题描述"><span
-class="header-section-number">1</span> 问题描述</h1>
-<p>NFS客户端采用NFSv4.2(vers=4.2)挂载时，tcpdump抓包发现，NFS服务端经常SEQUENCE
-返回 NFS4ERR_BADSESSION错误导致
-客户端主动DESTROY_SESSION和CREATE_SESSION，客户端创建会话时，服务端返回NFS4ERR_STATLE_CLIENTID错误，客户端需要重新EXCHANGE_ID后CREATE_SESSION才成功，因为反复出现这种现象，导致客户端读写文件会出现偶尔错误，系统errno
-会返回5。客户端改成
-NFSv4.0和NFSv4.1没有出现这种现象。client日志中打印了<code>NFS: nfs4_reclaim_open_state: Lock reclaim failed!</code>，server日志中打印了<code>NFSD: client xx.xx.xx.xx testing state ID with incorrect client ID</code>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>NFS客户端采用NFSv4.2(vers=4.2)挂载时，tcpdump抓包发现，NFS服务端经常SEQUENCE 返回 NFS4ERR_BADSESSION错误导致 客户端主动DESTROY_SESSION和CREATE_SESSION，客户端创建会话时，服务端返回NFS4ERR_STATLE_CLIENTID错误，客户端需要重新EXCHANGE_ID后CREATE_SESSION才成功，因为反复出现这种现象，导致客户端读写文件会出现偶尔错误，系统errno 会返回5。客户端改成 NFSv4.0和NFSv4.1没有出现这种现象。client日志中打印了<code>NFS: nfs4_reclaim_open_state: Lock reclaim failed!</code>，server日志中打印了<code>NFSD: client xx.xx.xx.xx testing state ID with incorrect client ID</code>。</p>
 <p>挂载参数:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">ro,noexec,relatime,vers=4.1,rsize=1048576,wsize=1048576,namlen=255,soft,proto=tcp,timeo=10,retrans=2,sec=sys,clientaddr=xx.xx.xx.xx,local_lock=none,addr=xx.xx.xx.xx</span><span class="kw">)</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">ro,noexec,relatime,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,soft,proto=tcp,timeo=10,retrans=2,sec=sys,clientaddr=xx.xx.xx.xx,local_lock=none,addr=xx.xx.xx.xx</span><span class="kw">)</span></span></code></pre></div>
-<h1 data-number="2" id="分析"><span
-class="header-section-number">2</span> 分析</h1>
-<p>关于打印日志<code>NFS: nfs4_reclaim_open_state: Lock reclaim failed!</code>，请查看<a
-href="https://chenxiaosong.com/course/nfs/patch/NFS-Improve-warning-message-when-locks-are-lost.html"><code>3e2910c7e23b NFS: Improve warning message when locks are lost.</code></a>，注意nfs4.0、4.1和4.2都会有这个打印。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">(</span><span class="ex">ro</span>,noexec,relatime,vers=4.1,rsize=1048576,wsize=1048576,namlen=255,soft,proto=tcp,timeo=10,retrans=2,sec=sys,clientaddr=xx.xx.xx.xx,local_lock=none,addr=xx.xx.xx.xx<span class="kw">)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">(</span><span class="ex">ro</span>,noexec,relatime,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,soft,proto=tcp,timeo=10,retrans=2,sec=sys,clientaddr=xx.xx.xx.xx,local_lock=none,addr=xx.xx.xx.xx<span class="kw">)</span></span></code></pre></div>
+<h1 data-number="2" id="分析"><span class="header-section-number">2</span> 分析</h1>
+<p>关于打印日志<code>NFS: nfs4_reclaim_open_state: Lock reclaim failed!</code>，请查看<a href="https://chenxiaosong.com/course/nfs/patch/NFS-Improve-warning-message-when-locks-are-lost.html"><code>3e2910c7e23b NFS: Improve warning message when locks are lost.</code></a>，注意nfs4.0、4.1和4.2都会有这个打印。</p>
 <p>关于打印<code>NFSD: client xx.xx.xx.xx testing state ID with incorrect client ID</code>已经被补丁<code>663e36f07666 nfsd4: kill warnings on testing stateids with mismatched clientids</code>移除。</p>
-<h1 data-number="3" id="调试"><span
-class="header-section-number">3</span> 调试</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> ro,noexec,relatime,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,soft,proto=tcp,timeo=10,retrans=2,sec=sys,local_lock=none 192.168.53.214:s_test /mnt</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">--interface</span><span class="op">=</span>ens2 <span class="at">--buffer-size</span><span class="op">=</span>20480 <span class="at">-w</span> good.cap <span class="kw">&amp;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /mnt/file</span></code></pre></div>
+<h1 data-number="3" id="调试"><span class="header-section-number">3</span> 调试</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="fu">mount</span> -t nfs -o ro,noexec,relatime,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,soft,proto=tcp,timeo=10,retrans=2,sec=sys,local_lock=none 192.168.53.214:s_test /mnt</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">tcpdump</span> --interface=ens2 --buffer-size=20480 -w good.cap <span class="kw">&amp;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="fu">cat</span> /mnt/file</span></code></pre></div>
 <p>打开server端的打印开关:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7FFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># NFSDDBG_ALL</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="bu">echo</span> 0x7FFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># NFSDDBG_ALL</span></span></code></pre></div>
 <p>有以下打印:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">__find_in_sessionid_hashtbl:</span> session not found</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">__find_in_sessionid_hashtbl</span>: session not found</span></code></pre></div>
 <p>kprobe跟踪函数:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/tracing/</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> __find_in_sessionid_hashtbl <span class="co"># 找不到</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> find_in_sessionid_hashtbl</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> init_session</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> unhash_session <span class="co"># 找不到</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> nfsd4_destroy_session</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> unhash_client_locked</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> tracing_on</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;p:p_find_in_sessionid_hashtbl find_in_sessionid_hashtbl&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/enable</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/trigger</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/trigger</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/enable</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;-:p_find_in_sessionid_hashtbl&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;p:p_init_session init_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_init_session/enable</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_init_session/trigger</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_init_session/trigger</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_init_session/enable</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;-:p_init_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;p:p_nfsd4_destroy_session nfsd4_destroy_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/enable</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/trigger</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/trigger</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/enable</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;-:p_nfsd4_destroy_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;p:p_unhash_client_locked unhash_client_locked&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/enable</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/trigger</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/trigger</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/enable</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;-:p_unhash_client_locked&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> trace <span class="co"># 清除trace信息</span></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> trace_pipe</span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>kthread</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  nfsd</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    svc_process</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      svc_process_common</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        nfsd_dispatch</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>          nfsd4_proc_compound</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>nfsd4_proc_compound</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  nfsd4_sequence</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    find_in_sessionid_hashtbl</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      __find_in_sessionid_hashtbl</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        idx <span class="op">=</span> hash_sessionid</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>nfsd4_proc_compound</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  nfsd4_create_session</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    init_session</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>      idx <span class="op">=</span> hash_sessionid</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>      list_add<span class="op">(&amp;</span>new<span class="op">-&gt;</span>se_hash<span class="op">,</span> <span class="op">&amp;</span>nn<span class="op">-&gt;</span>sessionid_hashtbl<span class="op">[</span>idx<span class="op">])</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>nfsd4_proc_compound</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 执行umount命令时，先执行到这里，再执行到unhash_client_locked</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  nfsd4_destroy_session</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    unhash_session</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>      list_del<span class="op">(&amp;</span>ses<span class="op">-&gt;</span>se_hash<span class="op">)</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>nfsd4_proc_compound</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  nfsd4_destroy_clientid</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    unhash_client</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>      unhash_client_locked</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>        list_del_init<span class="op">(&amp;</span>ses<span class="op">-&gt;</span>se_hash<span class="op">)</span></span></code></pre></div>
-<h1 data-number="4" id="结论"><span
-class="header-section-number">4</span> 结论</h1>
-<p>当多个 NFS
-客户端使用相同的主机名时，默认的统一客户端字符串可能不够唯一，导致 NFS
-服务器无法区分不同的客户端。NFS
-服务器会将第二个客户端视为第一个客户端重启后的结果，从而使第一个客户端的
-clientid 失效/过期，阻止第一个客户端进行通信。具体查看<a
-href="https://access.redhat.com/solutions/6395261">NFSv4 clientid was
-expired suddenly due to use same hostname on several NFS
-clients</a>。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="bu">cd</span> /sys/kernel/debug/tracing/</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> __find_in_sessionid_hashtbl <span class="co"># 找不到</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> find_in_sessionid_hashtbl</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> init_session</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> unhash_session <span class="co"># 找不到</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> nfsd4_destroy_session</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> unhash_client_locked</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> tracing_on</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;p:p_find_in_sessionid_hashtbl find_in_sessionid_hashtbl&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/enable</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/trigger</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/trigger</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/enable</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;-:p_find_in_sessionid_hashtbl&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;p:p_init_session init_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_init_session/enable</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_init_session/trigger</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_init_session/trigger</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_init_session/enable</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;-:p_init_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;p:p_nfsd4_destroy_session nfsd4_destroy_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/enable</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/trigger</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/trigger</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/enable</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;-:p_nfsd4_destroy_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;p:p_unhash_client_locked unhash_client_locked&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/enable</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true"></a><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/trigger</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/trigger</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/enable</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;-:p_unhash_client_locked&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> trace <span class="co"># 清除trace信息</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true"></a><span class="fu">cat</span> trace_pipe</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>kthread</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>  nfsd</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    svc_process</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>      svc_process_common</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>        nfsd_dispatch</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>          nfsd4_proc_compound</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>nfsd4_proc_compound</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>  nfsd4_sequence</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>    find_in_sessionid_hashtbl</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>      __find_in_sessionid_hashtbl</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>        idx = hash_sessionid</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a>nfsd4_proc_compound</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>  nfsd4_create_session</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a>    init_session</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>      idx = hash_sessionid</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>      list_add(&amp;new-&gt;se_hash, &amp;nn-&gt;sessionid_hashtbl[idx])</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true"></a>nfsd4_proc_compound</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true"></a>  <span class="co">// 执行umount命令时，先执行到这里，再执行到unhash_client_locked</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true"></a>  nfsd4_destroy_session</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true"></a>    unhash_session</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true"></a>      list_del(&amp;ses-&gt;se_hash)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true"></a></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true"></a>nfsd4_proc_compound</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true"></a>  nfsd4_destroy_clientid</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true"></a>    unhash_client</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true"></a>      unhash_client_locked</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true"></a>        list_del_init(&amp;ses-&gt;se_hash)</span></code></pre></div>
+<h1 data-number="4" id="结论"><span class="header-section-number">4</span> 结论</h1>
+<p>当多个 NFS 客户端使用相同的主机名时，默认的统一客户端字符串可能不够唯一，导致 NFS 服务器无法区分不同的客户端。NFS 服务器会将第二个客户端视为第一个客户端重启后的结果，从而使第一个客户端的 clientid 失效/过期，阻止第一个客户端进行通信。具体查看<a href="https://access.redhat.com/solutions/6395261">NFSv4 clientid was expired suddenly due to use same hostname on several NFS clients</a>。</p>
 </body>
 </html>

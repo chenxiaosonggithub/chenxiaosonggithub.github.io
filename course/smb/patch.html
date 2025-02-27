@@ -8,19 +8,10 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    ul.task-list{list-style: none;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -30,52 +21,32 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">smb补丁分析</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#我写的补丁" id="toc-我写的补丁"><span
-class="toc-section-number">1</span> 我写的补丁</a></li>
+<li><a href="#我写的补丁"><span class="toc-section-number">1</span> 我写的补丁</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/course/smb/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/course/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
-<h1 data-number="1" id="我写的补丁"><span
-class="header-section-number">1</span> 我写的补丁</h1>
-<p><a
-href="https://lore.kernel.org/all/?q=chenxiaosong">点击查看kernel.org网站上我的Linux内核邮件列表</a></p>
-<p><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log/?qt=grep&amp;q=chenxiaosong">点击查看kernel.org网站上我的Linux内核仓库提交记录</a>（加载需要一丢丢时间哈）</p>
-<p><a
-href="https://chenxiaosong.com/course/smb/patch/CVE-2024-46742.html">CVE-2024-46742:
-<code>4e8771a3666c8 smb/server: fix potential null-ptr-deref of lease_ctx_info in smb2_open()</code></a></p>
-<p><a
-href="https://patchwork.kernel.org/project/cifs-client/patch/20221104074441.634677-1-chenxiaosong2@huawei.com/"><code>542228db2f28f cifs: fix use-after-free on the link name</code></a></p>
-<p><a
-href="https://patchwork.kernel.org/project/cifs-client/patch/20221119045159.1400244-1-chenxiaosong2@huawei.com/"><code>502487847743 cifs: fix missing unlock in cifs_file_copychunk_range()</code></a></p>
-<p><a
-href="https://patchwork.kernel.org/project/cifs-client/patch/20230302135804.2583061-1-chenxiaosong2@huawei.com/"><code>2624b445544f ksmbd: fix possible refcount leak in smb2_open()</code></a></p>
-<p><a
-href="https://lore.kernel.org/all/20240822082101.391272-2-chenxiaosong@chenxiaosong.com/"><code>2186a116538a7 smb/server: fix return value of smb2_open()</code></a></p>
-<p><a
-href="https://lore.kernel.org/all/20220518145649.2487377-1-chenxiaosong2@huawei.com/"><code>2b058acecf56f cifs: return the more nuanced writeback error on close()</code></a></p>
-<p>补丁集: <a
-href="https://lore.kernel.org/all/20240822082101.391272-1-chenxiaosong@chenxiaosong.com/"><code>[PATCH v2 00/12] smb: fix some bugs, move duplicate definitions to common header file, and some small cleanups</code></a></p>
+<p><a href="https://chenxiaosong.com/course/smb/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
+<h1 data-number="1" id="我写的补丁"><span class="header-section-number">1</span> 我写的补丁</h1>
+<p><a href="https://lore.kernel.org/all/?q=chenxiaosong">点击查看kernel.org网站上我的Linux内核邮件列表</a></p>
+<p><a href="https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log/?qt=grep&amp;q=chenxiaosong">点击查看kernel.org网站上我的Linux内核仓库提交记录</a>（加载需要一丢丢时间哈）</p>
+<p><a href="https://chenxiaosong.com/course/smb/patch/CVE-2024-46742.html">CVE-2024-46742: <code>4e8771a3666c8 smb/server: fix potential null-ptr-deref of lease_ctx_info in smb2_open()</code></a></p>
+<p><a href="https://patchwork.kernel.org/project/cifs-client/patch/20221104074441.634677-1-chenxiaosong2@huawei.com/"><code>542228db2f28f cifs: fix use-after-free on the link name</code></a></p>
+<p><a href="https://patchwork.kernel.org/project/cifs-client/patch/20221119045159.1400244-1-chenxiaosong2@huawei.com/"><code>502487847743 cifs: fix missing unlock in cifs_file_copychunk_range()</code></a></p>
+<p><a href="https://patchwork.kernel.org/project/cifs-client/patch/20230302135804.2583061-1-chenxiaosong2@huawei.com/"><code>2624b445544f ksmbd: fix possible refcount leak in smb2_open()</code></a></p>
+<p><a href="https://lore.kernel.org/all/20240822082101.391272-2-chenxiaosong@chenxiaosong.com/"><code>2186a116538a7 smb/server: fix return value of smb2_open()</code></a></p>
+<p><a href="https://lore.kernel.org/all/20220518145649.2487377-1-chenxiaosong2@huawei.com/"><code>2b058acecf56f cifs: return the more nuanced writeback error on close()</code></a></p>
+<p>补丁集: <a href="https://lore.kernel.org/all/20240822082101.391272-1-chenxiaosong@chenxiaosong.com/"><code>[PATCH v2 00/12] smb: fix some bugs, move duplicate definitions to common header file, and some small cleanups</code></a></p>
 </body>
 </html>

@@ -8,19 +8,10 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    ul.task-list{list-style: none;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -30,167 +21,86 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">陈孝松博客</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#课程" id="toc-课程"><span
-class="toc-section-number">1</span> 课程</a></li>
-<li><a href="#博客配套视频" id="toc-博客配套视频"><span
-class="toc-section-number">2</span> 博客配套视频</a></li>
-<li><a href="#linux内核" id="toc-linux内核"><span
-class="toc-section-number">3</span> Linux内核</a></li>
-<li><a href="#nfs网络文件系统" id="toc-nfs网络文件系统"><span
-class="toc-section-number">4</span> NFS（网络文件系统）</a></li>
-<li><a href="#smbcifs文件系统" id="toc-smbcifs文件系统"><span
-class="toc-section-number">5</span> SMB(CIFS)文件系统</a></li>
-<li><a href="#xfs文件系统" id="toc-xfs文件系统"><span
-class="toc-section-number">6</span> XFS文件系统</a></li>
-<li><a href="#文件系统" id="toc-文件系统"><span
-class="toc-section-number">7</span> 文件系统</a></li>
-<li><a href="#linux环境" id="toc-linux环境"><span
-class="toc-section-number">8</span> Linux环境</a></li>
-<li><a href="#还没有分类" id="toc-还没有分类"><span
-class="toc-section-number">9</span> 还没有分类</a></li>
-<li><a href="#翻译" id="toc-翻译"><span
-class="toc-section-number">10</span> 翻译</a></li>
+<li><a href="#课程"><span class="toc-section-number">1</span> 课程</a></li>
+<li><a href="#博客配套视频"><span class="toc-section-number">2</span> 博客配套视频</a></li>
+<li><a href="#linux内核"><span class="toc-section-number">3</span> Linux内核</a></li>
+<li><a href="#nfs网络文件系统"><span class="toc-section-number">4</span> NFS（网络文件系统）</a></li>
+<li><a href="#smbcifs文件系统"><span class="toc-section-number">5</span> SMB(CIFS)文件系统</a></li>
+<li><a href="#xfs文件系统"><span class="toc-section-number">6</span> XFS文件系统</a></li>
+<li><a href="#文件系统"><span class="toc-section-number">7</span> 文件系统</a></li>
+<li><a href="#linux环境"><span class="toc-section-number">8</span> Linux环境</a></li>
+<li><a href="#还没有分类"><span class="toc-section-number">9</span> 还没有分类</a></li>
+<li><a href="#翻译"><span class="toc-section-number">10</span> 翻译</a></li>
 </ul>
 </nav>
 <p>我的大部分工作都是和开源社区打交道，所以我的笔记也都可以公开。我的笔记没有什么高大上的内容，只是记录自己学到的一些知识点，当然如果能对其他热爱技术的朋友有所启发，我就更开心了。</p>
-<p>博客内容还在完善和整理中，更多的内容可以查看我的博客的<a
-href="https://github.com/chenxiaosonggithub/blog">GitHub仓库</a>或<a
-href="https://gitee.com/chenxiaosonggitee/blog">gitee仓库</a>。</p>
-<p>我的博客网页只是简单的内容展示，如果要进行关键字搜索，可以在<a
-href="https://github.com/search?q=repo%3Achenxiaosonggithub%2Fblog+&amp;type=code">GitHub仓库上搜索</a>。</p>
-<h1 data-number="1" id="课程"><span
-class="header-section-number">1</span> 课程</h1>
-<p><a
-href="https://chenxiaosong.com/course.html">点击查看课程（持续更新中）</a></p>
+<p>博客内容还在完善和整理中，更多的内容可以查看我的博客的<a href="https://github.com/chenxiaosonggithub/blog">GitHub仓库</a>或<a href="https://gitee.com/chenxiaosonggitee/blog">gitee仓库</a>。</p>
+<p>我的博客网页只是简单的内容展示，如果要进行关键字搜索，可以在<a href="https://github.com/search?q=repo%3Achenxiaosonggithub%2Fblog+&amp;type=code">GitHub仓库上搜索</a>。</p>
+<h1 data-number="1" id="课程"><span class="header-section-number">1</span> 课程</h1>
+<p><a href="https://chenxiaosong.com/course.html">点击查看课程（持续更新中）</a></p>
 <p>利用业余时间写了一些教程，同时也录了配套的视频，最大的目的是为了整理自己以前学习到的知识点，当然也为了学习还没学到的知识点，查缺补漏，温故知新。</p>
-<h1 data-number="2" id="博客配套视频"><span
-class="header-section-number">2</span> 博客配套视频</h1>
-<p><a
-href="https://chenxiaosong.com/video.html">点击这里查看博客配套的教学视频</a></p>
-<h1 data-number="3" id="linux内核"><span
-class="header-section-number">3</span> Linux内核</h1>
-<p><a
-href="https://chenxiaosong.com/course/kernel/kernel.html">点击查看Linux内核课程（持续更新中）</a></p>
-<p><a
-href="https://chenxiaosong.com/src/kernel-environment/kernel-qemu-kvm.html">QEMU/KVM环境搭建与使用</a></p>
-<p><a
-href="https://chenxiaosong.com/src/strace-fault-inject/strace-fault-inject.html">strace内存分配失败故障注入</a></p>
-<p><a
-href="https://chenxiaosong.com/src/kernel/openeuler-sysmonitor.html">openEuler的sysmonitor</a></p>
-<p><a
-href="https://chenxiaosong.com/src/kernel/kprobe-scsi-data.html">使用kprobe监控scsi的读写数据</a></p>
-<p><a
-href="https://chenxiaosong.com/src/kernel/gio-to-mount.html">gio执行慢的临时解决办法</a></p>
-<p><a
-href="https://chenxiaosong.com/course/kernel/test.html#syzkaller">syzkaller
-- 内核模糊测试工具</a></p>
-<h1 data-number="4" id="nfs网络文件系统"><span
-class="header-section-number">4</span> NFS（网络文件系统）</h1>
-<p><a
-href="https://chenxiaosong.com/course/nfs/nfs.html">点击查看nfs文件系统课程（持续更新中）</a></p>
-<p><a
-href="https://chenxiaosong.com/src/nfs/4.19-rdma-not-supported.html">4.19
-rdma协议不支持的问题</a></p>
-<p><a
-href="https://chenxiaosong.com/src/nfs/4.19-nfs-mount-hung.html">4.19
-nfs lazy umount 后无法挂载的问题</a></p>
-<p><a
-href="https://chenxiaosong.com/src/nfs/unable-to-initialize-client-recovery-tracking.html">重启nfs
-server后client打开文件卡顿很长时间的问题</a></p>
-<p><a
-href="https://chenxiaosong.com/src/nfs/4.19-ltp-nfs-fail.html">4.19 ltp
-nfs测试失败问题</a></p>
-<p><a
-href="https://chenxiaosong.com/src/nfs/nfs-no-net-oom.html">nfs断网导致oom的问题</a></p>
-<h1 data-number="5" id="smbcifs文件系统"><span
-class="header-section-number">5</span> SMB(CIFS)文件系统</h1>
-<p><a
-href="https://chenxiaosong.com/course/smb/smb.html">点击查看smb文件系统课程（持续更新中）</a></p>
-<p><a
-href="https://chenxiaosong.com/course/smb/issue/4.19-null-ptr-deref-in-cifs_reconnect.html">4.19
-cifs_reconnect()空指针解引用问题</a></p>
-<p><a
-href="https://chenxiaosong.com/course/smb/issue/cifs-newfstatat-ENOTSUPP.html">cifs
-newfstatat()系统调用报错ENOTSUPP</a></p>
-<h1 data-number="6" id="xfs文件系统"><span
-class="header-section-number">6</span> XFS文件系统</h1>
-<p><a href="https://chenxiaosong.com/src/xfs/xfs-shutdown-fs.html">xfs
-agf没落盘的问题</a></p>
-<h1 data-number="7" id="文件系统"><span
-class="header-section-number">7</span> 文件系统</h1>
-<p><a
-href="https://chenxiaosong.com/src/filesystem/microsoft-fs.html">微软文件系统</a></p>
-<p><a
-href="https://chenxiaosong.com/src/btrfs/4.19-btrfs-forced-readonly.html">4.19
-btrfs文件系统变成只读的问题</a></p>
-<p><a
-href="https://chenxiaosong.com/src/filesystem/tmpfs-oom.html">tmpfs不断写导致oom的问题</a></p>
-<p><a
-href="https://chenxiaosong.com/src/filesystem/lazy-umount.html">文件系统延迟卸载</a></p>
-<h1 data-number="8" id="linux环境"><span
-class="header-section-number">8</span> Linux环境</h1>
-<p><a
-href="https://chenxiaosong.com/course/gnu-linux/install.html#vnc">VNC远程桌面</a></p>
-<p><a
-href="https://chenxiaosong.com/src/blog-web/blog-web.html">如何拥有个人域名的网站和邮箱</a></p>
-<p><a
-href="https://chenxiaosong.com/src/linux-config/linux-config.html">Linux配置文件</a></p>
-<p><a
-href="https://chenxiaosong.com/src/ssh-reverse/ssh-reverse.html">反向ssh和内网穿透</a></p>
-<p><a
-href="https://chenxiaosong.com/src/docker/docker.html">Docker安装与使用</a></p>
-<p><a
-href="https://chenxiaosong.com/src/macos/qemu-kvm-install-macos.html">QEMU/KVM安装macOS系统</a></p>
-<p><a
-href="https://chenxiaosong.com/src/userspace-environment/ghostwriter-makdown.html">ghostwriter:
-一款makdown编辑器</a></p>
-<p><a
-href="https://chenxiaosong.com/src/userspace-environment/mosquitto-mqtt.html">使用mosquitto搭建MQTT服务器</a></p>
-<p><a
-href="https://chenxiaosong.com/src/windows/wine.html">Linux使用wine运行Windows软件</a></p>
-<p><a
-href="https://chenxiaosong.com/src/userspace-environment/eulerlauncher.html">macOS下用EulerLauncher运行openEuler</a></p>
-<h1 data-number="9" id="还没有分类"><span
-class="header-section-number">9</span> 还没有分类</h1>
-<p><a
-href="https://chenxiaosong.com/src/windows/windows.html">Windows系统</a></p>
-<p><a
-href="https://chenxiaosong.com/src/keybord/keybord.html">键盘配置</a></p>
-<p><a
-href="https://chenxiaosong.com/src/wubi/wubi.html">五笔输入法</a></p>
-<p><a
-href="https://chenxiaosong.com/src/free-software/free-software.html">自由软件介绍</a></p>
-<p><a
-href="https://chenxiaosong.com/src/lorawan/lorawan.html">LoRaWAN</a></p>
-<p><a href="https://chenxiaosong.com/src/lorawan/stm32-linux.html">STM32
-Linux开发环境</a></p>
-<p><a
-href="https://chenxiaosong.com/src/health/tooth-clean.html">牙齿护理</a></p>
-<p><a
-href="https://chenxiaosong.com/src/game/black-myth-wukong.html">黑神话：悟空</a></p>
-<p><a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/gitee-md/书法.md">书法：左手练字</a></p>
-<h1 data-number="10" id="翻译"><span
-class="header-section-number">10</span> 翻译</h1>
-<p><a
-href="https://chenxiaosong.com/src/blog-web/translation.html">点击查看翻译文章</a></p>
+<h1 data-number="2" id="博客配套视频"><span class="header-section-number">2</span> 博客配套视频</h1>
+<p><a href="https://chenxiaosong.com/video.html">点击这里查看博客配套的教学视频</a></p>
+<h1 data-number="3" id="linux内核"><span class="header-section-number">3</span> Linux内核</h1>
+<p><a href="https://chenxiaosong.com/course/kernel/kernel.html">点击查看Linux内核课程（持续更新中）</a></p>
+<p><a href="https://chenxiaosong.com/src/kernel-environment/kernel-qemu-kvm.html">QEMU/KVM环境搭建与使用</a></p>
+<p><a href="https://chenxiaosong.com/src/strace-fault-inject/strace-fault-inject.html">strace内存分配失败故障注入</a></p>
+<p><a href="https://chenxiaosong.com/src/kernel/openeuler-sysmonitor.html">openEuler的sysmonitor</a></p>
+<p><a href="https://chenxiaosong.com/src/kernel/kprobe-scsi-data.html">使用kprobe监控scsi的读写数据</a></p>
+<p><a href="https://chenxiaosong.com/src/kernel/gio-to-mount.html">gio执行慢的临时解决办法</a></p>
+<p><a href="https://chenxiaosong.com/course/kernel/test.html#syzkaller">syzkaller - 内核模糊测试工具</a></p>
+<h1 data-number="4" id="nfs网络文件系统"><span class="header-section-number">4</span> NFS（网络文件系统）</h1>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击查看nfs文件系统课程（持续更新中）</a></p>
+<p><a href="https://chenxiaosong.com/src/nfs/4.19-rdma-not-supported.html">4.19 rdma协议不支持的问题</a></p>
+<p><a href="https://chenxiaosong.com/src/nfs/4.19-nfs-mount-hung.html">4.19 nfs lazy umount 后无法挂载的问题</a></p>
+<p><a href="https://chenxiaosong.com/src/nfs/unable-to-initialize-client-recovery-tracking.html">重启nfs server后client打开文件卡顿很长时间的问题</a></p>
+<p><a href="https://chenxiaosong.com/src/nfs/4.19-ltp-nfs-fail.html">4.19 ltp nfs测试失败问题</a></p>
+<p><a href="https://chenxiaosong.com/src/nfs/nfs-no-net-oom.html">nfs断网导致oom的问题</a></p>
+<h1 data-number="5" id="smbcifs文件系统"><span class="header-section-number">5</span> SMB(CIFS)文件系统</h1>
+<p><a href="https://chenxiaosong.com/course/smb/smb.html">点击查看smb文件系统课程（持续更新中）</a></p>
+<p><a href="https://chenxiaosong.com/course/smb/issue/4.19-null-ptr-deref-in-cifs_reconnect.html">4.19 cifs_reconnect()空指针解引用问题</a></p>
+<p><a href="https://chenxiaosong.com/course/smb/issue/cifs-newfstatat-ENOTSUPP.html">cifs newfstatat()系统调用报错ENOTSUPP</a></p>
+<h1 data-number="6" id="xfs文件系统"><span class="header-section-number">6</span> XFS文件系统</h1>
+<p><a href="https://chenxiaosong.com/src/xfs/xfs-shutdown-fs.html">xfs agf没落盘的问题</a></p>
+<h1 data-number="7" id="文件系统"><span class="header-section-number">7</span> 文件系统</h1>
+<p><a href="https://chenxiaosong.com/src/filesystem/microsoft-fs.html">微软文件系统</a></p>
+<p><a href="https://chenxiaosong.com/src/btrfs/4.19-btrfs-forced-readonly.html">4.19 btrfs文件系统变成只读的问题</a></p>
+<p><a href="https://chenxiaosong.com/src/filesystem/tmpfs-oom.html">tmpfs不断写导致oom的问题</a></p>
+<p><a href="https://chenxiaosong.com/src/filesystem/lazy-umount.html">文件系统延迟卸载</a></p>
+<h1 data-number="8" id="linux环境"><span class="header-section-number">8</span> Linux环境</h1>
+<p><a href="https://chenxiaosong.com/course/gnu-linux/install.html#vnc">VNC远程桌面</a></p>
+<p><a href="https://chenxiaosong.com/src/blog-web/blog-web.html">如何拥有个人域名的网站和邮箱</a></p>
+<p><a href="https://chenxiaosong.com/src/linux-config/linux-config.html">Linux配置文件</a></p>
+<p><a href="https://chenxiaosong.com/src/ssh-reverse/ssh-reverse.html">反向ssh和内网穿透</a></p>
+<p><a href="https://chenxiaosong.com/src/docker/docker.html">Docker安装与使用</a></p>
+<p><a href="https://chenxiaosong.com/src/macos/qemu-kvm-install-macos.html">QEMU/KVM安装macOS系统</a></p>
+<p><a href="https://chenxiaosong.com/src/userspace-environment/ghostwriter-makdown.html">ghostwriter: 一款makdown编辑器</a></p>
+<p><a href="https://chenxiaosong.com/src/userspace-environment/mosquitto-mqtt.html">使用mosquitto搭建MQTT服务器</a></p>
+<p><a href="https://chenxiaosong.com/src/windows/wine.html">Linux使用wine运行Windows软件</a></p>
+<p><a href="https://chenxiaosong.com/src/userspace-environment/eulerlauncher.html">macOS下用EulerLauncher运行openEuler</a></p>
+<h1 data-number="9" id="还没有分类"><span class="header-section-number">9</span> 还没有分类</h1>
+<p><a href="https://chenxiaosong.com/src/windows/windows.html">Windows系统</a></p>
+<p><a href="https://chenxiaosong.com/src/keybord/keybord.html">键盘配置</a></p>
+<p><a href="https://chenxiaosong.com/src/wubi/wubi.html">五笔输入法</a></p>
+<p><a href="https://chenxiaosong.com/src/free-software/free-software.html">自由软件介绍</a></p>
+<p><a href="https://chenxiaosong.com/src/lorawan/lorawan.html">LoRaWAN</a></p>
+<p><a href="https://chenxiaosong.com/src/lorawan/stm32-linux.html">STM32 Linux开发环境</a></p>
+<p><a href="https://chenxiaosong.com/src/health/tooth-clean.html">牙齿护理</a></p>
+<p><a href="https://chenxiaosong.com/src/game/black-myth-wukong.html">黑神话：悟空</a></p>
+<p><a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/gitee-md/书法.md">书法：左手练字</a></p>
+<h1 data-number="10" id="翻译"><span class="header-section-number">10</span> 翻译</h1>
+<p><a href="https://chenxiaosong.com/src/blog-web/translation.html">点击查看翻译文章</a></p>
 </body>
 </html>
