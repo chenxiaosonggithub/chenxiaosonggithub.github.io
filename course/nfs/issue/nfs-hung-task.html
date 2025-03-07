@@ -145,6 +145,7 @@ class="header-section-number">2</span> 调试</h1>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dprintk</span><span class="er">(</span><span class="st">&quot;NFSD: nfsd4_open filename %.*s op_openowner %p\n&quot;</span><span class="ex">,</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                <span class="kw">(</span><span class="ex">int</span><span class="kw">)</span><span class="ex">open-</span><span class="op">&gt;</span>op_fname.len, open-<span class="op">&gt;</span>op_fname.data,</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                <span class="ex">open-</span><span class="op">&gt;</span>op_openowner<span class="kw">);</span></span></code></pre></div>
+<p>测试命令如下:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs localhost:/ /mnt</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /mnt/file <span class="kw">&amp;</span> <span class="co"># 会打印出pid 576</span></span></code></pre></div>
