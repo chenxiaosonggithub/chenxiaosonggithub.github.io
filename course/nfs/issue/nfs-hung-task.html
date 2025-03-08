@@ -114,8 +114,8 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 <ul>
 <li><a href="#问题描述" id="toc-问题描述"><span
 class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#调试" id="toc-调试"><span
-class="toc-section-number">2</span> 调试</a></li>
+<li><a href="#构造复现" id="toc-构造复现"><span
+class="toc-section-number">2</span> 构造复现</a></li>
 </ul>
 </nav>
 <p><a
@@ -127,9 +127,9 @@ class="header-section-number">1</span> 问题描述</h1>
 <p>nfs client使用nfsv4.2挂载，<a
 href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/nfs-hung-task-log.txt">4.19内核
 hung task日志</a>。</p>
-<h1 data-number="2" id="调试"><span
-class="header-section-number">2</span> 调试</h1>
-<p>nfs server的代码的修改如下:</p>
+<h1 data-number="2" id="构造复现"><span
+class="header-section-number">2</span> 构造复现</h1>
+<p>nfs server构造收到打开文件的请求后不回复的情况，代码修改如下:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/fs/nfsd/nfs4proc.c</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/fs/nfsd/nfs4proc.c</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-356,6</span> +356,11 @@ nfsd4_open<span class="er">(</span><span class="ex">struct</span> svc_rqst <span class="pp">*</span>rqstp, struct nfsd4_compound_state <span class="pp">*</span>cstate,</span>
