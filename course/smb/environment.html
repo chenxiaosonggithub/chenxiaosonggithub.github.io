@@ -96,7 +96,10 @@
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#内核server搭建"><span class="toc-section-number">1</span> 内核server搭建</a></li>
-<li><a href="#用户态server搭建"><span class="toc-section-number">2</span> 用户态server搭建</a></li>
+<li><a href="#用户态server搭建"><span class="toc-section-number">2</span> 用户态server搭建</a>
+<ul>
+<li><a href="#build-samba-from-source"><span class="toc-section-number">2.1</span> 源码安装samba（用户态smb server）</a></li>
+</ul></li>
 <li><a href="#smb客户端环境"><span class="toc-section-number">3</span> smb客户端环境</a>
 <ul>
 <li><a href="#linux客户端"><span class="toc-section-number">3.1</span> Linux客户端</a></li>
@@ -169,17 +172,36 @@
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="fu">sudo</span> firewall-cmd --get-services <span class="co"># 查看所有的service</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="fu">sudo</span> firewall-cmd --list-services <span class="co"># 查看已添加的service</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="fu">sudo</span> systemctl restart smb.service      #（重启samba服务）</span></code></pre></div>
+<h2 data-number="2.1" id="build-samba-from-source"><span class="header-section-number">2.1</span> 源码安装samba（用户态smb server）</h2>
+<p><a href="https://wiki.samba.org/index.php/Build_Samba_from_Source">参考文档: Build Samba from Source</a>。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="fu">git</span> clone https://gitlab.com/samba-team/devel/samba.git </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="bu">cd</span> samba/bootstrap/generated-dists/fedora41/ <span class="co"># fedora41可替换你使用的发行版</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">./bootstrap.sh</span> <span class="co"># 安装依赖软件，时间可能比较久</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="bu">cd</span> ../../../</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="ex">./configure</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="fu">make</span> -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="fu">make</span> install -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="bu">export</span> <span class="va">PATH=</span>/usr/local/samba/bin/:/usr/local/samba/sbin/:<span class="va">$PATH</span></span></code></pre></div>
+<p>修改<code>/usr/lib/systemd/system/smb.service</code>（具体位置可以用<code>systemctl status smb</code>查看）:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="va">ExecStart=</span>/usr/local/samba/sbin/smbd <span class="ex">...</span> # 原本是 /usr/sbin/smbd</span></code></pre></div>
+<p>创建配置文件:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="fu">cp</span> /etc/samba/smb.conf /usr/local/samba/etc/smb.conf</span></code></pre></div>
+<p>需要特别注意的是要重新创建用户:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ex">pdbedit</span> -a -u root</span></code></pre></div>
+<p>启动服务:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="ex">systemctl</span> daemon-reload</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="ex">systemctl</span> restart smb.service</span></code></pre></div>
 <h1 data-number="3" id="smb客户端环境"><span class="header-section-number">3</span> smb客户端环境</h1>
 <h2 data-number="3.1" id="linux客户端"><span class="header-section-number">3.1</span> Linux客户端</h2>
 <p>安装所需工具:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">apt</span> install cifs-utils -y # 安装 cifs 客户端, 否则无法挂载</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">dnf</span> install cifs-utils -y # fedora</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">apt</span> install smbclient -y # 查询服务器共享了哪些目录</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="ex">apt</span> install cifs-utils -y # 安装 cifs 客户端, 否则无法挂载</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="ex">dnf</span> install cifs-utils -y # fedora</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="ex">apt</span> install smbclient -y # 查询服务器共享了哪些目录</span></code></pre></div>
 <p>测试:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">smbclient</span> -L //127.0.0.1 -U root</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="ex">smbclient</span> //127.0.0.1/TEST -U root # 然后用help查看帮助，ftp的语法</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="ex">nmblookup</span> -U 192.168.53.209 netbios_name</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="ex">nmblookup</span> -S netbios_name</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="ex">smbclient</span> -L //127.0.0.1 -U root</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="ex">smbclient</span> //127.0.0.1/TEST -U root # 然后用help查看帮助，ftp的语法</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="ex">nmblookup</span> -U 192.168.53.209 netbios_name</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="ex">nmblookup</span> -S netbios_name</span></code></pre></div>
 <p>挂载命令:</p>
 <pre class="shell"><code>getsebool -a | grep samba
 setsebool -P samba_enable_home_dirs=1
