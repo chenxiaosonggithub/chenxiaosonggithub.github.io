@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,96 +94,122 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">nfs调试方法</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#日志"><span class="toc-section-number">1</span> 日志</a></li>
-<li><a href="#tcpdump抓包"><span class="toc-section-number">2</span> tcpdump抓包</a></li>
-<li><a href="#重新挂载"><span class="toc-section-number">3</span> 重新挂载</a></li>
-<li><a href="#导出vmcore"><span class="toc-section-number">4</span> 导出vmcore</a></li>
-<li><a href="#非特权源端口挂载"><span class="toc-section-number">5</span> 非特权源端口挂载</a></li>
+<li><a href="#日志" id="toc-日志"><span
+class="toc-section-number">1</span> 日志</a></li>
+<li><a href="#tcpdump抓包" id="toc-tcpdump抓包"><span
+class="toc-section-number">2</span> tcpdump抓包</a></li>
+<li><a href="#重新挂载" id="toc-重新挂载"><span
+class="toc-section-number">3</span> 重新挂载</a></li>
+<li><a href="#导出vmcore" id="toc-导出vmcore"><span
+class="toc-section-number">4</span> 导出vmcore</a></li>
+<li><a href="#非特权源端口挂载" id="toc-非特权源端口挂载"><span
+class="toc-section-number">5</span> 非特权源端口挂载</a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
 <p>本文介绍一下我尝试过的nfs定位问题的常用方法，非权威，欢迎指正。</p>
-<h1 data-number="1" id="日志"><span class="header-section-number">1</span> 日志</h1>
+<h1 data-number="1" id="日志"><span
+class="header-section-number">1</span> 日志</h1>
 <p>发生问题时，报错日志肯定是很有用的信息，大部分发行版都会把日志放在<code>/var/log/messages*</code>文件中，默认情况下，nfs只会打印错误信息。但有些时候，我们需要一些调试日志信息，这时就要打开nfs和rpc的调试开关。几个打印相关的宏定义是<code>dprintk()</code>、<code>dprintk_cont()</code>、<code>dprintk_rcu()</code>、<code>dprintk_rcu_cont</code>，下面以<code>dprintk()</code>为例讲一下这个宏定义的展开:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">// include/linux/sunrpc/debug.h</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>dprintk(fmt, ...)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  dfprintk(FACILITY, fmt, ##__VA_ARGS__)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>    ifdebug(fac)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>      <span class="co">// include/linux/sunrpc/debug.h</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>      <span class="cf">if</span> (unlikely(rpc_debug &amp; RPCDBG_FACILITY))</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>      <span class="co">// include/linux/nfs_fs.h</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>      <span class="cf">if</span> (unlikely(nfs_debug &amp; NFSDBG_FACILITY))</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>      <span class="co">// fs/nfsd/nfsd.h</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>      <span class="cf">if</span> (nfsd_debug &amp; NFSDDBG_FACILITY)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>      <span class="co">// include/linux/lockd/debug.h</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>      <span class="cf">if</span> (unlikely(nlm_debug &amp; NLMDBG_FACILITY))</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>    printk(KERN_DEFAULT fmt, ##__VA_ARGS__);</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// include/linux/sunrpc/debug.h</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>dprintk<span class="op">(</span>fmt<span class="op">,</span> <span class="op">...)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  dfprintk<span class="op">(</span>FACILITY<span class="op">,</span> fmt<span class="op">,</span> ##__VA_ARGS__<span class="op">)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    ifdebug<span class="op">(</span>fac<span class="op">)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>      <span class="co">// include/linux/sunrpc/debug.h</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>unlikely<span class="op">(</span>rpc_debug <span class="op">&amp;</span> RPCDBG_FACILITY<span class="op">))</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>      <span class="co">// include/linux/nfs_fs.h</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>unlikely<span class="op">(</span>nfs_debug <span class="op">&amp;</span> NFSDBG_FACILITY<span class="op">))</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      <span class="co">// fs/nfsd/nfsd.h</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>nfsd_debug <span class="op">&amp;</span> NFSDDBG_FACILITY<span class="op">)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      <span class="co">// include/linux/lockd/debug.h</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>unlikely<span class="op">(</span>nlm_debug <span class="op">&amp;</span> NLMDBG_FACILITY<span class="op">))</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    printk<span class="op">(</span>KERN_DEFAULT fmt<span class="op">,</span> ##__VA_ARGS__<span class="op">);</span></span></code></pre></div>
 <p>以下是打开全部日志的命令，注意这将会打印大量日志，请先把<code>/var/log/messages*</code>复制保存到其他位置，避免错误日志被覆盖:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_ALL</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_ALL</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="bu">echo</span> 0x7FFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># NFSDDBG_ALL</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/nlm_debug <span class="co"># NLMDBG_ALL</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_ALL</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_ALL</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7FFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># NFSDDBG_ALL</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/nlm_debug <span class="co"># NLMDBG_ALL</span></span></code></pre></div>
 <p>如果你缩小了定位的范围，可以只打开某些日志:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="bu">echo</span> 0x0008 <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_PAGECACHE</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="bu">echo</span> 0x0040 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_SCHED</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="bu">echo</span> 0x0400 <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># NFSDDBG_PNFS</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="bu">echo</span> 0x0008 <span class="op">&gt;</span> /proc/sys/sunrpc/nlm_debug <span class="co"># NLMDBG_SVCLOCK</span></span></code></pre></div>
-<h1 data-number="2" id="tcpdump抓包"><span class="header-section-number">2</span> tcpdump抓包</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x0008 <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_PAGECACHE</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x0040 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_SCHED</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x0400 <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># NFSDDBG_PNFS</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x0008 <span class="op">&gt;</span> /proc/sys/sunrpc/nlm_debug <span class="co"># NLMDBG_SVCLOCK</span></span></code></pre></div>
+<h1 data-number="2" id="tcpdump抓包"><span
+class="header-section-number">2</span> tcpdump抓包</h1>
 <p>既然nfs涉及到网络，定位问题肯定也少不了网络抓包，甚至在绝大多数情况下，网络抓包能够比日志提供更有用更直观的信息，使用<code>tcpdump</code>工具抓包:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co"># --interface: 指定要监听的网络接口，any表示所有的网络接口</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co"># --buffer-size: 默认4KB, 单位 KB, 20480 代表 20MB。buffer大一点可以防止抓包数据丢失</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="ex">tcpdump</span> --interface=<span class="op">&lt;</span>网络接口<span class="op">&gt;</span> --buffer-size=20480 -w out.cap</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --interface: 指定要监听的网络接口，any表示所有的网络接口</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># --buffer-size: 默认4KB, 单位 KB, 20480 代表 20MB。buffer大一点可以防止抓包数据丢失</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">--interface</span><span class="op">=&lt;</span>网络接口<span class="op">&gt;</span> --buffer-size=20480 <span class="at">-w</span> out.cap</span></code></pre></div>
 <p>当数据量比较大时，有时会发生抓包数据丢失。配置网络参数，把参数调大可以防止抓包数据丢失:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">sysctl</span> -a <span class="kw">|</span> <span class="fu">grep</span> net.core.rmem <span class="co"># 查看配置</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">sysctl</span> net.core.rmem_default=xxx</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">sysctl</span> net.core.rmem_max=xxx</span></code></pre></div>
-<p><code>tcpdump</code>抓包的文件，可以使用<a href="https://www.wireshark.org/"><code>wireshark</code></a>分析。如果要查看端口，需要在<code>preferences -&gt; appearance -&gt; columns</code>中添加<code>Src port (unresolved)</code>和<code>Dest port (unresolved)</code>。</p>
-<h1 data-number="3" id="重新挂载"><span class="header-section-number">3</span> 重新挂载</h1>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sysctl</span> <span class="at">-a</span> <span class="kw">|</span> <span class="fu">grep</span> net.core.rmem <span class="co"># 查看配置</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sysctl</span> net.core.rmem_default=xxx</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">sysctl</span> net.core.rmem_max=xxx</span></code></pre></div>
+<p><code>tcpdump</code>抓包的文件，可以使用<a
+href="https://www.wireshark.org/"><code>wireshark</code></a>分析。如果要查看端口，需要在<code>preferences -&gt; appearance -&gt; columns</code>中添加<code>Src port (unresolved)</code>和<code>Dest port (unresolved)</code>。</p>
+<h1 data-number="3" id="重新挂载"><span
+class="header-section-number">3</span> 重新挂载</h1>
 <p>在生产环境下，如果出现问题，很多时候可能没有很多时间可以保留现场，可能需要重新挂载快速恢复。</p>
 <p>请注意，在<code>umount</code>之前，务必收集好需要的调试信息，因为很多问题可能一年半载也只会出现那么一次。</p>
 <p><code>umount &lt;挂载点&gt;</code>命令如果报错<code>device is busy</code>之类的信息，说明挂载点正在使用，可以使用以下命令查看使用挂载点的进程:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">lsof</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="fu">fuser</span> -m <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">lsof</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fuser</span> <span class="at">-m</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span></code></pre></div>
 <p>如果找到的使用挂载点的进程非常重要，kill这些进程会导致重大问题，可以使用以下命令延迟卸载，会导致挂载点在后台被卸载，而不会强制终止进程:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="fu">umount</span> --lazy <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> <span class="at">--lazy</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span></code></pre></div>
 <p>如果找到的使用挂载点的进程没有那么重要，建议还是kill掉这些进程再卸载，这样才能更彻底的恢复环境:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="bu">kill</span> -SIGKILL <span class="op">&lt;</span>进程号<span class="op">&gt;</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="fu">umount</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span></code></pre></div>
-<h1 data-number="4" id="导出vmcore"><span class="header-section-number">4</span> 导出vmcore</h1>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">kill</span> <span class="at">-SIGKILL</span> <span class="op">&lt;</span>进程号<span class="op">&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span></code></pre></div>
+<h1 data-number="4" id="导出vmcore"><span
+class="header-section-number">4</span> 导出vmcore</h1>
 <p>在生产环境下，如果必须要快速恢复环境，且这个环境是可以接受重启系统，就可以尝试手动导出vmcore，vmcore中的信息有时对分析问题很有帮助:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /proc/sys/kernel/sysrq</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="bu">echo</span> c <span class="op">&gt;</span> /proc/sysrq-trigger</span></code></pre></div>
-<p>关于vmcore的更详细内容，请查看<a href="https://chenxiaosong.com/course/kernel/debug.html#kdump-crash">内核调试方法</a>。</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /proc/sys/kernel/sysrq</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> c <span class="op">&gt;</span> /proc/sysrq-trigger</span></code></pre></div>
+<p>关于vmcore的更详细内容，请查看<a
+href="https://chenxiaosong.com/course/kernel/debug.html#kdump-crash">内核调试方法</a>。</p>
 <p>如果要让内核在hungtask或softlockup等情况触发panic，可以执行以下操作:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="ex">sysctl</span> -w kernel.softlockup_panic=1 # -w：表示“写”操作，用来修改内核参数</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="ex">sysctl</span> -w kernel.hung_task_panic=0</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="ex">sysctl</span> kernel.softlockup_panic # 查看</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="co"># 或者用以下命令</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /proc/sys/kernel/softlockup_panic <span class="co"># 和sysctl命令效果一样</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/kernel/hung_task_panic</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="fu">cat</span> /proc/sys/kernel/softlockup_panic <span class="co"># 查看</span></span></code></pre></div>
-<h1 data-number="5" id="非特权源端口挂载"><span class="header-section-number">5</span> 非特权源端口挂载</h1>
-<p>默认情况下，nfs client挂载使用的源端口是小于1024的特权端口（Privileged Ports），需要root权限。</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sysctl</span> <span class="at">-w</span> kernel.softlockup_panic=1 <span class="co"># -w：表示“写”操作，用来修改内核参数</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sysctl</span> <span class="at">-w</span> kernel.hung_task_panic=0</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">sysctl</span> kernel.softlockup_panic <span class="co"># 查看</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 或者用以下命令</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /proc/sys/kernel/softlockup_panic <span class="co"># 和sysctl命令效果一样</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/kernel/hung_task_panic</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/sys/kernel/softlockup_panic <span class="co"># 查看</span></span></code></pre></div>
+<h1 data-number="5" id="非特权源端口挂载"><span
+class="header-section-number">5</span> 非特权源端口挂载</h1>
+<p>默认情况下，nfs
+client挂载使用的源端口是小于1024的特权端口（Privileged
+Ports），需要root权限。</p>
 <p>但在某些情况下，无法挂载时，可以尝试使用大于1024的非特权端口挂载，这对排查问题很有帮助。</p>
 <p>首先，server端的<code>/etc/exports</code>文件中对导出路径增加<code>insecure</code>选项，如:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="ex">/tmp/</span> *(rw,no_root_squash,fsid=0,insecure)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/tmp/</span> <span class="pp">*(</span>rw,no_root_squash,fsid=0,insecure<span class="pp">)</span></span></code></pre></div>
 <p>重启server端服务:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="ex">systemctl</span> restart nfs-server.service</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart nfs-server.service</span></code></pre></div>
 <p>这时client端可以使用所有范围的端口挂载，默认情况下还是使用小于1024的端口，而大于1024的端口要指定挂载选项<code>noresvport</code>:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="fu">mount</span> -t nfs -o noresvport <span class="va">${server_ip}</span>:/ /mnt</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> noresvport <span class="va">${server_ip}</span>:/ /mnt</span></code></pre></div>
 <p>请注意，使用非特权源端口挂载在一些场景下是不安全的（从server端的配置选项的字面意思<code>insecure</code>就能看出），尽量只在调试场景下使用。</p>
 <p>在我曾经定位过的nfs问题中，有碰到过路由器或交换机出于产品的某些原因，把小于1024的端口的数据包都给过滤了，当时就是使用非特权源端口挂载的方法排除其他可能性，最终定位出问题。</p>
 </body>
