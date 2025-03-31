@@ -480,9 +480,10 @@ class="header-section-number">5.1</span> 源码安装crash</h2>
 <div class="sourceCode" id="cb28"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/crash-utility/crash.git</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install autoconf automake libtool texinfo <span class="at">-y</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> crash</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j64</span> <span class="co"># 如果下载gdb很慢，可以先在其他地方先下载好（如 http://ftp.gnu.org/gnu/gdb/gdb-10.2.tar.gz），放到相应的位置</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co"># make target=ARM64 -j64 # 交叉编译能解析arm64 vmcore的crash</span></span></code></pre></div>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install libgmp-dev libmpfr-dev <span class="at">-y</span> <span class="co"># 编译gdb需要</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> crash</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j64</span> <span class="co"># 如果下载gdb很慢，可以先在其他地方先下载好（如 http://ftp.gnu.org/gnu/gdb/gdb-xx.xx.tar.gz），放到相应的位置</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co"># make target=ARM64 -j64 # 交叉编译能解析arm64 vmcore的crash</span></span></code></pre></div>
 <h2 data-number="5.2" id="fedora环境"><span
 class="header-section-number">5.2</span> fedora环境</h2>
 <p>以fedora40为例。</p>
