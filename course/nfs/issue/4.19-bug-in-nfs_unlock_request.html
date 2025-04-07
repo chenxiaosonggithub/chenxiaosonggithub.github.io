@@ -119,10 +119,10 @@ class="toc-section-number">2</span> 解析vmcore</a>
 <ul>
 <li><a href="#准备" id="toc-准备"><span
 class="toc-section-number">2.1</span> 准备</a></li>
-<li><a href="#寻找nfs_unlock_request参数nfs_page的值"
-id="toc-寻找nfs_unlock_request参数nfs_page的值"><span
+<li><a href="#寻找nfs_unlock_request参数struct-nfs_page-req的值"
+id="toc-寻找nfs_unlock_request参数struct-nfs_page-req的值"><span
 class="toc-section-number">2.2</span>
-寻找<code>nfs_unlock_request</code>参数<code>nfs_page</code>的值</a>
+寻找<code>nfs_unlock_request()</code>参数<code>struct nfs_page *req</code>的值</a>
 <ul>
 <li><a href="#寄存器中找不到" id="toc-寄存器中找不到"><span
 class="toc-section-number">2.2.1</span> 寄存器中找不到</a></li>
@@ -185,6 +185,7 @@ class="header-section-number">1</span> 问题描述</h1>
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.532686]</span>  ret_from_fork+0x35/0x40</span></code></pre></div>
 <h1 data-number="2" id="解析vmcore"><span
 class="header-section-number">2</span> 解析vmcore</h1>
+<p>[详细的vmcore输出信息请点击这里查看]。</p>
 <h2 data-number="2.1" id="准备"><span
 class="header-section-number">2.1</span> 准备</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rpm2cpio</span> kernel-debuginfo-4.19.xxx.x86_64.rpm <span class="kw">|</span> <span class="fu">cpio</span> <span class="at">-div</span></span>
@@ -197,9 +198,10 @@ class="header-section-number">2.1</span> 准备</h2>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfs</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv3</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv4</span></code></pre></div>
-<h2 data-number="2.2" id="寻找nfs_unlock_request参数nfs_page的值"><span
+<h2 data-number="2.2"
+id="寻找nfs_unlock_request参数struct-nfs_page-req的值"><span
 class="header-section-number">2.2</span>
-寻找<code>nfs_unlock_request</code>参数<code>nfs_page</code>的值</h2>
+寻找<code>nfs_unlock_request()</code>参数<code>struct nfs_page *req</code>的值</h2>
 <h3 data-number="2.2.1" id="寄存器中找不到"><span
 class="header-section-number">2.2.1</span> 寄存器中找不到</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
@@ -285,18 +287,16 @@ class="header-section-number">4</span> 代码分析</h1>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      nfs_writepages_callback</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        nfs_do_writepage</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>          nfs_page_async_flush <span class="co">// 内联</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            nfs_redirty_request</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>              nfs_end_page_writeback</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                nfs_unlock_request <span class="co">// rdi寄存器值被覆盖了，也没压栈</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                  <span class="cf">if</span> <span class="op">(!</span>NFS_WBACK_BUSY<span class="op">(</span>req<span class="op">))</span> <span class="co">// 正常情况下条件不满足</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                  clear_bit<span class="op">(</span>PG_BUSY<span class="op">,</span> <span class="co">// 只在这里清除busy位</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                  wake_up_bit<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_flags<span class="op">,</span> PG_BUSY<span class="op">)</span> <span class="co">// 唤醒进程</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">// 设置PG_BUSY位</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>nfs_lock_and_join_requests</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  nfs_lock_request <span class="co">// lock成功了就不执行nfs_wait_on_request()</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    test_and_set_bit<span class="op">(</span>PG_BUSY<span class="op">,</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  nfs_wait_on_request</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    wait_on_bit_io<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_flags<span class="op">,</span> PG_BUSY<span class="op">,</span></span></code></pre></div>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            nfs_lock_and_join_requests</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>              nfs_lock_request <span class="co">// lock成功了就不执行nfs_wait_on_request()</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                test_and_set_bit<span class="op">(</span>PG_BUSY<span class="op">,</span> <span class="co">// 设置PG_BUSY位</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>              nfs_wait_on_request</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                wait_on_bit_io<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_flags<span class="op">,</span> PG_BUSY<span class="op">,</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>            nfs_redirty_request</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>              nfs_end_page_writeback</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                nfs_unlock_request <span class="co">// rdi寄存器值被覆盖了，也没压栈</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                  <span class="cf">if</span> <span class="op">(!</span>NFS_WBACK_BUSY<span class="op">(</span>req<span class="op">))</span> <span class="co">// 正常情况下条件不满足</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                  clear_bit<span class="op">(</span>PG_BUSY<span class="op">,</span> <span class="co">// 只在这里清除busy位</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>                  wake_up_bit<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_flags<span class="op">,</span> PG_BUSY<span class="op">)</span> <span class="co">// 唤醒进程</span></span></code></pre></div>
 </body>
 </html>
