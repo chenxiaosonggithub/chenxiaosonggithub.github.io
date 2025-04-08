@@ -119,16 +119,10 @@ class="toc-section-number">2</span> 解析vmcore</a>
 <ul>
 <li><a href="#准备" id="toc-准备"><span
 class="toc-section-number">2.1</span> 准备</a></li>
-<li><a href="#寻找nfs_unlock_request参数struct-nfs_page-req的值"
-id="toc-寻找nfs_unlock_request参数struct-nfs_page-req的值"><span
+<li><a href="#寻找nfs_unlock_request参数req的值"
+id="toc-寻找nfs_unlock_request参数req的值"><span
 class="toc-section-number">2.2</span>
-寻找<code>nfs_unlock_request()</code>参数<code>struct nfs_page *req</code>的值</a>
-<ul>
-<li><a href="#寄存器中找不到" id="toc-寄存器中找不到"><span
-class="toc-section-number">2.2.1</span> 寄存器中找不到</a></li>
-<li><a href="#栈中也找不到" id="toc-栈中也找不到"><span
-class="toc-section-number">2.2.2</span> 栈中也找不到</a></li>
-</ul></li>
+寻找<code>nfs_unlock_request()</code>参数<code>req</code>的值</a></li>
 </ul></li>
 <li><a href="#补丁" id="toc-补丁"><span
 class="toc-section-number">3</span> 补丁</a></li>
@@ -186,7 +180,7 @@ class="header-section-number">1</span> 问题描述</h1>
 <h1 data-number="2" id="解析vmcore"><span
 class="header-section-number">2</span> 解析vmcore</h1>
 <p><a
-href="https://chenxiaosong.com/tmp/nfs/4.19-bug-in-nfs_unlock_request-vmcore.html">详细的crash命令输出信息请点击这里查看</a>。</p>
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/4.19-bug-in-nfs_unlock_request-vmcore.md">详细的crash命令输出信息请点击这里查看</a>。</p>
 <h2 data-number="2.1" id="准备"><span
 class="header-section-number">2.1</span> 准备</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rpm2cpio</span> kernel-debuginfo-4.19.xxx.x86_64.rpm <span class="kw">|</span> <span class="fu">cpio</span> <span class="at">-div</span></span>
@@ -199,12 +193,9 @@ class="header-section-number">2.1</span> 准备</h2>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfs</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv3</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv4</span></code></pre></div>
-<h2 data-number="2.2"
-id="寻找nfs_unlock_request参数struct-nfs_page-req的值"><span
+<h2 data-number="2.2" id="寻找nfs_unlock_request参数req的值"><span
 class="header-section-number">2.2</span>
-寻找<code>nfs_unlock_request()</code>参数<code>struct nfs_page *req</code>的值</h2>
-<h3 data-number="2.2.1" id="寄存器中找不到"><span
-class="header-section-number">2.2.1</span> 寄存器中找不到</h3>
+寻找<code>nfs_unlock_request()</code>参数<code>req</code>的值</h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 3930345  TASK: ffff9c13db3bdf00  CPU: 30  COMMAND: <span class="st">&quot;java&quot;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a> <span class="co">#0 [ffffb2f160b236a0] machine_kexec at ffffffff8e45adde</span></span>
@@ -242,62 +233,80 @@ class="header-section-number">2.2.1</span> 寄存器中找不到</h3>
 <span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df27</span> <span class="op">&lt;</span>nfs_unlock_request+55<span class="op">&gt;</span>:     ud2 </span></code></pre></div>
 <p>x86_64下整数参数使用的寄存器依次为:
 RDI，RSI，RDX，RCX，R8，R9，可以看出<code>nfs_unlock_request()</code>的第一个参数<code>%rdi</code>寄存器的值被覆盖了（<code>mov    $0xffffffffc0970df0,%rdi</code>），
-所以无法通过寄存器的值得到<code>nfs_page</code>的值。</p>
-<h3 data-number="2.2.2" id="栈中也找不到"><span
-class="header-section-number">2.2.2</span> 栈中也找不到</h3>
-<p>反汇编内联<code>nfs_page_async_flush()</code>函数的<code>nfs_do_writepage()</code>:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> nfs_do_writepage</span>
+所以无法通过传参寄存器<code>%rdi</code>的值得到<code>nfs_page</code>的值。</p>
+<p>接下来再分析栈中上面几层函数的汇编，反汇编<code>nfs_end_page_writeback()</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> nfs_end_page_writeback</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc09623fe</span> <span class="op">&lt;</span>nfs_do_writepage+94<span class="op">&gt;</span>:       call   0xffffffffc0961d30 <span class="op">&lt;</span>nfs_lock_and_join_requests<span class="op">&gt;</span> # 返回值放到%rax</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc0962403</span> <span class="op">&lt;</span>nfs_do_writepage+99<span class="op">&gt;</span>:       test   %rax,%rax <span class="co"># %rax 的值与自身进行 AND 运算，​如果结果为零，则设置 ZF 为 1；否则，设置为 0</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc0962406</span> <span class="op">&lt;</span>nfs_do_writepage+102<span class="op">&gt;</span>:      mov    %rax,%r14 <span class="co"># nfs_lock_and_join_requests()的返回值放到%r14</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc0962409</span> <span class="op">&lt;</span>nfs_do_writepage+105<span class="op">&gt;</span>:      je     0xffffffffc096253d <span class="op">&lt;</span>nfs_do_writepage+413<span class="op">&gt;</span> # ZF 为1时，程序会跳转到指定的目标地址；否则，继续执行后续指令。</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc0962530</span> <span class="op">&lt;</span>nfs_do_writepage+400<span class="op">&gt;</span>:      mov    %r14,%rdi <span class="co"># nfs_redirty_request()的第一个参数</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc0962533</span> <span class="op">&lt;</span>nfs_do_writepage+403<span class="op">&gt;</span>:      call   0xffffffffc09616f0 <span class="op">&lt;</span>nfs_redirty_request<span class="op">&gt;</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> nfs_redirty_request <span class="co"># 没有对%r14压栈，也没有对参数%rdi压栈</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> nfs_end_page_writeback <span class="co"># 没有对%r14压栈，也没有对参数%rdi压栈</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> nfs_unlock_request <span class="co"># 没有对%r14压栈，也没有对参数%rdi压栈</span></span></code></pre></div>
-<p>从以上的分析可以看出，栈上也找不到<code>nfs_page</code>的值。</p>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc09615fb</span> <span class="op">&lt;</span>nfs_end_page_writeback+11<span class="op">&gt;</span>: mov    %rdi,%rbx <span class="co"># rdi是第一个参数</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc0961652</span> <span class="op">&lt;</span>nfs_end_page_writeback+98<span class="op">&gt;</span>: mov    %rbx,%rdi <span class="co"># nfs_unlock_request()的第一个参数</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc0961658</span> <span class="op">&lt;</span>nfs_end_page_writeback+104<span class="op">&gt;</span>:    call   0xffffffffc095def0 <span class="op">&lt;</span>nfs_unlock_request<span class="op">&gt;</span></span></code></pre></div>
+<p>再结合前面<code>nfs_unlock_request()</code>的反汇编，可以推出在崩溃时<code>%rbx</code>存的是<code>nfs_unlock_request()</code>第一个参数的值。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># RBX: ffff9bf9f048da00</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct nfs_page ffff9bf9f048da00 <span class="at">-x</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> nfs_page {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_list</span> = {</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">next</span> = 0xffff9bf9f048da00,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">prev</span> = 0xffff9bf9f048da00</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_page</span> = 0xfffffb9dd6f34dc0,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_context</span> = 0xffff9c13143a9a80,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_lock_context</span> = 0xffff9c13143a9a80,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_index</span> = 0x6af69,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_offset</span> = 0x0,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_pgbase</span> = 0x0,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_bytes</span> = 0xfff,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_kref</span> = {</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">refcount</span> = {</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>      <span class="ex">refs</span> = {</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        <span class="ex">counter</span> = 0x1</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>      <span class="er">}</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_flags</span> = 0x12, <span class="co"># 0b10010, PG_MAPPED, PG_INODE_REF</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_verf</span> = {</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="ex">data</span> = <span class="st">&quot;\000\000\000\000\000\000\000&quot;</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_this_page</span> = 0xffff9bf9f048da00,</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_head</span> = 0xffff9bf9f048da00</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p><code>struct nfs_page</code>结构体中的引用计数为<code>1</code>，<code>wb_flags</code>值为<code>0x12</code>（二进制<code>0b10010</code>，设置了<code>PG_MAPPED</code>和<code>PG_INODE_REF</code>）。</p>
 <h1 data-number="3" id="补丁"><span
 class="header-section-number">3</span> 补丁</h1>
 <p>没找到含有函数关键字的相关补丁（4.19内核肯定包含2012年的补丁）:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfs_end_page_writeback</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2012-05-09 d1182b33ed9b NFS: nfs_set_page_writeback no longer needs to reference the page Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2012-05-09 3aff4ebb95b2 NFS: Prevent a deadlock in the new writeback code Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfs_unlock_request</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2012-05-09 1d1afcbc294c NFS: Clean up - Rename nfs_unlock_request and nfs_unlock_request_dont_release Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2012-05-09 3aff4ebb95b2 NFS: Prevent a deadlock in the new writeback code Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2009-12-10 190f38e5cedc NFS: Fix nfs_migrate_page() Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2006-10-20 b6dff26a0818 [PATCH] NFS: Fix oops in nfs_cancel_commit_list Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfs_end_page_writeback</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2012-05-09 d1182b33ed9b NFS: nfs_set_page_writeback no longer needs to reference the page Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2012-05-09 3aff4ebb95b2 NFS: Prevent a deadlock in the new writeback code Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfs_unlock_request</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2012-05-09 1d1afcbc294c NFS: Clean up - Rename nfs_unlock_request and nfs_unlock_request_dont_release Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2012-05-09 3aff4ebb95b2 NFS: Prevent a deadlock in the new writeback code Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2009-12-10 190f38e5cedc NFS: Fix nfs_migrate_page() Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2006-10-20 b6dff26a0818 [PATCH] NFS: Fix oops in nfs_cancel_commit_list Trond Myklebust &lt;Trond.Myklebust@netapp.com&gt;</span></span></code></pre></div>
 <p>查找<code>nfs_unlock_request()</code>函数修改记录:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">-L:nfs_unlock_request:fs</span>/nfs/pagelist.c</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 43d20e80e288 NFS: Fix a few more clear_bit() instances that need release semantics</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">-L:nfs_unlock_request:fs</span>/nfs/pagelist.c</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 43d20e80e288 NFS: Fix a few more clear_bit() instances that need release semantics</span></span></code></pre></div>
 <h1 data-number="4" id="代码分析"><span
 class="header-section-number">4</span> 代码分析</h1>
 <p>在nfs中只有在<code>nfs_unlock_request()</code>一个地方清除<code>PG_BUSY</code>位，发生panic肯定是两次执行到了<code>nfs_unlock_request()</code>函数。
 正常情况下<code>nfs_lock_request()</code>是原子操作，不会出现并发的情况，需要进一步查找异常情况。</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>do_writepages</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  nfs_writepages</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    write_cache_pages</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      nfs_writepages_callback</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        nfs_do_writepage</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>          nfs_page_async_flush <span class="co">// 内联</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            nfs_lock_and_join_requests</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>              nfs_lock_request <span class="co">// lock成功了就不执行nfs_wait_on_request()</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                test_and_set_bit<span class="op">(</span>PG_BUSY<span class="op">,</span> <span class="co">// 设置PG_BUSY位</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>              nfs_wait_on_request</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                wait_on_bit_io<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_flags<span class="op">,</span> PG_BUSY<span class="op">,</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>            nfs_redirty_request</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>              nfs_end_page_writeback</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                nfs_unlock_request <span class="co">// rdi寄存器值被覆盖了，也没压栈</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                  <span class="cf">if</span> <span class="op">(!</span>NFS_WBACK_BUSY<span class="op">(</span>req<span class="op">))</span> <span class="co">// 正常情况下条件不满足</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                  clear_bit<span class="op">(</span>PG_BUSY<span class="op">,</span> <span class="co">// 只在这里清除busy位</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>                  wake_up_bit<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_flags<span class="op">,</span> PG_BUSY<span class="op">)</span> <span class="co">// 唤醒进程</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>do_writepages</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  nfs_writepages</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    write_cache_pages</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      nfs_writepages_callback</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        nfs_do_writepage</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>          nfs_page_async_flush <span class="co">// 内联</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            nfs_lock_and_join_requests</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>              nfs_lock_request <span class="co">// lock成功了就不执行nfs_wait_on_request()</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                test_and_set_bit<span class="op">(</span>PG_BUSY<span class="op">,</span> <span class="co">// 设置PG_BUSY位</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>              nfs_wait_on_request</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                wait_on_bit_io<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_flags<span class="op">,</span> PG_BUSY<span class="op">,</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>            nfs_redirty_request</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>              nfs_end_page_writeback</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                nfs_unlock_request <span class="co">// rdi寄存器值被覆盖了，也没压栈</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>                  <span class="cf">if</span> <span class="op">(!</span>NFS_WBACK_BUSY<span class="op">(</span>req<span class="op">))</span> <span class="co">// 正常情况下条件不满足</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>                  clear_bit<span class="op">(</span>PG_BUSY<span class="op">,</span> <span class="co">// 只在这里清除busy位</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>                  wake_up_bit<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_flags<span class="op">,</span> PG_BUSY<span class="op">)</span> <span class="co">// 唤醒进程</span></span></code></pre></div>
 </body>
 </html>
