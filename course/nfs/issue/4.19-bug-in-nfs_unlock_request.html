@@ -142,7 +142,7 @@ class="header-section-number">1</span> 问题描述</h1>
 href="https://access.redhat.com/solutions/1455633">redhat遇到的类似问题</a>。</p>
 <p>重点强调一下一个可能有用的线索: nfs client系统日志写到nfs
 server，client定期进行日志切割，先锁定原日志文件（如<code>messages</code>），重命名为<code>messages-20250410</code>，
-再生成新的<code>messages</code>，然后再将锁定期间缓存日志数据写入<code>messages</code>。</p>
+再生成新的<code>messages</code>文件，然后再将锁定期间缓存日志数据写入<code>messages</code>文件。</p>
 <p>4.19内核发生panic，日志如下:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.245995]</span> NFS: Invalid unlock attempted</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.256784]</span> <span class="at">------------[</span> cut here ]------------</span>
