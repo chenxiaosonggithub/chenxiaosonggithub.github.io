@@ -122,6 +122,14 @@ class="toc-section-number">3</span> 重新挂载</a></li>
 class="toc-section-number">4</span> 导出vmcore</a></li>
 <li><a href="#非特权源端口挂载" id="toc-非特权源端口挂载"><span
 class="toc-section-number">5</span> 非特权源端口挂载</a></li>
+<li><a href="#script" id="toc-script"><span
+class="toc-section-number">6</span> 调试脚本</a>
+<ul>
+<li><a href="#client-script" id="toc-client-script"><span
+class="toc-section-number">6.1</span> nfs client调试脚本</a></li>
+<li><a href="#server-script" id="toc-server-script"><span
+class="toc-section-number">6.2</span> nfs server调试脚本</a></li>
+</ul></li>
 </ul>
 </nav>
 <p><a
@@ -212,5 +220,79 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> noresvport <span class="va">${server_ip}</span>:/ /mnt</span></code></pre></div>
 <p>请注意，使用非特权源端口挂载在一些场景下是不安全的（从server端的配置选项的字面意思<code>insecure</code>就能看出），尽量只在调试场景下使用。</p>
 <p>在我曾经定位过的nfs问题中，有碰到过路由器或交换机出于产品的某些原因，把小于1024的端口的数据包都给过滤了，当时就是使用非特权源端口挂载的方法排除其他可能性，最终定位出问题。</p>
+<h1 data-number="6" id="script"><span
+class="header-section-number">6</span> 调试脚本</h1>
+<h2 data-number="6.1" id="client-script"><span
+class="header-section-number">6.1</span> nfs client调试脚本</h2>
+<p>client脚本要和server脚本同时执行（如果server也要调试的话）。</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="va">mnt_point</span><span class="op">=</span>/mnt/ <span class="co"># 修改为nfs挂载点</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="va">log_time</span><span class="op">=</span>60s <span class="co"># 日志收集时长</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="va">log_dir</span><span class="op">=</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>/dmesg-log/ <span class="co"># 日志保存目录</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="va">net_interface</span><span class="op">=</span>any <span class="co"># 网络接口，如果不确定就填any</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="va">test_cmd</span><span class="op">=</span><span class="st">&quot;df </span><span class="va">${mnt_point}</span><span class="st">&quot;</span> <span class="co"># 测试命令</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="va">cap_file</span><span class="op">=</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>/nfs_client.cap</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="va">tcpdump_cmd</span><span class="op">=</span><span class="st">&quot;tcpdump --interface=</span><span class="va">${net_interface}</span><span class="st"> --buffer-size=20480 -w </span><span class="va">${cap_file}</span><span class="st">&quot;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;打开nfs日志开头&quot;</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="va">${tcpdump_cmd}</span> <span class="kw">&amp;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="va">tcpdump_pid</span><span class="op">=</span><span class="va">$!</span> <span class="co"># 记录pid</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&lt;1&gt; nfs debug log begin: </span><span class="va">$(</span><span class="fu">date</span><span class="va">)</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/kmsg <span class="co"># 内核日志记录当前时间</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># 打开nfs日志</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># 打开rpc日志</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co"># echo 0x7fff &gt; /proc/sys/sunrpc/nlm_debug # 如果需要定位nfsv3的NLM（网络锁管理协议），还要打开这个，但一般不涉及</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 1s</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="va">${test_cmd}</span> <span class="kw">&amp;</span> <span class="co"># 后台执行</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;等一段时间以产生足够多的日志&quot;</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> <span class="va">${log_time}</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># 关闭</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># 关闭</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="co"># echo 0 &gt; /proc/sys/sunrpc/nlm_debug</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&lt;1&gt; nfs debug log end: </span><span class="va">$(</span><span class="fu">date</span><span class="va">)</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/kmsg <span class="co"># 内核日志记录当前时间</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="bu">kill</span> <span class="at">-SIGINT</span> <span class="va">${tcpdump_pid}</span> <span class="co"># 退出tcpdump</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 5</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="va">${log_dir}</span> <span class="at">-rf</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="va">${log_dir}</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /var/log/messages<span class="pp">*</span> <span class="va">${log_dir}</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /var/log/dmesg<span class="pp">*</span> <span class="va">${log_dir}</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="va">${cap_file}</span> <span class="va">${log_dir}</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;日志已保存到 </span><span class="va">${log_dir}</span><span class="st">/ 目录下&quot;</span></span></code></pre></div>
+<h2 data-number="6.2" id="server-script"><span
+class="header-section-number">6.2</span> nfs server调试脚本</h2>
+<p>server的脚本和client脚本同时执行。</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="va">log_time</span><span class="op">=</span>60s <span class="co"># 日志收集时长</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="va">log_dir</span><span class="op">=</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>/dmesg-log/ <span class="co"># 日志保存目录</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="va">net_interface</span><span class="op">=</span>any <span class="co"># 网络接口，如果不确定就填any</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="va">cap_file</span><span class="op">=</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>/nfs_server.cap</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="va">tcpdump_cmd</span><span class="op">=</span><span class="st">&quot;tcpdump --interface=</span><span class="va">${net_interface}</span><span class="st"> --buffer-size=20480 -w </span><span class="va">${cap_file}</span><span class="st">&quot;</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;打开nfs日志开头&quot;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="va">${tcpdump_cmd}</span> <span class="kw">&amp;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="va">tcpdump_pid</span><span class="op">=</span><span class="va">$!</span> <span class="co"># 记录pid</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&lt;1&gt; nfsd debug log begin: </span><span class="va">$(</span><span class="fu">date</span><span class="va">)</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/kmsg <span class="co"># 内核日志记录当前时间</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7FFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># 打开nfsd日志</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># 打开rpc日志</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;等一段时间以产生足够多的日志&quot;</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> <span class="va">${log_time}</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># 关闭</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># 关闭</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&lt;1&gt; nfsd debug log end: </span><span class="va">$(</span><span class="fu">date</span><span class="va">)</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/kmsg <span class="co"># 内核日志记录当前时间</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="bu">kill</span> <span class="at">-SIGINT</span> <span class="va">${tcpdump_pid}</span> <span class="co"># 退出tcpdump</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 5</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="va">${log_dir}</span> <span class="at">-rf</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="va">${log_dir}</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /var/log/messages<span class="pp">*</span> <span class="va">${log_dir}</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /var/log/dmesg<span class="pp">*</span> <span class="va">${log_dir}</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="va">${cap_file}</span> <span class="va">${log_dir}</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;日志已保存到 </span><span class="va">${log_dir}</span><span class="st">/ 目录下&quot;</span></span></code></pre></div>
 </body>
 </html>
