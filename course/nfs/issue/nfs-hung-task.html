@@ -186,21 +186,22 @@ class="header-section-number">3</span> 调试</h1>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># 打开nfs日志</span></span>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># 打开rpc日志</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="va">${test_cmd}</span> <span class="kw">&amp;</span> <span class="co"># 后台执行</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;等一段时间以产生足够多的日志&quot;</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> <span class="va">${log_time}</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># 关闭</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># 关闭</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&lt;1&gt; nfs debug log end: </span><span class="va">$(</span><span class="fu">date</span><span class="va">)</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/kmsg <span class="co"># 内核日志记录当前时间</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="bu">kill</span> <span class="at">-SIGINT</span> <span class="va">${tcpdump_pid}</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 5</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="va">${log_dir}</span> <span class="at">-rf</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="va">${log_dir}</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /var/log/messages<span class="pp">*</span> <span class="va">${log_dir}</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /var/log/dmesg<span class="pp">*</span> <span class="va">${log_dir}</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="va">${cap_file}</span> <span class="va">${log_dir}</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;日志已保存到 </span><span class="va">${log_dir}</span><span class="st">/ 目录下&quot;</span></span></code></pre></div>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 1s</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="va">${test_cmd}</span> <span class="kw">&amp;</span> <span class="co"># 后台执行</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;等一段时间以产生足够多的日志&quot;</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> <span class="va">${log_time}</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># 关闭</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># 关闭</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;&lt;1&gt; nfs debug log end: </span><span class="va">$(</span><span class="fu">date</span><span class="va">)</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/kmsg <span class="co"># 内核日志记录当前时间</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="bu">kill</span> <span class="at">-SIGINT</span> <span class="va">${tcpdump_pid}</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 5</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="va">${log_dir}</span> <span class="at">-rf</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="va">${log_dir}</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /var/log/messages<span class="pp">*</span> <span class="va">${log_dir}</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /var/log/dmesg<span class="pp">*</span> <span class="va">${log_dir}</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="va">${cap_file}</span> <span class="va">${log_dir}</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;日志已保存到 </span><span class="va">${log_dir}</span><span class="st">/ 目录下&quot;</span></span></code></pre></div>
 </body>
 </html>
