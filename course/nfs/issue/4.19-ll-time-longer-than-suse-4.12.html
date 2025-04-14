@@ -141,7 +141,7 @@ class="header-section-number">2</span> 调试</h1>
 <h2 data-number="2.1" id="环境准备"><span
 class="header-section-number">2.1</span> 环境准备</h2>
 <p>在nfs server端(suse)的测试目录下创建足够多的文件:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">counter</span><span class="op">=</span>200000</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">counter</span><span class="op">=</span>100000</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">path</span><span class="op">=</span>/tmp/test</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> <span class="va">${path}</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="va">${path}</span></span>
@@ -171,20 +171,35 @@ class="header-section-number">2.1</span> 环境准备</h2>
 class="header-section-number">2.2</span> 测试</h2>
 <p>nfs client测试命令:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">time</span> ls <span class="at">-l</span> /mnt/test/ <span class="op">&gt;</span> /dev/null <span class="kw">&amp;</span> <span class="co"># 连续执行4次</span></span></code></pre></div>
-<p>suse测试结果如下:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    5m53.793s</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    6m21.455s</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    6m34.097s</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    6m39.315s</span></code></pre></div>
-<p>麒麟系统上测试结果如下:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    6m23.243s</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    6m37.083s</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    6m44.486s</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    6m51.066s</span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="va">counter</span><span class="op">=</span>3</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="kw">((</span><span class="va">i</span><span class="op">=</span><span class="dv">1</span><span class="kw">;</span><span class="va">i</span><span class="op">&lt;=</span><span class="va">${counter}</span><span class="kw">;</span><span class="va">i</span><span class="op">++</span><span class="kw">))</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="va">$i</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">time</span> ls <span class="at">-l</span> /mnt/test/ <span class="op">&gt;</span> /dev/null <span class="kw">&amp;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sleep</span> 1</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<p>suse 4.12内核测试结果如下:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    0m45.698s <span class="co"># 执行一次</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 连续执行3次</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    1m11.736s</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    1m15.464s</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    1m17.997s</span></code></pre></div>
+<p>suse内核替换为麒麟的4.19，测试结果如下:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    0m50.777s <span class="co"># 执行一次</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 连续执行3次</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    1m10.020s</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    1m13.480s</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    1m15.569s</span></code></pre></div>
+<p>suse内核替换为主线，测试结果如下:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    0m20.973s <span class="co"># 执行一次</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 连续执行3次</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    0m24.753s</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    0m24.534s</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">real</span>    0m24.502s</span></code></pre></div>
 <h1 data-number="3" id="结论"><span
 class="header-section-number">3</span> 结论</h1>
-<p>SUSE Linux Enterprise Server 12 SP5
-的4.12内核替换为4.19内核（使用suse的内核config），测试时间一样，排除了内核代码上的问题。</p>
+<p>在虚拟机中SUSE Linux Enterprise Server 12 SP5
+的4.12内核替换为4.19内核（使用suse的内核config），测试时间一样。</p>
+<p>但在某些物理机环境上还是有问题，需要进一步定位。</p>
 </body>
 </html>
