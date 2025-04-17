@@ -208,16 +208,19 @@ class="header-section-number">2</span> 解析vmcore</h1>
 href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/4.19-bug-in-nfs_unlock_request-vmcore.md">详细的crash命令输出信息请点击这里查看</a>。</p>
 <h2 data-number="2.1" id="准备"><span
 class="header-section-number">2.1</span> 准备</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rpm2cpio</span> kernel-debuginfo-4.19.xxx.x86_64.rpm <span class="kw">|</span> <span class="fu">cpio</span> <span class="at">-div</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span> vmcore usr/lib/debug/lib/modules/4.19.xxx.x86_64/vmlinux</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="kw">|</span> <span class="fu">grep</span> nfs</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc084c000  nfs_acl                 16384  (not loaded)  [CONFIG_KALLSYMS]</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc0858100  nfsv3                   49152  (not loaded)  [CONFIG_KALLSYMS]</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc0985c80  nfs                    311296  (not loaded)  [CONFIG_KALLSYMS]</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc0c51400  nfsv4                  679936  (not loaded)  [CONFIG_KALLSYMS]</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfs</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv3</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv4</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">md5sum</span> vmcore</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 4d708113fe3f28fa0fd3ef88c5b3f0e3  vmcore # 其中一个vmcore</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">rpm2cpio</span> kernel-debuginfo-4.19.xxx.x86_64.rpm <span class="kw">|</span> <span class="fu">cpio</span> <span class="at">-div</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span> vmcore usr/lib/debug/lib/modules/4.19.xxx.x86_64/vmlinux</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="kw">|</span> <span class="fu">grep</span> nfs</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc084c000  nfs_acl                 16384  (not loaded)  [CONFIG_KALLSYMS]</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc0858100  nfsv3                   49152  (not loaded)  [CONFIG_KALLSYMS]</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc0985c80  nfs                    311296  (not loaded)  [CONFIG_KALLSYMS]</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc0c51400  nfsv4                  679936  (not loaded)  [CONFIG_KALLSYMS]</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfs</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv3</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv4</span></code></pre></div>
 <h2 data-number="2.2" id="寻找nfs_unlock_request参数req的值"><span
 class="header-section-number">2.2</span>
 寻找<code>nfs_unlock_request()</code>参数<code>req</code>的值</h2>
@@ -335,7 +338,7 @@ class="header-section-number">3</span> 代码分析</h1>
 <p>在nfs中只有在<code>nfs_unlock_request()</code>一个地方清除<code>PG_BUSY</code>位，发生panic肯定是两次执行到了<code>nfs_unlock_request()</code>函数。
 正常情况下执行<code>nfs_redirty_request()</code>前会先执行<code>nfs_lock_and_join_requests()</code>，<code>nfs_lock_and_join_requests()</code>中引用计数变为<code>2</code>，<code>wb_flags</code>变为<code>0x13</code>。</p>
 <p>从前面的vmcore解释中可知崩溃时<code>struct nfs_page</code>结构体中的引用计数为<code>1</code>，<code>wb_flags</code>值为<code>0x12</code>（二进制<code>0b10010</code>，设置了<code>PG_MAPPED</code>和<code>PG_INODE_REF</code>）。初步怀疑是在另一个并行执行的进程中同时操作了减引用计数和清除<code>wb_flags</code>的<code>PG_BUSY</code>位，同时执行这两个操作的函数是<code>nfs_unlock_and_release_request()</code>。</p>
-<p>初始化<code>nfs_page</code>:</p>
+<p>初始化<code>nfs_page</code>的流程:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>nfs_file_write</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  generic_perform_write</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    nfs_write_end</span>
@@ -380,7 +383,7 @@ class="header-section-number">3</span> 代码分析</h1>
 <span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>                  BUG <span class="co">// 异常情况下panic了</span></span>
 <span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>                  clear_bit<span class="op">(</span>PG_BUSY<span class="op">,</span> <span class="co">// 只在nfs_unlock_request 中清除busy位</span></span>
 <span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>                  wake_up_bit<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_flags<span class="op">,</span> PG_BUSY<span class="op">)</span> <span class="co">// 唤醒进程</span></span></code></pre></div>
-<p>异步释放<code>nfs_page</code>:</p>
+<p>异步释放<code>nfs_page</code>的流程:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rpc_async_release</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  nfs_pgio_release</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    nfs_write_completion</span>
