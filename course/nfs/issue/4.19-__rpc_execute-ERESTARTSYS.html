@@ -137,18 +137,20 @@ class="header-section-number">2</span> 补丁</h1>
 href="https://gitee.com/openeuler/kernel/issues/I4DD74">openeuler
 issue</a>。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">5483b904bf33</span> SUNRPC: Should wake up the privileged task firstly.</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">fcb170a9d825</span> SUNRPC: Fix the batch tasks count wraparound.</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">fcb170a9d825</span> SUNRPC: Fix the batch tasks count wraparound.</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">c3aba897c6e6</span> NFSv4: Fix second deadlock in nfs4_evict_inode<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">dfe1fe75e00e</span> NFSv4: Fix deadlock between nfs4_evict_inode<span class="er">(</span><span class="kw">)</span> <span class="ex">and</span> nfs4_opendata_get_inode<span class="er">(</span><span class="kw">)</span></span></code></pre></div>
 <h1 data-number="3" id="代码分析"><span
 class="header-section-number">3</span> 代码分析</h1>
 <p>根据打印的日志，挂载不上是因为<code>__rpc_execute()</code>中的捕获到信号:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>__rpc_execute</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  dprintk<span class="op">(</span><span class="st">&quot;RPC: </span><span class="sc">%5u</span><span class="st"> sync task going to sleep</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  dprintk<span class="op">(</span><span class="st">&quot;RPC: </span><span class="sc">%5u</span><span class="st"> sync task going to sleep</span><span class="sc">\n</span><span class="st">&quot;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  out_of_line_wait_on_bit</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    __wait_on_bit</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>      rpc_wait_bit_killable <span class="co">// (*action)(</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>signal_pending_state</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span>ERESTARTSYS <span class="co">// 512</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  dprintk<span class="op">(</span><span class="st">&quot;RPC: </span><span class="sc">%5u</span><span class="st"> got signal</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  dprintk<span class="op">(</span><span class="st">&quot;RPC: </span><span class="sc">%5u</span><span class="st"> got signal</span><span class="sc">\n</span><span class="st">&quot;</span></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  rpc_exit<span class="op">(</span>task<span class="op">,</span> <span class="op">-</span>ERESTARTSYS</span></code></pre></div>
 <p>打印出很多rpc任务是因为写<code>/proc/sys/sunrpc/rpc_debug</code>文件:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>proc_dodebug</span>
