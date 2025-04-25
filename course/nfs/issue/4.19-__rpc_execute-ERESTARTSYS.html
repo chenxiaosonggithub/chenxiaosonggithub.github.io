@@ -133,6 +133,7 @@ href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/4.19-__rpc_execute
 <p>有些情况下还会有<a
 href="https://chenxiaosong.com/course/nfs/issue/nfs-hung-task.html">hung
 task的日志</a>。</p>
+<p>server端是nas盘，有两个ip，挂载另一个ip成功。</p>
 <h1 data-number="2" id="补丁"><span
 class="header-section-number">2</span> 补丁</h1>
 <p><a
@@ -157,20 +158,29 @@ class="header-section-number">3</span> 代码分析</h1>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    rpc_show_header</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    rpc_show_task</span></code></pre></div>
 <p><code>ForeChannel Slot table</code>相关的流程:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nfs41_init_client</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  nfs4_alloc_session</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    nfs4_init_slot_table<span class="op">(...,</span> <span class="st">&quot;ForeChannel Slot table&quot;</span><span class="op">)</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      rpc_init_priority_wait_queue<span class="op">(&amp;</span>tbl<span class="op">-&gt;</span>slot_tbl_waitq<span class="op">,</span> <span class="op">...)</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        __rpc_init_priority_wait_queue</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>          rpc_assign_waitqueue_name</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            q<span class="op">-&gt;</span>name <span class="op">=</span> name<span class="op">;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>nfs4_setup_sequence</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>nfs4_slot_tbl_draining<span class="op">(</span>tbl<span class="op">)</span> <span class="co">// 如果正在清空slot，则执行goto out_sleep</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  nfs4_alloc_slot <span class="co">// 如果找不到空闲的slot，也执行goto out_sleep</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  out_sleep<span class="op">:</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  rpc_sleep_on_priority<span class="op">(&amp;</span>tbl<span class="op">-&gt;</span>slot_tbl_waitq<span class="op">,</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  rpc_sleep_on<span class="op">(&amp;</span>tbl<span class="op">-&gt;</span>slot_tbl_waitq<span class="op">,</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mount_fs</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  nfs4_remote_mount</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    nfs4_create_server</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      nfs4_init_server</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        nfs4_set_client</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>          nfs_get_client</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            nfs4_init_client</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>              nfs41_init_client</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 再挂载同一个ip不会生成新的session</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 但挂载另一个ip会生成新的session</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                nfs4_alloc_session</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                  nfs4_init_slot_table<span class="op">(...,</span> <span class="st">&quot;ForeChannel Slot table&quot;</span><span class="op">)</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                    rpc_init_priority_wait_queue<span class="op">(&amp;</span>tbl<span class="op">-&gt;</span>slot_tbl_waitq<span class="op">,</span> <span class="op">...)</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                      __rpc_init_priority_wait_queue</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                        rpc_assign_waitqueue_name</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>                          q<span class="op">-&gt;</span>name <span class="op">=</span> name<span class="op">;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>nfs4_setup_sequence</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>nfs4_slot_tbl_draining<span class="op">(</span>tbl<span class="op">)</span> <span class="co">// 如果正在清空slot，则执行goto out_sleep</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  nfs4_alloc_slot <span class="co">// 如果找不到空闲的slot，也执行goto out_sleep</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  out_sleep<span class="op">:</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  rpc_sleep_on_priority<span class="op">(&amp;</span>tbl<span class="op">-&gt;</span>slot_tbl_waitq<span class="op">,</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  rpc_sleep_on<span class="op">(&amp;</span>tbl<span class="op">-&gt;</span>slot_tbl_waitq<span class="op">,</span></span></code></pre></div>
 <p>我们还可以在虚拟机中尝试把server端服务停掉，然后写文件，修改<code>/proc/sys/sunrpc/rpc_debug</code>文件的值时，
 打印的是类似<code>91 4080      0 8eecf24b e2badc1c     3000 66c9f56f nfsv4 GETATTR a:call_timeout q:delayq</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 初始化delayq</span></span>
