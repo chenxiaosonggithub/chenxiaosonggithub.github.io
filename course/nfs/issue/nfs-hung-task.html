@@ -115,9 +115,11 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 <li><a href="#问题描述" id="toc-问题描述"><span
 class="toc-section-number">1</span> 问题描述</a></li>
 <li><a href="#构造复现" id="toc-构造复现"><span
-class="toc-section-number">2</span> 构造复现</a></li>
+class="toc-section-number">2</span> 4.19构造复现</a></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">3</span> 4.19代码分析</a></li>
 <li><a href="#debug" id="toc-debug"><span
-class="toc-section-number">3</span> 调试</a></li>
+class="toc-section-number">4</span> 调试</a></li>
 </ul>
 </nav>
 <p><a
@@ -130,26 +132,35 @@ class="header-section-number">1</span> 问题描述</h1>
 href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/nfs-hung-task-log.txt">4.19内核
 hung task日志</a>。</p>
 <h1 data-number="2" id="构造复现"><span
-class="header-section-number">2</span> 构造复现</h1>
+class="header-section-number">2</span> 4.19构造复现</h1>
+<p>在4.19内核上做修改。</p>
 <p>nfs server构造收到打开文件的请求后不回复的情况，代码修改如下:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/fs/nfsd/nfs4proc.c</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/fs/nfsd/nfs4proc.c</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-356,6</span> +356,11 @@ nfsd4_open<span class="er">(</span><span class="ex">struct</span> svc_rqst <span class="pp">*</span>rqstp, struct nfsd4_compound_state <span class="pp">*</span>cstate,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">struct</span> nfsd_net <span class="pp">*</span>nn = net_generic<span class="er">(</span><span class="ex">net,</span> nfsd_net_id<span class="kw">);</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">bool</span> reclaim = false<span class="kw">;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       while <span class="er">(</span><span class="ex">1</span><span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               printk<span class="er">(</span><span class="st">&quot;%s:%d, sleep\n&quot;</span><span class="ex">,</span> __func__, __LINE__<span class="kw">);</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               msleep<span class="er">(</span><span class="ex">20</span> <span class="pp">*</span> 1000<span class="kw">);</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       }</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dprintk</span><span class="er">(</span><span class="st">&quot;NFSD: nfsd4_open filename %.*s op_openowner %p\n&quot;</span><span class="ex">,</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                <span class="kw">(</span><span class="ex">int</span><span class="kw">)</span><span class="ex">open-</span><span class="op">&gt;</span>op_fname.len, open-<span class="op">&gt;</span>op_fname.data,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                <span class="ex">open-</span><span class="op">&gt;</span>op_openowner<span class="kw">);</span></span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-46,6</span> +46,7 @@</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a> <span class="co">#include &quot;acl.h&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a> <span class="co">#include &quot;pnfs.h&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a> <span class="co">#include &quot;trace.h&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">+#include</span> <span class="op">&lt;</span>linux/delay.h<span class="op">&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a> <span class="co">#ifdef CONFIG_NFSD_V4_SECURITY_LABEL</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a> <span class="co">#include &lt;linux/security.h&gt;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-356,6</span> +356,11 @@ nfsd4_open<span class="er">(</span><span class="ex">struct</span> svc_rqst <span class="pp">*</span>rqstp, struct nfsd4_compound_state <span class="pp">*</span>cstate,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="ex">struct</span> nfsd_net <span class="pp">*</span>nn = net_generic<span class="er">(</span><span class="ex">net,</span> nfsd_net_id<span class="kw">);</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="ex">bool</span> reclaim = false<span class="kw">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       while <span class="er">(</span><span class="ex">1</span><span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               printk<span class="er">(</span><span class="st">&quot;%s:%d, sleep\n&quot;</span><span class="ex">,</span> __func__, __LINE__<span class="kw">);</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               msleep<span class="er">(</span><span class="ex">20</span> <span class="pp">*</span> 1000<span class="kw">);</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       }</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dprintk</span><span class="er">(</span><span class="st">&quot;NFSD: nfsd4_open filename %.*s op_openowner %p\n&quot;</span><span class="ex">,</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>                <span class="kw">(</span><span class="ex">int</span><span class="kw">)</span><span class="ex">open-</span><span class="op">&gt;</span>op_fname.len, open-<span class="op">&gt;</span>op_fname.data,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>                <span class="ex">open-</span><span class="op">&gt;</span>op_openowner<span class="kw">);</span></span></code></pre></div>
 <p>为了方便，我们用一台机器既做server又做client。测试命令如下:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs localhost:/ /mnt</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span> <span class="co"># 会打印出pid 576</span></span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span> <span class="co"># 进程575</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span> <span class="co"># 进程576</span></span></code></pre></div>
 <p>等待120秒后就会打印出以下信息:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  246.880095] INFO: task <span class="er">bash:576</span> <span class="ex">blocked</span> for more than 120 seconds.</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  246.882393]       Not tainted <span class="er">4.19.325+</span> <span class="co">#3</span></span>
@@ -168,8 +179,53 @@ class="header-section-number">2</span> 构造复现</h1>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  246.908748]  __x64_sys_openat+0x1f/0x30</span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>[  246.910124]  <span class="er">do_syscall_64+0x64/0x1e0</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  246.912958]  entry_SYSCALL_64_after_hwframe+0x5c/0xc1</span></code></pre></div>
-<h1 data-number="3" id="debug"><span
-class="header-section-number">3</span> 调试</h1>
+<p>等待rpc回复的进程:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/575/stack</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] __rpc_wait_for_completion_task+0x2d/0x30</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_run_open_task+0x12c/0x1b0</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] _nfs4_open_and_get_state+0x6f/0x430</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] _nfs4_do_open.isra.0+0x17c/0x490</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_do_open+0xd3/0x1f0</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_atomic_open+0xe7/0x100</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs_atomic_open+0x1d7/0x720</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] atomic_open+0x96/0x260</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] lookup_open+0x316/0x550</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_last+0x3df/0x8b0</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] path_openat+0x8b/0x2c0</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_filp_open+0x91/0x130</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_sys_open+0x16f/0x200</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] __x64_sys_openat+0x1f/0x30</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_syscall_64+0x64/0x1e0</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] entry_SYSCALL_64_after_hwframe+0x44/0xa9</span></code></pre></div>
+<h1 data-number="3" id="代码分析"><span
+class="header-section-number">3</span> 4.19代码分析</h1>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>do_last</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  lookup_open</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    inode_lock</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      down_write <span class="co">// 写锁</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    atomic_open</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      nfs_atomic_open</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        nfs4_atomic_open</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>          nfs4_do_open</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            _nfs4_do_open</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>              _nfs4_open_and_get_state</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                nfs4_run_open_task</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                  <span class="op">.</span>flags <span class="op">=</span> RPC_TASK_ASYNC<span class="op">,</span> <span class="co">// 异步</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                  rpc_run_task</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                    rpc_execute</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                      rpc_make_runnable <span class="co">// 异步执行</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                  __rpc_wait_for_completion_task <span class="co">// 等待nfs server回复后唤醒</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>do_sys_open</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  do_filp_open</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    path_openat</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>      do_last</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        down_write <span class="co">// 写锁</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>          call_rwsem_down_write_failed</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>            rwsem_down_write_failed</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>              schedule <span class="co">// 让出cpu，超过120秒后报hung_task</span></span></code></pre></div>
+<h1 data-number="4" id="debug"><span
+class="header-section-number">4</span> 调试</h1>
 <p><a
 href="https://chenxiaosong.com/course/nfs/debug.html#client-script">参考《nfs
 client调试脚本》</a></p>
