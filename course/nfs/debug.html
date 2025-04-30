@@ -114,11 +114,11 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 <ul>
 <li><a href="#日志" id="toc-日志"><span
 class="toc-section-number">1</span> 日志</a></li>
-<li><a href="#tcpdump抓包" id="toc-tcpdump抓包"><span
+<li><a href="#tcpdump" id="toc-tcpdump"><span
 class="toc-section-number">2</span> tcpdump抓包</a></li>
 <li><a href="#重新挂载" id="toc-重新挂载"><span
 class="toc-section-number">3</span> 重新挂载</a></li>
-<li><a href="#导出vmcore" id="toc-导出vmcore"><span
+<li><a href="#vmcore" id="toc-vmcore"><span
 class="toc-section-number">4</span> 导出vmcore</a></li>
 <li><a href="#非特权源端口挂载" id="toc-非特权源端口挂载"><span
 class="toc-section-number">5</span> 非特权源端口挂载</a></li>
@@ -163,7 +163,7 @@ class="header-section-number">1</span> 日志</h1>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x0040 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_SCHED</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x0400 <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># NFSDDBG_PNFS</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x0008 <span class="op">&gt;</span> /proc/sys/sunrpc/nlm_debug <span class="co"># NLMDBG_SVCLOCK</span></span></code></pre></div>
-<h1 data-number="2" id="tcpdump抓包"><span
+<h1 data-number="2" id="tcpdump"><span
 class="header-section-number">2</span> tcpdump抓包</h1>
 <p>既然nfs涉及到网络，定位问题肯定也少不了网络抓包，甚至在绝大多数情况下，网络抓包能够比日志提供更有用更直观的信息，使用<code>tcpdump</code>工具抓包:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --interface: 指定要监听的网络接口，any表示所有的网络接口</span></span>
@@ -187,7 +187,7 @@ class="header-section-number">3</span> 重新挂载</h1>
 <p>如果找到的使用挂载点的进程没有那么重要，建议还是kill掉这些进程再卸载，这样才能更彻底的恢复环境:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">kill</span> <span class="at">-SIGKILL</span> <span class="op">&lt;</span>进程号<span class="op">&gt;</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span></code></pre></div>
-<h1 data-number="4" id="导出vmcore"><span
+<h1 data-number="4" id="vmcore"><span
 class="header-section-number">4</span> 导出vmcore</h1>
 <p>在生产环境下，如果必须要快速恢复环境，且这个环境是可以接受重启系统，就可以尝试手动导出vmcore，vmcore中的信息有时对分析问题很有帮助:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /proc/sys/kernel/sysrq</span>

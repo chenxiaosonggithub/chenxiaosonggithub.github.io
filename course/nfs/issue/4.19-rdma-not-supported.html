@@ -227,16 +227,17 @@ class="header-section-number">3</span> 代码分析</h1>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        dprintk<span class="op">(</span><span class="st">&quot;svc: creating transport </span><span class="sc">%s</span><span class="st">[</span><span class="sc">%d</span><span class="st">]</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        _svc_create_xprt</span>
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>          <span class="co">// 从 svc_xprt_class_list 链表中找</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>          __svc_xpo_create</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>          __svc_xpo_create <span class="co">// 找到了才会执行到这里</span></span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>            svc_rdma_create <span class="co">// xcl-&gt;xcl_ops-&gt;xpo_create</span></span>
 <span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>              dprintk<span class="op">(</span><span class="st">&quot;svcrdma: Creating RDMA listener</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">)</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>rpc_rdma_init</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  svc_rdma_init</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    svc_reg_xprt_class</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>      dprintk<span class="op">(</span><span class="st">&quot;svc: Adding svc transport class&quot;</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>      <span class="co">// 加到 svc_xprt_class_list 链表中</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>      list_add_tail<span class="op">(&amp;</span>xcl<span class="op">-&gt;</span>xcl_list<span class="op">,</span> <span class="op">&amp;</span>svc_xprt_class_list<span class="op">)</span></span></code></pre></div>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>          <span class="cf">return</span> <span class="op">-</span>EPROTONOSUPPORT <span class="co">// 找不到返回错误码</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>rpc_rdma_init</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  svc_rdma_init</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    svc_reg_xprt_class</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>      dprintk<span class="op">(</span><span class="st">&quot;svc: Adding svc transport class&quot;</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>      <span class="co">// 加到 svc_xprt_class_list 链表中</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>      list_add_tail<span class="op">(&amp;</span>xcl<span class="op">-&gt;</span>xcl_list<span class="op">,</span> <span class="op">&amp;</span>svc_xprt_class_list<span class="op">)</span></span></code></pre></div>
 <h1 data-number="4" id="解决方案"><span
 class="header-section-number">4</span> 解决方案</h1>
 <p>重新编译内核，使用<code>modinfo rpcrdma</code>查看:</p>
