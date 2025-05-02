@@ -202,16 +202,43 @@ href="https://github.com/nfs-ganesha/nfs-ganesha">nfs-ganesha的github仓库</a>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ../src/scripts/systemd/nfs-ganesha-lock.service.el8 /usr/lib/systemd/system/nfs-ganesha-lock.service</span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ../src/scripts/systemd/nfs-ganesha.service.el7 /usr/lib/systemd/system/nfs-ganesha.service</span></code></pre></div>
 <p>配置文件的位置在<code>/etc/ganesha/ganesha.conf</code>，可以参考<a
-href="https://github.com/nfs-ganesha/nfs-ganesha/tree/next/src/config_samples"><code>config_samples</code></a>。
-我使用了<a
-href="https://github.com/nfs-ganesha/nfs-ganesha/blob/next/src/config_samples/vfs.conf"><code>vfs.conf</code></a>。</p>
-<p>启动服务:</p>
+href="https://github.com/nfs-ganesha/nfs-ganesha/tree/next/src/config_samples"><code>config_samples</code></a>，
+下面示例的配置中<code>/tmp/s_test</code>挂载的是xfs文件系统:</p>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> daemon-reload</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> start nfs-ganesha</span></code></pre></div>
-<p>查看导出的目录:</p>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">EXPORT</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Export_Id</span> = 12345<span class="kw">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Path</span> = /tmp/s_test<span class="kw">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Pseudo</span> = /<span class="kw">;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Protocols</span> = 3,4<span class="kw">;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Access_Type</span> = RW<span class="kw">;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="ex">FSAL</span> {</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                <span class="co"># todo: 怎么导出其他文件系统，比如tmpfs</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                <span class="ex">Name</span> = XFS<span class="kw">;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        <span class="kw">}</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="ex">NFSV4</span> {</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 作为设置 idmapper 程序的替代方法</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Allow_Numeric_Owners</span> = true<span class="kw">;</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Only_Numeric_Owners</span> = true<span class="kw">;</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>如果要调试，可以加上以下配置:</p>
 <div class="sourceCode" id="cb11"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">showmount</span> <span class="at">-e</span> localhost</span></code></pre></div>
-<p>啥也看不到，为什么，哪里错了呢。</p>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">LOG</span> {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Default log level for all components</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Default_Log_Level</span> = DEBUG<span class="kw">;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>查看调试日志:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">journalctl</span> <span class="at">-u</span> nfs-ganesha <span class="at">-b</span></span></code></pre></div>
+<p>启动服务:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> daemon-reload</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> start nfs-ganesha</span></code></pre></div>
+<p>查看导出的目录:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">showmount</span> <span class="at">-e</span> localhost</span></code></pre></div>
+<p>然后就能正常挂载了。</p>
 </body>
 </html>
