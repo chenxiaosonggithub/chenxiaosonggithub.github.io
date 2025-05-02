@@ -113,13 +113,7 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#nfs-server环境" id="toc-nfs-server环境"><span
-class="toc-section-number">1</span> nfs server环境</a>
-<ul>
-<li><a href="#步骤" id="toc-步骤"><span
-class="toc-section-number">1.1</span> 步骤</a></li>
-<li><a href="#软件和配置文件" id="toc-软件和配置文件"><span
-class="toc-section-number">1.2</span> 软件和配置文件</a></li>
-</ul></li>
+class="toc-section-number">1</span> nfs server环境</a></li>
 <li><a href="#nfs-client环境" id="toc-nfs-client环境"><span
 class="toc-section-number">2</span> nfs client环境</a></li>
 </ul>
@@ -130,81 +124,29 @@ href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套�
 href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
 <h1 data-number="1" id="nfs-server环境"><span
 class="header-section-number">1</span> nfs server环境</h1>
-<h2 data-number="1.1" id="步骤"><span
-class="header-section-number">1.1</span> 步骤</h2>
-<p>nfs server安装所需软件:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apt-get</span> install nfs-kernel-server <span class="at">-y</span> <span class="co"># debian</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> install nfs-utils <span class="at">-y</span> <span class="co"># openeuler</span></span></code></pre></div>
-<p>nfs
-server编辑<code>exportfs</code>的配置文件<code>/etc/exports</code>，配置选项的含义可以通过命令<code>man 5 exports</code>查看:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/tmp/</span> <span class="pp">*(</span>rw,no_root_squash,fsid=0<span class="pp">)</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/tmp/s_test/</span> <span class="pp">*(</span>rw,no_root_squash,fsid=1<span class="pp">)</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/tmp/s_scratch</span> <span class="pp">*(</span>rw,no_root_squash,fsid=2<span class="pp">)</span></span></code></pre></div>
-<p>或者使用以下命令，具体用法查看<code>man 8 exportfs</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">exportfs</span> <span class="at">-i</span> <span class="at">-o</span> fsid=148252,no_root_squash,rw <span class="pp">*</span>:/tmp/s_test <span class="co"># 添加</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">exportfs</span> <span class="at">-u</span> <span class="pp">*</span>:/tmp/s_test <span class="co"># 删除</span></span></code></pre></div>
-<p>执行脚本<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/nfs-svr-setup.sh">nfs-svr-setup.sh</a>启动nfs
-server，其中，<code>rpcbind</code>（在服务文件<code>/lib/systemd/system/rpcbind.service</code>中）负责端口的对应工作（以前叫<code>portmap</code>），其他程序请查看<code>/lib/systemd/system/nfs-server.service</code>服务文件。</p>
-<h2 data-number="1.2" id="软件和配置文件"><span
-class="header-section-number">1.2</span> 软件和配置文件</h2>
-<p><code>/etc/exports</code>的配置格式如下:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 注意不能使用 192.168.122.* 而要使用 192.168.122.0/24</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [分享出去的目录]   [ip/(权限)]             [主机名]         [通配符]</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">tmp</span>              192.168.122.0/24<span class="er">(</span><span class="ex">ro</span><span class="kw">)</span>   <span class="ex">localhost</span><span class="er">(</span><span class="ex">rw</span><span class="kw">)</span>   <span class="ex">*.chenxiaosong.com</span><span class="er">(</span><span class="ex">ro,sync</span><span class="kw">)</span></span></code></pre></div>
-<p>详细的配置查看<code>man 5 exports</code>，下面介绍几个常用的:</p>
-<ul>
-<li><code>rw</code>可读可写，<code>ro</code>只读。</li>
-<li><code>sync</code>写入磁盘，<code>async</code>先存放在内存中。</li>
-<li>client账号为root时，默认<code>root_squash</code>压缩成<code>nobody(nfsnobody)</code>，<code>no_root_squash</code>不压缩。</li>
-<li><code>all_squash</code>把所有的用户都压缩成<code>nobody(nfsnobody)</code>。</li>
-<li><code>anonuid,anongid</code>设置<code>nobody(nfsnobody)</code>对应的uid和gid。</li>
-<li><code>nohide</code>和<code>crossmnt</code>: 仅针对v2和v3.</li>
-<li><code>fsid=num|root|uuid</code>: 文件系统标识。</li>
-</ul>
-<p>用以下命令查看开了哪些端口:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">netstat</span> <span class="at">-tulnp</span><span class="kw">|</span> <span class="fu">grep</span> <span class="at">-E</span> <span class="st">&#39;(rpc|nfs)&#39;</span></span></code></pre></div>
-<p>以下命令查看rpc状态:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -p: 针对ip</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">rpcinfo</span> <span class="at">-p</span> localhost</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -t: tcp, -u: udp</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">rpcinfo</span> <span class="at">-t</span> localhost nfs <span class="co"># nfs程序检查软件版本信息（tcp）</span></span></code></pre></div>
-<p>以下命令查看或操作分享的目录:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">showmount</span> <span class="at">-e</span> localhost <span class="co"># 查看</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">exportfs</span> <span class="co"># 查看</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -a: 全部，-r: 重新, -u: 取消，-v: 打印</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">exportfs</span> <span class="at">-arv</span> <span class="co"># 重新分享</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">exportfs</span> <span class="at">-auv</span> <span class="co"># 全部删除</span></span></code></pre></div>
-<p>还有两个文件:</p>
-<ul>
-<li><code>/var/lib/nfs/etab</code>:
-记录<code>/etc/exports</code>配置文件或<code>exportfs</code>命令分享出来的目录权限配置值。</li>
-<li><code>/var/lib/nfs/xtab</code>和<code>/var/lib/nfs/rmtab</code>:
-记录客户端数据。</li>
-</ul>
+<p><a href="https://chenxiaosong.com/course/nfs/nfsd.html">请查看《nfs
+server(nfsd)》</a></p>
 <h1 data-number="2" id="nfs-client环境"><span
 class="header-section-number">2</span> nfs client环境</h1>
 <p>nfs client安装所需软件:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apt-get</span> install nfs-common <span class="at">-y</span> <span class="co"># debian</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> install nfs-utils <span class="at">-y</span> <span class="co"># openeuler</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apt-get</span> install nfs-common <span class="at">-y</span> <span class="co"># debian</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> install nfs-utils <span class="at">-y</span> <span class="co"># openeuler</span></span></code></pre></div>
 <p>nfs
 client挂载（更多挂载选项可以通过命令<code>man 5 nfs</code>查看）:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nfsv4的根路径是/tmp/，源路径填写相对路径 /s_test 或 s_test</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=4.0 <span class="va">${server_ip}</span>:/s_test /mnt</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=4.1 <span class="va">${server_ip}</span>:/s_test /mnt</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=4.2 <span class="va">${server_ip}</span>:/s_test /mnt</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># nfsv3和nfsv2 源路径要写完整的源路径，没有根路径的概念，源路径必须是绝对路径/tmp/s_test</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=3 <span class="va">${server_ip}</span>:/tmp/s_test /mnt</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># nfsv2, nfs server 需要修改 /etc/nfs.conf 中的 `[nfsd] vers2=y`,但在Debian 11 (bullseye) 上安装的nfs-utils 1.3.3上找不到/etc/nfs.conf</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=2 <span class="va">${server_ip}</span>:/tmp/s_test /mnt</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nfsv4的根路径是/tmp/，源路径填写相对路径 /s_test 或 s_test</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=4.0 <span class="va">${server_ip}</span>:/s_test /mnt</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=4.1 <span class="va">${server_ip}</span>:/s_test /mnt</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=4.2 <span class="va">${server_ip}</span>:/s_test /mnt</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># nfsv3和nfsv2 源路径要写完整的源路径，没有根路径的概念，源路径必须是绝对路径/tmp/s_test</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=3 <span class="va">${server_ip}</span>:/tmp/s_test /mnt</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># nfsv2, nfs server 需要修改 /etc/nfs.conf 中的 `[nfsd] vers2=y`,但在Debian 11 (bullseye) 上安装的nfs-utils 1.3.3上找不到/etc/nfs.conf</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=2 <span class="va">${server_ip}</span>:/tmp/s_test /mnt</span></code></pre></div>
 <p>如果nfs
 server的exportfs的配置文件<code>/etc/exports</code>如下，没有<code>fsid</code>选项:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/tmp/s_test/</span> <span class="pp">*(</span>rw,no_root_squash<span class="pp">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/tmp/s_test/</span> <span class="pp">*(</span>rw,no_root_squash<span class="pp">)</span></span></code></pre></div>
 <p>这时nfsv4的根路径就是<code>/</code>，nfs
 client挂载nfsv4的命令如下:</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=4.0 <span class="va">${server_ip}</span>:/tmp/s_test /mnt <span class="co"># 或 tmp/s_test</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=4.0 <span class="va">${server_ip}</span>:/tmp/s_test /mnt <span class="co"># 或 tmp/s_test</span></span></code></pre></div>
 <p>要注意的是nfs不能在<code>/etc/fstab</code>文件中配置开机挂载，因为那时网络还没启动。</p>
 </body>
 </html>
