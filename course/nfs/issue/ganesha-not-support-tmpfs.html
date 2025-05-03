@@ -97,7 +97,7 @@
 <ul>
 <li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
 <li><a href="#调试"><span class="toc-section-number">2</span> 调试</a></li>
-<li><a href="#解决"><span class="toc-section-number">3</span> 解决</a></li>
+<li><a href="#补丁"><span class="toc-section-number">3</span> 补丁</a></li>
 </ul>
 </nav>
 <p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
@@ -118,18 +118,8 @@
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="ex">journalctl</span> -u nfs-ganesha -b --no-pager <span class="op">&gt;</span> tmpfs-log.txt</span></code></pre></div>
 <p>有以下日志:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">May</span> 03 13:09:20 localhost.localdomain nfs-ganesha[1263]: [main] populate_posix_file_systems :FSAL :DEBUG :Ignoring /tmp because type tmpfs</span></code></pre></div>
-<h1 data-number="3" id="解决"><span class="header-section-number">3</span> 解决</h1>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">---</span> a/src/FSAL/localfs.c</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">+++</span> b/src/FSAL/localfs.c</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="ex">@@</span> -945,8 +945,7 @@ int populate_posix_file_systems(const char *path)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>                    <span class="ex">strcasecmp</span>(mnt-<span class="op">&gt;</span>mnt_type, <span class="st">&quot;configfs&quot;</span>) == <span class="ex">0</span> <span class="kw">||</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>                    <span class="ex">strcasecmp</span>(mnt-<span class="op">&gt;</span>mnt_type, <span class="st">&quot;binfmt_misc&quot;</span>) == <span class="ex">0</span> <span class="kw">||</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>                    <span class="ex">strcasecmp</span>(mnt-<span class="op">&gt;</span>mnt_type, <span class="st">&quot;rpc_pipefs&quot;</span>) == <span class="ex">0</span> <span class="kw">||</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="ex">-</span>                   strcasecmp(mnt-<span class="op">&gt;</span>mnt_type, <span class="st">&quot;vboxsf&quot;</span>) == <span class="ex">0</span> <span class="kw">||</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="ex">-</span>                   strcasecmp(mnt-<span class="op">&gt;</span>mnt_type, <span class="st">&quot;tmpfs&quot;</span>) == <span class="ex">0</span>) <span class="kw">{</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="ex">+</span>                   strcasecmp(mnt-<span class="op">&gt;</span>mnt_type, <span class="st">&quot;vboxsf&quot;</span>) == <span class="ex">0</span>) <span class="kw">{</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>                        <span class="ex">LogDebug</span>(COMPONENT_FSAL, <span class="st">&quot;Ignoring %s because type %s&quot;</span>,</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>                                 <span class="ex">mnt-</span><span class="op">&gt;</span>mnt_dir, mnt-<span class="op">&gt;</span>mnt_type);</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>                        <span class="bu">continue</span><span class="kw">;</span></span></code></pre></div>
+<h1 data-number="3" id="补丁"><span class="header-section-number">3</span> 补丁</h1>
+<p>回退补丁<a href="https://github.com/nfs-ganesha/nfs-ganesha/commit/e21025367"><code>e21025367 Fixed GPFS create export issue during claim_posix_filesystem</code></a>就能导出tmpfs。</p>
+<p>这个补丁是为了解决<a href="https://github.com/nfs-ganesha/nfs-ganesha/issues/857">export fails due to stale dev id entry in avl tree (issue with resolve_posix_filesystem())</a>。</p>
 </body>
 </html>
