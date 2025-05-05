@@ -366,7 +366,9 @@
 <p>改变<code>/sys/class/mydebug-ctrl/debug</code>文件的值就能控制调试开关:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true"></a><span class="fu">cat</span> /sys/class/mydebug-ctrl/debug <span class="co"># 开机时默认打开第0个开关</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true"></a><span class="bu">echo</span> 31 <span class="op">&gt;</span> /sys/class/mydebug-ctrl/debug <span class="co"># 打开第31个开关</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true"></a><span class="bu">echo</span> 32 <span class="op">&gt;</span> /sys/class/mydebug-ctrl/debug <span class="co"># 无效，总共32个开关（0 ~ 31）</span></span></code></pre></div>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true"></a><span class="bu">echo</span> 32 <span class="op">&gt;</span> /sys/class/mydebug-ctrl/debug <span class="co"># 无效，总共32个开关（0 ~ 31）</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true"></a><span class="bu">echo</span> all <span class="op">&gt;</span> /sys/class/mydebug-ctrl/debug <span class="co"># 打开全部开头</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true"></a><span class="bu">echo</span> all <span class="op">&gt;</span> /sys/class/mydebug-ctrl/debug <span class="co"># 再执行一次就是关闭全部开头</span></span></code></pre></div>
 <p>代码使用示例:</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a>...</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;mydebug.h&gt;</span></span>
