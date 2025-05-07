@@ -116,6 +116,8 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 class="toc-section-number">1</span> client流程</a></li>
 <li><a href="#lock" id="toc-lock"><span
 class="toc-section-number">2</span> lock</a></li>
+<li><a href="#ksmbd代码流程" id="toc-ksmbd代码流程"><span
+class="toc-section-number">3</span> ksmbd代码流程</a></li>
 </ul>
 </nav>
 <p><a
@@ -298,5 +300,19 @@ class="header-section-number">2</span> lock</h1>
 <div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">-o</span> lock lock.c</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./lock</span> <span class="co"># client 1</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">./lock</span> <span class="co"># client 2，这时会调用 SMB2_lock， server会调用 smb2_lock</span></span></code></pre></div>
+<h1 data-number="3" id="ksmbd代码流程"><span
+class="header-section-number">3</span> ksmbd代码流程</h1>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>kthread</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  worker_thread</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    process_scheduled_works</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>      process_one_work</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        handle_ksmbd_work</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>          __handle_ksmbd_work</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>            __process_request</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>              smb2_open</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                dentry_open</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                  vfs_open</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                    do_dentry_open</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                      ext2_file_open</span></code></pre></div>
 </body>
 </html>

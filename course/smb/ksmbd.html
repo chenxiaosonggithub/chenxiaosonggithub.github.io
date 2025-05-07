@@ -118,8 +118,6 @@ class="toc-section-number">1</span> 参考资料</a></li>
 class="toc-section-number">2</span> 现状</a></li>
 <li><a href="#环境" id="toc-环境"><span
 class="toc-section-number">3</span> 环境</a></li>
-<li><a href="#代码流程" id="toc-代码流程"><span
-class="toc-section-number">4</span> 代码流程</a></li>
 </ul>
 </nav>
 <p><a
@@ -236,19 +234,5 @@ server。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ksmbd.control <span class="at">--shutdown</span> <span class="co"># 关闭</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ksmbd.mountd <span class="co"># 启动</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> mount <span class="at">-o</span> user=root //127.0.0.1/TEST /mnt</span></code></pre></div>
-<h1 data-number="4" id="代码流程"><span
-class="header-section-number">4</span> 代码流程</h1>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>kthread</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  worker_thread</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    process_scheduled_works</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      process_one_work</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        handle_ksmbd_work</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>          __handle_ksmbd_work</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            __process_request</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>              smb2_open</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                dentry_open</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                  vfs_open</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                    do_dentry_open</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                      ext2_file_open</span></code></pre></div>
 </body>
 </html>
