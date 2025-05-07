@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -94,564 +83,510 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">4.19内核nfs_unlock_request()报BUG()的问题</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#问题描述" id="toc-问题描述"><span
-class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#解析vmcore" id="toc-解析vmcore"><span
-class="toc-section-number">2</span> 解析vmcore</a>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#解析vmcore"><span class="toc-section-number">2</span> 解析vmcore</a>
 <ul>
-<li><a href="#准备" id="toc-准备"><span
-class="toc-section-number">2.1</span> 准备</a></li>
-<li><a href="#寻找nfs_unlock_request参数req的值"
-id="toc-寻找nfs_unlock_request参数req的值"><span
-class="toc-section-number">2.2</span>
-寻找<code>nfs_unlock_request()</code>参数<code>req</code>的值</a></li>
+<li><a href="#准备"><span class="toc-section-number">2.1</span> 准备</a></li>
+<li><a href="#寻找nfs_unlock_request参数req的值"><span class="toc-section-number">2.2</span> 寻找<code>nfs_unlock_request()</code>参数<code>req</code>的值</a></li>
 </ul></li>
-<li><a href="#代码分析" id="toc-代码分析"><span
-class="toc-section-number">3</span> 代码分析</a></li>
-<li><a href="#补丁" id="toc-补丁"><span
-class="toc-section-number">4</span> 补丁</a></li>
-<li><a href="#debug" id="toc-debug"><span
-class="toc-section-number">5</span> 调试</a></li>
-<li><a href="#构造复现" id="toc-构造复现"><span
-class="toc-section-number">6</span> 构造复现</a>
+<li><a href="#代码分析"><span class="toc-section-number">3</span> 代码分析</a></li>
+<li><a href="#补丁"><span class="toc-section-number">4</span> 补丁</a></li>
+<li><a href="#debug"><span class="toc-section-number">5</span> 调试</a></li>
+<li><a href="#构造复现"><span class="toc-section-number">6</span> 构造复现</a>
 <ul>
-<li><a href="#让内核执行到nfs_redirty_request所做的修改"
-id="toc-让内核执行到nfs_redirty_request所做的修改"><span
-class="toc-section-number">6.1</span>
-让内核执行到<code>nfs_redirty_request()</code>所做的修改</a></li>
-<li><a href="#在nfs_redirty_request中delay"
-id="toc-在nfs_redirty_request中delay"><span
-class="toc-section-number">6.2</span>
-在<code>nfs_redirty_request()</code>中delay</a></li>
-<li><a href="#触发invalidatepage" id="toc-触发invalidatepage"><span
-class="toc-section-number">6.3</span> 触发invalidatepage</a></li>
+<li><a href="#让内核执行到nfs_redirty_request所做的修改"><span class="toc-section-number">6.1</span> 让内核执行到<code>nfs_redirty_request()</code>所做的修改</a></li>
+<li><a href="#在nfs_redirty_request中delay"><span class="toc-section-number">6.2</span> 在<code>nfs_redirty_request()</code>中delay</a></li>
+<li><a href="#触发invalidatepage"><span class="toc-section-number">6.3</span> 触发invalidatepage</a></li>
 </ul></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<h1 data-number="1" id="问题描述"><span
-class="header-section-number">1</span> 问题描述</h1>
-<p><a
-href="https://access.redhat.com/solutions/1455633">redhat遇到的类似问题</a>。</p>
-<p>重点强调一下一个可能有用的线索: nfs client系统日志写到nfs
-server，client定期进行日志切割，先锁定原日志文件（如<code>messages</code>），重命名为<code>messages-20250410</code>，
-再生成新的<code>messages</code>文件，然后再将锁定期间缓存日志数据写入<code>messages</code>文件。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p><a href="https://access.redhat.com/solutions/1455633">redhat遇到的类似问题</a>。</p>
+<p>重点强调一下一个可能有用的线索: nfs client系统日志写到nfs server，client定期进行日志切割，先锁定原日志文件（如<code>messages</code>），重命名为<code>messages-20250410</code>， 再生成新的<code>messages</code>文件，然后再将锁定期间缓存日志数据写入<code>messages</code>文件。</p>
 <p>4.19内核发生panic，日志如下:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.245995]</span> NFS: Invalid unlock attempted</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.256784]</span> <span class="at">------------[</span> cut here ]------------</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.256787]</span> kernel BUG at fs/nfs/pagelist.c:382!</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.259330]</span> invalid opcode: 0000 <span class="pp">[</span><span class="ss">#1</span><span class="pp">]</span> SMP NOPTI</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.301490]</span> Call Trace:</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.302501]</span>  nfs_end_page_writeback+0x6d/0x100 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.304672]</span>  nfs_redirty_request+0x28/0x40 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.306123]</span>  nfs_do_writepage+0x1f6/0x2a0 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.307856]</span>  nfs_writepages_callback+0xf/0x20 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.309453]</span>  write_cache_pages+0x187/0x410</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.313517]</span>  nfs_writepages+0xb0/0x170 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.315238]</span>  do_writepages+0x4b/0xe0</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.319478]</span>  __filemap_fdatawrite_range+0xcf/0x110</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.321603]</span>  filemap_write_and_wait_range+0x30/0x80</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.323860]</span>  nfs_file_fsync+0x44/0x1f0 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.328512]</span>  filp_close+0x3e/0xd0</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.330914]</span>  __x64_sys_close+0x1e/0x50</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.333686]</span>  do_syscall_64+0x5b/0x1c0</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305675.336788]</span>  entry_SYSCALL_64_after_hwframe+0x44/0xa9</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 另一台机器的日志</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.431213]</span> NFS: Invalid unlock attempted</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.432588]</span> <span class="at">------------[</span> cut here ]------------</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.432590]</span> kernel BUG at fs/nfs/pagelist.c:382!</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.433859]</span> invalid opcode: 0000 <span class="pp">[</span><span class="ss">#1</span><span class="pp">]</span> SMP NOPTI</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.468588]</span> Call Trace:</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.469602]</span>  nfs_end_page_writeback+0x6d/0x100 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.471389]</span>  nfs_redirty_request+0x28/0x40 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.473202]</span>  nfs_do_writepage+0x1f6/0x2a0 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.474824]</span>  nfs_writepages_callback+0xf/0x20 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.476719]</span>  write_cache_pages+0x187/0x410</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.481762]</span>  nfs_writepages+0xb0/0x170 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.483415]</span>  do_writepages+0x4b/0xe0</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.490717]</span>  __writeback_single_inode+0x3d/0x310</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.494506]</span>  writeback_sb_inodes+0x1ad/0x4b0</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.498275]</span>  __writeback_inodes_wb+0x5d/0xb0</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.501829]</span>  wb_writeback+0x26c/0x300</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.511473]</span>  wb_workfn+0x1dc/0x4c0</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.515136]</span>  process_one_work+0x195/0x3d0</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.518714]</span>  worker_thread+0x30/0x390</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.525743]</span>  kthread+0x113/0x130</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="ex">[2305678.532686]</span>  ret_from_fork+0x35/0x40</span></code></pre></div>
-<h1 data-number="2" id="解析vmcore"><span
-class="header-section-number">2</span> 解析vmcore</h1>
-<p><a
-href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/4.19-bug-in-nfs_unlock_request-vmcore.md">详细的crash命令输出信息请点击这里查看</a>。</p>
-<h2 data-number="2.1" id="准备"><span
-class="header-section-number">2.1</span> 准备</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">md5sum</span> vmcore</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 4d708113fe3f28fa0fd3ef88c5b3f0e3  vmcore # 其中一个vmcore</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">rpm2cpio</span> kernel-debuginfo-4.19.xxx.x86_64.rpm <span class="kw">|</span> <span class="fu">cpio</span> <span class="at">-div</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span> vmcore usr/lib/debug/lib/modules/4.19.xxx.x86_64/vmlinux</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="kw">|</span> <span class="fu">grep</span> nfs</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc084c000  nfs_acl                 16384  (not loaded)  [CONFIG_KALLSYMS]</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc0858100  nfsv3                   49152  (not loaded)  [CONFIG_KALLSYMS]</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc0985c80  nfs                    311296  (not loaded)  [CONFIG_KALLSYMS]</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ffffffffc0c51400  nfsv4                  679936  (not loaded)  [CONFIG_KALLSYMS]</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfs</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv3</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsv4</span></code></pre></div>
-<h2 data-number="2.2" id="寻找nfs_unlock_request参数req的值"><span
-class="header-section-number">2.2</span>
-寻找<code>nfs_unlock_request()</code>参数<code>req</code>的值</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 3930345  TASK: ffff9c13db3bdf00  CPU: 30  COMMAND: <span class="st">&quot;java&quot;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a> <span class="co">#0 [ffffb2f160b236a0] machine_kexec at ffffffff8e45adde</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a> <span class="co">#1 [ffffb2f160b236f8] __crash_kexec at ffffffff8e55df01</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a> <span class="ex">...</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">[exception</span> RIP: nfs_unlock_request+55]</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RIP:</span> ffffffffc095df27  RSP: ffffb2f160b239a0  RFLAGS: 00010286</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RAX:</span> 000000000000001d  RBX: ffff9bf9f048da00  RCX: 0000000000000000</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RDX:</span> 0000000000000000  RSI: ffff9c147cf968f8  RDI: ffff9c147cf968f8</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">RBP:</span> ffff9c114b4c8aa0   R8: 000000000000163c   R9: 0000000000000018</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R10:</span> ffffffffffffff83  R11: ffff9c14733a1b10  R12: ffff9c131b2e5800</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R13:</span> 0000000000000001  R14: ffff9bf9f048da00  R15: ffff9c114b4c8aa0</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ORIG_RAX:</span> ffffffffffffffff  CS: 0010  SS: 0018</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a> <span class="co">#7 [ffffb2f160b239a0] nfs_end_page_writeback at ffffffffc096165d [nfs]</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a> <span class="co">#8 [ffffb2f160b239c8] nfs_redirty_request at ffffffffc0961718 [nfs]</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a> <span class="co">#9 [ffffb2f160b239d8] nfs_do_writepage at ffffffffc0962596 [nfs]</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a> <span class="ex">...</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> nfs_unlock_request</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095def0</span> <span class="op">&lt;</span>nfs_unlock_request<span class="op">&gt;</span>:        nopl   0x0<span class="er">(</span><span class="ex">%rax,%rax,1</span><span class="kw">)</span> <span class="ex">[FTRACE</span> NOP]</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095def5</span> <span class="op">&lt;</span>nfs_unlock_request+5<span class="op">&gt;</span>:      mov    0x40<span class="er">(</span><span class="ex">%rdi</span><span class="kw">)</span><span class="ex">,%rax</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095def9</span> <span class="op">&lt;</span>nfs_unlock_request+9<span class="op">&gt;</span>:      test   <span class="va">$0</span>x1,%al</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095defb</span> <span class="op">&lt;</span>nfs_unlock_request+11<span class="op">&gt;</span>:     je     0xffffffffc095df1b <span class="op">&lt;</span>nfs_unlock_request+43<span class="op">&gt;</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095defd</span> <span class="op">&lt;</span>nfs_unlock_request+13<span class="op">&gt;</span>:     lea    0x40<span class="er">(</span><span class="ex">%rdi</span><span class="kw">)</span><span class="ex">,%rdx</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df01</span> <span class="op">&lt;</span>nfs_unlock_request+17<span class="op">&gt;</span>:     lock andb <span class="va">$0</span>xfe,0x40<span class="er">(</span><span class="ex">%rdi</span><span class="kw">)</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df06</span> <span class="op">&lt;</span>nfs_unlock_request+22<span class="op">&gt;</span>:     mov    0x40<span class="er">(</span><span class="ex">%rdi</span><span class="kw">)</span><span class="ex">,%rax</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df0a</span> <span class="op">&lt;</span>nfs_unlock_request+26<span class="op">&gt;</span>:     test   <span class="va">$0</span>x10,%ah</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df0d</span> <span class="op">&lt;</span>nfs_unlock_request+29<span class="op">&gt;</span>:     jne    0xffffffffc095df11 <span class="op">&lt;</span>nfs_unlock_request+33<span class="op">&gt;</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df0f</span> <span class="op">&lt;</span>nfs_unlock_request+31<span class="op">&gt;</span>:     repz ret </span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df11</span> <span class="op">&lt;</span>nfs_unlock_request+33<span class="op">&gt;</span>:     xor    %esi,%esi</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df13</span> <span class="op">&lt;</span>nfs_unlock_request+35<span class="op">&gt;</span>:     mov    %rdx,%rdi</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df16</span> <span class="op">&lt;</span>nfs_unlock_request+38<span class="op">&gt;</span>:     jmp    0xffffffff8e5017b0 <span class="op">&lt;</span>wake_up_bit<span class="op">&gt;</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df1b</span> <span class="op">&lt;</span>nfs_unlock_request+43<span class="op">&gt;</span>:     mov    <span class="va">$0</span>xffffffffc0970df0,%rdi</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df22</span> <span class="op">&lt;</span>nfs_unlock_request+50<span class="op">&gt;</span>:     call   0xffffffff8e51d0fe <span class="op">&lt;</span>printk<span class="op">&gt;</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc095df27</span> <span class="op">&lt;</span>nfs_unlock_request+55<span class="op">&gt;</span>:     ud2 </span></code></pre></div>
-<p>x86_64下整数参数使用的寄存器依次为:
-RDI，RSI，RDX，RCX，R8，R9，可以看出<code>nfs_unlock_request()</code>的第一个参数<code>%rdi</code>寄存器的值被覆盖了（<code>mov    $0xffffffffc0970df0,%rdi</code>），
-所以无法通过传参寄存器<code>%rdi</code>的值得到<code>nfs_page</code>的值。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>[<span class="ex">2305675.245995</span>] NFS: Invalid unlock attempted</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>[<span class="ex">2305675.256784</span>] ------------[ cut here ]------------</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>[<span class="ex">2305675.256787</span>] kernel BUG at fs/nfs/pagelist.c:382!</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>[<span class="ex">2305675.259330</span>] invalid opcode: 0000 [#1] SMP NOPTI</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>[<span class="ex">2305675.301490</span>] Call Trace:</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>[<span class="ex">2305675.302501</span>]  nfs_end_page_writeback+0x6d/0x100 [nfs]</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>[<span class="ex">2305675.304672</span>]  nfs_redirty_request+0x28/0x40 [nfs]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>[<span class="ex">2305675.306123</span>]  nfs_do_writepage+0x1f6/0x2a0 [nfs]</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>[<span class="ex">2305675.307856</span>]  nfs_writepages_callback+0xf/0x20 [nfs]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>[<span class="ex">2305675.309453</span>]  write_cache_pages+0x187/0x410</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>[<span class="ex">2305675.313517</span>]  nfs_writepages+0xb0/0x170 [nfs]</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>[<span class="ex">2305675.315238</span>]  do_writepages+0x4b/0xe0</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>[<span class="ex">2305675.319478</span>]  __filemap_fdatawrite_range+0xcf/0x110</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>[<span class="ex">2305675.321603</span>]  filemap_write_and_wait_range+0x30/0x80</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>[<span class="ex">2305675.323860</span>]  nfs_file_fsync+0x44/0x1f0 [nfs]</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>[<span class="ex">2305675.328512</span>]  filp_close+0x3e/0xd0</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>[<span class="ex">2305675.330914</span>]  __x64_sys_close+0x1e/0x50</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>[<span class="ex">2305675.333686</span>]  do_syscall_64+0x5b/0x1c0</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>[<span class="ex">2305675.336788</span>]  entry_SYSCALL_64_after_hwframe+0x44/0xa9</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="co"># 另一台机器的日志</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>[<span class="ex">2305678.431213</span>] NFS: Invalid unlock attempted</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>[<span class="ex">2305678.432588</span>] ------------[ cut here ]------------</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>[<span class="ex">2305678.432590</span>] kernel BUG at fs/nfs/pagelist.c:382!</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>[<span class="ex">2305678.433859</span>] invalid opcode: 0000 [#1] SMP NOPTI</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>[<span class="ex">2305678.468588</span>] Call Trace:</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a>[<span class="ex">2305678.469602</span>]  nfs_end_page_writeback+0x6d/0x100 [nfs]</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>[<span class="ex">2305678.471389</span>]  nfs_redirty_request+0x28/0x40 [nfs]</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>[<span class="ex">2305678.473202</span>]  nfs_do_writepage+0x1f6/0x2a0 [nfs]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>[<span class="ex">2305678.474824</span>]  nfs_writepages_callback+0xf/0x20 [nfs]</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>[<span class="ex">2305678.476719</span>]  write_cache_pages+0x187/0x410</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>[<span class="ex">2305678.481762</span>]  nfs_writepages+0xb0/0x170 [nfs]</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>[<span class="ex">2305678.483415</span>]  do_writepages+0x4b/0xe0</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>[<span class="ex">2305678.490717</span>]  __writeback_single_inode+0x3d/0x310</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>[<span class="ex">2305678.494506</span>]  writeback_sb_inodes+0x1ad/0x4b0</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>[<span class="ex">2305678.498275</span>]  __writeback_inodes_wb+0x5d/0xb0</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>[<span class="ex">2305678.501829</span>]  wb_writeback+0x26c/0x300</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a>[<span class="ex">2305678.511473</span>]  wb_workfn+0x1dc/0x4c0</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a>[<span class="ex">2305678.515136</span>]  process_one_work+0x195/0x3d0</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a>[<span class="ex">2305678.518714</span>]  worker_thread+0x30/0x390</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>[<span class="ex">2305678.525743</span>]  kthread+0x113/0x130</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a>[<span class="ex">2305678.532686</span>]  ret_from_fork+0x35/0x40</span></code></pre></div>
+<h1 data-number="2" id="解析vmcore"><span class="header-section-number">2</span> 解析vmcore</h1>
+<p><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/4.19-bug-in-nfs_unlock_request-vmcore.md">详细的crash命令输出信息请点击这里查看</a>。</p>
+<h2 data-number="2.1" id="准备"><span class="header-section-number">2.1</span> 准备</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">md5sum</span> vmcore</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="co"># 4d708113fe3f28fa0fd3ef88c5b3f0e3  vmcore # 其中一个vmcore</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="ex">rpm2cpio</span> kernel-debuginfo-4.19.xxx.x86_64.rpm <span class="kw">|</span> <span class="fu">cpio</span> -div</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="ex">crash</span> vmcore usr/lib/debug/lib/modules/4.19.xxx.x86_64/vmlinux</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="kw">|</span> <span class="fu">grep</span> nfs</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  <span class="co"># ffffffffc084c000  nfs_acl                 16384  (not loaded)  [CONFIG_KALLSYMS]</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>  <span class="co"># ffffffffc0858100  nfsv3                   49152  (not loaded)  [CONFIG_KALLSYMS]</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>  <span class="co"># ffffffffc0985c80  nfs                    311296  (not loaded)  [CONFIG_KALLSYMS]</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>  <span class="co"># ffffffffc0c51400  nfsv4                  679936  (not loaded)  [CONFIG_KALLSYMS]</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfs</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfsv3</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfsv4</span></code></pre></div>
+<h2 data-number="2.2" id="寻找nfs_unlock_request参数req的值"><span class="header-section-number">2.2</span> 寻找<code>nfs_unlock_request()</code>参数<code>req</code>的值</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">PID</span>: 3930345  TASK: ffff9c13db3bdf00  CPU: 30  COMMAND: <span class="st">&quot;java&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a> <span class="co">#0 [ffffb2f160b236a0] machine_kexec at ffffffff8e45adde</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a> <span class="co">#1 [ffffb2f160b236f8] __crash_kexec at ffffffff8e55df01</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a> <span class="ex">...</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    [<span class="ex">exception</span> RIP: nfs_unlock_request+55]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>    <span class="ex">RIP</span>: ffffffffc095df27  RSP: ffffb2f160b239a0  RFLAGS: 00010286</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>    <span class="ex">RAX</span>: 000000000000001d  RBX: ffff9bf9f048da00  RCX: 0000000000000000</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>    <span class="ex">RDX</span>: 0000000000000000  RSI: ffff9c147cf968f8  RDI: ffff9c147cf968f8</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>    <span class="ex">RBP</span>: ffff9c114b4c8aa0   R8: 000000000000163c   R9: 0000000000000018</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>    <span class="ex">R10</span>: ffffffffffffff83  R11: ffff9c14733a1b10  R12: ffff9c131b2e5800</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>    <span class="ex">R13</span>: 0000000000000001  R14: ffff9bf9f048da00  R15: ffff9c114b4c8aa0</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>    <span class="ex">ORIG_RAX</span>: ffffffffffffffff  CS: 0010  SS: 0018</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a> <span class="co">#7 [ffffb2f160b239a0] nfs_end_page_writeback at ffffffffc096165d [nfs]</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a> <span class="co">#8 [ffffb2f160b239c8] nfs_redirty_request at ffffffffc0961718 [nfs]</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a> <span class="co">#9 [ffffb2f160b239d8] nfs_do_writepage at ffffffffc0962596 [nfs]</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a> <span class="ex">...</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dis -l nfs_unlock_request</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a><span class="ex">0xffffffffc095def0</span> <span class="op">&lt;</span>nfs_unlock_request<span class="op">&gt;</span>:        nopl   0x0(%rax,%rax,1) [<span class="ex">FTRACE</span> NOP]</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a><span class="ex">0xffffffffc095def5</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">5&gt;</span>:      mov    0x40(%rdi),<span class="ex">%rax</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a><span class="ex">0xffffffffc095def9</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">9&gt;</span>:      test   <span class="va">$0</span>x1,%al</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a><span class="ex">0xffffffffc095defb</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">11&gt;</span>:     je     0xffffffffc095df1b <span class="op">&lt;</span>nfs_unlock_request+<span class="op">43&gt;</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a><span class="ex">0xffffffffc095defd</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">13&gt;</span>:     lea    0x40(%rdi),<span class="ex">%rdx</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a><span class="ex">0xffffffffc095df01</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">17&gt;</span>:     lock andb <span class="va">$0</span>xfe,0x40(%rdi)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a><span class="ex">0xffffffffc095df06</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">22&gt;</span>:     mov    0x40(%rdi),<span class="ex">%rax</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a><span class="ex">0xffffffffc095df0a</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">26&gt;</span>:     test   <span class="va">$0</span>x10,%ah</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a><span class="ex">0xffffffffc095df0d</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">29&gt;</span>:     jne    0xffffffffc095df11 <span class="op">&lt;</span>nfs_unlock_request+<span class="op">33&gt;</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a><span class="ex">0xffffffffc095df0f</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">31&gt;</span>:     repz ret </span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a><span class="ex">0xffffffffc095df11</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">33&gt;</span>:     xor    %esi,%esi</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a><span class="ex">0xffffffffc095df13</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">35&gt;</span>:     mov    %rdx,%rdi</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a><span class="ex">0xffffffffc095df16</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">38&gt;</span>:     jmp    0xffffffff8e5017b0 <span class="op">&lt;</span>wake_up_bit<span class="op">&gt;</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a><span class="ex">0xffffffffc095df1b</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">43&gt;</span>:     mov    <span class="va">$0</span>xffffffffc0970df0,%rdi</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a><span class="ex">0xffffffffc095df22</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">50&gt;</span>:     call   0xffffffff8e51d0fe <span class="op">&lt;</span>printk<span class="op">&gt;</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a><span class="ex">0xffffffffc095df27</span> <span class="op">&lt;</span>nfs_unlock_request+<span class="op">55&gt;</span>:     ud2 </span></code></pre></div>
+<p>x86_64下整数参数使用的寄存器依次为: RDI，RSI，RDX，RCX，R8，R9，可以看出<code>nfs_unlock_request()</code>的第一个参数<code>%rdi</code>寄存器的值被覆盖了（<code>mov    $0xffffffffc0970df0,%rdi</code>）， 所以无法通过传参寄存器<code>%rdi</code>的值得到<code>nfs_page</code>的值。</p>
 <p>接下来再分析栈中上面几层函数的汇编，反汇编<code>nfs_end_page_writeback()</code>:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> nfs_end_page_writeback</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc09615fb</span> <span class="op">&lt;</span>nfs_end_page_writeback+11<span class="op">&gt;</span>: mov    %rdi,%rbx <span class="co"># rdi是第一个参数</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc0961652</span> <span class="op">&lt;</span>nfs_end_page_writeback+98<span class="op">&gt;</span>: mov    %rbx,%rdi <span class="co"># nfs_unlock_request()的第一个参数</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc0961658</span> <span class="op">&lt;</span>nfs_end_page_writeback+104<span class="op">&gt;</span>:    call   0xffffffffc095def0 <span class="op">&lt;</span>nfs_unlock_request<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dis -l nfs_end_page_writeback</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="ex">0xffffffffc09615fb</span> <span class="op">&lt;</span>nfs_end_page_writeback+<span class="op">11&gt;</span>: mov    %rdi,%rbx # rdi是第一个参数</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="ex">0xffffffffc0961652</span> <span class="op">&lt;</span>nfs_end_page_writeback+<span class="op">98&gt;</span>: mov    %rbx,%rdi # nfs_unlock_request()的第一个参数</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="ex">0xffffffffc0961658</span> <span class="op">&lt;</span>nfs_end_page_writeback+<span class="op">104&gt;</span>:    call   0xffffffffc095def0 <span class="op">&lt;</span>nfs_unlock_request<span class="op">&gt;</span></span></code></pre></div>
 <p>再结合前面<code>nfs_unlock_request()</code>的反汇编（<code>%rbx</code>的值没有被覆盖），可以推出在崩溃时<code>%rbx</code>存的是<code>nfs_unlock_request()</code>第一个参数的值。</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># RBX: ffff9bf9f048da00</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct nfs_page ffff9bf9f048da00 <span class="at">-x</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> nfs_page {</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_list</span> = {</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">next</span> = 0xffff9bf9f048da00,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">prev</span> = 0xffff9bf9f048da00</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_page</span> = 0xfffffb9dd6f34dc0,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_context</span> = 0xffff9c13143a9a80,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_lock_context</span> = 0xffff9c13143a9a80,</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_index</span> = 0x6af69,</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_offset</span> = 0x0,</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_pgbase</span> = 0x0,</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_bytes</span> = 0xfff,</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_kref</span> = {</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">refcount</span> = {</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>      <span class="ex">refs</span> = {</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        <span class="ex">counter</span> = 0x1</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>      <span class="er">}</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_flags</span> = 0x12, <span class="co"># 0b10010, PG_MAPPED, PG_INODE_REF</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_verf</span> = {</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="ex">data</span> = <span class="st">&quot;\000\000\000\000\000\000\000&quot;</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_this_page</span> = 0xffff9bf9f048da00,</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  <span class="ex">wb_head</span> = 0xffff9bf9f048da00</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff9bf9f048da00 <span class="co"># nfs_init_nfspagecache</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="ex">CACHE</span>             OBJSIZE  ALLOCATED     TOTAL  SLABS  SSIZE  NAME</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff9c0a2749c700</span>      128      11389     53376    834     8k  secpath_cache</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="ex">SLAB</span>              MEMORY            NODE  TOTAL  ALLOCATED  FREE</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="ex">fffffb9d91c12300</span>  ffff9bf9f048c000     0     64         50    14</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  <span class="ex">FREE</span> / <span class="pp">[</span><span class="ss">ALLOCATED</span><span class="pp">]</span></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[ffff9bf9f048da00]</span></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>      <span class="ex">PAGE</span>         PHYSICAL      MAPPING       INDEX CNT FLAGS</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="ex">fffffb9d91c12340</span> 247048d000 dead000000000400        0  0 17ffffc0000000</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct page 0xfffffb9dd6f34dc0 <span class="at">-x</span></span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> page {</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  <span class="ex">flags</span> = 0x17ffffc0001039, <span class="co"># 第12位PG_private为1，在nfs_inode_add_request()设置的</span></span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  <span class="kw">{</span></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>      <span class="ex">...</span></span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>      <span class="ex">private</span> = 0xffff9bf9f048da00 <span class="co"># 就是nfs_page的值</span></span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    <span class="ex">},</span></span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> search 0xfffffb9dd6f34dc0 <span class="co"># nfs_page-&gt;wb_page</span></span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff9bf9f048da10:</span> fffffb9dd6f34dc0 <span class="co"># 这个是崩溃时的nfs_page</span></span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff9c01b80175c8:</span> fffffb9dd6f34dc0 <span class="co"># radix_tree_node</span></span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff9c028515b9d0:</span> fffffb9dd6f34dc0 <span class="co"># 不是slab</span></span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff9c028515b9e0:</span> fffffb9dd6f34dc0 <span class="co"># 不是slab</span></span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff9c028515ba08:</span> fffffb9dd6f34dc0 <span class="co"># 不是slab</span></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff9c028515ba98:</span> fffffb9dd6f34dc0 <span class="co"># 不是slab</span></span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffb2f160b239d0:</span> fffffb9dd6f34dc0 <span class="co"># 不是slab</span></span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffb2f160b239e0:</span> fffffb9dd6f34dc0 <span class="co"># 不是slab</span></span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffb2f160b23a08:</span> fffffb9dd6f34dc0 <span class="co"># 不是slab</span></span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffb2f160b23a98:</span> fffffb9dd6f34dc0 <span class="co"># 不是slab</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co"># RBX: ffff9bf9f048da00</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct nfs_page ffff9bf9f048da00 -x</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">struct</span> nfs_page {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>  <span class="ex">wb_list</span> = {</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>    <span class="ex">next</span> = 0xffff9bf9f048da00,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>    <span class="ex">prev</span> = 0xffff9bf9f048da00</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>  },</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>  <span class="ex">wb_page</span> = 0xfffffb9dd6f34dc0,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>  <span class="ex">wb_context</span> = 0xffff9c13143a9a80,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>  <span class="ex">wb_lock_context</span> = 0xffff9c13143a9a80,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>  <span class="ex">wb_index</span> = 0x6af69,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>  <span class="ex">wb_offset</span> = 0x0,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>  <span class="ex">wb_pgbase</span> = 0x0,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a>  <span class="ex">wb_bytes</span> = 0xfff,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>  <span class="ex">wb_kref</span> = {</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a>    <span class="ex">refcount</span> = {</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a>      <span class="ex">refs</span> = {</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a>        <span class="ex">counter</span> = 0x1</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a>      }</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a>    }</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a>  },</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a>  <span class="ex">wb_flags</span> = 0x12, # 0b10010, PG_MAPPED, PG_INODE_REF</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a>  <span class="ex">wb_verf</span> = {</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a>    <span class="ex">data</span> = <span class="st">&quot;\000\000\000\000\000\000\000&quot;</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a>  },</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a>  <span class="ex">wb_this_page</span> = 0xffff9bf9f048da00,</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true"></a>  <span class="ex">wb_head</span> = 0xffff9bf9f048da00</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true"></a>}</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff9bf9f048da00 # nfs_init_nfspagecache</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true"></a><span class="ex">CACHE</span>             OBJSIZE  ALLOCATED     TOTAL  SLABS  SSIZE  NAME</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true"></a><span class="ex">ffff9c0a2749c700</span>      128      11389     53376    834     8k  secpath_cache</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true"></a>  <span class="ex">SLAB</span>              MEMORY            NODE  TOTAL  ALLOCATED  FREE</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true"></a>  <span class="ex">fffffb9d91c12300</span>  ffff9bf9f048c000     0     64         50    14</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true"></a>  <span class="ex">FREE</span> / [ALLOCATED]</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true"></a>  [<span class="ex">ffff9bf9f048da00</span>]</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true"></a>      <span class="ex">PAGE</span>         PHYSICAL      MAPPING       INDEX CNT FLAGS</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true"></a><span class="ex">fffffb9d91c12340</span> 247048d000 dead000000000400        0  0 17ffffc0000000</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true"></a></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct page 0xfffffb9dd6f34dc0 -x</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true"></a><span class="ex">struct</span> page {</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true"></a>  <span class="ex">flags</span> = 0x17ffffc0001039, # 第12位PG_private为1，在nfs_inode_add_request()设置的</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true"></a>  <span class="kw">{</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true"></a>    <span class="kw">{</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true"></a>      <span class="ex">...</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true"></a>      <span class="ex">private</span> = 0xffff9bf9f048da00 # 就是nfs_page的值</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true"></a>    <span class="kw">}</span>,</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true"></a></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> search 0xfffffb9dd6f34dc0 # nfs_page-<span class="op">&gt;</span>wb_page</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true"></a><span class="ex">ffff9bf9f048da10</span>: fffffb9dd6f34dc0 # 这个是崩溃时的nfs_page</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true"></a><span class="ex">ffff9c01b80175c8</span>: fffffb9dd6f34dc0 # radix_tree_node</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true"></a><span class="ex">ffff9c028515b9d0</span>: fffffb9dd6f34dc0 # 不是slab</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true"></a><span class="ex">ffff9c028515b9e0</span>: fffffb9dd6f34dc0 # 不是slab</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true"></a><span class="ex">ffff9c028515ba08</span>: fffffb9dd6f34dc0 # 不是slab</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true"></a><span class="ex">ffff9c028515ba98</span>: fffffb9dd6f34dc0 # 不是slab</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true"></a><span class="ex">ffffb2f160b239d0</span>: fffffb9dd6f34dc0 # 不是slab</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true"></a><span class="ex">ffffb2f160b239e0</span>: fffffb9dd6f34dc0 # 不是slab</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true"></a><span class="ex">ffffb2f160b23a08</span>: fffffb9dd6f34dc0 # 不是slab</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true"></a><span class="ex">ffffb2f160b23a98</span>: fffffb9dd6f34dc0 # 不是slab</span></code></pre></div>
 <p><code>struct nfs_page</code>结构体中的引用计数为<code>1</code>，<code>wb_flags</code>值为<code>0x12</code>（二进制<code>0b10010</code>，设置了<code>PG_MAPPED</code>和<code>PG_INODE_REF</code>）。</p>
 <p>从下面的代码分析可知，这里正常情况下<code>wb_flags</code>值为<code>0x13</code>，引用计数为<code>2</code>。</p>
-<h1 data-number="3" id="代码分析"><span
-class="header-section-number">3</span> 代码分析</h1>
-<p>在nfs中只有在<code>nfs_unlock_request()</code>一个地方清除<code>PG_BUSY</code>位，发生panic肯定是两次执行到了<code>nfs_unlock_request()</code>函数。
-正常情况下执行<code>nfs_redirty_request()</code>前会先执行<code>nfs_lock_and_join_requests()</code>，<code>nfs_lock_and_join_requests()</code>中引用计数变为<code>2</code>，<code>wb_flags</code>变为<code>0x13</code>。</p>
+<h1 data-number="3" id="代码分析"><span class="header-section-number">3</span> 代码分析</h1>
+<p>在nfs中只有在<code>nfs_unlock_request()</code>一个地方清除<code>PG_BUSY</code>位，发生panic肯定是两次执行到了<code>nfs_unlock_request()</code>函数。 正常情况下执行<code>nfs_redirty_request()</code>前会先执行<code>nfs_lock_and_join_requests()</code>，<code>nfs_lock_and_join_requests()</code>中引用计数变为<code>2</code>，<code>wb_flags</code>变为<code>0x13</code>。</p>
 <p>从前面的vmcore解释中可知崩溃时<code>struct nfs_page</code>结构体中的引用计数为<code>1</code>，<code>wb_flags</code>值为<code>0x12</code>（二进制<code>0b10010</code>，设置了<code>PG_MAPPED</code>和<code>PG_INODE_REF</code>）。初步怀疑是在另一个并行执行的进程中同时操作了减引用计数和清除<code>wb_flags</code>的<code>PG_BUSY</code>位，同时执行这两个操作的函数是<code>nfs_unlock_and_release_request()</code>。</p>
 <p>初始化<code>nfs_page</code>的流程:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>nfs_file_write</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  generic_perform_write</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    nfs_write_end</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      nfs_updatepage</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        nfs_writepage_setup <span class="co">// 内联</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>          nfs_setup_write_request</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            nfs_create_request</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>              <span class="co">// 引用计数设置为1</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>              kref_init<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_kref<span class="op">)</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>            nfs_inode_add_request</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>              nfs_lock_request <span class="co">// wb_flags == 0x1</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>              set_bit<span class="op">(</span>PG_MAPPED<span class="op">,</span> <span class="co">// wb_flags == 0x3</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>              set_page_private<span class="op">(</span>req<span class="op">-&gt;</span>wb_page<span class="op">,</span> <span class="op">(</span><span class="dt">unsigned</span> <span class="dt">long</span><span class="op">)</span>req<span class="op">)</span> <span class="co">// 设置page的private字段</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>              test_and_set_bit<span class="op">(</span>PG_INODE_REF<span class="op">,</span> <span class="co">// wb_flags == 0x13</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>              kref_get<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_kref<span class="op">)</span> <span class="co">// 引用计数为2</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>          nfs_unlock_and_release_request</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>            nfs_unlock_request <span class="co">// wb_flags == 0x12</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>            nfs_release_request <span class="co">// 引用计数为1</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>nfs_file_write</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>  generic_perform_write</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    nfs_write_end</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>      nfs_updatepage</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>        nfs_writepage_setup <span class="co">// 内联</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>          nfs_setup_write_request</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>            nfs_create_request</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>              <span class="co">// 引用计数设置为1</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>              kref_init(&amp;req-&gt;wb_kref)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>            nfs_inode_add_request</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>              nfs_lock_request <span class="co">// wb_flags == 0x1</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>              set_bit(PG_MAPPED, <span class="co">// wb_flags == 0x3</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>              set_page_private(req-&gt;wb_page, (<span class="dt">unsigned</span> <span class="dt">long</span>)req) <span class="co">// 设置page的private字段</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>              test_and_set_bit(PG_INODE_REF, <span class="co">// wb_flags == 0x13</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a>              kref_get(&amp;req-&gt;wb_kref) <span class="co">// 引用计数为2</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>          nfs_unlock_and_release_request</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a>            nfs_unlock_request <span class="co">// wb_flags == 0x12</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>            nfs_release_request <span class="co">// 引用计数为1</span></span></code></pre></div>
 <p>回写流程:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 可能是由close文件触发，也可能是由内核线程（wb_workfn）触发</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>do_writepages</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  nfs_writepages</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    write_cache_pages</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>      nfs_writepages_callback</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        nfs_do_writepage</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>          nfs_page_async_flush <span class="co">// 内联</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>            nfs_lock_and_join_requests</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>              nfs_page_find_head_request</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                nfs_page_find_private_request</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                  kref_get<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_kref<span class="op">)</span> <span class="co">// 引用计数为2</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>              nfs_lock_request <span class="co">// lock成功了就不执行nfs_wait_on_request()</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                test_and_set_bit<span class="op">(</span>PG_BUSY<span class="op">,</span> <span class="co">// wb_flags == 0x13</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>              nfs_wait_on_request <span class="co">// 其他进程lock了nfs_page时才会执行到这里等待</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                wait_on_bit_io<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_flags<span class="op">,</span> PG_BUSY<span class="op">,</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>            nfs_pageio_add_request <span class="co">// 发生了错误</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>            <span class="co">// 错误码不是以下情况时会执行到nfs_redirty_request</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>            <span class="co">//   不是 -EACCES, -EDQUOT, -EFBIG, -EIO, -ENOSPC, -EROFS, -ESTALE, -E2BIG</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>            nfs_redirty_request</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>              nfs_end_page_writeback</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>                nfs_unlock_request</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>                  <span class="cf">if</span> <span class="op">(!</span>NFS_WBACK_BUSY<span class="op">(</span>req<span class="op">))</span> <span class="co">// 正常情况下条件不满足</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>                  BUG <span class="co">// 异常情况下panic了</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>                  clear_bit<span class="op">(</span>PG_BUSY<span class="op">,</span> <span class="co">// 只在nfs_unlock_request 中清除busy位</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>                  wake_up_bit<span class="op">(&amp;</span>req<span class="op">-&gt;</span>wb_flags<span class="op">,</span> PG_BUSY<span class="op">)</span> <span class="co">// 唤醒进程</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co">// 可能是由close文件触发，也可能是由内核线程（wb_workfn）触发</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>do_writepages</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>  nfs_writepages</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>    write_cache_pages</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>      nfs_writepages_callback</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>        nfs_do_writepage</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>          nfs_page_async_flush <span class="co">// 内联</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>            nfs_lock_and_join_requests</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>              nfs_page_find_head_request</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a>                nfs_page_find_private_request</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a>                  kref_get(&amp;req-&gt;wb_kref) <span class="co">// 引用计数为2</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a>              nfs_lock_request <span class="co">// lock成功了就不执行nfs_wait_on_request()</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a>                test_and_set_bit(PG_BUSY, <span class="co">// wb_flags == 0x13</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a>              nfs_wait_on_request <span class="co">// 其他进程lock了nfs_page时才会执行到这里等待</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a>                wait_on_bit_io(&amp;req-&gt;wb_flags, PG_BUSY,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true"></a>            nfs_pageio_add_request <span class="co">// 发生了错误</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true"></a>            <span class="co">// 错误码不是以下情况时会执行到nfs_redirty_request</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true"></a>            <span class="co">//   不是 -EACCES, -EDQUOT, -EFBIG, -EIO, -ENOSPC, -EROFS, -ESTALE, -E2BIG</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true"></a>            nfs_redirty_request</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true"></a>              nfs_end_page_writeback</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true"></a>                nfs_unlock_request</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true"></a>                  <span class="cf">if</span> (!NFS_WBACK_BUSY(req)) <span class="co">// 正常情况下条件不满足</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true"></a>                  BUG <span class="co">// 异常情况下panic了</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true"></a>                  clear_bit(PG_BUSY, <span class="co">// 只在nfs_unlock_request 中清除busy位</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true"></a>                  wake_up_bit(&amp;req-&gt;wb_flags, PG_BUSY) <span class="co">// 唤醒进程</span></span></code></pre></div>
 <p>异步释放<code>nfs_page</code>的流程:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rpc_async_release</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  nfs_pgio_release</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    nfs_write_completion</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      nfs_inode_remove_request</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        set_page_private<span class="op">(</span>head<span class="op">-&gt;</span>wb_page<span class="op">,</span> <span class="dv">0</span><span class="op">);</span> <span class="co">// 清除page的private字段</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        clear_bit<span class="op">(</span>PG_MAPPED<span class="op">,</span> <span class="co">// wb_flags == 0x11</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        test_and_clear_bit<span class="op">(</span>PG_INODE_REF<span class="op">,</span> <span class="co">// wb_flags == 0x1</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        nfs_release_request <span class="co">// 引用计数为1</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      nfs_end_page_writeback</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        nfs_unlock_request <span class="co">// wb_flags == 0x0</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>      nfs_release_request <span class="co">// 引用计数为0，释放nfs_page</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>rpc_async_release</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>  nfs_pgio_release</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>    nfs_write_completion</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>      nfs_inode_remove_request</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>        set_page_private(head-&gt;wb_page, <span class="dv">0</span>); <span class="co">// 清除page的private字段</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>        clear_bit(PG_MAPPED, <span class="co">// wb_flags == 0x11</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>        test_and_clear_bit(PG_INODE_REF, <span class="co">// wb_flags == 0x1</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>        nfs_release_request <span class="co">// 引用计数为1</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>      nfs_end_page_writeback</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a>        nfs_unlock_request <span class="co">// wb_flags == 0x0</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a>      nfs_release_request <span class="co">// 引用计数为0，释放nfs_page</span></span></code></pre></div>
 <p>调用<code>nfs_unlock_and_release_request()</code>的地方（已排除的放后面）:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 600 fs/nfs/write.c</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">// 这种情况不会执行到nfs_redirty_request</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">// 有没可能是其他并行的进程？</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>nfs_lock_and_join_requests</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  nfs_page_find_head_request <span class="co">// 引用计数加1</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  nfs_lock_request <span class="co">// 设置PG_BUSY</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  nfs_unlock_and_release_request</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">// 591 fs/nfs/write.c</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">// 有没可能是其他并行的进程？</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>nfs_lock_and_join_requests</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  nfs_page_find_head_request</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  nfs_unlock_and_release_request</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">// 552 fs/nfs/write.c</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">// 有没可能是其他并行的进程？</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>nfs_lock_and_join_requests</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  nfs_page_find_head_request</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  nfs_unlock_and_release_request</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">// 504 fs/nfs/write.c</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co">// 有没可能是其他并行的进程？</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>nfs_lock_and_join_requests</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  nfs_page_find_head_request</span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  nfs_unlock_and_release_request</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co">// 452 fs/nfs/write.c</span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">// 有没可能是其他并行的进程？</span></span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>nfs_lock_and_join_requests</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  nfs_page_find_head_request</span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  nfs_destroy_unlinked_subrequests</span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    nfs_unlock_and_release_request</span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="co">// 396 fs/nfs/write.c</span></span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>nfs_lock_and_join_requests</span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>  nfs_page_find_head_request</span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span>subreq <span class="op">=</span> head<span class="op">-&gt;</span>wb_this_page <span class="co">// 在其他进程执行循环？</span></span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>  nfs_unroll_locks</span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    nfs_unlock_and_release_request</span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="co">// 947 fs/nfs/direct.c</span></span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>nfs_file_direct_write</span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>  nfs_direct_write_schedule_iovec</span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    nfs_unlock_and_release_request</span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="co">// 856 fs/nfs/direct.c</span></span>
-<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>nfs_write_sync_pgio_error <span class="co">// .error_cleanup</span></span>
-<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>  nfs_unlock_and_release_request</span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="co">// 840 fs/nfs/direct.c</span></span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>nfs_direct_write_completion <span class="co">// .completion</span></span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>  nfs_unlock_and_release_request</span>
-<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="co">// 729 fs/nfs/direct.c</span></span>
-<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>nfs_direct_commit_complete <span class="co">// .completion</span></span>
-<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>  nfs_unlock_and_release_request</span>
-<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="co">// 703 fs/nfs/direct.c</span></span>
-<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>INIT_WORK<span class="op">(&amp;</span>dreq<span class="op">-&gt;</span>work<span class="op">,</span> nfs_direct_write_schedule_work<span class="op">)</span></span>
-<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>  nfs_direct_write_schedule_work</span>
-<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>    nfs_direct_write_reschedule</span>
-<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>      nfs_unlock_and_release_request</span>
-<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a><span class="co">// 已排除</span></span>
-<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="co">// 2053 fs/nfs/write.c</span></span>
-<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>nfs_invalidate_page <span class="co">// .invalidatepage</span></span>
-<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>  nfs_wb_page_cancel</span>
-<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>    nfs_lock_and_join_requests <span class="co">// 假设这里真有情况会返回NULL</span></span>
-<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>    nfs_inode_remove_request <span class="co">// 这里执行完wb_flags肯定清除了`PG_MAPPED`和`PG_INODE_REF`</span></span>
-<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>    nfs_unlock_and_release_request</span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a><span class="co">// 已排除</span></span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a><span class="co">// 1873 fs/nfs/write.c</span></span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>nfs_commit_release_pages <span class="co">// .completion</span></span>
-<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>req<span class="op">-&gt;</span>wb_page<span class="op">)</span> <span class="co">// 满足条件</span></span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>  nfs_inode_remove_request <span class="co">// 这里执行完wb_flags肯定清除了`PG_MAPPED`和`PG_INODE_REF`</span></span>
-<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>  nfs_unlock_and_release_request</span>
-<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a><span class="co">// 已排除</span></span>
-<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a><span class="co">// 1784 fs/nfs/write.c</span></span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a><span class="co">// pnfs相关，不涉及</span></span>
-<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>pnfs_generic_retry_commit</span>
-<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>  nfs_retry_commit</span>
-<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>    nfs_unlock_and_release_request</span>
-<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a><span class="co">// 已排除</span></span>
-<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a><span class="co">// 1207 fs/nfs/write.c</span></span>
-<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a><span class="co">// 初始化nfs_page，不会重复初始化</span></span>
-<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>nfs_updatepage</span>
-<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>  nfs_writepage_setup</span>
-<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>    nfs_unlock_and_release_request</span>
-<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a><span class="co">// 已排除</span></span>
-<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a><span class="co">// 1166 fs/nfs/write.c</span></span>
-<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a><span class="co">// 初始化nfs_page，不会重复初始化</span></span>
-<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>nfs_writepage_setup</span>
-<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>  nfs_setup_write_request</span>
-<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>    nfs_try_to_update_request</span>
-<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>      nfs_unlock_and_release_request</span></code></pre></div>
-<h1 data-number="4" id="补丁"><span
-class="header-section-number">4</span> 补丁</h1>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co">// 600 fs/nfs/write.c</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co">// 这种情况不会执行到nfs_redirty_request</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="co">// 有没可能是其他并行的进程？</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>nfs_lock_and_join_requests</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>  nfs_page_find_head_request <span class="co">// 引用计数加1</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>  nfs_lock_request <span class="co">// 设置PG_BUSY</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>  nfs_unlock_and_release_request</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a><span class="co">// 591 fs/nfs/write.c</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a><span class="co">// 有没可能是其他并行的进程？</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>nfs_lock_and_join_requests</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>  nfs_page_find_head_request</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>  nfs_unlock_and_release_request</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a><span class="co">// 552 fs/nfs/write.c</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true"></a><span class="co">// 有没可能是其他并行的进程？</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true"></a>nfs_lock_and_join_requests</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true"></a>  nfs_page_find_head_request</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true"></a>  nfs_unlock_and_release_request</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true"></a><span class="co">// 504 fs/nfs/write.c</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true"></a><span class="co">// 有没可能是其他并行的进程？</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true"></a>nfs_lock_and_join_requests</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true"></a>  nfs_page_find_head_request</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true"></a>  nfs_unlock_and_release_request</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true"></a></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true"></a><span class="co">// 452 fs/nfs/write.c</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true"></a><span class="co">// 有没可能是其他并行的进程？</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true"></a>nfs_lock_and_join_requests</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true"></a>  nfs_page_find_head_request</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true"></a>  nfs_destroy_unlinked_subrequests</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true"></a>    nfs_unlock_and_release_request</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true"></a><span class="co">// 396 fs/nfs/write.c</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true"></a>nfs_lock_and_join_requests</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true"></a>  nfs_page_find_head_request</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true"></a>  <span class="cf">for</span> (subreq = head-&gt;wb_this_page <span class="co">// 在其他进程执行循环？</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true"></a>  nfs_unroll_locks</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true"></a>    nfs_unlock_and_release_request</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true"></a></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true"></a><span class="co">// 947 fs/nfs/direct.c</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true"></a>nfs_file_direct_write</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true"></a>  nfs_direct_write_schedule_iovec</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true"></a>    nfs_unlock_and_release_request</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true"></a></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true"></a><span class="co">// 856 fs/nfs/direct.c</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true"></a>nfs_write_sync_pgio_error <span class="co">// .error_cleanup</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true"></a>  nfs_unlock_and_release_request</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true"></a></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true"></a><span class="co">// 840 fs/nfs/direct.c</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true"></a>nfs_direct_write_completion <span class="co">// .completion</span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true"></a>  nfs_unlock_and_release_request</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true"></a></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true"></a><span class="co">// 729 fs/nfs/direct.c</span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true"></a>nfs_direct_commit_complete <span class="co">// .completion</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true"></a>  nfs_unlock_and_release_request</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true"></a></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true"></a><span class="co">// 703 fs/nfs/direct.c</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true"></a>INIT_WORK(&amp;dreq-&gt;work, nfs_direct_write_schedule_work)</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true"></a>  nfs_direct_write_schedule_work</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true"></a>    nfs_direct_write_reschedule</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true"></a>      nfs_unlock_and_release_request</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true"></a></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true"></a><span class="co">// 已排除</span></span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true"></a><span class="co">// 2053 fs/nfs/write.c</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true"></a>nfs_invalidate_page <span class="co">// .invalidatepage</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true"></a>  nfs_wb_page_cancel</span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true"></a>    nfs_lock_and_join_requests <span class="co">// 假设这里真有情况会返回NULL</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true"></a>    nfs_inode_remove_request <span class="co">// 这里执行完wb_flags肯定清除了`PG_MAPPED`和`PG_INODE_REF`</span></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true"></a>    nfs_unlock_and_release_request</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true"></a></span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true"></a><span class="co">// 已排除</span></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true"></a><span class="co">// 1873 fs/nfs/write.c</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true"></a>nfs_commit_release_pages <span class="co">// .completion</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true"></a>  <span class="cf">if</span> (req-&gt;wb_page) <span class="co">// 满足条件</span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true"></a>  nfs_inode_remove_request <span class="co">// 这里执行完wb_flags肯定清除了`PG_MAPPED`和`PG_INODE_REF`</span></span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true"></a>  nfs_unlock_and_release_request</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true"></a></span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true"></a><span class="co">// 已排除</span></span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true"></a><span class="co">// 1784 fs/nfs/write.c</span></span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true"></a><span class="co">// pnfs相关，不涉及</span></span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true"></a>pnfs_generic_retry_commit</span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true"></a>  nfs_retry_commit</span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true"></a>    nfs_unlock_and_release_request</span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true"></a></span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true"></a><span class="co">// 已排除</span></span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true"></a><span class="co">// 1207 fs/nfs/write.c</span></span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true"></a><span class="co">// 初始化nfs_page，不会重复初始化</span></span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true"></a>nfs_updatepage</span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true"></a>  nfs_writepage_setup</span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true"></a>    nfs_unlock_and_release_request</span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true"></a></span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true"></a><span class="co">// 已排除</span></span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true"></a><span class="co">// 1166 fs/nfs/write.c</span></span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true"></a><span class="co">// 初始化nfs_page，不会重复初始化</span></span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true"></a>nfs_writepage_setup</span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true"></a>  nfs_setup_write_request</span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true"></a>    nfs_try_to_update_request</span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true"></a>      nfs_unlock_and_release_request</span></code></pre></div>
+<h1 data-number="4" id="补丁"><span class="header-section-number">4</span> 补丁</h1>
 <p>查找含有函数关键字的相关补丁:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfs_end_page_writeback</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 都是2012年前的补丁，4.19内核肯定包含2012年的补丁</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 4.19内核肯定包含2012年的补丁</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfs_unlock_request</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 都是2012年前的补丁，4.19内核肯定包含2012年的补丁</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfs_lock_and_join_requests</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2024-11-18 66f9dac9077c Revert &quot;nfs: don&#39;t reuse partially completed requests in nfs_lock_and_join_requests&quot; Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2024-07-08 b571cfcb9dca nfs: don&#39;t reuse partially completed requests in nfs_lock_and_join_requests Christoph Hellwig &lt;hch@lst.de&gt;</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2024-07-08 25edbcac6e32 nfs: fold nfs_page_group_lock_subrequests into nfs_lock_and_join_requests Christoph Hellwig &lt;hch@lst.de&gt;</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2024-07-08 c3f2235782c3 nfs: fold nfs_folio_find_and_lock_request into nfs_lock_and_join_requests Christoph Hellwig &lt;hch@lst.de&gt;</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2020-04-01 e00ed89d7bd5 NFS: Refactor nfs_lock_and_join_requests() Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2020-04-01 a62f8e3bd836 NFS: Clean up nfs_lock_and_join_requests() Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2020-04-01 08ca8b21f760 NFS: Fix races nfs_page_group_destroy() vs nfs_destroy_unlinked_subrequests() Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2020-04-01 add42de31721 NFS: Fix a page leak in nfs_destroy_unlinked_subrequests() Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="fu">git</span> log origin/master --oneline --date=short --format=<span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> --grep=nfs_end_page_writeback</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>  <span class="co"># 都是2012年前的补丁，4.19内核肯定包含2012年的补丁</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="co"># 4.19内核肯定包含2012年的补丁</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="fu">git</span> log origin/master --oneline --date=short --format=<span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> --grep=nfs_unlock_request</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>  <span class="co"># 都是2012年前的补丁，4.19内核肯定包含2012年的补丁</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a><span class="fu">git</span> log origin/master --oneline --date=short --format=<span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> --grep=nfs_lock_and_join_requests</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>  <span class="co"># 2024-11-18 66f9dac9077c Revert &quot;nfs: don&#39;t reuse partially completed requests in nfs_lock_and_join_requests&quot; Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>  <span class="co"># 2024-07-08 b571cfcb9dca nfs: don&#39;t reuse partially completed requests in nfs_lock_and_join_requests Christoph Hellwig &lt;hch@lst.de&gt;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>  <span class="co"># 2024-07-08 25edbcac6e32 nfs: fold nfs_page_group_lock_subrequests into nfs_lock_and_join_requests Christoph Hellwig &lt;hch@lst.de&gt;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a>  <span class="co"># 2024-07-08 c3f2235782c3 nfs: fold nfs_folio_find_and_lock_request into nfs_lock_and_join_requests Christoph Hellwig &lt;hch@lst.de&gt;</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a>  <span class="co"># 2020-04-01 e00ed89d7bd5 NFS: Refactor nfs_lock_and_join_requests() Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a>  <span class="co"># 2020-04-01 a62f8e3bd836 NFS: Clean up nfs_lock_and_join_requests() Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true"></a>  <span class="co"># 2020-04-01 08ca8b21f760 NFS: Fix races nfs_page_group_destroy() vs nfs_destroy_unlinked_subrequests() Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true"></a>  <span class="co"># 2020-04-01 add42de31721 NFS: Fix a page leak in nfs_destroy_unlinked_subrequests() Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span></code></pre></div>
 <p>查找<code>nfs_unlock_request()</code>函数修改记录:</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">-L:nfs_unlock_request:fs</span>/nfs/pagelist.c</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># v5.16-rc1 43d20e80e288 NFS: Fix a few more clear_bit() instances that need release semantics</span></span></code></pre></div>
-<h1 data-number="5" id="debug"><span
-class="header-section-number">5</span> 调试</h1>
-<p>补丁<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/issue/0001-debug-nfs_unlock_request.patch"><code>0001-debug-nfs_unlock_request.patch</code></a>。</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="fu">git</span> log -L:nfs_unlock_request:fs/nfs/pagelist.c</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>  <span class="co"># v5.16-rc1 43d20e80e288 NFS: Fix a few more clear_bit() instances that need release semantics</span></span></code></pre></div>
+<h1 data-number="5" id="debug"><span class="header-section-number">5</span> 调试</h1>
+<p>补丁<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/issue/0001-debug-nfs_unlock_request.patch"><code>0001-debug-nfs_unlock_request.patch</code></a>。</p>
 <p>编译并安装rpm包:</p>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./scripts/buildrpm.sh</span> <span class="at">--baseonly</span> <span class="at">--test</span> <span class="co"># 编译</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">rpm</span> <span class="at">-i</span> kernel-4.19.<span class="pp">*</span> kernel-core-4.19.<span class="pp">*</span> kernel-modules-<span class="pp">*</span> <span class="at">--force</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">view</span> /boot/grub2/grub.cfg <span class="co"># 复制 Kylin Linux Advanced Server (4.19.90-25.44.v2101.fortest.ky10.x86_64) V10 (Halberd)</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">grub2-set-default</span> <span class="st">&quot;Kylin Linux Advanced Server (4.19.90-25.44.v2101.fortest.ky10.x86_64) V10 (Halberd)&quot;</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /boot/grub2/grubenv <span class="co"># 查看是否更改成功</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span> <span class="co"># 确保落盘</span></span></code></pre></div>
-<h1 data-number="6" id="构造复现"><span
-class="header-section-number">6</span> 构造复现</h1>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="ex">./scripts/buildrpm.sh</span> --baseonly --test <span class="co"># 编译</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="ex">rpm</span> -i kernel-4.19.* kernel-core-4.19.* kernel-modules-* --force</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="ex">view</span> /boot/grub2/grub.cfg # 复制 Kylin Linux Advanced Server (4.19.90-25.44.v2101.fortest.ky10.x86_64) <span class="ex">V10</span> (Halberd)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="ex">grub2-set-default</span> <span class="st">&quot;Kylin Linux Advanced Server (4.19.90-25.44.v2101.fortest.ky10.x86_64) V10 (Halberd)&quot;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a><span class="fu">cat</span> /boot/grub2/grubenv <span class="co"># 查看是否更改成功</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a><span class="fu">sync</span> <span class="co"># 确保落盘</span></span></code></pre></div>
+<h1 data-number="6" id="构造复现"><span class="header-section-number">6</span> 构造复现</h1>
 <p>还在尝试中，暂未构造出来。</p>
-<h2 data-number="6.1"
-id="让内核执行到nfs_redirty_request所做的修改"><span
-class="header-section-number">6.1</span>
-让内核执行到<code>nfs_redirty_request()</code>所做的修改</h2>
+<h2 data-number="6.1" id="让内核执行到nfs_redirty_request所做的修改"><span class="header-section-number">6.1</span> 让内核执行到<code>nfs_redirty_request()</code>所做的修改</h2>
 <p>内核做以下修改，写文件就能执行到<code>nfs_redirty_request()</code>:</p>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/fs/nfs/pagelist.c</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/fs/nfs/pagelist.c</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-869,22</span> +870,35 @@ static void nfs_pageio_setup_mirroring<span class="er">(</span><span class="ex">struct</span> nfs_pageio_descriptor <span class="pp">*</span>pgio,</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a> <span class="kw">{</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">unsigned</span> int mirror_count = 1<span class="kw">;</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       if <span class="er">(</span><span class="ex">1</span><span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               pgio-<span class="op">&gt;</span>pg_error = <span class="at">-ERESTARTSYS</span><span class="kw">;</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               pgio-<span class="op">&gt;</span>pg_mirrors = pgio-<span class="op">&gt;</span>pg_mirrors_static<span class="kw">;</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               mirror_count = 1<span class="kw">;</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               pgio-<span class="op">&gt;</span>pg_mirror_count = mirror_count<span class="kw">;</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>               return<span class="kw">;</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       }</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">(</span><span class="ex">pgio-</span><span class="op">&gt;</span>pg_ops-<span class="op">&gt;</span>pg_get_mirror_count<span class="kw">)</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>                <span class="ex">mirror_count</span> = pgio-<span class="op">&gt;</span>pg_ops-<span class="op">&gt;</span>pg_get_mirror_count<span class="er">(</span><span class="ex">pgio,</span> req<span class="kw">);</span></span></code></pre></div>
-<h2 data-number="6.2" id="在nfs_redirty_request中delay"><span
-class="header-section-number">6.2</span>
-在<code>nfs_redirty_request()</code>中delay</h2>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/fs/nfs/write.c</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/fs/nfs/write.c</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-1404,6</span> +1405,9 @@ static void nfs_initiate_write<span class="er">(</span><span class="ex">struct</span> nfs_pgio_header <span class="pp">*</span>hdr,</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">*/</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a> <span class="ex">static</span> void nfs_redirty_request<span class="er">(</span><span class="ex">struct</span> nfs_page <span class="pp">*</span>req<span class="kw">)</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a> <span class="kw">{</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       printk<span class="er">(</span><span class="st">&quot;%s:%d, delay begin\n&quot;</span><span class="ex">,</span> __func__, __LINE__<span class="kw">);</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       mdelay<span class="er">(</span><span class="ex">20</span> <span class="pp">*</span> 1000<span class="kw">);</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>       printk<span class="er">(</span><span class="st">&quot;%s:%d, delay end\n&quot;</span><span class="ex">,</span> __func__, __LINE__<span class="kw">);</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        <span class="ex">nfs_mark_request_dirty</span><span class="er">(</span><span class="ex">req</span><span class="kw">);</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        <span class="ex">set_bit</span><span class="er">(</span><span class="ex">NFS_CONTEXT_RESEND_WRITES,</span> <span class="kw">&amp;</span><span class="ex">req-</span><span class="op">&gt;</span>wb_context-<span class="op">&gt;</span>flags<span class="kw">);</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        <span class="ex">nfs_end_page_writeback</span><span class="er">(</span><span class="ex">req</span><span class="kw">);</span></span></code></pre></div>
-<h2 data-number="6.3" id="触发invalidatepage"><span
-class="header-section-number">6.3</span> 触发invalidatepage</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="ex">---</span> a/fs/nfs/pagelist.c</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="ex">+++</span> b/fs/nfs/pagelist.c</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="ex">@@</span> -869,22 +870,35 @@ static void nfs_pageio_setup_mirroring(struct nfs_pageio_descriptor *pgio,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a> <span class="kw">{</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a>        <span class="ex">unsigned</span> int mirror_count = 1<span class="kw">;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a> </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true"></a><span class="ex">+</span>       if (1) <span class="kw">{</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true"></a><span class="ex">+</span>               pgio-<span class="op">&gt;</span>pg_error = -ERESTARTSYS<span class="kw">;</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true"></a><span class="ex">+</span>               pgio-<span class="op">&gt;</span>pg_mirrors = pgio-<span class="op">&gt;</span>pg_mirrors_static<span class="kw">;</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true"></a><span class="ex">+</span>               mirror_count = 1<span class="kw">;</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true"></a><span class="ex">+</span>               pgio-<span class="op">&gt;</span>pg_mirror_count = mirror_count<span class="kw">;</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true"></a><span class="ex">+</span>               return<span class="kw">;</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true"></a><span class="ex">+</span>       <span class="kw">}</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true"></a><span class="ex">+</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true"></a>        <span class="kw">if</span> <span class="kw">(</span><span class="ex">pgio-</span><span class="op">&gt;</span>pg_ops-<span class="op">&gt;</span>pg_get_mirror_count<span class="kw">)</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true"></a>                <span class="ex">mirror_count</span> = pgio-<span class="op">&gt;</span>pg_ops-<span class="op">&gt;</span>pg_get_mirror_count(pgio, req);</span></code></pre></div>
+<h2 data-number="6.2" id="在nfs_redirty_request中delay"><span class="header-section-number">6.2</span> 在<code>nfs_redirty_request()</code>中delay</h2>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="ex">---</span> a/fs/nfs/write.c</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="ex">+++</span> b/fs/nfs/write.c</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a><span class="ex">@@</span> -1404,6 +1405,9 @@ static void nfs_initiate_write(struct nfs_pgio_header *hdr,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a>  <span class="ex">*/</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a> <span class="ex">static</span> void nfs_redirty_request(struct nfs_page *req)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true"></a> <span class="kw">{</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true"></a><span class="ex">+</span>       printk(<span class="st">&quot;%s:%d, delay begin\n&quot;</span>, __func__, __LINE__);</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true"></a><span class="ex">+</span>       mdelay(20 * 1000);</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true"></a><span class="ex">+</span>       printk(<span class="st">&quot;%s:%d, delay end\n&quot;</span>, __func__, __LINE__);</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true"></a>        <span class="ex">nfs_mark_request_dirty</span>(req);</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true"></a>        <span class="ex">set_bit</span>(NFS_CONTEXT_RESEND_WRITES, <span class="kw">&amp;</span><span class="ex">req-</span><span class="op">&gt;</span>wb_context-<span class="op">&gt;</span>flags);</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true"></a>        <span class="ex">nfs_end_page_writeback</span>(req);</span></code></pre></div>
+<h2 data-number="6.3" id="触发invalidatepage"><span class="header-section-number">6.3</span> 触发invalidatepage</h2>
 <p><code>write.c</code>:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;string.h&gt;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>filename <span class="op">=</span> <span class="st">&quot;/mnt/file&quot;</span><span class="op">;</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">size_t</span> data_size <span class="op">=</span> <span class="dv">4100</span><span class="op">;</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">FILE</span> <span class="op">*</span>fp <span class="op">=</span> fopen<span class="op">(</span>filename<span class="op">,</span> <span class="st">&quot;wb&quot;</span><span class="op">);</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(!</span>fp<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        perror<span class="op">(</span><span class="st">&quot;fopen&quot;</span><span class="op">);</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> EXIT_FAILURE<span class="op">;</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 分配 4090 字节的缓冲区，并填充字符 &#39;A&#39;</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> <span class="op">*</span>buffer <span class="op">=</span> malloc<span class="op">(</span>data_size<span class="op">);</span></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(!</span>buffer<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>        perror<span class="op">(</span><span class="st">&quot;malloc&quot;</span><span class="op">);</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>        fclose<span class="op">(</span>fp<span class="op">);</span></span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> EXIT_FAILURE<span class="op">;</span></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    memset<span class="op">(</span>buffer<span class="op">,</span> <span class="ch">&#39;A&#39;</span><span class="op">,</span> data_size<span class="op">);</span></span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 写入数据</span></span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    <span class="dt">size_t</span> written <span class="op">=</span> fwrite<span class="op">(</span>buffer<span class="op">,</span> <span class="dv">1</span><span class="op">,</span> data_size<span class="op">,</span> fp<span class="op">);</span></span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>written <span class="op">!=</span> data_size<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>        perror<span class="op">(</span><span class="st">&quot;fwrite&quot;</span><span class="op">);</span></span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>        free<span class="op">(</span>buffer<span class="op">);</span></span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>        fclose<span class="op">(</span>fp<span class="op">);</span></span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> EXIT_FAILURE<span class="op">;</span></span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 在关闭文件之前，睡眠</span></span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>    sleep<span class="op">(</span><span class="dv">100000</span><span class="op">);</span></span>
-<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 释放资源并关闭文件</span></span>
-<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>buffer<span class="op">);</span></span>
-<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>    fclose<span class="op">(</span>fp<span class="op">);</span></span>
-<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> EXIT_SUCCESS<span class="op">;</span></span>
-<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;string.h&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a><span class="dt">int</span> main(<span class="dt">void</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a>{</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a>    <span class="dt">const</span> <span class="dt">char</span> *filename = <span class="st">&quot;/mnt/file&quot;</span>;</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true"></a>    <span class="dt">const</span> <span class="dt">size_t</span> data_size = <span class="dv">4100</span>;</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true"></a>    <span class="dt">FILE</span> *fp = fopen(filename, <span class="st">&quot;wb&quot;</span>);</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true"></a>    <span class="cf">if</span> (!fp) {</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true"></a>        perror(<span class="st">&quot;fopen&quot;</span>);</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true"></a>        <span class="cf">return</span> EXIT_FAILURE;</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true"></a>    }</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true"></a>    <span class="co">// 分配 4090 字节的缓冲区，并填充字符 &#39;A&#39;</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true"></a>    <span class="dt">char</span> *buffer = malloc(data_size);</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true"></a>    <span class="cf">if</span> (!buffer) {</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true"></a>        perror(<span class="st">&quot;malloc&quot;</span>);</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true"></a>        fclose(fp);</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true"></a>        <span class="cf">return</span> EXIT_FAILURE;</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true"></a>    }</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true"></a>    memset(buffer, <span class="ch">&#39;A&#39;</span>, data_size);</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true"></a></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true"></a>    <span class="co">// 写入数据</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true"></a>    <span class="dt">size_t</span> written = fwrite(buffer, <span class="dv">1</span>, data_size, fp);</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true"></a>    <span class="cf">if</span> (written != data_size) {</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true"></a>        perror(<span class="st">&quot;fwrite&quot;</span>);</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true"></a>        free(buffer);</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true"></a>        fclose(fp);</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true"></a>        <span class="cf">return</span> EXIT_FAILURE;</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true"></a>    }</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true"></a></span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true"></a>    <span class="co">// 在关闭文件之前，睡眠</span></span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true"></a>    sleep(<span class="dv">100000</span>);</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true"></a></span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true"></a>    <span class="co">// 释放资源并关闭文件</span></span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true"></a>    free(buffer);</span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true"></a>    fclose(fp);</span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true"></a>    <span class="cf">return</span> EXIT_SUCCESS;</span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>truncate.c</code>:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;string.h&gt;</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/stat.h&gt;</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>filename <span class="op">=</span> <span class="st">&quot;/mnt/file&quot;</span><span class="op">;</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> fd <span class="op">=</span> open<span class="op">(</span>filename<span class="op">,</span> O_RDWR <span class="op">|</span> O_CREAT<span class="op">,</span> <span class="bn">0666</span><span class="op">);</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>fd <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>        perror<span class="op">(</span><span class="st">&quot;open&quot;</span><span class="op">);</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> EXIT_FAILURE<span class="op">;</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 调用 ftruncate 将文件截断到较小尺寸，比如 100 字节，</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 这会使得超过 100 字节部分的页缓存被标记为无效（触发 invalidate page）</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    off_t new_size <span class="op">=</span> <span class="dv">100</span><span class="op">;</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>ftruncate<span class="op">(</span>fd<span class="op">,</span> new_size<span class="op">)</span> <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>        perror<span class="op">(</span><span class="st">&quot;ftruncate&quot;</span><span class="op">);</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>        close<span class="op">(</span>fd<span class="op">);</span></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> EXIT_FAILURE<span class="op">;</span></span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    sleep<span class="op">(</span><span class="dv">100000</span><span class="op">);</span></span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    close<span class="op">(</span>fd<span class="op">);</span></span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> EXIT_SUCCESS<span class="op">;</span></span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">-o</span> write write.c</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">-o</span> truncate truncate.c</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="ex">./write</span> <span class="kw">&amp;</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 1</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="ex">./truncate</span> <span class="kw">&amp;</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;string.h&gt;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;sys/stat.h&gt;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true"></a><span class="dt">int</span> main(<span class="dt">void</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true"></a>{</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true"></a>    <span class="dt">const</span> <span class="dt">char</span> *filename = <span class="st">&quot;/mnt/file&quot;</span>;</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true"></a>    <span class="dt">int</span> fd = open(filename, O_RDWR | O_CREAT, <span class="bn">0666</span>);</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true"></a>    <span class="cf">if</span> (fd &lt; <span class="dv">0</span>) {</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true"></a>        perror(<span class="st">&quot;open&quot;</span>);</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true"></a>        <span class="cf">return</span> EXIT_FAILURE;</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true"></a>    }</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true"></a>    <span class="co">// 调用 ftruncate 将文件截断到较小尺寸，比如 100 字节，</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true"></a>    <span class="co">// 这会使得超过 100 字节部分的页缓存被标记为无效（触发 invalidate page）</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true"></a>    off_t new_size = <span class="dv">100</span>;</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true"></a>    <span class="cf">if</span> (ftruncate(fd, new_size) &lt; <span class="dv">0</span>) {</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true"></a>        perror(<span class="st">&quot;ftruncate&quot;</span>);</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true"></a>        close(fd);</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true"></a>        <span class="cf">return</span> EXIT_FAILURE;</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true"></a>    }</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true"></a></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true"></a>    sleep(<span class="dv">100000</span>);</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true"></a></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true"></a>    close(fd);</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true"></a>    <span class="cf">return</span> EXIT_SUCCESS;</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="fu">gcc</span> -o write write.c</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a><span class="fu">gcc</span> -o truncate truncate.c</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a><span class="ex">./write</span> <span class="kw">&amp;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a><span class="fu">sleep</span> 1</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a><span class="ex">./truncate</span> <span class="kw">&amp;</span></span></code></pre></div>
 </body>
 </html>
