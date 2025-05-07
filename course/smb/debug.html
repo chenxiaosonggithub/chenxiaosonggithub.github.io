@@ -118,7 +118,12 @@ class="toc-section-number">1</span> 打印</a>
 <li><a href="#server打印" id="toc-server打印"><span
 class="toc-section-number">1.1</span> server打印</a></li>
 <li><a href="#client打印" id="toc-client打印"><span
-class="toc-section-number">1.2</span> client打印</a></li>
+class="toc-section-number">1.2</span> client打印</a>
+<ul>
+<li><a href="#mydebug_print" id="toc-mydebug_print"><span
+class="toc-section-number">1.2.1</span>
+<code>mydebug_print()</code></a></li>
+</ul></li>
 </ul></li>
 <li><a href="#tcpdump抓包" id="toc-tcpdump抓包"><span
 class="toc-section-number">2</span> tcpdump抓包</a></li>
@@ -170,13 +175,37 @@ class="header-section-number">1.2</span> client打印</h2>
 client打印函数有<code>cifs_dbg()</code>、<code>cifs_server_dbg()</code>、<code>cifs_tcon_dbg()</code>、<code>cifs_info()</code>，要打开配置<code>CONFIG_CIFS_DEBUG</code>才有效，打开<code>CONFIG_CIFS_DEBUG2</code>和<code>CONFIG_CIFS_DEBUG_DUMP_KEYS</code>能打印更多信息，以<code>cifs_dbg()</code>为例代码如下:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cifs_dbg</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  cifs_dbg_func<span class="op">(</span>once<span class="op">,</span> <span class="op">...)</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    pr_debug_once <span class="co">// 还有 pr_err_once</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      printk_once <span class="co">// 只打印一次</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    pr_debug_once <span class="op">/</span> pr_err_once</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      printk_once<span class="op">(</span>KERN_DEBUG <span class="op">/</span> printk_once<span class="op">(</span>KERN_ERR <span class="co">// 只打印一次</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  cifs_dbg_func<span class="op">(</span>ratelimited<span class="op">,</span> <span class="op">...)</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    pr_debug_ratelimited <span class="co">// 还有 pr_err_ratelimited</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      __dynamic_pr_debug <span class="co">// 打开了配置 CONFIG_DYNAMIC_DEBUG</span></span></code></pre></div>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    pr_debug_ratelimited</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      __dynamic_pr_debug <span class="co">// 打开配置 CONFIG_DYNAMIC_DEBUG</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    pr_err_ratelimited</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      printk_ratelimited</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        printk</span></code></pre></div>
 <p>动态打印相关的内容请查看<a
 href="https://chenxiaosong.com/course/kernel/debug.html#dynamic_print">《内核调试方法》</a>。</p>
+<p>通过以下命令控制开关:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">less</span> <span class="co"># 查看所有的动态打印</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;file fs/smb/client/cifsfs.c +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开文件中所有的动态打印</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;module cifs -p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 关闭cifs模块所有动态打印</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;func cifs_copy_file_range +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开某个函数的打印</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-n</span> <span class="st">&#39;*cifs_smb3* -p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 关闭文件路径中包含cifs_smb3的打印</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-n</span> <span class="st">&#39;+p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 所有打印</span></span></code></pre></div>
+<h3 data-number="1.2.1" id="mydebug_print"><span
+class="header-section-number">1.2.1</span>
+<code>mydebug_print()</code></h3>
+<p>但在熟悉代码阶段，一个调试打印这么折腾还限制打印次数，对熟悉代码肯定不友好，所以我在熟悉代码阶段用的是<a
+href="https://chenxiaosong.com/course/kernel/debug.html#mydebug"><code>mydebug</code>模块</a>，
+打上<a
+href="https://chenxiaosong.com/course/kernel/debug.html#mydebug"><code>mydebug</code>模块</a>的补丁后，
+再打上补丁<a
+href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/smb/src/0001-smb-client-use-mydebug_print.patch"><code>0001-smb-client-use-mydebug_print.patch</code></a>。</p>
+<p>另外还会有一些动态打印（使用<code>pr_debug()</code>），所以还要打开动态打印的开关:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;module cifs +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开cifs模块所有动态打印</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">grep</span> cifs</span></code></pre></div>
 <h1 data-number="2" id="tcpdump抓包"><span
 class="header-section-number">2</span> tcpdump抓包</h1>
 <p>请查看<a
