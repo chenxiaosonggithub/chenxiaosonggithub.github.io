@@ -165,7 +165,7 @@
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="bu">echo</span> -n <span class="st">&#39;+p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 所有打印</span></span></code></pre></div>
 <h3 data-number="1.2.1" id="mydebug_print"><span class="header-section-number">1.2.1</span> <code>mydebug_print()</code></h3>
 <p>但在熟悉代码阶段，一个调试打印这么折腾还限制打印次数，对熟悉代码肯定不友好，所以我在熟悉代码阶段用的是<a href="https://chenxiaosong.com/course/kernel/debug.html#mydebug"><code>mydebug</code>模块</a>， 打上<a href="https://chenxiaosong.com/course/kernel/debug.html#mydebug"><code>mydebug</code>模块</a>的补丁后， 再打上补丁<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/smb/src/0001-smb-client-use-mydebug_print.patch"><code>0001-smb-client-use-mydebug_print.patch</code></a>。</p>
-<p>另外还会有一些动态打印（使用<code>pr_debug()</code>），所以还要打开动态打印的开关:</p>
+<p>另外可能还会有一些新增的动态打印（使用<code>pr_debug()</code>），可以用以下命令查看并打开动态打印:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;module cifs +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开cifs模块所有动态打印</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">grep</span> cifs</span></code></pre></div>
