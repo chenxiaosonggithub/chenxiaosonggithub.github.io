@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>nfs client数据结构和函数流程</title>
+  <title>nfs client数据结构</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -108,74 +108,58 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
-<h1 class="title">nfs client数据结构和函数流程</h1>
+<h1 class="title">nfs client数据结构</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#数据结构" id="toc-数据结构"><span
-class="toc-section-number">1</span> 数据结构</a>
-<ul>
 <li><a href="#超级块" id="toc-超级块"><span
-class="toc-section-number">1.1</span> 超级块</a>
+class="toc-section-number">1</span> 超级块</a>
 <ul>
 <li><a href="#struct-nfs_server" id="toc-struct-nfs_server"><span
-class="toc-section-number">1.1.1</span>
+class="toc-section-number">1.1</span>
 <code>struct nfs_server</code></a></li>
 <li><a href="#struct-nfs_client" id="toc-struct-nfs_client"><span
-class="toc-section-number">1.1.2</span>
+class="toc-section-number">1.2</span>
 <code>struct nfs_client</code></a></li>
 </ul></li>
 <li><a href="#超级块操作" id="toc-超级块操作"><span
-class="toc-section-number">1.2</span> 超级块操作</a></li>
+class="toc-section-number">2</span> 超级块操作</a></li>
 <li><a href="#索引节点" id="toc-索引节点"><span
-class="toc-section-number">1.3</span> 索引节点</a></li>
+class="toc-section-number">3</span> 索引节点</a></li>
 <li><a href="#索引节点操作" id="toc-索引节点操作"><span
-class="toc-section-number">1.4</span> 索引节点操作</a>
+class="toc-section-number">4</span> 索引节点操作</a>
 <ul>
 <li><a href="#常规文件" id="toc-常规文件"><span
-class="toc-section-number">1.4.1</span> 常规文件</a></li>
+class="toc-section-number">4.1</span> 常规文件</a></li>
 <li><a href="#目录" id="toc-目录"><span
-class="toc-section-number">1.4.2</span> 目录</a></li>
+class="toc-section-number">4.2</span> 目录</a></li>
 <li><a href="#符号链接" id="toc-符号链接"><span
-class="toc-section-number">1.4.3</span> 符号链接</a></li>
+class="toc-section-number">4.3</span> 符号链接</a></li>
 <li><a href="#命名空间" id="toc-命名空间"><span
-class="toc-section-number">1.4.4</span> 命名空间</a></li>
+class="toc-section-number">4.4</span> 命名空间</a></li>
 </ul></li>
 <li><a href="#dentry操作" id="toc-dentry操作"><span
-class="toc-section-number">1.5</span> <code>dentry</code>操作</a></li>
+class="toc-section-number">5</span> <code>dentry</code>操作</a></li>
 <li><a href="#file操作" id="toc-file操作"><span
-class="toc-section-number">1.6</span> <code>file</code>操作</a>
+class="toc-section-number">6</span> <code>file</code>操作</a>
 <ul>
 <li><a href="#常规文件-1" id="toc-常规文件-1"><span
-class="toc-section-number">1.6.1</span> 常规文件</a></li>
+class="toc-section-number">6.1</span> 常规文件</a></li>
 <li><a href="#目录-1" id="toc-目录-1"><span
-class="toc-section-number">1.6.2</span> 目录</a></li>
+class="toc-section-number">6.2</span> 目录</a></li>
 </ul></li>
 <li><a href="#address_space操作" id="toc-address_space操作"><span
-class="toc-section-number">1.7</span> <code>address_space</code>操作</a>
+class="toc-section-number">7</span> <code>address_space</code>操作</a>
 <ul>
 <li><a href="#常规文件-2" id="toc-常规文件-2"><span
-class="toc-section-number">1.7.1</span> 常规文件</a></li>
+class="toc-section-number">7.1</span> 常规文件</a></li>
 <li><a href="#目录-2" id="toc-目录-2"><span
-class="toc-section-number">1.7.2</span> 目录</a></li>
+class="toc-section-number">7.2</span> 目录</a></li>
 </ul></li>
 <li><a href="#文件系统类型" id="toc-文件系统类型"><span
-class="toc-section-number">1.8</span> 文件系统类型</a></li>
+class="toc-section-number">8</span> 文件系统类型</a></li>
 <li><a href="#模块加载卸载方法" id="toc-模块加载卸载方法"><span
-class="toc-section-number">1.9</span> 模块加载卸载方法</a></li>
-</ul></li>
-<li><a href="#函数流程" id="toc-函数流程"><span
-class="toc-section-number">2</span> 函数流程</a>
-<ul>
-<li><a href="#rpc" id="toc-rpc"><span
-class="toc-section-number">2.1</span> rpc</a></li>
-<li><a href="#mount" id="toc-mount"><span
-class="toc-section-number">2.2</span> mount</a></li>
-<li><a href="#umount" id="toc-umount"><span
-class="toc-section-number">2.3</span> umount</a></li>
-<li><a href="#read" id="toc-read"><span
-class="toc-section-number">2.4</span> read</a></li>
-</ul></li>
+class="toc-section-number">9</span> 模块加载卸载方法</a></li>
 </ul>
 </nav>
 <p><a
@@ -194,14 +178,11 @@ href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所�
 <li>定义文件系统类型。</li>
 <li>模块加载卸载方法。</li>
 </ol>
-<p>除了列出结构体的代码和中文注释外，还会整理一些函数的执行流程，方便后续查询。</p>
-<h1 data-number="1" id="数据结构"><span
-class="header-section-number">1</span> 数据结构</h1>
-<h2 data-number="1.1" id="超级块"><span
-class="header-section-number">1.1</span> 超级块</h2>
-<h3 data-number="1.1.1" id="struct-nfs_server"><span
-class="header-section-number">1.1.1</span>
-<code>struct nfs_server</code></h3>
+<h1 data-number="1" id="超级块"><span
+class="header-section-number">1</span> 超级块</h1>
+<h2 data-number="1.1" id="struct-nfs_server"><span
+class="header-section-number">1.1</span>
+<code>struct nfs_server</code></h2>
 <p>由于nfs
 client没有磁盘超级块，所以只有内存超级块结构体，在<code>nfs_get_tree_common()</code>函数中赋值<code>fc-&gt;s_fs_info = server</code>。</p>
 <p>这个结构体太长了。</p>
@@ -329,9 +310,9 @@ client没有磁盘超级块，所以只有内存超级块结构体，在<code>nf
 <span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>        <span class="dt">bool</span>                    has_sec_mnt_opts<span class="op">;</span></span>
 <span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> kobject          kobj<span class="op">;</span></span>
 <span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
-<h3 data-number="1.1.2" id="struct-nfs_client"><span
-class="header-section-number">1.1.2</span>
-<code>struct nfs_client</code></h3>
+<h2 data-number="1.2" id="struct-nfs_client"><span
+class="header-section-number">1.2</span>
+<code>struct nfs_client</code></h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*                                                                                                 </span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * nfs_client 标识我们的客户端状态到服务器。                                       </span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span>                                                                                                </span>
@@ -435,8 +416,8 @@ class="header-section-number">1.1.2</span>
 <span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> net              <span class="op">*</span>cl_net<span class="op">;</span> <span class="co">// 网络命名空间</span></span>
 <span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> list_head        pending_cb_stateids<span class="op">;</span>                          </span>
 <span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                </span></code></pre></div>
-<h2 data-number="1.2" id="超级块操作"><span
-class="header-section-number">1.2</span> 超级块操作</h2>
+<h1 data-number="2" id="超级块操作"><span
+class="header-section-number">2</span> 超级块操作</h1>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// nfsv2, nfsv3</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> super_operations nfs_sops <span class="op">=</span> <span class="op">{</span> </span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>alloc_inode    <span class="op">=</span> nfs_alloc_inode<span class="op">,</span> </span>
@@ -466,8 +447,8 @@ class="header-section-number">1.2</span> 超级块操作</h2>
 <span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>show_path      <span class="op">=</span> nfs_show_path<span class="op">,</span>           </span>
 <span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>show_stats     <span class="op">=</span> nfs_show_stats<span class="op">,</span>          </span>
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                 </span></code></pre></div>
-<h2 data-number="1.3" id="索引节点"><span
-class="header-section-number">1.3</span> 索引节点</h2>
+<h1 data-number="3" id="索引节点"><span
+class="header-section-number">3</span> 索引节点</h1>
 <p>nfs没有磁盘索引节点，只有内存索引节点。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * nfs fs inode 内存中的数据</span></span>
@@ -581,10 +562,10 @@ class="header-section-number">1.3</span> 索引节点</h2>
 <span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
 <span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a>        <span class="op">};</span></span>
 <span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
-<h2 data-number="1.4" id="索引节点操作"><span
-class="header-section-number">1.4</span> 索引节点操作</h2>
-<h3 data-number="1.4.1" id="常规文件"><span
-class="header-section-number">1.4.1</span> 常规文件</h3>
+<h1 data-number="4" id="索引节点操作"><span
+class="header-section-number">4</span> 索引节点操作</h1>
+<h2 data-number="4.1" id="常规文件"><span
+class="header-section-number">4.1</span> 常规文件</h2>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// nfsv2</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">const</span> <span class="kw">struct</span> inode_operations nfs_file_inode_operations <span class="op">=</span> <span class="op">{</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>permission     <span class="op">=</span> nfs_permission<span class="op">,</span>                         </span>
@@ -611,8 +592,8 @@ class="header-section-number">1.4.1</span> 常规文件</h3>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setattr        <span class="op">=</span> nfs_setattr<span class="op">,</span>                             </span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>listxattr      <span class="op">=</span> nfs4_listxattr<span class="op">,</span>                          </span>
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                                 </span></code></pre></div>
-<h3 data-number="1.4.2" id="目录"><span
-class="header-section-number">1.4.2</span> 目录</h3>
+<h2 data-number="4.2" id="目录"><span
+class="header-section-number">4.2</span> 目录</h2>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// nfsv2</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">const</span> <span class="kw">struct</span> inode_operations nfs_dir_inode_operations <span class="op">=</span> <span class="op">{</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>create         <span class="op">=</span> nfs_create<span class="op">,</span>                            </span>
@@ -667,8 +648,8 @@ class="header-section-number">1.4.2</span> 目录</h3>
 <span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setattr        <span class="op">=</span> nfs_setattr<span class="op">,</span>                            </span>
 <span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>listxattr      <span class="op">=</span> nfs4_listxattr<span class="op">,</span>                         </span>
 <span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                                </span></code></pre></div>
-<h3 data-number="1.4.3" id="符号链接"><span
-class="header-section-number">1.4.3</span> 符号链接</h3>
+<h2 data-number="4.3" id="符号链接"><span
+class="header-section-number">4.3</span> 符号链接</h2>
 <div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*                                                            </span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * symlinks can&#39;t do much...                                  </span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span>                                                           </span>
@@ -677,8 +658,8 @@ class="header-section-number">1.4.3</span> 符号链接</h3>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>getattr        <span class="op">=</span> nfs_getattr<span class="op">,</span>                        </span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setattr        <span class="op">=</span> nfs_setattr<span class="op">,</span>                        </span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                            </span></code></pre></div>
-<h3 data-number="1.4.4" id="命名空间"><span
-class="header-section-number">1.4.4</span> 命名空间</h3>
+<h2 data-number="4.4" id="命名空间"><span
+class="header-section-number">4.4</span> 命名空间</h2>
 <div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> inode_operations nfs_mountpoint_inode_operations <span class="op">=</span> <span class="op">{</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>getattr        <span class="op">=</span> nfs_getattr<span class="op">,</span>                           </span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setattr        <span class="op">=</span> nfs_setattr<span class="op">,</span>                           </span>
@@ -688,8 +669,8 @@ class="header-section-number">1.4.4</span> 命名空间</h3>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>getattr        <span class="op">=</span> nfs_namespace_getattr<span class="op">,</span>                 </span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>setattr        <span class="op">=</span> nfs_namespace_setattr<span class="op">,</span>                 </span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                               </span></code></pre></div>
-<h2 data-number="1.5" id="dentry操作"><span
-class="header-section-number">1.5</span> <code>dentry</code>操作</h2>
+<h1 data-number="5" id="dentry操作"><span
+class="header-section-number">5</span> <code>dentry</code>操作</h1>
 <div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// nfsv2 nfsv3</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> dentry_operations nfs_dentry_operations <span class="op">=</span> <span class="op">{</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>d_revalidate   <span class="op">=</span> nfs_lookup_revalidate<span class="op">,</span>        </span>
@@ -709,10 +690,10 @@ class="header-section-number">1.5</span> <code>dentry</code>操作</h2>
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>d_automount    <span class="op">=</span> nfs_d_automount<span class="op">,</span>               </span>
 <span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>d_release      <span class="op">=</span> nfs_d_release<span class="op">,</span>                 </span>
 <span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                       </span></code></pre></div>
-<h2 data-number="1.6" id="file操作"><span
-class="header-section-number">1.6</span> <code>file</code>操作</h2>
-<h3 data-number="1.6.1" id="常规文件-1"><span
-class="header-section-number">1.6.1</span> 常规文件</h3>
+<h1 data-number="6" id="file操作"><span
+class="header-section-number">6</span> <code>file</code>操作</h1>
+<h2 data-number="6.1" id="常规文件-1"><span
+class="header-section-number">6.1</span> 常规文件</h2>
 <div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// nfsv2 nfsv3</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations nfs_file_operations <span class="op">=</span> <span class="op">{</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>llseek         <span class="op">=</span> nfs_file_llseek<span class="op">,</span>          </span>
@@ -755,8 +736,8 @@ class="header-section-number">1.6.1</span> 常规文件</h3>
 <span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>llseek         <span class="op">=</span> nfs_file_llseek<span class="op">,</span>           </span>
 <span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif                                               </span></span>
 <span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                   </span></code></pre></div>
-<h3 data-number="1.6.2" id="目录-1"><span
-class="header-section-number">1.6.2</span> 目录</h3>
+<h2 data-number="6.2" id="目录-1"><span
+class="header-section-number">6.2</span> 目录</h2>
 <div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> file_operations nfs_dir_operations <span class="op">=</span> <span class="op">{</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>llseek         <span class="op">=</span> nfs_llseek_dir<span class="op">,</span>          </span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>read           <span class="op">=</span> generic_read_dir<span class="op">,</span>        </span>
@@ -765,11 +746,11 @@ class="header-section-number">1.6.2</span> 目录</h3>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>release        <span class="op">=</span> nfs_closedir<span class="op">,</span>            </span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fsync          <span class="op">=</span> nfs_fsync_dir<span class="op">,</span>           </span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                 </span></code></pre></div>
-<h2 data-number="1.7" id="address_space操作"><span
-class="header-section-number">1.7</span>
-<code>address_space</code>操作</h2>
-<h3 data-number="1.7.1" id="常规文件-2"><span
-class="header-section-number">1.7.1</span> 常规文件</h3>
+<h1 data-number="7" id="address_space操作"><span
+class="header-section-number">7</span>
+<code>address_space</code>操作</h1>
+<h2 data-number="7.1" id="常规文件-2"><span
+class="header-section-number">7.1</span> 常规文件</h2>
 <div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> address_space_operations nfs_file_aops <span class="op">=</span> <span class="op">{</span> </span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>read_folio <span class="op">=</span> nfs_read_folio<span class="op">,</span>                   </span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>readahead <span class="op">=</span> nfs_readahead<span class="op">,</span>                     </span>
@@ -788,13 +769,13 @@ class="header-section-number">1.7.1</span> 常规文件</h3>
 <span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>swap_deactivate <span class="op">=</span> nfs_swap_deactivate<span class="op">,</span>         </span>
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>swap_rw <span class="op">=</span> nfs_swap_rw<span class="op">,</span>                         </span>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                      </span></code></pre></div>
-<h3 data-number="1.7.2" id="目录-2"><span
-class="header-section-number">1.7.2</span> 目录</h3>
+<h2 data-number="7.2" id="目录-2"><span
+class="header-section-number">7.2</span> 目录</h2>
 <div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="kw">struct</span> address_space_operations nfs_dir_aops <span class="op">=</span> <span class="op">{</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>free_folio <span class="op">=</span> nfs_readdir_clear_array<span class="op">,</span>        </span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                    </span></code></pre></div>
-<h2 data-number="1.8" id="文件系统类型"><span
-class="header-section-number">1.8</span> 文件系统类型</h2>
+<h1 data-number="8" id="文件系统类型"><span
+class="header-section-number">8</span> 文件系统类型</h1>
 <div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// nfsv2 nfsv3</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> file_system_type nfs_fs_type <span class="op">=</span> <span class="op">{</span>                                     </span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>owner                  <span class="op">=</span> THIS_MODULE<span class="op">,</span>                              </span>
@@ -814,145 +795,8 @@ class="header-section-number">1.8</span> 文件系统类型</h2>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>kill_sb                <span class="op">=</span> nfs_kill_super<span class="op">,</span>                           </span>
 <span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>fs_flags               <span class="op">=</span> FS_RENAME_DOES_D_MOVE<span class="op">|</span>FS_BINARY_MOUNTDATA<span class="op">,</span></span>
 <span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="op">};</span>                                                                          </span></code></pre></div>
-<h2 data-number="1.9" id="模块加载卸载方法"><span
-class="header-section-number">1.9</span> 模块加载卸载方法</h2>
+<h1 data-number="9" id="模块加载卸载方法"><span
+class="header-section-number">9</span> 模块加载卸载方法</h1>
 <p><code>init_nfs_fs()</code>和<code>exit_nfs_fs()</code>。</p>
-<h1 data-number="2" id="函数流程"><span
-class="header-section-number">2</span> 函数流程</h1>
-<h2 data-number="2.1" id="rpc"><span
-class="header-section-number">2.1</span> rpc</h2>
-<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 挂载时</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>nfs4_alloc_client</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  nfs_create_rpc_client</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    rpc_create</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>      rpc_create_xprt <span class="co">// 只会在挂载时执行到</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        rpc_ping</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>          rpc_call_null_helper</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>            rpc_call_null_helper</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>              rpc_run_task</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>rpc_run_task <span class="op">/</span> rpc_run_bc_task</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  rpc_new_task</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    rpc_init_task</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>      rpc_task_get_xprt</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  rpc_execute</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    rpc_make_runnable</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>      INIT_WORK<span class="op">(&amp;</span>task<span class="op">-&gt;</span>u<span class="op">.</span>tk_work<span class="op">,</span> rpc_async_schedule<span class="op">)</span> <span class="co">// 异步执行</span></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    __rpc_execute <span class="co">// 同步执行，异步在内核线程执行到这个函数</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>rpc_task_release_client <span class="op">/</span> nfs4_async_handle_exception</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  rpc_task_release_transport</span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>rpc_task_set_client <span class="op">/</span> call_start</span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  rpc_task_set_transport</span></code></pre></div>
-<h2 data-number="2.2" id="mount"><span
-class="header-section-number">2.2</span> mount</h2>
-<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>vfs_parse_fs_param</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 不指定版本号挂载时，默认用哪个版本由 `mount.nfs` 程序决定</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  nfs_fs_context_parse_param</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co">// v3</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>vfs_get_tree</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  nfs_get_tree</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    nfs_try_get_tree</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>      nfs_try_mount_request</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        nfs3_create_server</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>          nfs_create_server</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>            nfs_init_server</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>              nfs_get_client</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>                nfs_match_client</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>                nfs_alloc_client</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>                nfs_init_client</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co">// v4</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>vfs_get_tree</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  nfs_get_tree</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    nfs4_try_get_tree</span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>      nfs4_create_server</span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>        nfs4_init_server</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>          nfs4_set_client</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>            nfs_get_client</span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>              nfs_match_client</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>              nfs4_alloc_client</span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>                nfs_create_rpc_client</span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>                  rpc_create</span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>              nfs4_init_client</span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>                nfs4_discover_server_trunking</span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>                  nfs41_discover_server_trunking <span class="co">// 返回的 nfs_client 未就绪</span></span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>                    nfs4_proc_exchange_id</span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>              nfs4_add_trunk <span class="co">// 主线的多路径？</span></span>
-<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>                rpc_clnt_add_xprt</span>
-<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>kthread</span>
-<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>  nfs4_run_state_manager</span>
-<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>    nfs4_state_manager</span>
-<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>      nfs4_reclaim_lease</span>
-<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>        nfs4_establish_lease</span>
-<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>          nfs41_init_clientid</span>
-<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>            nfs4_proc_exchange_id</span>
-<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>            nfs4_proc_create_session</span>
-<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>            nfs_mark_client_ready<span class="op">(</span>clp<span class="op">,</span> NFS_CS_READY<span class="op">)</span> <span class="co">// 设置成就绪状态</span></span>
-<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a>      nfs4_state_end_reclaim_reboot</span>
-<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a>        nfs4_reclaim_complete</span>
-<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a>          nfs41_proc_reclaim_complete</span></code></pre></div>
-<h2 data-number="2.3" id="umount"><span
-class="header-section-number">2.3</span> umount</h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">// v4</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>task_work_run</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  __cleanup_mnt</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    cleanup_mnt</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>      deactivate_super</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        deactivate_locked_super</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>          nfs_kill_super</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>            nfs_free_server</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>              rpc_shutdown_client</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>              nfs_put_client</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                nfs4_free_client</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>                  nfs4_shutdown_client</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                    nfs41_shutdown_client</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                      nfs4_destroy_session</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>                        nfs4_proc_destroy_session</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>                      nfs4_destroy_clientid</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>                        nfs4_proc_destroy_clientid</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>                          _nfs4_proc_destroy_clientid</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>                  nfs_free_client</span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>                    rpc_shutdown_client</span></code></pre></div>
-<h2 data-number="2.4" id="read"><span
-class="header-section-number">2.4</span> read</h2>
-<div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>read</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  ksys_read</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    vfs_read</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>      new_sync_read</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        nfs_file_read</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>          generic_file_read_iter</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>            filemap_read</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>              filemap_get_pages</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>                page_cache_sync_readahead</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>                  page_cache_sync_ra</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>                    page_cache_ra_order</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>                      read_pages</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>                        nfs_readahead <span class="co">// 低版本是 nfs_readpages</span></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>                          nfs_pageio_complete_read</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                            nfs_pageio_complete</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>                              nfs_pageio_complete_mirror</span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>                                nfs_pageio_doio</span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>                                  nfs_generic_pg_pgios</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>                                    nfs_initiate_pgio</span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>                                      atomic_set<span class="op">(&amp;</span>task<span class="op">-&gt;</span>tk_count<span class="op">,</span> <span class="dv">1</span><span class="op">)</span> <span class="co">// 引用计数</span></span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="op">.</span>flags <span class="op">=</span> RPC_TASK_ASYNC <span class="op">|</span> flags<span class="op">,</span> <span class="co">// 异步</span></span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>                                      nfs_initiate_read</span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>                                        nfs3_proc_read_setup</span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>                                          <span class="op">&amp;</span>nfs3_procedures<span class="op">[</span>NFS3PROC_READ<span class="op">]</span></span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>                                      rpc_run_task</span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>                                        rpc_new_task</span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>                                          rpc_init_task</span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>                                            task<span class="op">-&gt;</span>tk_flags  <span class="op">=</span> task_setup_data<span class="op">-&gt;</span>flags <span class="co">// flag在这里赋值</span></span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>                                        atomic_inc<span class="op">(&amp;</span>task<span class="op">-&gt;</span>tk_count<span class="op">)</span> <span class="co">// 引用计数加1</span></span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>                                        rpc_execute</span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>                                          rpc_make_runnable</span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>                                            INIT_WORK<span class="op">(&amp;</span>task<span class="op">-&gt;</span>u<span class="op">.</span>tk_work<span class="op">,</span> rpc_async_schedule<span class="op">)</span></span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>                filemap_update_page</span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>                  folio_put_wait_locked <span class="co">// folio_unlock()唤醒？</span></span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>                    folio_wait_bit_common</span></code></pre></div>
 </body>
 </html>
