@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,87 +94,136 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">安装GNU/Linux发行版</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#启动配置"><span class="toc-section-number">1</span> 启动配置</a>
+<li><a href="#启动配置" id="toc-启动配置"><span
+class="toc-section-number">1</span> 启动配置</a>
 <ul>
-<li><a href="#bios设置"><span class="toc-section-number">1.1</span> BIOS设置</a></li>
-<li><a href="#双系统grub设置"><span class="toc-section-number">1.2</span> 双系统grub设置</a></li>
+<li><a href="#bios设置" id="toc-bios设置"><span
+class="toc-section-number">1.1</span> BIOS设置</a></li>
+<li><a href="#双系统grub设置" id="toc-双系统grub设置"><span
+class="toc-section-number">1.2</span> 双系统grub设置</a></li>
 </ul></li>
-<li><a href="#virt-manager安装虚拟机"><span class="toc-section-number">2</span> virt-manager安装虚拟机</a>
+<li><a href="#virt-manager安装虚拟机"
+id="toc-virt-manager安装虚拟机"><span
+class="toc-section-number">2</span> virt-manager安装虚拟机</a>
 <ul>
-<li><a href="#virt-manager安装aarch64系统"><span class="toc-section-number">2.1</span> <code>virt-manager</code>安装<code>aarch64</code>系统</a></li>
-<li><a href="#桥接"><span class="toc-section-number">2.2</span> 桥接</a></li>
+<li><a href="#virt-manager安装aarch64系统"
+id="toc-virt-manager安装aarch64系统"><span
+class="toc-section-number">2.1</span>
+<code>virt-manager</code>安装<code>aarch64</code>系统</a></li>
+<li><a href="#桥接" id="toc-桥接"><span
+class="toc-section-number">2.2</span> 桥接</a></li>
 </ul></li>
-<li><a href="#配置"><span class="toc-section-number">3</span> 配置</a></li>
-<li><a href="#vnc"><span class="toc-section-number">4</span> VNC远程桌面</a>
+<li><a href="#配置" id="toc-配置"><span
+class="toc-section-number">3</span> 配置</a></li>
+<li><a href="#vnc" id="toc-vnc"><span
+class="toc-section-number">4</span> VNC远程桌面</a>
 <ul>
-<li><a href="#vnc软件"><span class="toc-section-number">4.1</span> vnc软件</a>
+<li><a href="#vnc软件" id="toc-vnc软件"><span
+class="toc-section-number">4.1</span> vnc软件</a>
 <ul>
-<li><a href="#ubuntu"><span class="toc-section-number">4.1.1</span> ubuntu</a></li>
-<li><a href="#macos"><span class="toc-section-number">4.1.2</span> macOS</a></li>
-<li><a href="#tightvnc"><span class="toc-section-number">4.1.3</span> tightvnc</a></li>
+<li><a href="#ubuntu" id="toc-ubuntu"><span
+class="toc-section-number">4.1.1</span> ubuntu</a></li>
+<li><a href="#macos" id="toc-macos"><span
+class="toc-section-number">4.1.2</span> macOS</a></li>
+<li><a href="#tightvnc" id="toc-tightvnc"><span
+class="toc-section-number">4.1.3</span> tightvnc</a></li>
 </ul></li>
-<li><a href="#qemuvnc安装系统"><span class="toc-section-number">4.2</span> QEMU+VNC安装系统</a></li>
+<li><a href="#qemuvnc安装系统" id="toc-qemuvnc安装系统"><span
+class="toc-section-number">4.2</span> QEMU+VNC安装系统</a></li>
 </ul></li>
-<li><a href="#我的常用软件"><span class="toc-section-number">5</span> 我的常用软件</a>
+<li><a href="#我的常用软件" id="toc-我的常用软件"><span
+class="toc-section-number">5</span> 我的常用软件</a>
 <ul>
-<li><a href="#ubuntu-1"><span class="toc-section-number">5.1</span> ubuntu</a></li>
-<li><a href="#fedora"><span class="toc-section-number">5.2</span> fedora</a></li>
+<li><a href="#ubuntu-1" id="toc-ubuntu-1"><span
+class="toc-section-number">5.1</span> ubuntu</a></li>
+<li><a href="#fedora" id="toc-fedora"><span
+class="toc-section-number">5.2</span> fedora</a></li>
 </ul></li>
-<li><a href="#其他系统的一些笔记"><span class="toc-section-number">6</span> 其他系统的一些笔记</a>
+<li><a href="#其他系统的一些笔记" id="toc-其他系统的一些笔记"><span
+class="toc-section-number">6</span> 其他系统的一些笔记</a>
 <ul>
-<li><a href="#centos"><span class="toc-section-number">6.1</span> centos</a></li>
-<li><a href="#树莓派"><span class="toc-section-number">6.2</span> 树莓派</a></li>
-<li><a href="#麒麟系统"><span class="toc-section-number">6.3</span> 麒麟系统</a></li>
-<li><a href="#arcolinux"><span class="toc-section-number">6.4</span> arcolinux</a></li>
-<li><a href="#suse"><span class="toc-section-number">6.5</span> suse</a></li>
+<li><a href="#centos" id="toc-centos"><span
+class="toc-section-number">6.1</span> centos</a></li>
+<li><a href="#树莓派" id="toc-树莓派"><span
+class="toc-section-number">6.2</span> 树莓派</a></li>
+<li><a href="#麒麟系统" id="toc-麒麟系统"><span
+class="toc-section-number">6.3</span> 麒麟系统</a></li>
+<li><a href="#arcolinux" id="toc-arcolinux"><span
+class="toc-section-number">6.4</span> arcolinux</a></li>
+<li><a href="#suse" id="toc-suse"><span
+class="toc-section-number">6.5</span> suse</a></li>
 </ul></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
-<p>在GNU/Linux发行版的选择上，我们这里是学习的目的，所以就选用能体验最新特性的<a href="https://ubuntu.com/download">Ubuntu</a>和<a href="https://fedoraproject.org/">Fedora</a>，都是每年发布两个版本。</p>
-<p>与Linux内核开发相关的请查看<a href="https://chenxiaosong.com/course/kernel/dev-environment.html">内核开发环境</a>。</p>
-<h1 data-number="1" id="启动配置"><span class="header-section-number">1</span> 启动配置</h1>
-<h2 data-number="1.1" id="bios设置"><span class="header-section-number">1.1</span> BIOS设置</h2>
-<p>我用的主板是和Linus同款的“技嘉Aorus”，有时会抽风恢复默认的BIOS出厂设置， 在BIOS的“easy mode”中把“X.M.P. Disabled”改为“X.M.P.-DDR4-3600 18-22-22-42-64-1.35V”。 然后点击右下角的“Advanced Mode(F2)”进入“Advanced Mode”，“Tweaker -&gt; Advanced CPU Settings -&gt; SVM Mode”改为 “Enabled”开启硬件虚拟化配置。</p>
+<p><a
+href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
+<p>在GNU/Linux发行版的选择上，我们这里是学习的目的，所以就选用能体验最新特性的<a
+href="https://ubuntu.com/download">Ubuntu</a>和<a
+href="https://fedoraproject.org/">Fedora</a>，都是每年发布两个版本。</p>
+<p>与Linux内核开发相关的请查看<a
+href="https://chenxiaosong.com/course/kernel/dev-environment.html">内核开发环境</a>。</p>
+<h1 data-number="1" id="启动配置"><span
+class="header-section-number">1</span> 启动配置</h1>
+<h2 data-number="1.1" id="bios设置"><span
+class="header-section-number">1.1</span> BIOS设置</h2>
+<p>我用的主板是和Linus同款的“技嘉Aorus”，有时会抽风恢复默认的BIOS出厂设置，
+在BIOS的“easy mode”中把“X.M.P. Disabled”改为“X.M.P.-DDR4-3600
+18-22-22-42-64-1.35V”。 然后点击右下角的“Advanced Mode(F2)”进入“Advanced
+Mode”，“Tweaker -&gt; Advanced CPU Settings -&gt; SVM Mode”改为
+“Enabled”开启硬件虚拟化配置。</p>
 <p>另外再记录一下联想台式机进bios是按F1键。</p>
-<h2 data-number="1.2" id="双系统grub设置"><span class="header-section-number">1.2</span> 双系统grub设置</h2>
-<p>grub的配置文件的示例<a href="https://gitee.com/chenxiaosonggitee/blog/tree/master/course/gnu-linux/src/boot-efi-EFI">boot-efi-EFI</a>，在操作系统中的路径为<code>/boot/efi/EFI/{ubuntu,centos}/grub.cfg</code>。</p>
+<h2 data-number="1.2" id="双系统grub设置"><span
+class="header-section-number">1.2</span> 双系统grub设置</h2>
+<p>grub的配置文件的示例<a
+href="https://gitee.com/chenxiaosonggitee/blog/tree/master/course/gnu-linux/src/boot-efi-EFI">boot-efi-EFI</a>，在操作系统中的路径为<code>/boot/efi/EFI/{ubuntu,centos}/grub.cfg</code>。</p>
 <p>centos9 grub设置:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">blkid</span> # 打印 uuid</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ex">vim</span> /boot/efi/EFI/centos/grub.cfg # 更改 uuid, set prefix=(<span class="va">$dev</span>)<span class="ex">/</span> 后接正确的路径</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ex">grub2-mkconfig</span> -o /boot/grub2/grub.cfg # centos9使用的是grub2</span></code></pre></div>
-<p>ubuntu22.04 grub设置，修改配置<code>/boot/efi/EFI/ubuntu/grub.cfg</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">search.fs_uuid</span> 22bac2d6-b556-4158-8244-fba87a8a34c3 root # 用 blkid 查看 uuid</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">set</span> <span class="va">prefix=($root)</span><span class="st">&#39;/boot/grub&#39;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ex">configfile</span> <span class="va">$prefix</span>/grub.cfg</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">blkid</span> <span class="co"># 打印 uuid</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span> /boot/efi/EFI/centos/grub.cfg <span class="co"># 更改 uuid, set prefix=($dev)/ 后接正确的路径</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">grub2-mkconfig</span> <span class="at">-o</span> /boot/grub2/grub.cfg <span class="co"># centos9使用的是grub2</span></span></code></pre></div>
+<p>ubuntu22.04
+grub设置，修改配置<code>/boot/efi/EFI/ubuntu/grub.cfg</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">search.fs_uuid</span> 22bac2d6-b556-4158-8244-fba87a8a34c3 root <span class="co"># 用 blkid 查看 uuid</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> prefix=<span class="er">(</span><span class="va">$root</span><span class="kw">)</span><span class="st">&#39;/boot/grub&#39;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">configfile</span> <span class="va">$prefix</span>/grub.cfg</span></code></pre></div>
 <p>更改启动界面选择系统的超时时间:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">vim</span> /etc/default/grub # GRUB_TIMEOUT=5</span></code></pre></div>
-<h1 data-number="2" id="virt-manager安装虚拟机"><span class="header-section-number">2</span> virt-manager安装虚拟机</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span> /etc/default/grub <span class="co"># GRUB_TIMEOUT=5</span></span></code></pre></div>
+<h1 data-number="2" id="virt-manager安装虚拟机"><span
+class="header-section-number">2</span> virt-manager安装虚拟机</h1>
 <p><code>/etc/libvirt/qemu.conf</code>文件配置:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">user</span> = <span class="st">&quot;root&quot;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">group</span> = <span class="st">&quot;libvirt&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">user</span> = <span class="st">&quot;root&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">group</span> = <span class="st">&quot;libvirt&quot;</span></span></code></pre></div>
 <p>注意麒麟桌面系统v10的virt-manager图形显示协议要用vnc。</p>
-<h2 data-number="2.1" id="virt-manager安装aarch64系统"><span class="header-section-number">2.1</span> <code>virt-manager</code>安装<code>aarch64</code>系统</h2>
+<h2 data-number="2.1" id="virt-manager安装aarch64系统"><span
+class="header-section-number">2.1</span>
+<code>virt-manager</code>安装<code>aarch64</code>系统</h2>
 <ul>
 <li>首先<code>ssh-copy-id root@${ip}</code>确保可以免密码登录（非<code>root</code>用户就行）。</li>
-<li>启动virt-manager后，`添加连接 -&gt; 勾选 通过ssh连接到远程主机 -&gt; 用户名: root -&gt; 主机名: ${ip}:22｀。</li>
+<li>启动virt-manager后，`添加连接 -&gt; 勾选 通过ssh连接到远程主机 -&gt;
+用户名: root -&gt; 主机名: ${ip}:22｀。</li>
 <li><code>创建虚拟机 -&gt; 架构选项 -&gt; 架构: aarch64 -&gt; 机器类型: virt -&gt; 在完成前打勾 在安装前自定义配置</code>。</li>
 <li>弹出配置界面，<code>概况 固件: UEFI aarch64 -&gt; cpu数 型号: cortex-a72 -&gt; 添加硬件 图形 类型: spice服务器 地址: 所有接口 -&gt; 添加硬件 输入 USB鼠标 USB键盘</code>。</li>
 </ul>
 <p><code>添加硬件 图形 类型:</code>如果选<code>vnc服务器</code>，要把virt-manager窗口关闭才能用vnc客户端登录，而且系统鼠标定位有一点小问题，所以安装阶段不建议选择<code>vnc服务器</code>，建议选择<code>spice服务器</code>。</p>
-<h2 data-number="2.2" id="桥接"><span class="header-section-number">2.2</span> 桥接</h2>
+<h2 data-number="2.2" id="桥接"><span
+class="header-section-number">2.2</span> 桥接</h2>
 <ul>
 <li>网络源: Macvtap设备</li>
 <li>设备名称: 选择要桥接的接口，如enp2s0</li>
@@ -171,167 +231,226 @@
 </ul>
 <p>注意Macvtap方式不能访问宿主机和同一个交换机上的ip。</p>
 <p>目前暂还没找到完美的virt-manager桥接方法。可以使用其他虚拟机软件如vmware或virtualbox。</p>
-<h1 data-number="3" id="配置"><span class="header-section-number">3</span> 配置</h1>
-<p>有些发行版默认<code>poweroff</code>和<code>reboot</code>等命令可以以非root权限运行，容易误操作，这些命令都软链接到<code>/bin/systemctl</code>, 可以用以下命令修改权限:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="fu">sudo</span> chmod 700 /bin/systemctl</span></code></pre></div>
+<h1 data-number="3" id="配置"><span
+class="header-section-number">3</span> 配置</h1>
+<p>有些发行版默认<code>poweroff</code>和<code>reboot</code>等命令可以以非root权限运行，容易误操作，这些命令都软链接到<code>/bin/systemctl</code>,
+可以用以下命令修改权限:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chmod 700 /bin/systemctl</span></code></pre></div>
 <p>设置hostname:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="fu">sudo</span> hostnamectl set-hostname Threadripper-Ubuntu2204</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> hostnamectl set-hostname Threadripper-Ubuntu2204</span></code></pre></div>
 <p>新建或删除用户:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="fu">sudo</span> useradd -s /bin/bash -d /home/test -m test <span class="co"># 新建用户test</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="fu">sudo</span> userdel -r test <span class="co"># 删除用户test，-r选项代表同时删除用户的家目录和相关文件</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> useradd <span class="at">-s</span> /bin/bash <span class="at">-d</span> /home/test <span class="at">-m</span> test <span class="co"># 新建用户test</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> userdel <span class="at">-r</span> test <span class="co"># 删除用户test，-r选项代表同时删除用户的家目录和相关文件</span></span></code></pre></div>
 <p>修改ssh client的配置文件<code>/etc/ssh/ssh_config</code>:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="co"># ssh密码输入界面要很久才出现的解决办法</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="ex">GSSAPIAuthentication</span> no # GSSAPI 通常用于支持 Kerberos 认证，提供一种安全且无缝的认证方式</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ssh密码输入界面要很久才出现的解决办法</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">GSSAPIAuthentication</span> no <span class="co"># GSSAPI 通常用于支持 Kerberos 认证，提供一种安全且无缝的认证方式</span></span></code></pre></div>
 <p>修改ssh server的配置文件<code>/etc/ssh/sshd_config</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="ex">AllowTcpForwarding</span> yes # vscode连接服务器</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">AllowTcpForwarding</span> yes <span class="co"># vscode连接服务器</span></span></code></pre></div>
 <p>如果没有挂载<code>/tmp</code>目录，可以修改<code>/etc/fstab</code>文件:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="co"># defaults: 使用默认的挂载选项。</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="co"># noatime: 不更新文件的访问时间戳。</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="co"># nosuid: 不允许设置文件的 SUID 位。</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="co"># nodev: 不允许设备文件。</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="co"># noexec: 不允许执行二进制文件。安装vmware等软件时会安装不上</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="co"># mode=1777: 设置目录的权限为 1777，确保它是可写的临时目录。</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="ex">tmpfs</span> /tmp tmpfs defaults,noatime,nosuid,nodev,mode=1777,size=20G 0 0</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># defaults: 使用默认的挂载选项。</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># noatime: 不更新文件的访问时间戳。</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># nosuid: 不允许设置文件的 SUID 位。</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># nodev: 不允许设备文件。</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># noexec: 不允许执行二进制文件。安装vmware等软件时会安装不上</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># mode=1777: 设置目录的权限为 1777，确保它是可写的临时目录。</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ex">tmpfs</span> /tmp tmpfs defaults,noatime,nosuid,nodev,mode=1777,size=20G 0 0</span></code></pre></div>
 <p>自动挂载磁盘，修改配置文件<code>/etc/fstab</code>，添加:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="co"># uuid用blkid /dev/sda查看</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="co"># 最后2个参数（0 0）的意义: dump, fsck</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="va">UUID=</span>b7aa1308-f57e-4f28-834c-c463237a8383 <span class="ex">/home/sonvhi/sonvhi/</span>   ext4    errors=remount-ro    0       0</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># uuid用blkid /dev/sda查看</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 最后2个参数（0 0）的意义: dump, fsck</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="va">UUID</span><span class="op">=</span>b7aa1308-f57e-4f28-834c-c463237a8383 <span class="ex">/home/sonvhi/sonvhi/</span>   ext4    errors=remount-ro    0       0</span></code></pre></div>
 <p>如果内存比较小，可以添加swap:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="fu">sudo</span> fallocate -l 4G /swapfile</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="fu">sudo</span> chmod 600 /swapfile</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="fu">ls</span> -lh /swapfile</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="fu">sudo</span> mkswap /swapfile</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a><span class="fu">sudo</span> swapon /swapfile</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a><span class="fu">sudo</span> swapon -s</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a><span class="fu">sudo</span> vi /etc/fstab <span class="co"># 在/etc/fstab最后一行添加 /swapfile  none  swap  sw  0  0</span></span></code></pre></div>
-<p>shell界面路径名显示绝对路径，想换成只显示最后一个路径名分量, <code>~/.bashrc</code>文件修改以下变量:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="va">PS1=</span><span class="st">&#39;${debian_chroot:+($debian_chroot)}\u@\h:\W\$ &#39;</span></span></code></pre></div>
-<h1 data-number="4" id="vnc"><span class="header-section-number">4</span> VNC远程桌面</h1>
-<h2 data-number="4.1" id="vnc软件"><span class="header-section-number">4.1</span> vnc软件</h2>
-<h3 data-number="4.1.1" id="ubuntu"><span class="header-section-number">4.1.1</span> ubuntu</h3>
-<p>Ubuntu 服务端 <code>Settings -&gt; Sharing -&gt; Screen Sharing -&gt; 启用旧式vnc协议 -&gt; 打开远程控制</code>。</p>
-<p>在客户端<code>Remmina</code>输入: <code>sonvhi-XPS-13-9305.local</code>(<code>hostname.local</code>)或 ip, 注意前面不能有<code>vnc://</code>，连接后点击<code>切换绽放模式</code>。</p>
-<h3 data-number="4.1.2" id="macos"><span class="header-section-number">4.1.2</span> macOS</h3>
-<p>服务端<code>System Settings</code> -&gt; <code>General</code> -&gt; <code>Sharing</code> -&gt; <code>Screen Sharing</code> -&gt; <code>开关右侧的i号</code>。</p>
-<p>客户端可以使用系统自带的屏幕共享，<code>Spotlight Search</code>(command+space)搜索<code>Screen Sharing</code>（屏幕共享），然后直接输入ip。 还可以在Finder（访达）中按<code>cmd+k</code>跳出输入框（或在浏览器中直接输入），输入<code>vnc://${server_ip}:${port_number</code>。自带的屏幕共享鼠标功能支持更好。</p>
-<p>客户端还可以使用<a href="https://www.tightvnc.com/">tightvnc</a>，在<a href="https://remoteripple.com/download/">appstore安装Remote Ripple</a>。鼠标功能支持不够（至少在连接ubuntu时）。</p>
-<h3 data-number="4.1.3" id="tightvnc"><span class="header-section-number">4.1.3</span> tightvnc</h3>
-<p>Linux下的<a href="https://www.tightvnc.com/">tightvnc</a>，客户端 xtightvncviewer, 服务端 tightvncserver。服务端 tightvncserver 启动后，客户端连接后画面一片灰，原因暂时不明，推荐使用上面系统自带的 vnc 软件。</p>
-<h2 data-number="4.2" id="qemuvnc安装系统"><span class="header-section-number">4.2</span> QEMU+VNC安装系统</h2>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> fallocate <span class="at">-l</span> 4G /swapfile</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chmod 600 /swapfile</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-lh</span> /swapfile</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> mkswap /swapfile</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> swapon /swapfile</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> swapon <span class="at">-s</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> vi /etc/fstab <span class="co"># 在/etc/fstab最后一行添加 /swapfile  none  swap  sw  0  0</span></span></code></pre></div>
+<p>shell界面路径名显示绝对路径，想换成只显示最后一个路径名分量,
+<code>~/.bashrc</code>文件修改以下变量:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="va">PS1</span><span class="op">=</span><span class="st">&#39;${debian_chroot:+($debian_chroot)}\u@\h:\W\$ &#39;</span></span></code></pre></div>
+<h1 data-number="4" id="vnc"><span
+class="header-section-number">4</span> VNC远程桌面</h1>
+<h2 data-number="4.1" id="vnc软件"><span
+class="header-section-number">4.1</span> vnc软件</h2>
+<h3 data-number="4.1.1" id="ubuntu"><span
+class="header-section-number">4.1.1</span> ubuntu</h3>
+<p>Ubuntu 服务端
+<code>Settings -&gt; Sharing -&gt; Screen Sharing -&gt; 启用旧式vnc协议 -&gt; 打开远程控制</code>。</p>
+<p>在客户端<code>Remmina</code>输入:
+<code>sonvhi-XPS-13-9305.local</code>(<code>hostname.local</code>)或 ip,
+注意前面不能有<code>vnc://</code>，连接后点击<code>切换绽放模式</code>。</p>
+<h3 data-number="4.1.2" id="macos"><span
+class="header-section-number">4.1.2</span> macOS</h3>
+<p>服务端<code>System Settings</code> -&gt; <code>General</code> -&gt;
+<code>Sharing</code> -&gt; <code>Screen Sharing</code> -&gt;
+<code>开关右侧的i号</code>。</p>
+<p>客户端可以使用系统自带的屏幕共享，<code>Spotlight Search</code>(command+space)搜索<code>Screen Sharing</code>（屏幕共享），然后直接输入ip。
+还可以在Finder（访达）中按<code>cmd+k</code>跳出输入框（或在浏览器中直接输入），输入<code>vnc://${server_ip}:${port_number</code>。自带的屏幕共享鼠标功能支持更好。</p>
+<p>客户端还可以使用<a
+href="https://www.tightvnc.com/">tightvnc</a>，在<a
+href="https://remoteripple.com/download/">appstore安装Remote
+Ripple</a>。鼠标功能支持不够（至少在连接ubuntu时）。</p>
+<h3 data-number="4.1.3" id="tightvnc"><span
+class="header-section-number">4.1.3</span> tightvnc</h3>
+<p>Linux下的<a href="https://www.tightvnc.com/">tightvnc</a>，客户端
+xtightvncviewer, 服务端 tightvncserver。服务端 tightvncserver
+启动后，客户端连接后画面一片灰，原因暂时不明，推荐使用上面系统自带的 vnc
+软件。</p>
+<h2 data-number="4.2" id="qemuvnc安装系统"><span
+class="header-section-number">4.2</span> QEMU+VNC安装系统</h2>
 <p>通过iso文件安装Linux发行版时，要么在物理机上安装，要么在virt-manager上安装，如果我们想在没有图形界面的server环境上用命令行安装一个图形界面发行版，可以使用qemu+vnc来实现。下面我们以麒麟系统桌面发行版安装为例说明qemu+vnc的安装过程。</p>
 <p>首先挂载iso文件，并把文件复制出来:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="fu">mkdir</span> mnt</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="fu">sudo</span> mount Kylin-Desktop-V10-SP1-General-Release-2303-X86_64.iso mnt -o loop</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a><span class="fu">mkdir</span> tmp</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a><span class="fu">cp</span> mnt/. tmp/ -rf</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a><span class="fu">sudo</span> umount mnt</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> mnt</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> mount Kylin-Desktop-V10-SP1-General-Release-2303-X86_64.iso mnt <span class="at">-o</span> loop</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> tmp</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> mnt/. tmp/ <span class="at">-rf</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> umount mnt</span></code></pre></div>
 <p>创建qcow2文件，并运行虚拟机:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="ex">qemu-img</span> create -f qcow2 Kylin-Desktop-V10-SP1-General-Release-2303-X86_64.qcow2 512G</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a><span class="ex">qemu-system-x86_64</span> <span class="kw">\</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a><span class="ex">-m</span> 4096M <span class="kw">\</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a><span class="ex">-smp</span> 16 <span class="kw">\</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a><span class="ex">-boot</span> c <span class="kw">\</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a><span class="ex">-cpu</span> host <span class="kw">\</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a><span class="ex">--enable-kvm</span> <span class="kw">\</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a><span class="ex">-hda</span> Kylin-Desktop-V10-SP1-General-Release-2303-X86_64.qcow2 <span class="kw">\</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true"></a><span class="ex">-cdrom</span> Kylin-Desktop-V10-SP1-General-Release-2303-X86_64.iso <span class="kw">\</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true"></a><span class="ex">-kernel</span> tmp/casper/vmlinuz <span class="kw">\</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true"></a><span class="ex">-initrd</span> tmp/casper/initrd.lz <span class="kw">\</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true"></a><span class="ex">-vnc</span> :1</span></code></pre></div>
-<p>vnc客户端可以使用ubuntu自带的Remmina（当然也可以使用其他vnc客户端），连接<code>${server_ip}:5901</code>，端口<code>5901</code>是由<code>-vnc :1</code>决定的（<code>5900 + 1</code>）。 macOS除了使用macOS自带的<code>Screen Sharing</code>（屏幕共享），还可以使用<a href="https://remoteripple.com/download/">appstore安装的Remote Ripple</a>。</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qemu-img</span> create <span class="at">-f</span> qcow2 Kylin-Desktop-V10-SP1-General-Release-2303-X86_64.qcow2 512G</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">qemu-system-x86_64</span> <span class="dt">\</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>-m 4096M <span class="dt">\</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>-smp 16 <span class="dt">\</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>-boot c <span class="dt">\</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>-cpu host <span class="dt">\</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>--enable-kvm <span class="dt">\</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>-hda Kylin-Desktop-V10-SP1-General-Release-2303-X86_64.qcow2 <span class="dt">\</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>-cdrom Kylin-Desktop-V10-SP1-General-Release-2303-X86_64.iso <span class="dt">\</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>-kernel tmp/casper/vmlinuz <span class="dt">\</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>-initrd tmp/casper/initrd.lz <span class="dt">\</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>-vnc :1</span></code></pre></div>
+<p>vnc客户端可以使用ubuntu自带的Remmina（当然也可以使用其他vnc客户端），连接<code>${server_ip}:5901</code>，端口<code>5901</code>是由<code>-vnc :1</code>决定的（<code>5900 + 1</code>）。
+macOS除了使用macOS自带的<code>Screen Sharing</code>（屏幕共享），还可以使用<a
+href="https://remoteripple.com/download/">appstore安装的Remote
+Ripple</a>。</p>
 <p>安装完成后，再运行:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="ex">qemu-system-x86_64</span> <span class="kw">\</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="ex">-enable-kvm</span> <span class="kw">\</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="ex">-cpu</span> host <span class="kw">\</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="ex">-smp</span> 16 <span class="kw">\</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a><span class="ex">-m</span> 4096 <span class="kw">\</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a><span class="ex">-device</span> virtio-scsi-pci <span class="kw">\</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a><span class="ex">-drive</span> file=Kylin-Desktop-V10-SP1-General-Release-2303-X86_64.qcow2,if=none,format=qcow2,cache=writeback,file.locking=off,id=root <span class="kw">\</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true"></a><span class="ex">-device</span> virtio-blk,drive=root,id=d_root <span class="kw">\</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true"></a><span class="ex">-net</span> nic,model=virtio,macaddr=00:11:22:33:44:55 <span class="kw">\</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true"></a><span class="ex">-net</span> bridge,br=virbr0 <span class="kw">\</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true"></a><span class="ex">-vnc</span> :1</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qemu-system-x86_64</span> <span class="dt">\</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>-enable-kvm <span class="dt">\</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>-cpu host <span class="dt">\</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>-smp 16 <span class="dt">\</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>-m 4096 <span class="dt">\</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>-device virtio-scsi-pci <span class="dt">\</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>-drive file=Kylin-Desktop-V10-SP1-General-Release-2303-X86_64.qcow2,if=none,format=qcow2,cache=writeback,file.locking=off,id=root <span class="dt">\</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>-device virtio-blk,drive=root,id=d_root <span class="dt">\</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>-net nic,model=virtio,macaddr=00:11:22:33:44:55 <span class="dt">\</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>-net bridge,br=virbr0 <span class="dt">\</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>-vnc :1</span></code></pre></div>
 <p>但arm64的麒麟桌面系统没法这样安装（但可在virt-manager中安装），暂时还没找到原因。</p>
 <p>可以在arm芯片的mac电脑中用vmware fusion安装arm64的ubuntu。</p>
-<h1 data-number="5" id="我的常用软件"><span class="header-section-number">5</span> 我的常用软件</h1>
+<h1 data-number="5" id="我的常用软件"><span
+class="header-section-number">5</span> 我的常用软件</h1>
 <p>这是我的开发环境上的一些配置，方便自己的查阅</p>
-<h2 data-number="5.1" id="ubuntu-1"><span class="header-section-number">5.1</span> ubuntu</h2>
+<h2 data-number="5.1" id="ubuntu-1"><span
+class="header-section-number">5.1</span> ubuntu</h2>
 <p>我平时工作用的是ubuntu桌面系统。</p>
 <p>常用的软件安装:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="fu">strings</span> /lib/x86_64-linux-gnu/libc.so.6 <span class="kw">|</span> <span class="fu">grep</span> GLIBC_ <span class="co"># 查看支持的glibc版本</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a><span class="fu">sudo</span> apt install openssh-server -y <span class="co"># 默认桌面版本ubuntu不会安装ssh server</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a><span class="fu">sudo</span> apt install ibus*wubi* -y <span class="co"># 安装五笔，要重启才可用</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install fuse -y <span class="co"># v2ray的Linux桌面版本 V2Ray-Desktop-v2.4.0-linux-x86_64.AppImage 无法运行</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true"></a><span class="fu">sudo</span> apt install tmux -y <span class="co"># Tmux（缩写自&quot;Terminal Multiplexer&quot;）是一个在命令行界面下运行的终端复用工具，我主要是用tmux的会话附加和分离功能</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true"></a><span class="fu">sudo</span> apt install lxterminal -y <span class="co"># 这玩意儿比ubuntu默认的terminal更好用，是树莓派系统上默认的terminal</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true"></a></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true"></a><span class="fu">sudo</span> apt install exfat-utils -y <span class="co"># exfat文件系统所需的工具</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true"></a></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true"></a><span class="co"># 只在ubuntu2204上验证过，安装查看tcpdump工具收集的网络包的wireshark: https://launchpad.net/~wireshark-dev/+archive/ubuntu/stable</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true"></a><span class="fu">sudo</span> add-apt-repository ppa:wireshark-dev/stable</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true"></a><span class="fu">sudo</span> apt update</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true"></a><span class="fu">sudo</span> apt install wireshark -y</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true"></a></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true"></a><span class="co"># 安装游戏软件stem时需要安装的依赖软件，但steam里的游戏在ubuntu下根本跑不动（我在戴尔笔记本xps13上试过cs非常卡）</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true"></a><span class="fu">sudo</span> apt install libc6-i386 libgl1:i386 -y <span class="co"># for steam</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">strings</span> /lib/x86_64-linux-gnu/libc.so.6 <span class="kw">|</span> <span class="fu">grep</span> GLIBC_ <span class="co"># 查看支持的glibc版本</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install openssh-server <span class="at">-y</span> <span class="co"># 默认桌面版本ubuntu不会安装ssh server</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install ibus<span class="pp">*</span>wubi<span class="pp">*</span> <span class="at">-y</span> <span class="co"># 安装五笔，要重启才可用</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install fuse <span class="at">-y</span> <span class="co"># v2ray的Linux桌面版本 V2Ray-Desktop-v2.4.0-linux-x86_64.AppImage 无法运行</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install tmux <span class="at">-y</span> <span class="co"># Tmux（缩写自&quot;Terminal Multiplexer&quot;）是一个在命令行界面下运行的终端复用工具，我主要是用tmux的会话附加和分离功能</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install lxterminal <span class="at">-y</span> <span class="co"># 这玩意儿比ubuntu默认的terminal更好用，是树莓派系统上默认的terminal</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install exfat-utils <span class="at">-y</span> <span class="co"># exfat文件系统所需的工具</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 只在ubuntu2204上验证过，安装查看tcpdump工具收集的网络包的wireshark: https://launchpad.net/~wireshark-dev/+archive/ubuntu/stable</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> add-apt-repository ppa:wireshark-dev/stable</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install wireshark <span class="at">-y</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装游戏软件stem时需要安装的依赖软件，但steam里的游戏在ubuntu下根本跑不动（我在戴尔笔记本xps13上试过cs非常卡）</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install libc6-i386 libgl1:i386 <span class="at">-y</span> <span class="co"># for steam</span></span></code></pre></div>
 <p>通过<code>sudo apt install ./xxxx.deb -y</code>安装的软件，卸载用以下命令:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="fu">sudo</span> apt list --installed <span class="kw">|</span> <span class="fu">grep</span> wkhtmltox</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a><span class="fu">sudo</span> apt purge wkhtmltox -y</span></code></pre></div>
-<h2 data-number="5.2" id="fedora"><span class="header-section-number">5.2</span> fedora</h2>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt list <span class="at">--installed</span> <span class="kw">|</span> <span class="fu">grep</span> wkhtmltox</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt purge wkhtmltox <span class="at">-y</span></span></code></pre></div>
+<h2 data-number="5.2" id="fedora"><span
+class="header-section-number">5.2</span> fedora</h2>
 <p>安装软件:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="fu">sudo</span> dnf group install development-tools -y <span class="co"># fedora41不能用groupinstall，必须要两个单词group install</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a><span class="fu">strings</span> /lib64/libc.so.6 <span class="kw">|</span> <span class="fu">grep</span> ^GLIBC_ <span class="co"># 查看支持的glibc版本</span></span></code></pre></div>
-<h1 data-number="6" id="其他系统的一些笔记"><span class="header-section-number">6</span> 其他系统的一些笔记</h1>
-<h2 data-number="6.1" id="centos"><span class="header-section-number">6.1</span> centos</h2>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf group install development-tools <span class="at">-y</span> <span class="co"># fedora41不能用groupinstall，必须要两个单词group install</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">strings</span> /lib64/libc.so.6 <span class="kw">|</span> <span class="fu">grep</span> ^GLIBC_ <span class="co"># 查看支持的glibc版本</span></span></code></pre></div>
+<h1 data-number="6" id="其他系统的一些笔记"><span
+class="header-section-number">6</span> 其他系统的一些笔记</h1>
+<h2 data-number="6.1" id="centos"><span
+class="header-section-number">6.1</span> centos</h2>
 <p>centos的开发软件生态比ubuntu还是稍微差一些，尤其是桌面系统。</p>
 <p>常用软件安装:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a><span class="fu">sudo</span> dnf groupinstall <span class="st">&quot;development tools&quot;</span> -y <span class="co"># 编译常用软件</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true"></a><span class="fu">sudo</span> dnf install qemu-kvm virt-manager libvirt -y <span class="co"># 虚拟机相关软件</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true"></a><span class="fu">sudo</span> systemctl restart libvirtd <span class="co"># 需要重启libvirtd，否则虚拟机有些功能无法使用</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true"></a><span class="fu">sudo</span> dnf install ncurses-devel -y <span class="co"># 内核编译所需</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true"></a></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true"></a><span class="co"># centos9需要通过源码安装bridge-utils，https://wiki.linuxfoundation.org/networking/bridge</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true"></a><span class="fu">git</span> clone -b main git://git.kernel.org/pub/scm/network/bridge/bridge-utils.git</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true"></a><span class="bu">cd</span> bridge-utils</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true"></a><span class="fu">autoconf</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true"></a><span class="ex">./configure</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf groupinstall <span class="st">&quot;development tools&quot;</span> <span class="at">-y</span> <span class="co"># 编译常用软件</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf install qemu-kvm virt-manager libvirt <span class="at">-y</span> <span class="co"># 虚拟机相关软件</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart libvirtd <span class="co"># 需要重启libvirtd，否则虚拟机有些功能无法使用</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf install ncurses-devel <span class="at">-y</span> <span class="co"># 内核编译所需</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># centos9需要通过源码安装bridge-utils，https://wiki.linuxfoundation.org/networking/bridge</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="at">-b</span> main git://git.kernel.org/pub/scm/network/bridge/bridge-utils.git</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> bridge-utils</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="fu">autoconf</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="ex">./configure</span></span></code></pre></div>
 <p>默认centos9是打开selinux的，但个人用户没有那么高的安全需求时，可以关闭selinux:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="fu">sudo</span> vim /etc/selinux/config <span class="co"># centos9 改成 SELINUX=disabled</span></span></code></pre></div>
-<h2 data-number="6.2" id="树莓派"><span class="header-section-number">6.2</span> 树莓派</h2>
-<p>从<a href="https://www.raspberrypi.com/software/operating-systems/#raspberry-pi-os-64-bit">Operating system images</a>下载“Raspberry Pi OS with desktop and recommended software”。</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> vim /etc/selinux/config <span class="co"># centos9 改成 SELINUX=disabled</span></span></code></pre></div>
+<h2 data-number="6.2" id="树莓派"><span
+class="header-section-number">6.2</span> 树莓派</h2>
+<p>从<a
+href="https://www.raspberrypi.com/software/operating-systems/#raspberry-pi-os-64-bit">Operating
+system images</a>下载“Raspberry Pi OS with desktop and recommended
+software”。</p>
 <p>向SD卡烧录系统:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a><span class="fu">sudo</span> dd bs=4M if=解压之后的img of=/dev/sdb</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dd bs=4M if=解压之后的img of=/dev/sdb</span></code></pre></div>
 <p>图形界面的树莓派系统的常用软件安装:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a><span class="co"># 解决git无法显示中文</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true"></a><span class="fu">git</span> config --global core.quotepath false</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true"></a><span class="co"># 安装五笔，需要重启</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true"></a><span class="fu">sudo</span> apt-get update -y</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true"></a><span class="fu">sudo</span> apt install ibus*wubi* -y</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true"></a><span class="co"># 安装firefox</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true"></a><span class="co"># sudo apt update -y</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true"></a><span class="co"># sudo apt-get install iceweasel -y</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true"></a></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true"></a><span class="fu">sudo</span> apt update -y</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true"></a><span class="co"># 安装emacs</span></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true"></a><span class="fu">sudo</span> apt install emacs -y</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true"></a><span class="co"># 安装gvim</span></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true"></a><span class="fu">sudo</span> apt install vim-gtk3 -y</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 解决git无法显示中文</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> core.quotepath false</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装五笔，需要重启</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update <span class="at">-y</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install ibus<span class="pp">*</span>wubi<span class="pp">*</span> <span class="at">-y</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装firefox</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># sudo apt update -y</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co"># sudo apt-get install iceweasel -y</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update <span class="at">-y</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装emacs</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install emacs <span class="at">-y</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装gvim</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install vim-gtk3 <span class="at">-y</span></span></code></pre></div>
 <p>含代理服务器选项，chrome浏览器启动命令:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true"></a><span class="ex">chromium-browser</span> --proxy-server=<span class="st">&quot;https=127.0.0.1:1080;http=127.0.0.1:1080;ftp=127.0.0.1:1080&quot;</span></span></code></pre></div>
-<h2 data-number="6.3" id="麒麟系统"><span class="header-section-number">6.3</span> 麒麟系统</h2>
-<p>填写<a href="https://www.kylinos.cn/support/trial.html">产品试用申请</a>后就可以下载iso文件。</p>
-<p>注意桌面麒麟系统在arm芯片的macos上无法用vmware fusion安装，可以用<a href="https://github.com/utmapp/UTM">UTM</a>安装。</p>
-<p>基于openeuler的服务器麒麟系统用<code>qemu</code>命令行启动时，编辑网络用命令<code>nmtui</code>，网络接口名改成和<code>ifconfig</code>中一样的名，再<code>启用连接 -&gt; 激活</code>。arm64版本无法用<a href="https://gitee.com/src-openeuler/kernel/issues/I7LDS2">VMware以及UTM等虚拟机安装</a>，可以尝试用<a href="https://gitee.com/openeuler/eulerlauncher/tree/master/docs">EulerLauncher</a>安装（还可以参考<a href="https://gitee.com/openeuler/docs/tree/master/docs/zh/docs/EulerLauncher">openeuler文档中的EulerLauncher</a>）。</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">chromium-browser</span> <span class="at">--proxy-server</span><span class="op">=</span><span class="st">&quot;https=127.0.0.1:1080;http=127.0.0.1:1080;ftp=127.0.0.1:1080&quot;</span></span></code></pre></div>
+<h2 data-number="6.3" id="麒麟系统"><span
+class="header-section-number">6.3</span> 麒麟系统</h2>
+<p>填写<a
+href="https://www.kylinos.cn/support/trial.html">产品试用申请</a>后就可以下载iso文件。</p>
+<p>注意桌面麒麟系统在arm芯片的macos上无法用vmware fusion安装，可以用<a
+href="https://github.com/utmapp/UTM">UTM</a>安装。</p>
+<p>基于openeuler的服务器麒麟系统用<code>qemu</code>命令行启动时，编辑网络用命令<code>nmtui</code>，网络接口名改成和<code>ifconfig</code>中一样的名，再<code>启用连接 -&gt; 激活</code>。arm64版本无法用<a
+href="https://gitee.com/src-openeuler/kernel/issues/I7LDS2">VMware以及UTM等虚拟机安装</a>，可以尝试用<a
+href="https://gitee.com/openeuler/eulerlauncher/tree/master/docs">EulerLauncher</a>安装（还可以参考<a
+href="https://gitee.com/openeuler/docs/tree/master/docs/zh/docs/EulerLauncher">openeuler文档中的EulerLauncher</a>）。</p>
 <p>一直提示“发现未认证应用执行”的解决办法，打开<code>/etc/default/grub</code>，修改为<code>GRUB_CMDLINE_LINUX_SECURITY="security="</code>，更新grub配置<code>sudo update-grub</code>，最后，重启系统。</p>
 <p>麒麟server v10安装软件:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a><span class="fu">sudo</span> dnf remove docker-runc -y</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true"></a><span class="fu">sudo</span> dnf install docker-engine -y</span></code></pre></div>
-<h2 data-number="6.4" id="arcolinux"><span class="header-section-number">6.4</span> arcolinux</h2>
-<p><a href="https://arcolinux.com/">ArcoLinux</a>是<a href="https://archlinux.org/">Arch Linux</a>的衍生发行版。</p>
-<h2 data-number="6.5" id="suse"><span class="header-section-number">6.5</span> suse</h2>
-<div class="sourceCode" id="cb26"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true"></a><span class="ex">systemctl</span> stop SuSEfirewall2 # 关闭防火墙</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf remove docker-runc <span class="at">-y</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf install docker-engine <span class="at">-y</span></span></code></pre></div>
+<h2 data-number="6.4" id="arcolinux"><span
+class="header-section-number">6.4</span> arcolinux</h2>
+<p><a href="https://arcolinux.com/">ArcoLinux</a>是<a
+href="https://archlinux.org/">Arch Linux</a>的衍生发行版。</p>
+<h2 data-number="6.5" id="suse"><span
+class="header-section-number">6.5</span> suse</h2>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> stop SuSEfirewall2 <span class="co"># 关闭防火墙</span></span></code></pre></div>
 </body>
 </html>
