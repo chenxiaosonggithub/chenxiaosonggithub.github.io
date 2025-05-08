@@ -1003,7 +1003,11 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb65-1"><a href="#
 <span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> .text .data .bss <span class="co"># 输出各个段地址</span></span></code></pre></div>
 <p>在gdb窗口中加载ko文件:</p>
 <div class="sourceCode" id="cb66"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="ex">add-symbol-file</span> <span class="op">&lt;</span>ko文件位置<span class="op">&gt;</span> <span class="op">&lt;</span>text段地址<span class="op">&gt;</span> -s .data <span class="op">&lt;</span>data段地址<span class="op">&gt;</span> -s .bss <span class="op">&lt;</span>bss段地址<span class="op">&gt;</span></span></code></pre></div>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">add-symbol-file</span> <span class="op">&lt;</span>ko文件位置<span class="op">&gt;</span> <span class="op">&lt;</span>text段地址<span class="op">&gt;</span> -s .data <span class="op">&lt;</span>data段地址<span class="op">&gt;</span> -s .bss <span class="op">&lt;</span>bss段地址<span class="op">&gt;</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">info</span> files <span class="co"># 也可用info target，查看添加的ko</span></span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">remove-symbol-file</span> /这里要写完整的绝对路径/linux/x86_64-build/fs/smb/client/cifs.ko</span></code></pre></div>
+<p>可以在虚拟机中直接运行脚本获得要输入的完整gdb命令: <a
+href="https://gitee.com/chenxiaosonggitee/blog/tree/master/course/kernel/src/add-symbol-file-full-cmd.sh"><code>bash add-symbol-file-full-cmd.sh</code></a>。</p>
 <p>这时就能开心的对ko模块中的代码进行打断点之类的操作了。</p>
 </body>
 </html>
