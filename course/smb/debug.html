@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -94,132 +83,104 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">smb调试方法</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#打印" id="toc-打印"><span
-class="toc-section-number">1</span> 打印</a>
+<li><a href="#打印"><span class="toc-section-number">1</span> 打印</a>
 <ul>
-<li><a href="#server打印" id="toc-server打印"><span
-class="toc-section-number">1.1</span> server打印</a></li>
-<li><a href="#client打印" id="toc-client打印"><span
-class="toc-section-number">1.2</span> client打印</a>
+<li><a href="#server打印"><span class="toc-section-number">1.1</span> server打印</a></li>
+<li><a href="#client打印"><span class="toc-section-number">1.2</span> client打印</a>
 <ul>
-<li><a href="#mydebug_print" id="toc-mydebug_print"><span
-class="toc-section-number">1.2.1</span>
-<code>mydebug_print()</code></a></li>
+<li><a href="#mydebug_print"><span class="toc-section-number">1.2.1</span> <code>mydebug_print()</code></a></li>
 </ul></li>
 </ul></li>
-<li><a href="#tcpdump抓包" id="toc-tcpdump抓包"><span
-class="toc-section-number">2</span> tcpdump抓包</a></li>
+<li><a href="#tcpdump抓包"><span class="toc-section-number">2</span> tcpdump抓包</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/course/smb/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/course/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
-<h1 data-number="1" id="打印"><span
-class="header-section-number">1</span> 打印</h1>
-<h2 data-number="1.1" id="server打印"><span
-class="header-section-number">1.1</span> server打印</h2>
+<p><a href="https://chenxiaosong.com/course/smb/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
+<h1 data-number="1" id="打印"><span class="header-section-number">1</span> 打印</h1>
+<h2 data-number="1.1" id="server打印"><span class="header-section-number">1.1</span> server打印</h2>
 <p>smb server打印函数是<code>ksmbd_debug()</code>，相关代码如下:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>ksmbd_debug</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 拼接成 KSMBD_DEBUG_ALL 等宏定义</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>ksmbd_debug_types <span class="op">&amp;</span> KSMBD_DEBUG_##type<span class="op">)</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">// 使用宏拼接</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>CLASS_ATTR_RW<span class="op">(</span>debug<span class="op">)</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> class_attribute class_attr_debug <span class="op">=</span> __ATTR_RW<span class="op">(</span>debug<span class="op">)</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    __ATTR<span class="op">(</span>debug<span class="op">,</span> <span class="bn">0644</span><span class="op">,</span> debug_show<span class="op">,</span> debug_store<span class="op">)</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span>attr <span class="op">=</span> <span class="op">{.</span>name <span class="op">=</span> __stringify<span class="op">(</span>debug<span class="op">),</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        __stringify_1<span class="op">(</span>x<span class="op">)</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>          <span class="pp">#</span><span class="er">debug ==&gt; /sys/class/ksmbd-control/debug文件</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span>show   <span class="op">=</span> debug_show<span class="op">,</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span>store  <span class="op">=</span> debug_store<span class="op">,</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">// 还是宏拼接</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>ATTRIBUTE_GROUPS<span class="op">(</span>ksmbd_control_class<span class="op">)</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  ksmbd_control_class_group</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span>attrs <span class="op">=</span> ksmbd_control_class_attrs</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  __ATTRIBUTE_GROUPS<span class="op">(</span>ksmbd_control_class<span class="op">)</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    ksmbd_control_class_groups<span class="op">[]</span> <span class="co">// 引用这个变量的是ksmbd_control_class</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">&amp;</span>ksmbd_control_class_group<span class="op">,</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">struct</span> class ksmbd_control_class <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>name           <span class="op">=</span> <span class="st">&quot;ksmbd-control&quot;</span><span class="op">,</span> <span class="op">==&gt;</span> <span class="op">/</span>sys<span class="op">/</span>class<span class="op">/</span>ksmbd<span class="op">-</span>control<span class="op">/</span>目录</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>class_groups   <span class="op">=</span> ksmbd_control_class_groups<span class="op">,</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>ksmbd_debug</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="co">// 拼接成 KSMBD_DEBUG_ALL 等宏定义</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  <span class="cf">if</span> (ksmbd_debug_types &amp; KSMBD_DEBUG_##type)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co">// 使用宏拼接</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>CLASS_ATTR_RW(debug)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="kw">struct</span> class_attribute class_attr_debug = __ATTR_RW(debug)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>    __ATTR(debug, <span class="bn">0644</span>, debug_show, debug_store)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>      .attr = {.name = __stringify(debug),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>        __stringify_1(x)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>          <span class="er">#debug ==&gt; /sys/class/ksmbd-control/debug文件</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>      .show   = debug_show,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>      .store  = debug_store,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="co">// 还是宏拼接</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>ATTRIBUTE_GROUPS(ksmbd_control_class)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>  ksmbd_control_class_group</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>  .attrs = ksmbd_control_class_attrs</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>  __ATTRIBUTE_GROUPS(ksmbd_control_class)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>    ksmbd_control_class_groups[] <span class="co">// 引用这个变量的是ksmbd_control_class</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>    &amp;ksmbd_control_class_group,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="dt">static</span> <span class="kw">struct</span> class ksmbd_control_class = {</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>        .name           = <span class="st">&quot;ksmbd-control&quot;</span>, ==&gt; /sys/class/ksmbd-control/目录</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>        .class_groups   = ksmbd_control_class_groups,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>};</span></code></pre></div>
 <p>通过读写<code>/sys/class/ksmbd-control/debug</code>文件控制，但我们一般不直接操作这个文件，而是用以下命令控制打印的开关:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ksmbd.control</span> <span class="at">--help</span> <span class="co"># 查看帮助</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># COMPONENT的值有: `all&#39;, `smb&#39;, `auth&#39;, `vfs&#39;, `oplock&#39;, `ipc&#39;, `conn&#39;, or `rdma&#39;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">ksmbd.control</span> <span class="at">--debug</span><span class="op">=</span>vfs</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">ksmbd.control</span> <span class="at">--debug</span><span class="op">=</span> <span class="co"># 不加COMPONENT可以查看当前的状态</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">ksmbd.control</span> --help # 查看帮助</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="co"># COMPONENT的值有: `all&#39;, `smb&#39;, `auth&#39;, `vfs&#39;, `oplock&#39;, `ipc&#39;, `conn&#39;, or `rdma&#39;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ex">ksmbd.control</span> --debug=vfs</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="ex">ksmbd.control</span> --debug= # 不加COMPONENT可以查看当前的状态</span></code></pre></div>
 <p>在熟悉代码阶段，可以默认把日志开关全部打开:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/fs/smb/server/server.c</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/fs/smb/server/server.c</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-22,7</span> +22,7 @@</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a> <span class="co">#include &quot;crypto_ctx.h&quot;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a> <span class="co">#include &quot;auth.h&quot;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">-int</span> ksmbd_debug_types<span class="kw">;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">+int</span> ksmbd_debug_types = KSMBD_DEBUG_ALL<span class="kw">;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a> <span class="ex">struct</span> ksmbd_server_config server_conf<span class="kw">;</span></span></code></pre></div>
-<h2 data-number="1.2" id="client打印"><span
-class="header-section-number">1.2</span> client打印</h2>
-<p>smb
-client打印函数有<code>cifs_dbg()</code>、<code>cifs_server_dbg()</code>、<code>cifs_tcon_dbg()</code>、<code>cifs_info()</code>，要打开配置<code>CONFIG_CIFS_DEBUG</code>才有效，打开<code>CONFIG_CIFS_DEBUG2</code>和<code>CONFIG_CIFS_DEBUG_DUMP_KEYS</code>能打印更多信息，以<code>cifs_dbg()</code>为例代码如下:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>cifs_dbg</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  cifs_dbg_func<span class="op">(</span>once<span class="op">,</span> <span class="op">...)</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    pr_debug_once <span class="op">/</span> pr_err_once</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>      printk_once<span class="op">(</span>KERN_DEBUG <span class="op">/</span> printk_once<span class="op">(</span>KERN_ERR <span class="co">// 只打印一次</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  cifs_dbg_func<span class="op">(</span>ratelimited<span class="op">,</span> <span class="op">...)</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    pr_debug_ratelimited</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      __dynamic_pr_debug <span class="co">// 打开配置 CONFIG_DYNAMIC_DEBUG</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    pr_err_ratelimited</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      printk_ratelimited</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        printk</span></code></pre></div>
-<p>动态打印相关的内容请查看<a
-href="https://chenxiaosong.com/course/kernel/debug.html#dynamic_print">《内核调试方法》</a>。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">---</span> a/fs/smb/server/server.c</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">+++</span> b/fs/smb/server/server.c</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="ex">@@</span> -22,7 +22,7 @@</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a> <span class="co">#include &quot;crypto_ctx.h&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a> <span class="co">#include &quot;auth.h&quot;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="ex">-int</span> ksmbd_debug_types<span class="kw">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="ex">+int</span> ksmbd_debug_types = KSMBD_DEBUG_ALL<span class="kw">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a> </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a> <span class="ex">struct</span> ksmbd_server_config server_conf<span class="kw">;</span></span></code></pre></div>
+<h2 data-number="1.2" id="client打印"><span class="header-section-number">1.2</span> client打印</h2>
+<p>smb client打印函数有<code>cifs_dbg()</code>、<code>cifs_server_dbg()</code>、<code>cifs_tcon_dbg()</code>、<code>cifs_info()</code>，要打开配置<code>CONFIG_CIFS_DEBUG</code>才有效，打开<code>CONFIG_CIFS_DEBUG2</code>和<code>CONFIG_CIFS_DEBUG_DUMP_KEYS</code>能打印更多信息，以<code>cifs_dbg()</code>为例代码如下:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>cifs_dbg</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>  cifs_dbg_func(once, ...)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>    pr_debug_once / pr_err_once</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>      printk_once(KERN_DEBUG / printk_once(KERN_ERR <span class="co">// 只打印一次</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>  cifs_dbg_func(ratelimited, ...)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>    pr_debug_ratelimited</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>      __dynamic_pr_debug <span class="co">// 打开配置 CONFIG_DYNAMIC_DEBUG</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>    pr_err_ratelimited</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>      printk_ratelimited</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>        printk</span></code></pre></div>
+<p>动态打印相关的内容请查看<a href="https://chenxiaosong.com/course/kernel/debug.html#dynamic_print">《内核调试方法》</a>。</p>
 <p>通过以下命令控制开关:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">less</span> <span class="co"># 查看所有的动态打印</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;file fs/smb/client/cifsfs.c +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开文件中所有的动态打印</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;module cifs -p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 关闭cifs模块所有动态打印</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;func cifs_copy_file_range +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开某个函数的打印</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-n</span> <span class="st">&#39;*cifs_smb3* -p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 关闭文件路径中包含cifs_smb3的打印</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-n</span> <span class="st">&#39;+p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 所有打印</span></span></code></pre></div>
-<h3 data-number="1.2.1" id="mydebug_print"><span
-class="header-section-number">1.2.1</span>
-<code>mydebug_print()</code></h3>
-<p>但在熟悉代码阶段，一个调试打印这么折腾还限制打印次数，对熟悉代码肯定不友好，所以我在熟悉代码阶段用的是<a
-href="https://chenxiaosong.com/course/kernel/debug.html#mydebug"><code>mydebug</code>模块</a>，
-打上<a
-href="https://chenxiaosong.com/course/kernel/debug.html#mydebug"><code>mydebug</code>模块</a>的补丁后，
-再打上补丁<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/smb/src/0001-smb-client-use-mydebug_print.patch"><code>0001-smb-client-use-mydebug_print.patch</code></a>。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">less</span> <span class="co"># 查看所有的动态打印</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;file fs/smb/client/cifsfs.c +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开文件中所有的动态打印</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;module cifs -p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 关闭cifs模块所有动态打印</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;func cifs_copy_file_range +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开某个函数的打印</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="bu">echo</span> -n <span class="st">&#39;*cifs_smb3* -p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 关闭文件路径中包含cifs_smb3的打印</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="bu">echo</span> -n <span class="st">&#39;+p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 所有打印</span></span></code></pre></div>
+<h3 data-number="1.2.1" id="mydebug_print"><span class="header-section-number">1.2.1</span> <code>mydebug_print()</code></h3>
+<p>但在熟悉代码阶段，一个调试打印这么折腾还限制打印次数，对熟悉代码肯定不友好，所以我在熟悉代码阶段用的是<a href="https://chenxiaosong.com/course/kernel/debug.html#mydebug"><code>mydebug</code>模块</a>， 打上<a href="https://chenxiaosong.com/course/kernel/debug.html#mydebug"><code>mydebug</code>模块</a>的补丁后， 再打上补丁<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/smb/src/0001-smb-client-use-mydebug_print.patch"><code>0001-smb-client-use-mydebug_print.patch</code></a>。</p>
 <p>另外可能还会有一些新增的动态打印（使用<code>pr_debug()</code>），可以用以下命令查看并打开动态打印:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;module cifs +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开cifs模块所有动态打印</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">grep</span> cifs</span></code></pre></div>
-<h1 data-number="2" id="tcpdump抓包"><span
-class="header-section-number">2</span> tcpdump抓包</h1>
-<p>请查看<a
-href="https://chenxiaosong.com/course/nfs/debug.html#tcpdump">《nfs调试方法》</a>。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&#39;module cifs +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开cifs模块所有动态打印</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">grep</span> cifs</span></code></pre></div>
+<h1 data-number="2" id="tcpdump抓包"><span class="header-section-number">2</span> tcpdump抓包</h1>
+<p>请查看<a href="https://chenxiaosong.com/course/nfs/debug.html#tcpdump">《nfs调试方法》</a>。</p>
 </body>
 </html>
