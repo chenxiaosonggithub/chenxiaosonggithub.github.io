@@ -162,14 +162,18 @@ class="toc-section-number">6</span> 其他系统的一些笔记</a>
 <ul>
 <li><a href="#centos" id="toc-centos"><span
 class="toc-section-number">6.1</span> centos</a></li>
+</ul></li>
+<li><a href="#centos7" id="toc-centos7"><span
+class="toc-section-number">7</span> centos7</a>
+<ul>
 <li><a href="#树莓派" id="toc-树莓派"><span
-class="toc-section-number">6.2</span> 树莓派</a></li>
+class="toc-section-number">7.1</span> 树莓派</a></li>
 <li><a href="#麒麟系统" id="toc-麒麟系统"><span
-class="toc-section-number">6.3</span> 麒麟系统</a></li>
+class="toc-section-number">7.2</span> 麒麟系统</a></li>
 <li><a href="#arcolinux" id="toc-arcolinux"><span
-class="toc-section-number">6.4</span> arcolinux</a></li>
+class="toc-section-number">7.3</span> arcolinux</a></li>
 <li><a href="#suse" id="toc-suse"><span
-class="toc-section-number">6.5</span> suse</a></li>
+class="toc-section-number">7.4</span> suse</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -399,38 +403,46 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#
 <p>默认centos9是打开selinux的，但个人用户没有那么高的安全需求时，可以关闭selinux:</p>
 <div class="sourceCode" id="cb21"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> vim /etc/selinux/config <span class="co"># centos9 改成 SELINUX=disabled</span></span></code></pre></div>
-<h2 data-number="6.2" id="树莓派"><span
-class="header-section-number">6.2</span> 树莓派</h2>
+<h1 data-number="7" id="centos7"><span
+class="header-section-number">7</span> centos7</h1>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> /etc/yum.repos.d/ /etc/yum.repos.d.bak</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> /etc/yum.repos.d/</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-o</span> /etc/yum.repos.d/Centos7-aliyun.repo https://mirrors.wlnmp.com/centos/Centos7-aliyun-x86_64.repo</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="ex">yum</span> clean all</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="ex">yum</span> makecache</span></code></pre></div>
+<h2 data-number="7.1" id="树莓派"><span
+class="header-section-number">7.1</span> 树莓派</h2>
 <p>从<a
 href="https://www.raspberrypi.com/software/operating-systems/#raspberry-pi-os-64-bit">Operating
 system images</a>下载“Raspberry Pi OS with desktop and recommended
 software”。</p>
 <p>向SD卡烧录系统:</p>
-<div class="sourceCode" id="cb22"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dd bs=4M if=解压之后的img of=/dev/sdb</span></code></pre></div>
-<p>图形界面的树莓派系统的常用软件安装:</p>
 <div class="sourceCode" id="cb23"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 解决git无法显示中文</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> core.quotepath false</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装五笔，需要重启</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update <span class="at">-y</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install ibus<span class="pp">*</span>wubi<span class="pp">*</span> <span class="at">-y</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装firefox</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># sudo apt update -y</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co"># sudo apt-get install iceweasel -y</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update <span class="at">-y</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装emacs</span></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install emacs <span class="at">-y</span></span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装gvim</span></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install vim-gtk3 <span class="at">-y</span></span></code></pre></div>
-<p>含代理服务器选项，chrome浏览器启动命令:</p>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dd bs=4M if=解压之后的img of=/dev/sdb</span></code></pre></div>
+<p>图形界面的树莓派系统的常用软件安装:</p>
 <div class="sourceCode" id="cb24"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">chromium-browser</span> <span class="at">--proxy-server</span><span class="op">=</span><span class="st">&quot;https=127.0.0.1:1080;http=127.0.0.1:1080;ftp=127.0.0.1:1080&quot;</span></span></code></pre></div>
-<h2 data-number="6.3" id="麒麟系统"><span
-class="header-section-number">6.3</span> 麒麟系统</h2>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 解决git无法显示中文</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> core.quotepath false</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装五笔，需要重启</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update <span class="at">-y</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install ibus<span class="pp">*</span>wubi<span class="pp">*</span> <span class="at">-y</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装firefox</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co"># sudo apt update -y</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co"># sudo apt-get install iceweasel -y</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update <span class="at">-y</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装emacs</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install emacs <span class="at">-y</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装gvim</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install vim-gtk3 <span class="at">-y</span></span></code></pre></div>
+<p>含代理服务器选项，chrome浏览器启动命令:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">chromium-browser</span> <span class="at">--proxy-server</span><span class="op">=</span><span class="st">&quot;https=127.0.0.1:1080;http=127.0.0.1:1080;ftp=127.0.0.1:1080&quot;</span></span></code></pre></div>
+<h2 data-number="7.2" id="麒麟系统"><span
+class="header-section-number">7.2</span> 麒麟系统</h2>
 <p>填写<a
 href="https://www.kylinos.cn/support/trial.html">产品试用申请</a>后就可以下载iso文件。</p>
 <p>注意桌面麒麟系统在arm芯片的macos上无法用vmware fusion安装，可以用<a
@@ -441,16 +453,16 @@ href="https://gitee.com/openeuler/eulerlauncher/tree/master/docs">EulerLauncher<
 href="https://gitee.com/openeuler/docs/tree/master/docs/zh/docs/EulerLauncher">openeuler文档中的EulerLauncher</a>）。</p>
 <p>一直提示“发现未认证应用执行”的解决办法，打开<code>/etc/default/grub</code>，修改为<code>GRUB_CMDLINE_LINUX_SECURITY="security="</code>，更新grub配置<code>sudo update-grub</code>，最后，重启系统。</p>
 <p>麒麟server v10安装软件:</p>
-<div class="sourceCode" id="cb25"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf remove docker-runc <span class="at">-y</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf install docker-engine <span class="at">-y</span></span></code></pre></div>
-<h2 data-number="6.4" id="arcolinux"><span
-class="header-section-number">6.4</span> arcolinux</h2>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf remove docker-runc <span class="at">-y</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf install docker-engine <span class="at">-y</span></span></code></pre></div>
+<h2 data-number="7.3" id="arcolinux"><span
+class="header-section-number">7.3</span> arcolinux</h2>
 <p><a href="https://arcolinux.com/">ArcoLinux</a>是<a
 href="https://archlinux.org/">Arch Linux</a>的衍生发行版。</p>
-<h2 data-number="6.5" id="suse"><span
-class="header-section-number">6.5</span> suse</h2>
-<div class="sourceCode" id="cb26"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> stop SuSEfirewall2 <span class="co"># 关闭防火墙</span></span></code></pre></div>
+<h2 data-number="7.4" id="suse"><span
+class="header-section-number">7.4</span> suse</h2>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> stop SuSEfirewall2 <span class="co"># 关闭防火墙</span></span></code></pre></div>
 </body>
 </html>
