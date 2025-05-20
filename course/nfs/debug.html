@@ -180,8 +180,10 @@ class="header-section-number">3</span> 重新挂载</h1>
 <p>在生产环境下，如果出现问题，很多时候可能没有很多时间可以保留现场，可能需要重新挂载快速恢复。</p>
 <p>请注意，在<code>umount</code>之前，务必收集好需要的调试信息，因为很多问题可能一年半载也只会出现那么一次。</p>
 <p><code>umount &lt;挂载点&gt;</code>命令如果报错<code>device is busy</code>之类的信息，说明挂载点正在使用，可以使用以下命令查看使用挂载点的进程:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">lsof</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fuser</span> <span class="at">-m</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># +D：递归地列出指定目录下所有打开的文件</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">lsof</span> +D <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -m：表示查询挂载点（而不仅仅是某个文件）</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fuser</span> <span class="at">-m</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span></code></pre></div>
 <p>如果找到的使用挂载点的进程非常重要，kill这些进程会导致重大问题，可以使用以下命令延迟卸载，会导致挂载点在后台被卸载，而不会强制终止进程:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> <span class="at">--lazy</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></span></code></pre></div>
 <p>如果找到的使用挂载点的进程没有那么重要，建议还是kill掉这些进程再卸载，这样才能更彻底的恢复环境:</p>
