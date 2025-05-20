@@ -163,6 +163,8 @@ class="header-section-number">1</span> 日志</h1>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x0040 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_SCHED</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x0400 <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># NFSDDBG_PNFS</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x0008 <span class="op">&gt;</span> /proc/sys/sunrpc/nlm_debug <span class="co"># NLMDBG_SVCLOCK</span></span></code></pre></div>
+<p>注意最新主线代码的sunrpc中的<code>dprintk()</code>很多都移除了，可以使用tracepoint，tracepoint的使用请查看<a
+href="https://chenxiaosong.com/course/kernel/debug.html#tracepoint">《内核调试方法》</a>。</p>
 <h1 data-number="2" id="tcpdump"><span
 class="header-section-number">2</span> tcpdump抓包</h1>
 <p>既然nfs涉及到网络，定位问题肯定也少不了网络抓包，甚至在绝大多数情况下，网络抓包能够比日志提供更有用更直观的信息，使用<code>tcpdump</code>工具抓包:</p>
