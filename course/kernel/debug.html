@@ -337,17 +337,18 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> nop <span class="op">&gt;</span> current_tracer</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> tracing_on</span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_events  <span class="kw">|</span> <span class="fu">grep</span> ext2</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> ext2:ext2_dio_read_begin <span class="op">&gt;</span> set_event</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># find events/ -name &quot;*ext2*&quot; # 也可以查找函数所在位置，比较慢</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># echo 1 &gt; events/ext2/ext2_dio_read_begin/enable # 使能函数的tracepoint</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># echo ext2:* &gt; set_event # 所有的ext2跟踪点</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="ex">fallocate</span> <span class="at">-l</span> 10M ~/image</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext2</span> <span class="at">-F</span> image</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> image /mnt</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1234567890 <span class="op">&gt;</span> /mnt/file-in</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/mnt/file-in of=~/file-out iflag=direct bs=512 count=1 <span class="co"># bs不能随意指定</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> trace_pipe</span></code></pre></div>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> ext2:ext2_dio_read_begin <span class="op">&gt;</span> set_event <span class="co"># 打开某个tracepoint</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> ext2:<span class="pp">*</span> <span class="op">&gt;</span> set_event <span class="co"># 打开所有的ext2跟踪点</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># find events/ -name &quot;*ext2*&quot; # 也可以通过find查找tracepoint所在位置，比较慢</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># echo 1 &gt; events/ext2/ext2_dio_read_begin/enable # 打开某个tracepoint</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co"># echo 1 &gt; events/ext2/enable # 打开所有的ext2跟踪点</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="ex">fallocate</span> <span class="at">-l</span> 10M ~/image</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext2</span> <span class="at">-F</span> image</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> image /mnt</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1234567890 <span class="op">&gt;</span> /mnt/file-in</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/mnt/file-in of=~/file-out iflag=direct bs=512 count=1 <span class="co"># bs不能随意指定</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> trace_pipe</span></code></pre></div>
 <p>到相应<code>tracepoint</code>的目录下，设置跟踪条件:</p>
 <div class="sourceCode" id="cb16"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/tracing/</span>

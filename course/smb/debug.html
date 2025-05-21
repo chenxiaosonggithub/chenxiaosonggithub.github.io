@@ -125,8 +125,10 @@ class="toc-section-number">1.2.1</span>
 <code>mydebug_print()</code></a></li>
 </ul></li>
 </ul></li>
+<li><a href="#tracepoint" id="toc-tracepoint"><span
+class="toc-section-number">2</span> tracepoint</a></li>
 <li><a href="#tcpdump抓包" id="toc-tcpdump抓包"><span
-class="toc-section-number">2</span> tcpdump抓包</a></li>
+class="toc-section-number">3</span> tcpdump抓包</a></li>
 </ul>
 </nav>
 <p><a
@@ -217,8 +219,25 @@ href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/smb/src/0001-s
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;module cifs +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开cifs模块所有动态打印</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">grep</span> cifs</span></code></pre></div>
-<h1 data-number="2" id="tcpdump抓包"><span
-class="header-section-number">2</span> tcpdump抓包</h1>
+<h1 data-number="2" id="tracepoint"><span
+class="header-section-number">2</span> tracepoint</h1>
+<p>除了日志，还可以打开tracepoint。tracepoint的使用请查看<a
+href="https://chenxiaosong.com/course/kernel/debug.html#tracepoint">《内核调试方法》</a>。</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/tracing/</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> nop <span class="op">&gt;</span> current_tracer</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> tracing_on</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_events  <span class="kw">|</span> <span class="fu">grep</span> cifs</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_events  <span class="kw">|</span> <span class="fu">grep</span> smb</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> events/<span class="pp">*</span>cifs<span class="pp">*</span> <span class="at">-d</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> events/<span class="pp">*</span>smb<span class="pp">*</span> <span class="at">-d</span> <span class="co"># 没有</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> cifs:nfsd_cb_recall_done <span class="op">&gt;</span> set_event <span class="co"># 打开某个tracepoint</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> cifs:<span class="pp">*</span> <span class="op">&gt;</span> set_event <span class="co"># 打开所有的cifs跟踪点</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># echo 1 &gt; events/cifs/smb3_close_enter/enable # 打开某个tracepoint</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># echo 1 &gt; events/cifs/enable # 打开所有的cifs跟踪点</span></span></code></pre></div>
+<p>注意目前（2025.05.21）smb
+server的代码还没有使用任何的tracepoint，但以后可能会用，你可以使用命令<code>grep -r trace_ fs/smb/server/</code>在内核仓库下确认。</p>
+<h1 data-number="3" id="tcpdump抓包"><span
+class="header-section-number">3</span> tcpdump抓包</h1>
 <p>请查看<a
 href="https://chenxiaosong.com/course/nfs/debug.html#tcpdump">《nfs调试方法》</a>。</p>
 </body>
