@@ -224,8 +224,8 @@ Build Samba from Source</a>。</p>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> install <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span>/usr/local/samba/bin/:/usr/local/samba/sbin/:<span class="va">$PATH</span></span></code></pre></div>
-<p>修改<code>/usr/lib/systemd/system/smb.service</code>（具体位置可以用<code>systemctl status smb</code>查看）:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStart</span><span class="op">=</span>/usr/local/samba/sbin/smbd <span class="ex">...</span> <span class="co"># 原本是 /usr/sbin/smbd</span></span></code></pre></div>
+<p>更新<code>smb.service</code>（具体位置可以用<code>systemctl status smb</code>查看）:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ./packaging/systemd/smb.service.in /usr/lib/systemd/system/smb.service</span></code></pre></div>
 <p>创建配置文件:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> /etc/samba/smb.conf /usr/local/samba/etc/smb.conf</span></code></pre></div>
 <p>需要特别注意的是要重新创建用户:</p>
