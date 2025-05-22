@@ -227,7 +227,7 @@ Build Samba from Source</a>。</p>
 <p>修改<code>/usr/lib/systemd/system/smb.service</code>（具体位置可以用<code>systemctl status smb</code>查看）:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStart</span><span class="op">=</span>/usr/local/samba/sbin/smbd <span class="ex">...</span> <span class="co"># 原本是 /usr/sbin/smbd</span></span></code></pre></div>
 <p>创建配置文件:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /etc/samba/smb.conf /usr/local/samba/etc/smb.conf</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> /etc/samba/smb.conf /usr/local/samba/etc/smb.conf</span></code></pre></div>
 <p>需要特别注意的是要重新创建用户:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pdbedit</span> <span class="at">-a</span> <span class="at">-u</span> root</span></code></pre></div>
 <p>启动服务:</p>
