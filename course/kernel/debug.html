@@ -348,7 +348,8 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> image /mnt</span>
 <span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1234567890 <span class="op">&gt;</span> /mnt/file-in</span>
 <span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/mnt/file-in of=~/file-out iflag=direct bs=512 count=1 <span class="co"># bs不能随意指定</span></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> trace_pipe</span></code></pre></div>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> trace <span class="co"># 清除trace信息</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> trace_pipe</span></code></pre></div>
 <p>到相应<code>tracepoint</code>的目录下，设置跟踪条件:</p>
 <div class="sourceCode" id="cb16"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/tracing/</span>

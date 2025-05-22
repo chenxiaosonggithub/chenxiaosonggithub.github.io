@@ -175,6 +175,8 @@ class="toc-section-number">4.4</span> 源码安装qemu</a></li>
 class="toc-section-number">4.5</span> qemu配置</a></li>
 <li><a href="#qemu运行qcow2镜像" id="toc-qemu运行qcow2镜像"><span
 class="toc-section-number">4.6</span> qemu运行qcow2镜像</a></li>
+<li><a href="#qemu-multi-nic" id="toc-qemu-multi-nic"><span
+class="toc-section-number">4.7</span> 多个网卡</a></li>
 </ul></li>
 <li><a href="#gdb" id="toc-gdb"><span
 class="toc-section-number">5</span> 使用GDB调试内核代码</a>
@@ -887,6 +889,18 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb53-1"><a href="#
 <span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="co"># fedora26 安装 vim 前，先升级</span></span>
 <span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf update vim-common vim-minimal <span class="at">-y</span></span></code></pre></div>
 <p>注意fedora中账号密码输完后要用<code>ctrl+j</code>，不要用回车。</p>
+<h2 data-number="4.7" id="qemu-multi-nic"><span
+class="header-section-number">4.7</span> 多个网卡</h2>
+<p>最方便的就是在virt-manager虚拟机中测试，在图形界面上添加多个网卡。</p>
+<p>qemu命令行启动虚拟机时，多个网卡的启动参数如下:</p>
+<div class="sourceCode" id="cb54"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="ex">-net</span> tap <span class="dt">\</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>-net nic,model=virtio,macaddr=00:11:22:33:44:06 <span class="dt">\</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>-net nic,model=virtio,macaddr=00:11:22:33:44:56 <span class="dt">\</span></span></code></pre></div>
+<p>启动后，在虚拟机中用<code>ifconfig -a</code>可以看到另一个网卡<code>ens3</code>，debian还需要经过以下修改:</p>
+<div class="sourceCode" id="cb55"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-e</span> <span class="st">&quot;auto ens3\niface ens3 inet dhcp&quot;</span> <span class="op">&gt;&gt;</span> /etc/network/interfaces <span class="co"># ens3请换成你环境上的网卡名</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart networking</span></code></pre></div>
 <h1 data-number="5" id="gdb"><span
 class="header-section-number">5</span> 使用GDB调试内核代码</h1>
 <p>我刚开始是做用户态开发的，习惯了利用gdb调试来理解那些写得不好的用户态代码，尤其是公司内部一些不开源的比狗屎还难看的用户态代码（当然其中也包括我自己写的狗屎一样的代码）。</p>
@@ -894,19 +908,19 @@ class="header-section-number">5</span> 使用GDB调试内核代码</h1>
 <p>要特别说明的是，内核的大部分代码是很优美的，并不需要太依赖qemu+gdb这一调试手段，更建议通过阅读代码来理解。但某些写得不好的内核模块如果利用qemu+gdb将能使我们更快的熟悉代码。</p>
 <p>这里只介绍<code>x86_64</code>下的qemu+gdb调试，其他cpu架构以此类推，只需要做些小改动。</p>
 <p>如果是其他cpu架构，要安装:</p>
-<div class="sourceCode" id="cb54"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install gdb-multiarch <span class="at">-y</span></span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install gdb-multiarch <span class="at">-y</span></span></code></pre></div>
 <h2 data-number="5.1" id="编译选项和补丁"><span
 class="header-section-number">5.1</span> 编译选项和补丁</h2>
 <p>首先确保修改以下配置:</p>
-<div class="sourceCode" id="cb55"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_DEBUG_SECTION_MISMATCH</span><span class="op">=</span>y <span class="co"># 防止内联</span></span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_DEBUG_INFO</span><span class="op">=</span>y <span class="co"># 调试信息</span></span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_DEBUG_KERNEL</span><span class="op">=</span>y <span class="co"># 调试信息</span></span>
-<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_GDB_SCRIPTS</span><span class="op">=</span>y <span class="co"># gdb python</span></span>
-<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a><span class="va">DEBUG_INFO_REDUCED</span><span class="op">=</span>n <span class="co"># 关闭</span></span>
-<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_FRAME_POINTER</span><span class="op">=</span>y <span class="co"># Makefile 中选择GCC编译选项</span></span>
-<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="ex">CONFIG_RANDOMIZE_BASE</span> = n <span class="co"># 关闭地址随机化</span></span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_DEBUG_SECTION_MISMATCH</span><span class="op">=</span>y <span class="co"># 防止内联</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_DEBUG_INFO</span><span class="op">=</span>y <span class="co"># 调试信息</span></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_DEBUG_KERNEL</span><span class="op">=</span>y <span class="co"># 调试信息</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_GDB_SCRIPTS</span><span class="op">=</span>y <span class="co"># gdb python</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a><span class="va">DEBUG_INFO_REDUCED</span><span class="op">=</span>n <span class="co"># 关闭</span></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_FRAME_POINTER</span><span class="op">=</span>y <span class="co"># Makefile 中选择GCC编译选项</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="ex">CONFIG_RANDOMIZE_BASE</span> = n <span class="co"># 关闭地址随机化</span></span></code></pre></div>
 <p>可以使用 我常用的<a
 href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/config/x86_64-config">x86_64的内核配置文件</a>。
 配置文件。</p>
@@ -919,74 +933,74 @@ href="https://gitee.com/chenxiaosonggitee/blog/tree/master/course/kernel/src/x86
 <h2 data-number="5.2" id="qemu命令选项"><span
 class="header-section-number">5.2</span> QEMU命令选项</h2>
 <p>qemu启动虚拟机时，要添加以下几个选项:</p>
-<div class="sourceCode" id="cb56"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="ex">-append</span> <span class="st">&quot;nokaslr ...&quot;</span> <span class="co"># 防止地址随机化，编译内核时关闭配置 CONFIG_RANDOMIZE_BASE</span></span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="ex">-S</span> <span class="co"># 挂起 gdbserver</span></span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-gdb</span> tcp::5555 <span class="co"># 端口5555, 使用 -s 选项表示用默认的端口1234</span></span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="ex">-s</span> <span class="co"># 相当于 -gdb tcp::1234 默认端口1234，不建议用，最好指定端口</span></span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="ex">-append</span> <span class="st">&quot;nokaslr ...&quot;</span> <span class="co"># 防止地址随机化，编译内核时关闭配置 CONFIG_RANDOMIZE_BASE</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="ex">-S</span> <span class="co"># 挂起 gdbserver</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-gdb</span> tcp::5555 <span class="co"># 端口5555, 使用 -s 选项表示用默认的端口1234</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="ex">-s</span> <span class="co"># 相当于 -gdb tcp::1234 默认端口1234，不建议用，最好指定端口</span></span></code></pre></div>
 <p>完整的启动命令查看制作好的Ubuntu虚拟机镜像 （从百度网盘中下载的）
 中的<code>${HOME}/qemu-kernel/start.sh</code>脚本。</p>
 <h2 data-number="5.3" id="gdb命令"><span
 class="header-section-number">5.3</span> GDB命令</h2>
 <p>启动GDB:</p>
-<div class="sourceCode" id="cb57"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gdb</span> build/vmlinux</span></code></pre></div>
-<p>如果是其他架构:</p>
-<div class="sourceCode" id="cb58"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gdb</span> <span class="at">--tui</span> build/vmlinux <span class="co"># --tui: Use a terminal user interface.</span></span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="bu">set</span> architecture aarch64</span></code></pre></div>
-<p>进入GDB界面后:</p>
 <div class="sourceCode" id="cb59"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">target</span> remote:5555 <span class="co"># 对应qemu命令中的-gdb tcp::5555</span></span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">b</span> func_name <span class="co"># 普通断点</span></span>
-<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">hb</span> func_name <span class="co"># 硬件断点，有些函数普通断点不会停下, 如: nfs4_atomic_open，降低优化等级后没这个问题</span></span></code></pre></div>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gdb</span> build/vmlinux</span></code></pre></div>
+<p>如果是其他架构:</p>
+<div class="sourceCode" id="cb60"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gdb</span> <span class="at">--tui</span> build/vmlinux <span class="co"># --tui: Use a terminal user interface.</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="bu">set</span> architecture aarch64</span></code></pre></div>
+<p>进入GDB界面后:</p>
+<div class="sourceCode" id="cb61"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">target</span> remote:5555 <span class="co"># 对应qemu命令中的-gdb tcp::5555</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">b</span> func_name <span class="co"># 普通断点</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">hb</span> func_name <span class="co"># 硬件断点，有些函数普通断点不会停下, 如: nfs4_atomic_open，降低优化等级后没这个问题</span></span></code></pre></div>
 <p>gdb命令的用法和用户态程序的调试大同小异。</p>
 <h2 data-number="5.4" id="gdb辅助调试功能"><span
 class="header-section-number">5.4</span> GDB辅助调试功能</h2>
 <p>使用内核提供的<a
 href="https://github.com/torvalds/linux/blob/master/Documentation/dev-tools/gdb-kernel-debugging.rst">GDB辅助调试功能</a>可以更方便的调试内核（如打印断点处的进程名和进程id等）。</p>
 <p>内核最新版本（2024.04）使用以下命令开启GDB辅助调试功能，注意最新版本编译出的脚本无法调试4.19和5.10的代码:</p>
-<div class="sourceCode" id="cb60"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;set auto-load safe-path /&quot;</span> <span class="op">&gt;</span> ~/.gdbinit <span class="co"># 设置自动加载共享库文件的安全路径</span></span>
-<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;source </span><span class="va">${HOME}</span><span class="st">/.gdb-linux/vmlinux-gdb.py&quot;</span> <span class="op">&gt;&gt;</span> ~/.gdbinit</span>
-<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build scripts_gdb <span class="co"># 在内核仓库目录下执行</span></span>
-<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> <span class="va">${HOME}</span>/.gdb-linux/</span>
-<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="va">${HOME}</span>/.gdb-linux/</span>
-<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> build/scripts/gdb/<span class="pp">*</span> <span class="va">${HOME}</span>/.gdb-linux/ <span class="at">-rf</span> <span class="co"># 在内核仓库目录下执行</span></span>
-<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> scripts/gdb/vmlinux-gdb.py <span class="va">${HOME}</span>/.gdb-linux/ <span class="co"># 在内核仓库目录下执行</span></span>
-<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;/sys.path.insert/s/^/# /&#39;</span> <span class="va">${HOME}</span>/.gdb-linux/vmlinux-gdb.py <span class="co"># 将sys.path.insert所在的行注释掉</span></span>
-<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;/sys.path.insert/a\sys.path.insert(0, &quot;&#39;</span><span class="va">${HOME}</span><span class="st">&#39;/.gdb-linux&quot;)&#39;</span> <span class="va">${HOME}</span>/.gdb-linux/vmlinux-gdb.py <span class="co"># 插入 sys.path.insert(0, &quot;${HOME}/.gdb-linux&quot;)</span></span></code></pre></div>
-<p>内核5.10使用以下命令开启GDB辅助调试功能，也可以调试内核4.19代码，但无法调试内核最新的代码:</p>
-<div class="sourceCode" id="cb61"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;set auto-load safe-path /&quot;</span> <span class="op">&gt;</span> ~/.gdbinit <span class="co"># 设置自动加载共享库文件的安全路径</span></span>
-<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;source </span><span class="va">${HOME}</span><span class="st">/.gdb-linux-5.10/vmlinux-gdb.py&quot;</span> <span class="op">&gt;&gt;</span> ~/.gdbinit</span>
-<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build scripts_gdb <span class="co"># 在5.10内核仓库目录下执行</span></span>
-<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/</span>
-<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/</span>
-<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> build/scripts/gdb/<span class="pp">*</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/ <span class="at">-rf</span> <span class="co"># 在5.10内核仓库目录下执行</span></span>
-<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> scripts/gdb/vmlinux-gdb.py <span class="va">${HOME}</span>/.gdb-linux-5.10/ <span class="co"># 在5.10内核仓库目录下执行</span></span>
-<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;/sys.path.insert/s/^/# /&#39;</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/vmlinux-gdb.py <span class="co"># 将sys.path.insert所在的行注释掉</span></span>
-<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;/sys.path.insert/a\sys.path.insert(0, &quot;&#39;</span><span class="va">${HOME}</span><span class="st">&#39;/.gdb-linux-5.10&quot;)&#39;</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/vmlinux-gdb.py <span class="co"># 插入 sys.path.insert(0, &quot;${HOME}/.gdb-linux-5.10&quot;)</span></span></code></pre></div>
-<p>重新启动GDB就可以使用GDB辅助调试功能:</p>
 <div class="sourceCode" id="cb62"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="fu">apropos</span> lx <span class="co"># 查看有哪些命令</span></span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">p</span> <span class="va">$lx_current</span><span class="er">(</span><span class="kw">)</span><span class="ex">.pid</span> <span class="co"># 打印断点所在进程的进程id</span></span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">p</span> <span class="va">$lx_current</span><span class="er">(</span><span class="kw">)</span><span class="ex">.comm</span> <span class="co"># 打印断点所在进程的进程名</span></span></code></pre></div>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;set auto-load safe-path /&quot;</span> <span class="op">&gt;</span> ~/.gdbinit <span class="co"># 设置自动加载共享库文件的安全路径</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;source </span><span class="va">${HOME}</span><span class="st">/.gdb-linux/vmlinux-gdb.py&quot;</span> <span class="op">&gt;&gt;</span> ~/.gdbinit</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build scripts_gdb <span class="co"># 在内核仓库目录下执行</span></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> <span class="va">${HOME}</span>/.gdb-linux/</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="va">${HOME}</span>/.gdb-linux/</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> build/scripts/gdb/<span class="pp">*</span> <span class="va">${HOME}</span>/.gdb-linux/ <span class="at">-rf</span> <span class="co"># 在内核仓库目录下执行</span></span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> scripts/gdb/vmlinux-gdb.py <span class="va">${HOME}</span>/.gdb-linux/ <span class="co"># 在内核仓库目录下执行</span></span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;/sys.path.insert/s/^/# /&#39;</span> <span class="va">${HOME}</span>/.gdb-linux/vmlinux-gdb.py <span class="co"># 将sys.path.insert所在的行注释掉</span></span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;/sys.path.insert/a\sys.path.insert(0, &quot;&#39;</span><span class="va">${HOME}</span><span class="st">&#39;/.gdb-linux&quot;)&#39;</span> <span class="va">${HOME}</span>/.gdb-linux/vmlinux-gdb.py <span class="co"># 插入 sys.path.insert(0, &quot;${HOME}/.gdb-linux&quot;)</span></span></code></pre></div>
+<p>内核5.10使用以下命令开启GDB辅助调试功能，也可以调试内核4.19代码，但无法调试内核最新的代码:</p>
+<div class="sourceCode" id="cb63"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;set auto-load safe-path /&quot;</span> <span class="op">&gt;</span> ~/.gdbinit <span class="co"># 设置自动加载共享库文件的安全路径</span></span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;source </span><span class="va">${HOME}</span><span class="st">/.gdb-linux-5.10/vmlinux-gdb.py&quot;</span> <span class="op">&gt;&gt;</span> ~/.gdbinit</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build scripts_gdb <span class="co"># 在5.10内核仓库目录下执行</span></span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> build/scripts/gdb/<span class="pp">*</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/ <span class="at">-rf</span> <span class="co"># 在5.10内核仓库目录下执行</span></span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> scripts/gdb/vmlinux-gdb.py <span class="va">${HOME}</span>/.gdb-linux-5.10/ <span class="co"># 在5.10内核仓库目录下执行</span></span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;/sys.path.insert/s/^/# /&#39;</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/vmlinux-gdb.py <span class="co"># 将sys.path.insert所在的行注释掉</span></span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;/sys.path.insert/a\sys.path.insert(0, &quot;&#39;</span><span class="va">${HOME}</span><span class="st">&#39;/.gdb-linux-5.10&quot;)&#39;</span> <span class="va">${HOME}</span>/.gdb-linux-5.10/vmlinux-gdb.py <span class="co"># 插入 sys.path.insert(0, &quot;${HOME}/.gdb-linux-5.10&quot;)</span></span></code></pre></div>
+<p>重新启动GDB就可以使用GDB辅助调试功能:</p>
+<div class="sourceCode" id="cb64"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="fu">apropos</span> lx <span class="co"># 查看有哪些命令</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">p</span> <span class="va">$lx_current</span><span class="er">(</span><span class="kw">)</span><span class="ex">.pid</span> <span class="co"># 打印断点所在进程的进程id</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">p</span> <span class="va">$lx_current</span><span class="er">(</span><span class="kw">)</span><span class="ex">.comm</span> <span class="co"># 打印断点所在进程的进程名</span></span></code></pre></div>
 <h2 data-number="5.5" id="gdb打印结构体偏移"><span
 class="header-section-number">5.5</span> GDB打印结构体偏移</h2>
 <p>结构体定义有时候加了很多宏判断，再考虑到内存对齐之类的因素，通过看代码很难确定结构体中某一个成员的偏移大小，使用gdb来打印就很直观。</p>
 <p>如结构体<code>struct cifsFileInfo</code>:</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> cifsFileInfo <span class="op">{</span></span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> list_head tlist<span class="op">;</span></span>
-<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
-<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> tcon_link <span class="op">*</span>tlink<span class="op">;</span></span>
-<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
-<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> <span class="op">*</span>symlink_target<span class="op">;</span></span>
-<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> cifsFileInfo <span class="op">{</span></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> list_head tlist<span class="op">;</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> tcon_link <span class="op">*</span>tlink<span class="op">;</span></span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> <span class="op">*</span>symlink_target<span class="op">;</span></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
 <p>想要确定<code>tlink</code>的偏移，可以使用以下命令:</p>
-<div class="sourceCode" id="cb64"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gdb</span> ./cifs.ko <span class="co"># ko文件或vmlinux</span></span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">p</span> <span class="kw">&amp;((</span><span class="ex">struct</span> cifsFileInfo <span class="pp">*</span><span class="kw">)</span><span class="ex">0</span><span class="kw">)</span><span class="ex">-</span><span class="op">&gt;</span>tlink</span></code></pre></div>
+<div class="sourceCode" id="cb66"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gdb</span> ./cifs.ko <span class="co"># ko文件或vmlinux</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">p</span> <span class="kw">&amp;((</span><span class="ex">struct</span> cifsFileInfo <span class="pp">*</span><span class="kw">)</span><span class="ex">0</span><span class="kw">)</span><span class="ex">-</span><span class="op">&gt;</span>tlink</span></code></pre></div>
 <p><code>(struct cifsFileInfo *)0</code>: 这是将整数值 <code>0</code>
 强制类型转换为指向 <code>struct cifsFileInfo</code>
 类型的指针。这实际上是创建一个指向虚拟内存地址 <code>0</code>
@@ -999,14 +1013,14 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb64-1"><a href="#
 class="header-section-number">5.6</span> ko模块代码调试</h2>
 <p>使用<code>gdb vmlinux</code>启动gdb后，如果调用到ko模块里的代码，这时候就不能直接对ko模块的代码进行打断点之类的操作，因为找不到对应的符号。</p>
 <p>这时就要把符号加入进来。首先，查看被调试的qemu虚拟机中的各个段地址:</p>
-<div class="sourceCode" id="cb65"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/module/ext4/sections/ <span class="co"># ext4 为模块名</span></span>
-<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> .text .data .bss <span class="co"># 输出各个段地址</span></span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/module/ext4/sections/ <span class="co"># ext4 为模块名</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> .text .data .bss <span class="co"># 输出各个段地址</span></span></code></pre></div>
 <p>在gdb窗口中加载ko文件:</p>
-<div class="sourceCode" id="cb66"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">add-symbol-file</span> <span class="op">&lt;</span>ko文件位置<span class="op">&gt;</span> <span class="op">&lt;</span>text段地址<span class="op">&gt;</span> -s .data <span class="op">&lt;</span>data段地址<span class="op">&gt;</span> -s .bss <span class="op">&lt;</span>bss段地址<span class="op">&gt;</span></span>
-<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">info</span> files <span class="co"># 也可用info target，查看添加的ko</span></span>
-<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">remove-symbol-file</span> /这里要写完整的绝对路径/linux/x86_64-build/fs/smb/client/cifs.ko</span></code></pre></div>
+<div class="sourceCode" id="cb68"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">add-symbol-file</span> <span class="op">&lt;</span>ko文件位置<span class="op">&gt;</span> <span class="op">&lt;</span>text段地址<span class="op">&gt;</span> -s .data <span class="op">&lt;</span>data段地址<span class="op">&gt;</span> -s .bss <span class="op">&lt;</span>bss段地址<span class="op">&gt;</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">info</span> files <span class="co"># 也可用info target，查看添加的ko</span></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">remove-symbol-file</span> /这里要写完整的绝对路径/linux/x86_64-build/fs/smb/client/cifs.ko</span></code></pre></div>
 <p>可以在虚拟机中直接运行脚本获得要输入的完整gdb命令: <a
 href="https://gitee.com/chenxiaosonggitee/blog/tree/master/course/kernel/src/add-symbol-file-full-cmd.sh"><code>bash add-symbol-file-full-cmd.sh</code></a>。</p>
 <p>这时就能开心的对ko模块中的代码进行打断点之类的操作了。</p>
