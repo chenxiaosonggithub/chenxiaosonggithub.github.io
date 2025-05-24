@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,29 +94,42 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">统计nfsv3同步写的时间</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#调试"><span class="toc-section-number">2</span> 调试</a></li>
-<li><a href="#代码分析"><span class="toc-section-number">3</span> 代码分析</a></li>
-<li><a href="#脚本"><span class="toc-section-number">4</span> 脚本</a></li>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#调试" id="toc-调试"><span
+class="toc-section-number">2</span> 调试</a></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">3</span> 代码分析</a></li>
+<li><a href="#脚本" id="toc-脚本"><span
+class="toc-section-number">4</span> 脚本</a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p><a
+href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
 <p>需要统计4.19内核上同步写操作各个阶段所花的时间，nfsv3挂载选项:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">(</span><span class="ex">rw</span>,relatime,sync,vers=3,rsize=262144,wsize=262144,namlen=255,acregmin=0,acregmax=0,acdirmin=0,acdirmax=0,hard,noac,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=xx.xx.xx.xx,mountvers=3,mountport=2050,mountproto=tcp,local_lock=none,addr=xx.xx.xx.xx<span class="kw">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">rw,relatime,sync,vers=3,rsize=262144,wsize=262144,namlen=255,acregmin=0,acregmax=0,acdirmin=0,acdirmax=0,hard,noac,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=xx.xx.xx.xx,mountvers=3,mountport=2050,mountproto=tcp,local_lock=none,addr=xx.xx.xx.xx</span><span class="kw">)</span></span></code></pre></div>
 <p>通过<code>man nfs</code>查看<code>sync</code>挂载选项的解释:</p>
 <pre><code>NFS 客户端对 sync 挂载选项的处理方式与某些其他文件系统不同（参见 mount(8) 中对通用 sync 与 async 挂载选项的描述）。如果既未指定 sync，也未指定 async（或显式指定了 async），NFS 客户端会将应用程序的写入操作延迟发送到服务器，直到发生以下任一情况：
 
@@ -122,278 +146,282 @@
 如果在挂载点上指定了 sync 选项，则对该挂载点上的文件进行任何写操作的系统调用都会在返回用户空间之前，将数据刷新到服务器。这能在多个客户端之间提供更强的一致性保障，但会显著降低性能。
 
 应用程序也可使用 O_SYNC 打开标志，在不使用 sync 挂载选项的情况下，对单个文件的写操作强制立即发送到服务器。</code></pre>
-<h1 data-number="2" id="调试"><span class="header-section-number">2</span> 调试</h1>
+<h1 data-number="2" id="调试"><span
+class="header-section-number">2</span> 调试</h1>
 <p>打开日志开头:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_ALL</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_ALL</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_ALL</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_ALL</span></span></code></pre></div>
 <p>得到以下rpc状态变化的日志:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="bu">[</span> 2654.631317] RPC:    45 call_start nfs3 proc WRITE (async)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>[ 2654.632237] RPC:    45 call_reserve (status 0)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>[ 2654.635102] RPC:    45 call_reserveresult (status 0)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>[ 2654.635931] RPC:    45 call_refresh (status 0)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>[ 2654.637647] RPC:    45 call_refreshresult (status 0)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>[ 2654.638528] RPC:    45 call_allocate (status 0)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>[ 2654.640483] RPC:    45 call_bind (status 0)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>[ 2654.641244] RPC:    45 call_connect xprt 000000007e192939 is connected</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>[ 2654.642397] RPC:    45 call_transmit (status 0)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>[ 2654.685691] RPC:    45 call_status (status 136)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>[ 2654.685693] RPC:    45 call_decode (status 136)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>[ 2654.695916] RPC:    45 call_decode result 13</span></code></pre></div>
-<h1 data-number="3" id="代码分析"><span class="header-section-number">3</span> 代码分析</h1>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>write</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>  ksys_write</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    vfs_write</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>      __vfs_write</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>        new_sync_write</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>          nfs_file_write</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>            generic_write_sync <span class="co">// 同步写执行到这里</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>              vfs_fsync_range</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>                nfs_file_fsync <span class="co">// file-&gt;f_op-&gt;fsync</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>                  filemap_write_and_wait_range</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>                    __filemap_fdatawrite_range</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>                      do_writepages</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>                        nfs_writepages</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a>                          nfs_pageio_complete</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>                            nfs_pageio_doio</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a>                              nfs_generic_pg_pgios</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a>                                nfs_initiate_pgio</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a>                                  .rpc_message = &amp;msg,</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a>                                  .flags = RPC_TASK_ASYNC <span class="co">// 异步rpc</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a>                                  nfs_initiate_write <span class="co">// hdr-&gt;rw_ops-&gt;rw_initiate</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a>                                    nfs3_proc_write_setup</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a>                                      msg-&gt;rpc_proc = &amp;nfs3_procedures[NFS3PROC_WRITE]</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a>                                  rpc_run_task</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a>                                    rpc_new_task</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a>                                      rpc_init_task</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a>                                    rpc_task_set_rpc_message <span class="co">// 设置tk_msg的值，NFS3PROC_WRITE和task关联上了</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true"></a>                                    rpc_call_start</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true"></a>                                      task-&gt;tk_action = call_start</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true"></a>                                    rpc_execute</span></code></pre></div>
-<h1 data-number="4" id="脚本"><span class="header-section-number">4</span> 脚本</h1>
-<p>bpftrace的使用请查看<a href="https://chenxiaosong.com/course/kernel/bpf.html#bpftrace">《BPF》</a>。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.631317] RPC:    45 <span class="er">call_start</span> <span class="ex">nfs3</span> proc WRITE <span class="er">(</span><span class="ex">async</span><span class="kw">)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.632237] RPC:    45 <span class="er">call_reserve</span> <span class="kw">(</span><span class="ex">status</span> 0<span class="kw">)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.635102] RPC:    45 <span class="er">call_reserveresult</span> <span class="kw">(</span><span class="ex">status</span> 0<span class="kw">)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.635931] RPC:    45 <span class="er">call_refresh</span> <span class="kw">(</span><span class="ex">status</span> 0<span class="kw">)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.637647] RPC:    45 <span class="er">call_refreshresult</span> <span class="kw">(</span><span class="ex">status</span> 0<span class="kw">)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.638528] RPC:    45 <span class="er">call_allocate</span> <span class="kw">(</span><span class="ex">status</span> 0<span class="kw">)</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.640483] RPC:    45 <span class="er">call_bind</span> <span class="kw">(</span><span class="ex">status</span> 0<span class="kw">)</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.641244] RPC:    45 <span class="er">call_connect</span> <span class="ex">xprt</span> 000000007e192939 is connected</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.642397] RPC:    45 <span class="er">call_transmit</span> <span class="kw">(</span><span class="ex">status</span> 0<span class="kw">)</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.685691] RPC:    45 <span class="er">call_status</span> <span class="kw">(</span><span class="ex">status</span> 136<span class="kw">)</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.685693] RPC:    45 <span class="er">call_decode</span> <span class="kw">(</span><span class="ex">status</span> 136<span class="kw">)</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 2654.695916] RPC:    45 <span class="er">call_decode</span> <span class="ex">result</span> 13</span></code></pre></div>
+<h1 data-number="3" id="代码分析"><span
+class="header-section-number">3</span> 代码分析</h1>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>write</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  ksys_write</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    vfs_write</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      __vfs_write</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        new_sync_write</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>          nfs_file_write</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            generic_write_sync <span class="co">// 同步写执行到这里</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>              vfs_fsync_range</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                nfs_file_fsync <span class="co">// file-&gt;f_op-&gt;fsync</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                  filemap_write_and_wait_range</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                    __filemap_fdatawrite_range</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                      do_writepages</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                        nfs_writepages</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                          nfs_pageio_complete</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                            nfs_pageio_doio</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                              nfs_generic_pg_pgios</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                                nfs_initiate_pgio</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                                  <span class="op">.</span>rpc_message <span class="op">=</span> <span class="op">&amp;</span>msg<span class="op">,</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                                  <span class="op">.</span>flags <span class="op">=</span> RPC_TASK_ASYNC <span class="co">// 异步rpc</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>                                  nfs_initiate_write <span class="co">// hdr-&gt;rw_ops-&gt;rw_initiate</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>                                    nfs3_proc_write_setup</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>                                      msg<span class="op">-&gt;</span>rpc_proc <span class="op">=</span> <span class="op">&amp;</span>nfs3_procedures<span class="op">[</span>NFS3PROC_WRITE<span class="op">]</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>                                  rpc_run_task</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>                                    rpc_new_task</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>                                      rpc_init_task</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>                                    rpc_task_set_rpc_message <span class="co">// 设置tk_msg的值，NFS3PROC_WRITE和task关联上了</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>                                    rpc_call_start</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>                                      task<span class="op">-&gt;</span>tk_action <span class="op">=</span> call_start</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>                                    rpc_execute</span></code></pre></div>
+<h1 data-number="4" id="脚本"><span
+class="header-section-number">4</span> 脚本</h1>
+<p>bpftrace的使用请查看<a
+href="https://chenxiaosong.com/course/kernel/bpf.html#bpftrace">《BPF》</a>。</p>
 <p>跟踪以下函数:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>nfs_file_write</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>rpc_execute</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>call_start</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>call_transmit</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>call_decode</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>nfs_file_write</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>rpc_execute</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>call_start</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>call_transmit</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>call_decode</span></code></pre></div>
 <p><a href="https://dingpenglong.com/">丁鹏龙</a>写的脚本:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co">#include &lt;linux/fs.h&gt;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="co">#include &lt;linux/types.h&gt;</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="co">#include &lt;linux/uio.h&gt;</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="co">#include &lt;linux/sunrpc/clnt.h&gt;   // RPC 相关头文件</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="co">#include &lt;linux/sunrpc/sched.h&gt;  // struct rpc_task 定义</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a><span class="ex">BEGIN</span> {</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;Tracing nfs_file_write execution time... Hit Ctrl-C to end.\n&quot;</span>);</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>}</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a><span class="ex">//</span>                 NFS File Write 跟踪                    //</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a><span class="ex">kprobe</span>:nfs_file_write</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a><span class="kw">{</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true"></a>    <span class="va">$iocb</span>  = <span class="kw">(</span><span class="ex">struct</span> kiocb *<span class="kw">)</span><span class="ex">arg0</span><span class="kw">;</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true"></a>    <span class="va">$file</span>  = <span class="va">$iocb</span><span class="ex">-</span><span class="op">&gt;</span>ki_filp<span class="kw">;</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true"></a>    <span class="va">$dentry</span> = <span class="va">$file</span><span class="ex">-</span><span class="op">&gt;</span>f_path.dentry<span class="kw">;</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true"></a>    <span class="va">$from</span>  = <span class="kw">(</span><span class="ex">struct</span> iov_iter *<span class="kw">)</span><span class="ex">arg1</span><span class="kw">;</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true"></a></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true"></a>    <span class="ex">@filename_ptr</span>[tid]  = <span class="va">$dentry</span>-<span class="op">&gt;</span>d_name.name<span class="kw">;</span>  <span class="ex">//</span> 存储文件名指针</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true"></a>    <span class="ex">@inode</span>[tid]         = <span class="va">$file</span>-<span class="op">&gt;</span>f_inode-<span class="op">&gt;</span>i_ino<span class="kw">;</span> <span class="ex">//</span> 存储 inode</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true"></a>    <span class="ex">@write_offset</span>       = <span class="va">$iocb</span>-<span class="op">&gt;</span>ki_pos<span class="kw">;</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true"></a>    <span class="ex">@write_length</span>       = <span class="va">$from</span>-<span class="op">&gt;</span>count<span class="kw">;</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true"></a>    <span class="ex">@start_time</span>[tid]    = nsecs<span class="kw">;</span>                 <span class="ex">//</span> 记录起始时间</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true"></a></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;%s, name:%-20s inode:%-8lu len:%-6d offset:%-8d time:%-20llu\n&quot;</span>,</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true"></a>           <span class="ex">probe</span>, str(<span class="va">$dentry</span>-<span class="op">&gt;</span>d_name.name), <span class="va">$file</span><span class="ex">-</span><span class="op">&gt;</span>f_inode-<span class="op">&gt;</span>i_ino,</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true"></a>           <span class="ex">@write_length</span>, @write_offset, nsecs);</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true"></a><span class="kw">}</span></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true"></a></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true"></a><span class="ex">kretprobe</span>:nfs_file_write</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true"></a><span class="kw">{</span></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true"></a>    <span class="va">$duration</span> = <span class="ex">nsecs</span> - @start_time[tid]<span class="kw">;</span></span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true"></a>    <span class="va">$name_ptr</span> = <span class="ex">@filename_ptr</span>[tid]<span class="kw">;</span></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true"></a>    <span class="va">$ino</span>      = <span class="ex">@inode</span>[tid]<span class="kw">;</span></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true"></a></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;nfs_file_write - File: %-20s &quot;</span>, str(<span class="va">$name_ptr</span>));</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;Inode: %-8lu &quot;</span>, <span class="va">$ino</span>);</span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;Duration: %ld s %ld ms %ld μs %ld ns\n&quot;</span>,</span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true"></a>           <span class="va">$duration</span> <span class="ex">/</span> 1000000000,</span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true"></a>           <span class="kw">(</span><span class="va">$duration</span> <span class="ex">%</span> 1000000000<span class="kw">)</span> <span class="ex">/</span> 1000000,</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true"></a>           <span class="kw">(</span><span class="va">$duration</span> <span class="ex">%</span> 1000000<span class="kw">)</span> <span class="ex">/</span> 1000,</span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true"></a>           <span class="va">$duration</span> <span class="ex">%</span> 1000);</span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true"></a></span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true"></a>    <span class="ex">delete</span>(@filename_ptr[tid]);</span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true"></a>    <span class="ex">delete</span>(@inode[tid]);</span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true"></a>    <span class="ex">delete</span>(@start_time[tid]);</span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true"></a><span class="kw">}</span></span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true"></a></span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true"></a><span class="ex">//</span>                  RPC Execute 阶段                      //</span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true"></a><span class="ex">kprobe</span>:rpc_execute</span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true"></a><span class="kw">{</span></span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true"></a>    <span class="va">$task</span> = <span class="kw">(</span><span class="ex">struct</span> rpc_task *<span class="kw">)</span><span class="ex">arg0</span><span class="kw">;</span></span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true"></a>    <span class="ex">@rpc_task</span> = <span class="va">$task</span><span class="kw">;</span></span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true"></a></span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true"></a>    <span class="ex">//</span> 检查是否为 NFSv3 WRITE 操作</span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true"></a>    <span class="kw">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb7-61"><a href="#cb7-61" aria-hidden="true"></a>        <span class="bu">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
-<span id="cb7-62"><a href="#cb7-62" aria-hidden="true"></a>    <span class="kw">}</span></span>
-<span id="cb7-63"><a href="#cb7-63" aria-hidden="true"></a></span>
-<span id="cb7-64"><a href="#cb7-64" aria-hidden="true"></a>    <span class="ex">@rpc_xid</span>[tid]        = <span class="va">$task</span>-<span class="op">&gt;</span>tk_rqstp-<span class="op">&gt;</span>rq_xid<span class="kw">;</span>  <span class="ex">//</span> 存储 RPC XID</span>
-<span id="cb7-65"><a href="#cb7-65" aria-hidden="true"></a>    <span class="ex">@rpc_op</span>[tid]         = <span class="va">$task</span>-<span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_name<span class="kw">;</span>  <span class="ex">//</span> RPC 操作名</span>
-<span id="cb7-66"><a href="#cb7-66" aria-hidden="true"></a>    <span class="ex">@rpc_start_time</span>[tid] = nsecs<span class="kw">;</span></span>
-<span id="cb7-67"><a href="#cb7-67" aria-hidden="true"></a></span>
-<span id="cb7-68"><a href="#cb7-68" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;rpc_execute START - XID:0x%08x OP:%-12s time:%-20llu\n&quot;</span>,</span>
-<span id="cb7-69"><a href="#cb7-69" aria-hidden="true"></a>           <span class="ex">@rpc_xid</span>[tid], str(@rpc_op[tid]), <span class="ex">nsecs</span>);</span>
-<span id="cb7-70"><a href="#cb7-70" aria-hidden="true"></a><span class="kw">}</span></span>
-<span id="cb7-71"><a href="#cb7-71" aria-hidden="true"></a></span>
-<span id="cb7-72"><a href="#cb7-72" aria-hidden="true"></a><span class="ex">kretprobe</span>:rpc_execute</span>
-<span id="cb7-73"><a href="#cb7-73" aria-hidden="true"></a><span class="kw">{</span></span>
-<span id="cb7-74"><a href="#cb7-74" aria-hidden="true"></a>    <span class="va">$task</span> = <span class="ex">@rpc_task</span><span class="kw">;</span></span>
-<span id="cb7-75"><a href="#cb7-75" aria-hidden="true"></a>    <span class="kw">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb7-76"><a href="#cb7-76" aria-hidden="true"></a>        <span class="bu">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
-<span id="cb7-77"><a href="#cb7-77" aria-hidden="true"></a>    <span class="kw">}</span></span>
-<span id="cb7-78"><a href="#cb7-78" aria-hidden="true"></a></span>
-<span id="cb7-79"><a href="#cb7-79" aria-hidden="true"></a>    <span class="va">$duration</span> = <span class="ex">nsecs</span> - @rpc_start_time[tid]<span class="kw">;</span></span>
-<span id="cb7-80"><a href="#cb7-80" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;rpc_execute END   - XID:0x%08x &quot;</span>, @rpc_xid[tid]);</span>
-<span id="cb7-81"><a href="#cb7-81" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;Duration: %ld s %ld ms %ld μs %ld ns\n&quot;</span>,</span>
-<span id="cb7-82"><a href="#cb7-82" aria-hidden="true"></a>           <span class="va">$duration</span> <span class="ex">/</span> 1000000000,</span>
-<span id="cb7-83"><a href="#cb7-83" aria-hidden="true"></a>           <span class="kw">(</span><span class="va">$duration</span> <span class="ex">%</span> 1000000000<span class="kw">)</span> <span class="ex">/</span> 1000000,</span>
-<span id="cb7-84"><a href="#cb7-84" aria-hidden="true"></a>           <span class="kw">(</span><span class="va">$duration</span> <span class="ex">%</span> 1000000<span class="kw">)</span> <span class="ex">/</span> 1000,</span>
-<span id="cb7-85"><a href="#cb7-85" aria-hidden="true"></a>           <span class="va">$duration</span> <span class="ex">%</span> 1000);</span>
-<span id="cb7-86"><a href="#cb7-86" aria-hidden="true"></a></span>
-<span id="cb7-87"><a href="#cb7-87" aria-hidden="true"></a>    <span class="ex">delete</span>(@rpc_xid[tid]);</span>
-<span id="cb7-88"><a href="#cb7-88" aria-hidden="true"></a>    <span class="ex">delete</span>(@rpc_op[tid]);</span>
-<span id="cb7-89"><a href="#cb7-89" aria-hidden="true"></a>    <span class="ex">delete</span>(@rpc_start_time[tid]);</span>
-<span id="cb7-90"><a href="#cb7-90" aria-hidden="true"></a><span class="kw">}</span></span>
-<span id="cb7-91"><a href="#cb7-91" aria-hidden="true"></a></span>
-<span id="cb7-92"><a href="#cb7-92" aria-hidden="true"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
-<span id="cb7-93"><a href="#cb7-93" aria-hidden="true"></a><span class="ex">//</span>                  RPC Call 阶段                         //</span>
-<span id="cb7-94"><a href="#cb7-94" aria-hidden="true"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
-<span id="cb7-95"><a href="#cb7-95" aria-hidden="true"></a><span class="ex">kprobe</span>:call_start</span>
-<span id="cb7-96"><a href="#cb7-96" aria-hidden="true"></a><span class="kw">{</span></span>
-<span id="cb7-97"><a href="#cb7-97" aria-hidden="true"></a>    <span class="va">$task</span> = <span class="kw">(</span><span class="ex">struct</span> rpc_task *<span class="kw">)</span><span class="ex">arg0</span><span class="kw">;</span></span>
-<span id="cb7-98"><a href="#cb7-98" aria-hidden="true"></a>    <span class="ex">@rpc_task</span> = <span class="va">$task</span><span class="kw">;</span></span>
-<span id="cb7-99"><a href="#cb7-99" aria-hidden="true"></a></span>
-<span id="cb7-100"><a href="#cb7-100" aria-hidden="true"></a>    <span class="ex">//</span> 检查是否为 NFSv3 WRITE 操作</span>
-<span id="cb7-101"><a href="#cb7-101" aria-hidden="true"></a>    <span class="kw">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb7-102"><a href="#cb7-102" aria-hidden="true"></a>        <span class="bu">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
-<span id="cb7-103"><a href="#cb7-103" aria-hidden="true"></a>    <span class="kw">}</span></span>
-<span id="cb7-104"><a href="#cb7-104" aria-hidden="true"></a></span>
-<span id="cb7-105"><a href="#cb7-105" aria-hidden="true"></a>    <span class="ex">@call_xid</span>[tid]        = <span class="va">$task</span>-<span class="op">&gt;</span>tk_rqstp-<span class="op">&gt;</span>rq_xid<span class="kw">;</span></span>
-<span id="cb7-106"><a href="#cb7-106" aria-hidden="true"></a>    <span class="ex">@call_start_time</span>[tid] = nsecs<span class="kw">;</span></span>
-<span id="cb7-107"><a href="#cb7-107" aria-hidden="true"></a>    <span class="va">$proc_num</span>             = <span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc<span class="kw">;</span></span>
-<span id="cb7-108"><a href="#cb7-108" aria-hidden="true"></a></span>
-<span id="cb7-109"><a href="#cb7-109" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;call_start    - XID:0x%08x Proc:%-4d time:%-20llu\n&quot;</span>,</span>
-<span id="cb7-110"><a href="#cb7-110" aria-hidden="true"></a>           <span class="ex">@call_xid</span>[tid], <span class="va">$proc_num</span>, nsecs);</span>
-<span id="cb7-111"><a href="#cb7-111" aria-hidden="true"></a><span class="kw">}</span></span>
-<span id="cb7-112"><a href="#cb7-112" aria-hidden="true"></a></span>
-<span id="cb7-113"><a href="#cb7-113" aria-hidden="true"></a><span class="ex">kretprobe</span>:call_start</span>
-<span id="cb7-114"><a href="#cb7-114" aria-hidden="true"></a><span class="kw">{</span></span>
-<span id="cb7-115"><a href="#cb7-115" aria-hidden="true"></a>    <span class="va">$task</span> = <span class="ex">@rpc_task</span><span class="kw">;</span></span>
-<span id="cb7-116"><a href="#cb7-116" aria-hidden="true"></a>    <span class="kw">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb7-117"><a href="#cb7-117" aria-hidden="true"></a>        <span class="bu">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
-<span id="cb7-118"><a href="#cb7-118" aria-hidden="true"></a>    <span class="kw">}</span></span>
-<span id="cb7-119"><a href="#cb7-119" aria-hidden="true"></a></span>
-<span id="cb7-120"><a href="#cb7-120" aria-hidden="true"></a>    <span class="va">$duration</span> = <span class="ex">nsecs</span> - @call_start_time[tid]<span class="kw">;</span></span>
-<span id="cb7-121"><a href="#cb7-121" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;call_start    - XID:0x%08x &quot;</span>, @call_xid[tid]);</span>
-<span id="cb7-122"><a href="#cb7-122" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;Duration: %ld s %ld ms %ld μs %ld ns\n&quot;</span>,</span>
-<span id="cb7-123"><a href="#cb7-123" aria-hidden="true"></a>           <span class="va">$duration</span> <span class="ex">/</span> 1000000000,</span>
-<span id="cb7-124"><a href="#cb7-124" aria-hidden="true"></a>          <span class="kw">(</span><span class="va">$duration</span> <span class="ex">%</span> 1000000000<span class="kw">)</span> <span class="ex">/</span> 1000000,</span>
-<span id="cb7-125"><a href="#cb7-125" aria-hidden="true"></a>          <span class="kw">(</span><span class="va">$duration</span> <span class="ex">%</span> 1000000<span class="kw">)</span> <span class="ex">/</span> 1000,</span>
-<span id="cb7-126"><a href="#cb7-126" aria-hidden="true"></a>           <span class="va">$duration</span> <span class="ex">%</span> 1000);</span>
-<span id="cb7-127"><a href="#cb7-127" aria-hidden="true"></a></span>
-<span id="cb7-128"><a href="#cb7-128" aria-hidden="true"></a>    <span class="ex">delete</span>(@call_xid[tid]);</span>
-<span id="cb7-129"><a href="#cb7-129" aria-hidden="true"></a>    <span class="ex">delete</span>(@call_start_time[tid]);</span>
-<span id="cb7-130"><a href="#cb7-130" aria-hidden="true"></a><span class="kw">}</span></span>
-<span id="cb7-131"><a href="#cb7-131" aria-hidden="true"></a></span>
-<span id="cb7-132"><a href="#cb7-132" aria-hidden="true"></a><span class="ex">kprobe</span>:call_transmit</span>
-<span id="cb7-133"><a href="#cb7-133" aria-hidden="true"></a><span class="kw">{</span></span>
-<span id="cb7-134"><a href="#cb7-134" aria-hidden="true"></a>    <span class="va">$task</span> = <span class="kw">(</span><span class="ex">struct</span> rpc_task *<span class="kw">)</span><span class="ex">arg0</span><span class="kw">;</span></span>
-<span id="cb7-135"><a href="#cb7-135" aria-hidden="true"></a>    <span class="ex">@rpc_task</span> = <span class="va">$task</span><span class="kw">;</span></span>
-<span id="cb7-136"><a href="#cb7-136" aria-hidden="true"></a></span>
-<span id="cb7-137"><a href="#cb7-137" aria-hidden="true"></a>    <span class="ex">//</span> 检查是否为 NFSv3 WRITE 操作</span>
-<span id="cb7-138"><a href="#cb7-138" aria-hidden="true"></a>    <span class="kw">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb7-139"><a href="#cb7-139" aria-hidden="true"></a>        <span class="bu">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
-<span id="cb7-140"><a href="#cb7-140" aria-hidden="true"></a>    <span class="kw">}</span></span>
-<span id="cb7-141"><a href="#cb7-141" aria-hidden="true"></a></span>
-<span id="cb7-142"><a href="#cb7-142" aria-hidden="true"></a>    <span class="ex">@transmit_xid</span>[tid]        = <span class="va">$task</span>-<span class="op">&gt;</span>tk_rqstp-<span class="op">&gt;</span>rq_xid<span class="kw">;</span></span>
-<span id="cb7-143"><a href="#cb7-143" aria-hidden="true"></a>    <span class="ex">@transmit_start_time</span>[tid] = nsecs<span class="kw">;</span></span>
-<span id="cb7-144"><a href="#cb7-144" aria-hidden="true"></a></span>
-<span id="cb7-145"><a href="#cb7-145" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;call_transmit - XID:0x%08x time:%-20llu\n&quot;</span>,</span>
-<span id="cb7-146"><a href="#cb7-146" aria-hidden="true"></a>           <span class="ex">@transmit_xid</span>[tid], nsecs);</span>
-<span id="cb7-147"><a href="#cb7-147" aria-hidden="true"></a><span class="kw">}</span></span>
-<span id="cb7-148"><a href="#cb7-148" aria-hidden="true"></a></span>
-<span id="cb7-149"><a href="#cb7-149" aria-hidden="true"></a><span class="ex">kretprobe</span>:call_transmit</span>
-<span id="cb7-150"><a href="#cb7-150" aria-hidden="true"></a><span class="kw">{</span></span>
-<span id="cb7-151"><a href="#cb7-151" aria-hidden="true"></a>    <span class="va">$task</span> = <span class="ex">@rpc_task</span><span class="kw">;</span></span>
-<span id="cb7-152"><a href="#cb7-152" aria-hidden="true"></a>    <span class="kw">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb7-153"><a href="#cb7-153" aria-hidden="true"></a>        <span class="bu">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
-<span id="cb7-154"><a href="#cb7-154" aria-hidden="true"></a>    <span class="kw">}</span></span>
-<span id="cb7-155"><a href="#cb7-155" aria-hidden="true"></a></span>
-<span id="cb7-156"><a href="#cb7-156" aria-hidden="true"></a>    <span class="va">$duration</span> = <span class="ex">nsecs</span> - @transmit_start_time[tid]<span class="kw">;</span></span>
-<span id="cb7-157"><a href="#cb7-157" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;call_transmit - XID:0x%08x &quot;</span>, @transmit_xid[tid]);</span>
-<span id="cb7-158"><a href="#cb7-158" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;Duration: %ld s %ld ms %ld μs %ld ns\n&quot;</span>,</span>
-<span id="cb7-159"><a href="#cb7-159" aria-hidden="true"></a>           <span class="va">$duration</span> <span class="ex">/</span> 1000000000,</span>
-<span id="cb7-160"><a href="#cb7-160" aria-hidden="true"></a>          <span class="kw">(</span><span class="va">$duration</span> <span class="ex">%</span> 1000000000<span class="kw">)</span> <span class="ex">/</span> 1000000,</span>
-<span id="cb7-161"><a href="#cb7-161" aria-hidden="true"></a>          <span class="kw">(</span><span class="va">$duration</span> <span class="ex">%</span> 1000000<span class="kw">)</span> <span class="ex">/</span> 1000,</span>
-<span id="cb7-162"><a href="#cb7-162" aria-hidden="true"></a>           <span class="va">$duration</span> <span class="ex">%</span> 1000);</span>
-<span id="cb7-163"><a href="#cb7-163" aria-hidden="true"></a></span>
-<span id="cb7-164"><a href="#cb7-164" aria-hidden="true"></a>    <span class="ex">delete</span>(@transmit_xid[tid]);</span>
-<span id="cb7-165"><a href="#cb7-165" aria-hidden="true"></a>    <span class="ex">delete</span>(@transmit_start_time[tid]);</span>
-<span id="cb7-166"><a href="#cb7-166" aria-hidden="true"></a><span class="kw">}</span></span>
-<span id="cb7-167"><a href="#cb7-167" aria-hidden="true"></a></span>
-<span id="cb7-168"><a href="#cb7-168" aria-hidden="true"></a><span class="ex">kprobe</span>:call_decode</span>
-<span id="cb7-169"><a href="#cb7-169" aria-hidden="true"></a><span class="kw">{</span></span>
-<span id="cb7-170"><a href="#cb7-170" aria-hidden="true"></a>    <span class="va">$task</span> = <span class="kw">(</span><span class="ex">struct</span> rpc_task *<span class="kw">)</span><span class="ex">arg0</span><span class="kw">;</span></span>
-<span id="cb7-171"><a href="#cb7-171" aria-hidden="true"></a></span>
-<span id="cb7-172"><a href="#cb7-172" aria-hidden="true"></a>    <span class="ex">//</span> 检查是否为 NFSv3 WRITE 操作</span>
-<span id="cb7-173"><a href="#cb7-173" aria-hidden="true"></a>    <span class="kw">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb7-174"><a href="#cb7-174" aria-hidden="true"></a>        <span class="bu">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
-<span id="cb7-175"><a href="#cb7-175" aria-hidden="true"></a>    <span class="kw">}</span></span>
-<span id="cb7-176"><a href="#cb7-176" aria-hidden="true"></a></span>
-<span id="cb7-177"><a href="#cb7-177" aria-hidden="true"></a>    <span class="ex">@decode_xid</span>[tid]        = <span class="va">$task</span>-<span class="op">&gt;</span>tk_rqstp-<span class="op">&gt;</span>rq_xid<span class="kw">;</span></span>
-<span id="cb7-178"><a href="#cb7-178" aria-hidden="true"></a>    <span class="ex">@decode_start_time</span>[tid] = nsecs<span class="kw">;</span></span>
-<span id="cb7-179"><a href="#cb7-179" aria-hidden="true"></a></span>
-<span id="cb7-180"><a href="#cb7-180" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;call_decode   - XID:0x%08x time:%-20llu\n&quot;</span>,</span>
-<span id="cb7-181"><a href="#cb7-181" aria-hidden="true"></a>           <span class="ex">@decode_xid</span>[tid], nsecs);</span>
-<span id="cb7-182"><a href="#cb7-182" aria-hidden="true"></a><span class="kw">}</span></span>
-<span id="cb7-183"><a href="#cb7-183" aria-hidden="true"></a></span>
-<span id="cb7-184"><a href="#cb7-184" aria-hidden="true"></a><span class="ex">kretprobe</span>:call_decode</span>
-<span id="cb7-185"><a href="#cb7-185" aria-hidden="true"></a><span class="kw">{</span></span>
-<span id="cb7-186"><a href="#cb7-186" aria-hidden="true"></a>    <span class="va">$task</span> = <span class="ex">@rpc_task</span><span class="kw">;</span></span>
-<span id="cb7-187"><a href="#cb7-187" aria-hidden="true"></a>    <span class="kw">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb7-188"><a href="#cb7-188" aria-hidden="true"></a>        <span class="bu">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
-<span id="cb7-189"><a href="#cb7-189" aria-hidden="true"></a>    <span class="kw">}</span></span>
-<span id="cb7-190"><a href="#cb7-190" aria-hidden="true"></a></span>
-<span id="cb7-191"><a href="#cb7-191" aria-hidden="true"></a>    <span class="va">$duration</span> = <span class="ex">nsecs</span> - @decode_start_time[tid]<span class="kw">;</span></span>
-<span id="cb7-192"><a href="#cb7-192" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;call_decode   - XID:0x%08x &quot;</span>, @decode_xid[tid]);</span>
-<span id="cb7-193"><a href="#cb7-193" aria-hidden="true"></a>    <span class="bu">printf</span>(<span class="st">&quot;Duration: %ld s %ld ms %ld μs %ld ns\n&quot;</span>,</span>
-<span id="cb7-194"><a href="#cb7-194" aria-hidden="true"></a>           <span class="va">$duration</span> <span class="ex">/</span> 1000000000,</span>
-<span id="cb7-195"><a href="#cb7-195" aria-hidden="true"></a>          <span class="kw">(</span><span class="va">$duration</span> <span class="ex">%</span> 1000000000<span class="kw">)</span> <span class="ex">/</span> 1000000,</span>
-<span id="cb7-196"><a href="#cb7-196" aria-hidden="true"></a>          <span class="kw">(</span><span class="va">$duration</span> <span class="ex">%</span> 1000000<span class="kw">)</span> <span class="ex">/</span> 1000,</span>
-<span id="cb7-197"><a href="#cb7-197" aria-hidden="true"></a>           <span class="va">$duration</span> <span class="ex">%</span> 1000);</span>
-<span id="cb7-198"><a href="#cb7-198" aria-hidden="true"></a></span>
-<span id="cb7-199"><a href="#cb7-199" aria-hidden="true"></a>    <span class="ex">delete</span>(@decode_xid[tid]);</span>
-<span id="cb7-200"><a href="#cb7-200" aria-hidden="true"></a>    <span class="ex">delete</span>(@decode_start_time[tid]);</span>
-<span id="cb7-201"><a href="#cb7-201" aria-hidden="true"></a><span class="kw">}</span></span>
-<span id="cb7-202"><a href="#cb7-202" aria-hidden="true"></a></span>
-<span id="cb7-203"><a href="#cb7-203" aria-hidden="true"></a><span class="ex">END</span> {</span>
-<span id="cb7-204"><a href="#cb7-204" aria-hidden="true"></a>    <span class="fu">clear</span>(@filename_ptr);</span>
-<span id="cb7-205"><a href="#cb7-205" aria-hidden="true"></a>    <span class="fu">clear</span>(@inode);</span>
-<span id="cb7-206"><a href="#cb7-206" aria-hidden="true"></a>    <span class="fu">clear</span>(@start_time);</span>
-<span id="cb7-207"><a href="#cb7-207" aria-hidden="true"></a>    <span class="fu">clear</span>(@rpc_xid);</span>
-<span id="cb7-208"><a href="#cb7-208" aria-hidden="true"></a>    <span class="fu">clear</span>(@rpc_task);</span>
-<span id="cb7-209"><a href="#cb7-209" aria-hidden="true"></a>    <span class="fu">clear</span>(@rpc_op);</span>
-<span id="cb7-210"><a href="#cb7-210" aria-hidden="true"></a>    <span class="fu">clear</span>(@rpc_start_time);</span>
-<span id="cb7-211"><a href="#cb7-211" aria-hidden="true"></a>    <span class="fu">clear</span>(@call_xid);</span>
-<span id="cb7-212"><a href="#cb7-212" aria-hidden="true"></a>    <span class="fu">clear</span>(@call_start_time);</span>
-<span id="cb7-213"><a href="#cb7-213" aria-hidden="true"></a>    <span class="fu">clear</span>(@transmit_xid);</span>
-<span id="cb7-214"><a href="#cb7-214" aria-hidden="true"></a>    <span class="fu">clear</span>(@transmit_start_time);</span>
-<span id="cb7-215"><a href="#cb7-215" aria-hidden="true"></a>    <span class="fu">clear</span>(@decode_xid);</span>
-<span id="cb7-216"><a href="#cb7-216" aria-hidden="true"></a>    <span class="fu">clear</span>(@decode_start_time);</span>
-<span id="cb7-217"><a href="#cb7-217" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#include &lt;linux/fs.h&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#include &lt;linux/types.h&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#include &lt;linux/uio.h&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#include &lt;linux/sunrpc/clnt.h&gt;   // RPC 相关头文件</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#include &lt;linux/sunrpc/sched.h&gt;  // struct rpc_task 定义</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">BEGIN</span> {</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;Tracing nfs_file_write execution time... Hit Ctrl-C to end.\n&quot;</span><span class="kw">);</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ex">//</span>                 NFS File Write 跟踪                    //</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="ex">kprobe:nfs_file_write</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">$iocb</span>  = <span class="er">(</span><span class="ex">struct</span> kiocb <span class="pp">*</span><span class="kw">)</span><span class="ex">arg0</span><span class="kw">;</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">$file</span>  = <span class="va">$iocb</span>-<span class="op">&gt;</span>ki_filp<span class="kw">;</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">$dentry</span> = <span class="va">$file</span>-<span class="op">&gt;</span>f_path.dentry<span class="kw">;</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="va">$from</span>  = <span class="er">(</span><span class="ex">struct</span> iov_iter <span class="pp">*</span><span class="kw">)</span><span class="ex">arg1</span><span class="kw">;</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@filename_ptr[tid]</span>  = <span class="va">$dentry</span>-<span class="op">&gt;</span>d_name.name<span class="kw">;</span>  <span class="ex">//</span> 存储文件名指针</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@inode[tid]</span>         = <span class="va">$file</span>-<span class="op">&gt;</span>f_inode-<span class="op">&gt;</span>i_ino<span class="kw">;</span> <span class="ex">//</span> 存储 inode</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@write_offset</span>       = <span class="va">$iocb</span>-<span class="op">&gt;</span>ki_pos<span class="kw">;</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@write_length</span>       = <span class="va">$from</span>-<span class="op">&gt;</span>count<span class="kw">;</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@start_time[tid]</span>    = nsecs<span class="kw">;</span>                 <span class="ex">//</span> 记录起始时间</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;%s, name:%-20s inode:%-8lu len:%-6d offset:%-8d time:%-20llu\n&quot;</span><span class="ex">,</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>           <span class="ex">probe,</span> str<span class="er">(</span><span class="va">$dentry</span><span class="ex">-</span><span class="op">&gt;</span>d_name.name<span class="kw">)</span><span class="ex">,</span> <span class="va">$file</span>-<span class="op">&gt;</span>f_inode-<span class="op">&gt;</span>i_ino,</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>           <span class="ex">@write_length,</span> @write_offset, nsecs<span class="kw">);</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="ex">kretprobe:nfs_file_write</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="va">$duration</span> = nsecs <span class="at">-</span> @start_time<span class="pp">[</span><span class="ss">tid</span><span class="pp">]</span><span class="kw">;</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    <span class="va">$name_ptr</span> = @filename_ptr<span class="pp">[</span><span class="ss">tid</span><span class="pp">]</span><span class="kw">;</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    <span class="va">$ino</span>      = @inode<span class="pp">[</span><span class="ss">tid</span><span class="pp">]</span><span class="kw">;</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;nfs_file_write - File: %-20s &quot;</span><span class="ex">,</span> str<span class="er">(</span><span class="va">$name_ptr</span><span class="kw">));</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;Inode: %-8lu &quot;</span><span class="ex">,</span> <span class="va">$ino</span><span class="kw">);</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;Duration: %ld s %ld ms %ld μs %ld ns\n&quot;</span><span class="ex">,</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>           <span class="va">$duration</span> / 1000000000,</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>           <span class="kw">(</span><span class="va">$duration</span> % 1000000000<span class="kw">)</span> <span class="ex">/</span> 1000000,</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>           <span class="kw">(</span><span class="va">$duration</span> % 1000000<span class="kw">)</span> <span class="ex">/</span> 1000,</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>           <span class="va">$duration</span> % 1000<span class="kw">);</span></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@filename_ptr[tid]</span><span class="kw">);</span></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@inode[tid]</span><span class="kw">);</span></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@start_time[tid]</span><span class="kw">);</span></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a><span class="ex">//</span>                  RPC Execute 阶段                      //</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a><span class="ex">kprobe:rpc_execute</span></span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>    <span class="va">$task</span> = <span class="er">(</span><span class="ex">struct</span> rpc_task <span class="pp">*</span><span class="kw">)</span><span class="ex">arg0</span><span class="kw">;</span></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@rpc_task</span> = <span class="va">$task</span><span class="kw">;</span></span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>    <span class="ex">//</span> 检查是否为 NFSv3 WRITE 操作</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@rpc_xid[tid]</span>        = <span class="va">$task</span>-<span class="op">&gt;</span>tk_rqstp-<span class="op">&gt;</span>rq_xid<span class="kw">;</span>  <span class="ex">//</span> 存储 RPC XID</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@rpc_op[tid]</span>         = <span class="va">$task</span>-<span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_name<span class="kw">;</span>  <span class="ex">//</span> RPC 操作名</span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@rpc_start_time[tid]</span> = nsecs<span class="kw">;</span></span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;rpc_execute START - XID:0x%08x OP:%-12s time:%-20llu\n&quot;</span><span class="ex">,</span></span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>           <span class="ex">@rpc_xid[tid],</span> str<span class="er">(</span><span class="ex">@rpc_op[tid]</span><span class="kw">)</span><span class="ex">,</span> nsecs<span class="kw">);</span></span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a><span class="ex">kretprobe:rpc_execute</span></span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>    <span class="va">$task</span> = @rpc_task<span class="kw">;</span></span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>    <span class="va">$duration</span> = nsecs <span class="at">-</span> @rpc_start_time<span class="pp">[</span><span class="ss">tid</span><span class="pp">]</span><span class="kw">;</span></span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;rpc_execute END   - XID:0x%08x &quot;</span><span class="ex">,</span> @rpc_xid<span class="pp">[</span><span class="ss">tid</span><span class="pp">]</span><span class="kw">);</span></span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;Duration: %ld s %ld ms %ld μs %ld ns\n&quot;</span><span class="ex">,</span></span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>           <span class="va">$duration</span> / 1000000000,</span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>           <span class="kw">(</span><span class="va">$duration</span> % 1000000000<span class="kw">)</span> <span class="ex">/</span> 1000000,</span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>           <span class="kw">(</span><span class="va">$duration</span> % 1000000<span class="kw">)</span> <span class="ex">/</span> 1000,</span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>           <span class="va">$duration</span> % 1000<span class="kw">);</span></span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@rpc_xid[tid]</span><span class="kw">);</span></span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@rpc_op[tid]</span><span class="kw">);</span></span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@rpc_start_time[tid]</span><span class="kw">);</span></span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a><span class="ex">//</span>                  RPC Call 阶段                         //</span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a><span class="ex">////////////////////////////////////////////////////////////</span></span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a><span class="ex">kprobe:call_start</span></span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a>    <span class="va">$task</span> = <span class="er">(</span><span class="ex">struct</span> rpc_task <span class="pp">*</span><span class="kw">)</span><span class="ex">arg0</span><span class="kw">;</span></span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@rpc_task</span> = <span class="va">$task</span><span class="kw">;</span></span>
+<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a>    <span class="ex">//</span> 检查是否为 NFSv3 WRITE 操作</span>
+<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
+<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@call_xid[tid]</span>        = <span class="va">$task</span>-<span class="op">&gt;</span>tk_rqstp-<span class="op">&gt;</span>rq_xid<span class="kw">;</span></span>
+<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@call_start_time[tid]</span> = nsecs<span class="kw">;</span></span>
+<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a>    <span class="va">$proc_num</span>             = <span class="va">$task</span>-<span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc<span class="kw">;</span></span>
+<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;call_start    - XID:0x%08x Proc:%-4d time:%-20llu\n&quot;</span><span class="ex">,</span></span>
+<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a>           <span class="ex">@call_xid[tid],</span> <span class="va">$proc_num</span>, nsecs<span class="kw">);</span></span>
+<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a><span class="ex">kretprobe:call_start</span></span>
+<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a>    <span class="va">$task</span> = @rpc_task<span class="kw">;</span></span>
+<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb7-117"><a href="#cb7-117" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
+<span id="cb7-118"><a href="#cb7-118" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb7-119"><a href="#cb7-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-120"><a href="#cb7-120" aria-hidden="true" tabindex="-1"></a>    <span class="va">$duration</span> = nsecs <span class="at">-</span> @call_start_time<span class="pp">[</span><span class="ss">tid</span><span class="pp">]</span><span class="kw">;</span></span>
+<span id="cb7-121"><a href="#cb7-121" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;call_start    - XID:0x%08x &quot;</span><span class="ex">,</span> @call_xid<span class="pp">[</span><span class="ss">tid</span><span class="pp">]</span><span class="kw">);</span></span>
+<span id="cb7-122"><a href="#cb7-122" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;Duration: %ld s %ld ms %ld μs %ld ns\n&quot;</span><span class="ex">,</span></span>
+<span id="cb7-123"><a href="#cb7-123" aria-hidden="true" tabindex="-1"></a>           <span class="va">$duration</span> / 1000000000,</span>
+<span id="cb7-124"><a href="#cb7-124" aria-hidden="true" tabindex="-1"></a>          <span class="kw">(</span><span class="va">$duration</span> % 1000000000<span class="kw">)</span> <span class="ex">/</span> 1000000,</span>
+<span id="cb7-125"><a href="#cb7-125" aria-hidden="true" tabindex="-1"></a>          <span class="kw">(</span><span class="va">$duration</span> % 1000000<span class="kw">)</span> <span class="ex">/</span> 1000,</span>
+<span id="cb7-126"><a href="#cb7-126" aria-hidden="true" tabindex="-1"></a>           <span class="va">$duration</span> % 1000<span class="kw">);</span></span>
+<span id="cb7-127"><a href="#cb7-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-128"><a href="#cb7-128" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@call_xid[tid]</span><span class="kw">);</span></span>
+<span id="cb7-129"><a href="#cb7-129" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@call_start_time[tid]</span><span class="kw">);</span></span>
+<span id="cb7-130"><a href="#cb7-130" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-131"><a href="#cb7-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-132"><a href="#cb7-132" aria-hidden="true" tabindex="-1"></a><span class="ex">kprobe:call_transmit</span></span>
+<span id="cb7-133"><a href="#cb7-133" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb7-134"><a href="#cb7-134" aria-hidden="true" tabindex="-1"></a>    <span class="va">$task</span> = <span class="er">(</span><span class="ex">struct</span> rpc_task <span class="pp">*</span><span class="kw">)</span><span class="ex">arg0</span><span class="kw">;</span></span>
+<span id="cb7-135"><a href="#cb7-135" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@rpc_task</span> = <span class="va">$task</span><span class="kw">;</span></span>
+<span id="cb7-136"><a href="#cb7-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-137"><a href="#cb7-137" aria-hidden="true" tabindex="-1"></a>    <span class="ex">//</span> 检查是否为 NFSv3 WRITE 操作</span>
+<span id="cb7-138"><a href="#cb7-138" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb7-139"><a href="#cb7-139" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
+<span id="cb7-140"><a href="#cb7-140" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb7-141"><a href="#cb7-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-142"><a href="#cb7-142" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@transmit_xid[tid]</span>        = <span class="va">$task</span>-<span class="op">&gt;</span>tk_rqstp-<span class="op">&gt;</span>rq_xid<span class="kw">;</span></span>
+<span id="cb7-143"><a href="#cb7-143" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@transmit_start_time[tid]</span> = nsecs<span class="kw">;</span></span>
+<span id="cb7-144"><a href="#cb7-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-145"><a href="#cb7-145" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;call_transmit - XID:0x%08x time:%-20llu\n&quot;</span><span class="ex">,</span></span>
+<span id="cb7-146"><a href="#cb7-146" aria-hidden="true" tabindex="-1"></a>           <span class="ex">@transmit_xid[tid],</span> nsecs<span class="kw">);</span></span>
+<span id="cb7-147"><a href="#cb7-147" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-148"><a href="#cb7-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-149"><a href="#cb7-149" aria-hidden="true" tabindex="-1"></a><span class="ex">kretprobe:call_transmit</span></span>
+<span id="cb7-150"><a href="#cb7-150" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb7-151"><a href="#cb7-151" aria-hidden="true" tabindex="-1"></a>    <span class="va">$task</span> = @rpc_task<span class="kw">;</span></span>
+<span id="cb7-152"><a href="#cb7-152" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb7-153"><a href="#cb7-153" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
+<span id="cb7-154"><a href="#cb7-154" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb7-155"><a href="#cb7-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-156"><a href="#cb7-156" aria-hidden="true" tabindex="-1"></a>    <span class="va">$duration</span> = nsecs <span class="at">-</span> @transmit_start_time<span class="pp">[</span><span class="ss">tid</span><span class="pp">]</span><span class="kw">;</span></span>
+<span id="cb7-157"><a href="#cb7-157" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;call_transmit - XID:0x%08x &quot;</span><span class="ex">,</span> @transmit_xid<span class="pp">[</span><span class="ss">tid</span><span class="pp">]</span><span class="kw">);</span></span>
+<span id="cb7-158"><a href="#cb7-158" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;Duration: %ld s %ld ms %ld μs %ld ns\n&quot;</span><span class="ex">,</span></span>
+<span id="cb7-159"><a href="#cb7-159" aria-hidden="true" tabindex="-1"></a>           <span class="va">$duration</span> / 1000000000,</span>
+<span id="cb7-160"><a href="#cb7-160" aria-hidden="true" tabindex="-1"></a>          <span class="kw">(</span><span class="va">$duration</span> % 1000000000<span class="kw">)</span> <span class="ex">/</span> 1000000,</span>
+<span id="cb7-161"><a href="#cb7-161" aria-hidden="true" tabindex="-1"></a>          <span class="kw">(</span><span class="va">$duration</span> % 1000000<span class="kw">)</span> <span class="ex">/</span> 1000,</span>
+<span id="cb7-162"><a href="#cb7-162" aria-hidden="true" tabindex="-1"></a>           <span class="va">$duration</span> % 1000<span class="kw">);</span></span>
+<span id="cb7-163"><a href="#cb7-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-164"><a href="#cb7-164" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@transmit_xid[tid]</span><span class="kw">);</span></span>
+<span id="cb7-165"><a href="#cb7-165" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@transmit_start_time[tid]</span><span class="kw">);</span></span>
+<span id="cb7-166"><a href="#cb7-166" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-167"><a href="#cb7-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-168"><a href="#cb7-168" aria-hidden="true" tabindex="-1"></a><span class="ex">kprobe:call_decode</span></span>
+<span id="cb7-169"><a href="#cb7-169" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb7-170"><a href="#cb7-170" aria-hidden="true" tabindex="-1"></a>    <span class="va">$task</span> = <span class="er">(</span><span class="ex">struct</span> rpc_task <span class="pp">*</span><span class="kw">)</span><span class="ex">arg0</span><span class="kw">;</span></span>
+<span id="cb7-171"><a href="#cb7-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-172"><a href="#cb7-172" aria-hidden="true" tabindex="-1"></a>    <span class="ex">//</span> 检查是否为 NFSv3 WRITE 操作</span>
+<span id="cb7-173"><a href="#cb7-173" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb7-174"><a href="#cb7-174" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
+<span id="cb7-175"><a href="#cb7-175" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb7-176"><a href="#cb7-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-177"><a href="#cb7-177" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@decode_xid[tid]</span>        = <span class="va">$task</span>-<span class="op">&gt;</span>tk_rqstp-<span class="op">&gt;</span>rq_xid<span class="kw">;</span></span>
+<span id="cb7-178"><a href="#cb7-178" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@decode_start_time[tid]</span> = nsecs<span class="kw">;</span></span>
+<span id="cb7-179"><a href="#cb7-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-180"><a href="#cb7-180" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;call_decode   - XID:0x%08x time:%-20llu\n&quot;</span><span class="ex">,</span></span>
+<span id="cb7-181"><a href="#cb7-181" aria-hidden="true" tabindex="-1"></a>           <span class="ex">@decode_xid[tid],</span> nsecs<span class="kw">);</span></span>
+<span id="cb7-182"><a href="#cb7-182" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-183"><a href="#cb7-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-184"><a href="#cb7-184" aria-hidden="true" tabindex="-1"></a><span class="ex">kretprobe:call_decode</span></span>
+<span id="cb7-185"><a href="#cb7-185" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb7-186"><a href="#cb7-186" aria-hidden="true" tabindex="-1"></a>    <span class="va">$task</span> = @rpc_task<span class="kw">;</span></span>
+<span id="cb7-187"><a href="#cb7-187" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">(</span><span class="va">$task</span><span class="ex">-</span><span class="op">&gt;</span>tk_msg.rpc_proc-<span class="op">&gt;</span>p_proc != 7<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb7-188"><a href="#cb7-188" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="kw">;</span>  <span class="ex">//</span> 非 WRITE 操作，直接返回</span>
+<span id="cb7-189"><a href="#cb7-189" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb7-190"><a href="#cb7-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-191"><a href="#cb7-191" aria-hidden="true" tabindex="-1"></a>    <span class="va">$duration</span> = nsecs <span class="at">-</span> @decode_start_time<span class="pp">[</span><span class="ss">tid</span><span class="pp">]</span><span class="kw">;</span></span>
+<span id="cb7-192"><a href="#cb7-192" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;call_decode   - XID:0x%08x &quot;</span><span class="ex">,</span> @decode_xid<span class="pp">[</span><span class="ss">tid</span><span class="pp">]</span><span class="kw">);</span></span>
+<span id="cb7-193"><a href="#cb7-193" aria-hidden="true" tabindex="-1"></a>    <span class="bu">printf</span><span class="er">(</span><span class="st">&quot;Duration: %ld s %ld ms %ld μs %ld ns\n&quot;</span><span class="ex">,</span></span>
+<span id="cb7-194"><a href="#cb7-194" aria-hidden="true" tabindex="-1"></a>           <span class="va">$duration</span> / 1000000000,</span>
+<span id="cb7-195"><a href="#cb7-195" aria-hidden="true" tabindex="-1"></a>          <span class="kw">(</span><span class="va">$duration</span> % 1000000000<span class="kw">)</span> <span class="ex">/</span> 1000000,</span>
+<span id="cb7-196"><a href="#cb7-196" aria-hidden="true" tabindex="-1"></a>          <span class="kw">(</span><span class="va">$duration</span> % 1000000<span class="kw">)</span> <span class="ex">/</span> 1000,</span>
+<span id="cb7-197"><a href="#cb7-197" aria-hidden="true" tabindex="-1"></a>           <span class="va">$duration</span> % 1000<span class="kw">);</span></span>
+<span id="cb7-198"><a href="#cb7-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-199"><a href="#cb7-199" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@decode_xid[tid]</span><span class="kw">);</span></span>
+<span id="cb7-200"><a href="#cb7-200" aria-hidden="true" tabindex="-1"></a>    <span class="ex">delete</span><span class="er">(</span><span class="ex">@decode_start_time[tid]</span><span class="kw">);</span></span>
+<span id="cb7-201"><a href="#cb7-201" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-202"><a href="#cb7-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-203"><a href="#cb7-203" aria-hidden="true" tabindex="-1"></a><span class="ex">END</span> {</span>
+<span id="cb7-204"><a href="#cb7-204" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@filename_ptr</span><span class="kw">);</span></span>
+<span id="cb7-205"><a href="#cb7-205" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@inode</span><span class="kw">);</span></span>
+<span id="cb7-206"><a href="#cb7-206" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@start_time</span><span class="kw">);</span></span>
+<span id="cb7-207"><a href="#cb7-207" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@rpc_xid</span><span class="kw">);</span></span>
+<span id="cb7-208"><a href="#cb7-208" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@rpc_task</span><span class="kw">);</span></span>
+<span id="cb7-209"><a href="#cb7-209" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@rpc_op</span><span class="kw">);</span></span>
+<span id="cb7-210"><a href="#cb7-210" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@rpc_start_time</span><span class="kw">);</span></span>
+<span id="cb7-211"><a href="#cb7-211" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@call_xid</span><span class="kw">);</span></span>
+<span id="cb7-212"><a href="#cb7-212" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@call_start_time</span><span class="kw">);</span></span>
+<span id="cb7-213"><a href="#cb7-213" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@transmit_xid</span><span class="kw">);</span></span>
+<span id="cb7-214"><a href="#cb7-214" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@transmit_start_time</span><span class="kw">);</span></span>
+<span id="cb7-215"><a href="#cb7-215" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@decode_xid</span><span class="kw">);</span></span>
+<span id="cb7-216"><a href="#cb7-216" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clear</span><span class="er">(</span><span class="ex">@decode_start_time</span><span class="kw">);</span></span>
+<span id="cb7-217"><a href="#cb7-217" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
 </body>
 </html>
