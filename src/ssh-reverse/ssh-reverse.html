@@ -235,6 +235,22 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> phddns status <span class="co"># 查看状态</span></span></code></pre></div>
 <p>在<a href="https://console.hsk.oray.com/zh/device">贝锐花生壳管理 -
 设备列表</a>添加设备。</p>
+<p>注意可能会断开，可以用以下脚本检查重启服务:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 需要先执行 sudo -i</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="fu">true</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">phddns</span> status <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&quot;Runstatus: OFFLINE&quot;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">[</span> <span class="va">$?</span> <span class="ot">==</span> 0 <span class="bu">]</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">then</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="kw">`</span><span class="fu">date</span><span class="kw">`</span> fail</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        <span class="ex">phddns</span> restart</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="kw">`</span><span class="fu">date</span><span class="kw">`</span> success</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sleep</span> 60</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
 <h1 data-number="6" id="向日葵和todesk"><span
 class="header-section-number">6</span> 向日葵和ToDesk</h1>
 <p>还可以使用<a
@@ -242,9 +258,9 @@ href="https://sunlogin.oray.com/download?categ=personal">向日葵</a>和<a
 href="https://www.todesk.com/download.html">ToDesk</a>。</p>
 <p>向日葵有<a
 href="https://service.oray.com/question/11017.html">命令行版本</a>，但是要付费的，还不如自己买个服务器，下面以centos7为例说明安装过程:</p>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">yum</span> install ./sunloginclientshell-10.1.1.28779.x86_64.rpm <span class="at">-y</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> /usr/local/sunlogin/bin/sunloginclient</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ex">按F12</span> <span class="at">-</span><span class="op">&gt;</span> Bind, 登录向日葵账号密码</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">yum</span> install ./sunloginclientshell-10.1.1.28779.x86_64.rpm <span class="at">-y</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> /usr/local/sunlogin/bin/sunloginclient</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">按F12</span> <span class="at">-</span><span class="op">&gt;</span> Bind, 登录向日葵账号密码</span></code></pre></div>
 </body>
 </html>
