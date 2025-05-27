@@ -202,74 +202,41 @@ href="https://gitlab.com/samba-team/samba">用户态server仓库</a>。</p>
 <p>当然，代码中还有使用<code>DEBUG(11, ...)</code>、<code>DEBUG(15, ...)</code>、<code>DEBUG(18, ...)</code>、<code>DEBUG(19, ...)</code>等等，最大可用的<code>log level</code>为:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAX_DEBUG_LEVEL </span><span class="dv">1000</span></span></code></pre></div>
 <p><code>log level</code>的解析在<code>debug_parse_param()</code>函数中。</p>
-<p>打印函数堆栈用<code>log_stack_trace()</code>，比如要打印<code>smbd_parent_loop()</code>的调用栈，代码修改如下:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>diff <span class="op">--</span>git a<span class="op">/</span>source3<span class="op">/</span>smbd<span class="op">/</span>server<span class="op">.</span>c b<span class="op">/</span>source3<span class="op">/</span>smbd<span class="op">/</span>server<span class="op">.</span>c</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>index <span class="dv">1</span><span class="er">ad66ecbdba..fb265bccaa6</span> <span class="dv">100644</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>source3<span class="op">/</span>smbd<span class="op">/</span>server<span class="op">.</span>c</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>source3<span class="op">/</span>smbd<span class="op">/</span>server<span class="op">.</span>c</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">60</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">60</span><span class="op">,</span><span class="dv">7</span> @@</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&quot;lib/global_contexts.h&quot;</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&quot;source3/lib/substitute.h&quot;</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&quot;lib/addrchange.h&quot;</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>#include <span class="st">&quot;lib/util/fault.h&quot;</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a> <span class="pp">#ifdef CLUSTER_SUPPORT</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&quot;ctdb_protocol.h&quot;</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">1412</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">1413</span><span class="op">,</span><span class="dv">8</span> @@ <span class="dt">static</span> <span class="dt">void</span> smbd_parent_loop<span class="op">(</span><span class="kw">struct</span> tevent_context <span class="op">*</span>ev_ctx<span class="op">,</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>           <span class="cf">for</span> each incoming connection <span class="op">*/</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        DEBUG<span class="op">(</span><span class="dv">2</span><span class="op">,(</span><span class="st">&quot;waiting for connections</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">));</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       log_stack_trace<span class="op">();</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="op">+</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        ret <span class="op">=</span> tevent_loop_wait<span class="op">(</span>ev_ctx<span class="op">);</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>ret <span class="op">!=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>                DEBUG<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="op">(</span><span class="st">&quot;tevent_loop_wait failed: </span><span class="sc">%d</span><span class="st">, </span><span class="sc">%s</span><span class="st">, exiting</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>diff <span class="op">--</span>git a<span class="op">/</span>source3<span class="op">/</span>wscript_build b<span class="op">/</span>source3<span class="op">/</span>wscript_build</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>index <span class="dv">2870</span><span class="er">f1a704b..3df7d60eb8d</span> <span class="dv">100644</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>source3<span class="op">/</span>wscript_build</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>source3<span class="op">/</span>wscript_build</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">1137</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">1137</span><span class="op">,</span><span class="dv">7</span> @@ bld<span class="op">.</span>SAMBA3_SUBSYSTEM<span class="op">(</span><span class="ch">&#39;f</span><span class="er">d_handle</span><span class="ch">&#39;</span><span class="op">,</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a> bld<span class="op">.</span>SAMBA3_BINARY<span class="op">(</span><span class="ch">&#39;s</span><span class="er">mbd/smbd</span><span class="ch">&#39;</span><span class="op">,</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>                  source<span class="op">=</span><span class="ch">&#39;s</span><span class="er">mbd/server.c smbd/smbd_cleanupd.c</span><span class="ch">&#39;</span><span class="op">,</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>                  deps<span class="op">=</span><span class="ch">&#39;</span><span class="er">&#39;</span><span class="ch">&#39;</span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>                      smb<span class="op">-</span>panic</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>                       CMDLINE_S3</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>                       smbd_base</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>                       REG_FULL</span></code></pre></div>
+<p>打印函数堆栈用<code>log_stack_trace()</code>，比如打印<code>smbd_parent_loop()</code>的调用栈的补丁<a
+href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/smb/src/0001-dump-stack-of-smbd_parent_loop.patch"><code>0001-dump-stack-of-smbd_parent_loop.patch</code></a>。</p>
 <p><code>/usr/local/samba/var/log.smbd</code>日志文件中的打印结果如下:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[2025/05/27</span> 22:06:24.110919,  0] ../../lib/util/fault.c:261<span class="er">(</span><span class="ex">log_stack_trace</span><span class="kw">)</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">BACKTRACE:</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>   <span class="co">#0 log_stack_trace + 0x28 [ip=0x7f61f4a4098a] [sp=0x7ffc42cae650]</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>   <span class="co">#1 smbd_parent_loop + 0x93 [ip=0x409d78] [sp=0x7ffc42caef50]</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>   <span class="co">#2 main + 0x1a27 [ip=0x40ce2c] [sp=0x7ffc42caef80]</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>   <span class="co">#3 __libc_start_call_main + 0x78 [ip=0x7f61f480f088] [sp=0x7ffc42caf320]</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>   <span class="co">#4 __libc_start_main + 0x8b [ip=0x7f61f480f14b] [sp=0x7ffc42caf3c0]</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>   <span class="co">#5 _start + 0x25 [ip=0x405e95] [sp=0x7ffc42caf420]</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[2025/05/27</span> 22:06:24.110919,  0] ../../lib/util/fault.c:261<span class="er">(</span><span class="ex">log_stack_trace</span><span class="kw">)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">BACKTRACE:</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>   <span class="co">#0 log_stack_trace + 0x28 [ip=0x7f61f4a4098a] [sp=0x7ffc42cae650]</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>   <span class="co">#1 smbd_parent_loop + 0x93 [ip=0x409d78] [sp=0x7ffc42caef50]</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>   <span class="co">#2 main + 0x1a27 [ip=0x40ce2c] [sp=0x7ffc42caef80]</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>   <span class="co">#3 __libc_start_call_main + 0x78 [ip=0x7f61f480f088] [sp=0x7ffc42caf320]</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>   <span class="co">#4 __libc_start_main + 0x8b [ip=0x7f61f480f14b] [sp=0x7ffc42caf3c0]</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>   <span class="co">#5 _start + 0x25 [ip=0x405e95] [sp=0x7ffc42caf420]</span></span></code></pre></div>
 <h2 data-number="1.3" id="client打印"><span
 class="header-section-number">1.3</span> client打印</h2>
 <p>smb
 client打印函数有<code>cifs_dbg()</code>、<code>cifs_server_dbg()</code>、<code>cifs_tcon_dbg()</code>、<code>cifs_info()</code>，要打开配置<code>CONFIG_CIFS_DEBUG</code>才有效，打开<code>CONFIG_CIFS_DEBUG2</code>和<code>CONFIG_CIFS_DEBUG_DUMP_KEYS</code>能打印更多信息，以<code>cifs_dbg()</code>为例代码如下:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cifs_dbg</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  cifs_dbg_func<span class="op">(</span>once<span class="op">,</span> <span class="op">...)</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    pr_debug_once <span class="op">/</span> pr_err_once</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>      printk_once<span class="op">(</span>KERN_DEBUG <span class="op">/</span> printk_once<span class="op">(</span>KERN_ERR <span class="co">// 只打印一次</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  cifs_dbg_func<span class="op">(</span>ratelimited<span class="op">,</span> <span class="op">...)</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    pr_debug_ratelimited</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      __dynamic_pr_debug <span class="co">// 打开配置 CONFIG_DYNAMIC_DEBUG</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    pr_err_ratelimited</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>      printk_ratelimited</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        printk</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cifs_dbg</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  cifs_dbg_func<span class="op">(</span>once<span class="op">,</span> <span class="op">...)</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    pr_debug_once <span class="op">/</span> pr_err_once</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      printk_once<span class="op">(</span>KERN_DEBUG <span class="op">/</span> printk_once<span class="op">(</span>KERN_ERR <span class="co">// 只打印一次</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  cifs_dbg_func<span class="op">(</span>ratelimited<span class="op">,</span> <span class="op">...)</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    pr_debug_ratelimited</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      __dynamic_pr_debug <span class="co">// 打开配置 CONFIG_DYNAMIC_DEBUG</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    pr_err_ratelimited</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      printk_ratelimited</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        printk</span></code></pre></div>
 <p>动态打印相关的内容请查看<a
 href="https://chenxiaosong.com/course/kernel/debug.html#dynamic_print">《内核调试方法》</a>。</p>
 <p>通过以下命令控制开关:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">less</span> <span class="co"># 查看所有的动态打印</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;file fs/smb/client/cifsfs.c +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开文件中所有的动态打印</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;module cifs -p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 关闭cifs模块所有动态打印</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;func cifs_copy_file_range +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开某个函数的打印</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-n</span> <span class="st">&#39;*cifs_smb3* -p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 关闭文件路径中包含cifs_smb3的打印</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-n</span> <span class="st">&#39;+p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 所有打印</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">less</span> <span class="co"># 查看所有的动态打印</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;file fs/smb/client/cifsfs.c +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开文件中所有的动态打印</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;module cifs -p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 关闭cifs模块所有动态打印</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;func cifs_copy_file_range +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开某个函数的打印</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-n</span> <span class="st">&#39;*cifs_smb3* -p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 关闭文件路径中包含cifs_smb3的打印</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-n</span> <span class="st">&#39;+p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 所有打印</span></span></code></pre></div>
 <h3 data-number="1.3.1" id="mydebug_print"><span
 class="header-section-number">1.3.1</span>
 <code>mydebug_print()</code></h3>
@@ -280,28 +247,28 @@ href="https://chenxiaosong.com/course/kernel/debug.html#mydebug"><code>mydebug</
 再打上补丁<a
 href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/smb/src/0001-smb-client-use-mydebug_print.patch"><code>0001-smb-client-use-mydebug_print.patch</code></a>。</p>
 <p>另外可能还会有一些新增的动态打印（使用<code>pr_debug()</code>），可以用以下命令查看并打开动态打印:</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;module cifs +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开cifs模块所有动态打印</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">grep</span> cifs</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/dynamic_debug/</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;module cifs +p&#39;</span> <span class="op">&gt;</span> control <span class="co"># 打开cifs模块所有动态打印</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> control <span class="kw">|</span> <span class="fu">grep</span> cifs</span></code></pre></div>
 <h1 data-number="2" id="tracepoint"><span
 class="header-section-number">2</span> tracepoint</h1>
 <p>除了日志，还可以打开tracepoint。tracepoint的使用请查看<a
 href="https://chenxiaosong.com/course/kernel/debug.html#tracepoint">《内核调试方法》</a>。</p>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/tracing/</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> nop <span class="op">&gt;</span> current_tracer</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> tracing_on</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_events  <span class="kw">|</span> <span class="fu">grep</span> cifs</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_events  <span class="kw">|</span> <span class="fu">grep</span> smb</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> events/<span class="pp">*</span>cifs<span class="pp">*</span> <span class="at">-d</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> events/<span class="pp">*</span>smb<span class="pp">*</span> <span class="at">-d</span> <span class="co"># 没有</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> cifs:nfsd_cb_recall_done <span class="op">&gt;</span> set_event <span class="co"># 打开某个tracepoint</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> cifs:<span class="pp">*</span> <span class="op">&gt;</span> set_event <span class="co"># 打开所有的cifs跟踪点</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># echo 1 &gt; events/cifs/smb3_close_enter/enable # 打开某个tracepoint</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co"># echo 1 &gt; events/cifs/enable # 打开所有的cifs跟踪点</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> trace <span class="co"># 清除trace信息</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> trace_pipe</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /sys/kernel/debug/tracing/</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> nop <span class="op">&gt;</span> current_tracer</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> tracing_on</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_events  <span class="kw">|</span> <span class="fu">grep</span> cifs</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> available_events  <span class="kw">|</span> <span class="fu">grep</span> smb</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> events/<span class="pp">*</span>cifs<span class="pp">*</span> <span class="at">-d</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> events/<span class="pp">*</span>smb<span class="pp">*</span> <span class="at">-d</span> <span class="co"># 没有</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> cifs:nfsd_cb_recall_done <span class="op">&gt;</span> set_event <span class="co"># 打开某个tracepoint</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> cifs:<span class="pp">*</span> <span class="op">&gt;</span> set_event <span class="co"># 打开所有的cifs跟踪点</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># echo 1 &gt; events/cifs/smb3_close_enter/enable # 打开某个tracepoint</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># echo 1 &gt; events/cifs/enable # 打开所有的cifs跟踪点</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> trace <span class="co"># 清除trace信息</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> trace_pipe</span></code></pre></div>
 <p>注意目前（2025.05.21）smb
 server的代码还没有使用任何的tracepoint，但以后可能会用，你可以使用命令<code>grep -r trace_ fs/smb/server/</code>在内核仓库下确认。</p>
 <h1 data-number="3" id="tcpdump抓包"><span
