@@ -895,8 +895,8 @@ class="header-section-number">4.7</span> 多个网卡</h2>
 <p>qemu命令行启动虚拟机时，多个网卡的启动参数如下:</p>
 <div class="sourceCode" id="cb54"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="ex">-net</span> tap <span class="dt">\</span></span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>-net nic,model=virtio,macaddr=00:11:22:33:44:06 <span class="dt">\</span></span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>-net nic,model=virtio,macaddr=00:11:22:33:44:56 <span class="dt">\</span></span></code></pre></div>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>-net nic,model=virtio,macaddr=00:11:22:33:44:01 <span class="dt">\</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>-net nic,model=virtio,macaddr=00:11:22:33:44:61 <span class="dt">\</span></span></code></pre></div>
 <p>启动后，在虚拟机中用<code>ifconfig -a</code>可以看到另一个网卡<code>ens3</code>，debian还需要经过以下修改:</p>
 <div class="sourceCode" id="cb55"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-e</span> <span class="st">&quot;auto ens3\niface ens3 inet dhcp&quot;</span> <span class="op">&gt;&gt;</span> /etc/network/interfaces <span class="co"># ens3请换成你环境上的网卡名</span></span>
