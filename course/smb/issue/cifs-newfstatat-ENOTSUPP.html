@@ -159,8 +159,8 @@ class="header-section-number">2</span> <code>strace</code>调试</h1>
 class="header-section-number">3</span> <code>kprobe</code>调试</h1>
 <p>麒麟arm64系统下无法用<code>kprobe trace</code>，内核配置<code>CONFIG_TRACING</code>没打开。也没法用<code>systemtap</code>。</p>
 <p>使用<code>kretprobe</code>模块代码，<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/smb/kretprobe_smb.c"><code>kretprobe_smb.c</code></a>和<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/smb/Makefile"><code>Makefile</code></a>:</p>
+href="https://github.com/chenxiaosonggithub/blog/blob/master/src/smb/kretprobe_smb.c"><code>kretprobe_smb.c</code></a>和<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/src/smb/Makefile"><code>Makefile</code></a>:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">insmod</span> ./kretprobe_smb.ko func=<span class="st">&quot;compound_send_recv&quot;</span> <span class="co"># compound_send_recv可替换为其他函数名</span></span></code></pre></div>
 <p>尝试跟踪这几个返回<code>-ENOTSUPP</code>的函数:</p>

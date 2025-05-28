@@ -141,7 +141,7 @@ class="toc-section-number">4</span> 开发过程</a></li>
 <p>由于工作需要，写了一个功能最简单的文件系统，想着再完善一下，当成公开课素材，一来觉得挺好玩，二来觉得可以自己的简历也需要这么一个项目。</p>
 <p>这个”我的”（my）文件系统不是为了生产目的，目前只用于学习目的，欢迎更多的朋友来完善，可以参考其他文件系统的代码（当然不能整段copy），但请标明出处。</p>
 <p><a
-href="https://gitee.com/chenxiaosonggitee/myfs">点击这里访问代码仓库</a>。</p>
+href="https://github.com/chenxiaosonggithub/myfs">点击这里访问代码仓库</a>。</p>
 <h1 data-number="1" id="参考"><span
 class="header-section-number">1</span> 参考</h1>
 <ul>
@@ -157,14 +157,14 @@ class="header-section-number">2</span> 编译</h1>
 <h2 data-number="2.1" id="独立模块编译"><span
 class="header-section-number">2.1</span> 独立模块编译</h2>
 <p>修改<a
-href="https://gitee.com/chenxiaosonggitee/myfs/blob/master/Makefile"><code>Makefile</code></a>文件中的<code>KDIR</code>变量对应Linux内核仓库的路径，然后在<a
-href="https://gitee.com/chenxiaosonggitee/myfs"><code>myfs</code>代码仓库</a>执行以下命令:</p>
+href="https://github.com/chenxiaosonggithub/myfs/blob/master/Makefile"><code>Makefile</code></a>文件中的<code>KDIR</code>变量对应Linux内核仓库的路径，然后在<a
+href="https://github.com/chenxiaosonggithub/myfs"><code>myfs</code>代码仓库</a>执行以下命令:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="co"># 生成 myfs.ko</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># make clean # 清理编译生成的文件</span></span></code></pre></div>
 <h2 data-number="2.2" id="作为内核一部分编译"><span
 class="header-section-number">2.2</span> 作为内核一部分编译</h2>
 <p>把<a
-href="https://gitee.com/chenxiaosonggitee/myfs">整个代码仓库目录<code>myfs</code></a>复制到Linux内核仓库的<code>fs</code>目录下。然后到内核仓库中执行以下命令:</p>
+href="https://github.com/chenxiaosonggithub/myfs">整个代码仓库目录<code>myfs</code></a>复制到Linux内核仓库的<code>fs</code>目录下。然后到内核仓库中执行以下命令:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> am fs/myfs/0001-add-support-for-myfs.patch</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> fs/myfs/Makefile.kernel fs/myfs/Makefile</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=x86_64-build menuconfig</span>

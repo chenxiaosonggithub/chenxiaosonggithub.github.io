@@ -362,7 +362,7 @@ nfs_updatepage()空指针解引用问题》</a>。</p>
 class="header-section-number">5.1</span> 复现</h2>
 <p>打上补丁 <a
 href="https://lore.kernel.org/all/20190407175912.23528-21-trond.myklebust@hammerspace.com/"><code>22876f540bdf ("NFS: Don't call generic_error_remove_page() while holding locks")</code></a>、<code>89047634f5ce NFS: Don't interrupt file writeout due to fatal errors</code>、构造补丁<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/issue/0001-reproduce-4.19-null-ptr-deref-in-nfs_updatepage.patch">0001-reproduce-4.19-null-ptr-deref-in-nfs_updatepage.patch</a>，复现步骤:</p>
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/nfs/issue/0001-reproduce-4.19-null-ptr-deref-in-nfs_updatepage.patch">0001-reproduce-4.19-null-ptr-deref-in-nfs_updatepage.patch</a>，复现步骤:</p>
 <div class="sourceCode" id="cb14"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=4.1 <span class="va">${nfs_server_ip}</span>:/server/export/dir /mnt</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>

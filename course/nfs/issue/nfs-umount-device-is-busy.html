@@ -138,9 +138,9 @@ class="header-section-number">2</span> 构造内核打开文件</h1>
 <p>源码文件如下:</p>
 <ul>
 <li><a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/kernel-open-file.c"><code>kernel-open-file.c</code></a></li>
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/nfs/src/kernel-open-file.c"><code>kernel-open-file.c</code></a></li>
 <li><a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/Makefile"><code>Makefile</code></a></li>
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/nfs/src/Makefile"><code>Makefile</code></a></li>
 </ul>
 <h1 data-number="3" id="debug"><span
 class="header-section-number">3</span> 调试</h1>
@@ -169,7 +169,7 @@ href="https://chenxiaosong.com/course/nfs/debug.html#log">《nfs调试方法》<
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">insmod</span> kernel-open-file.ko</span></code></pre></div>
 <p>日志请查看<a
-href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/nfs-umount-device-is-busy-log.txt"><code>nfs-umount-device-is-busy-log.txt</code></a>:</p>
+href="https://github.com/chenxiaosonggithub/tmp/blob/master/nfs/nfs-umount-device-is-busy-log.txt"><code>nfs-umount-device-is-busy-log.txt</code></a>:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  122.567308] NFS: open <span class="er">file(dir/file)</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
@@ -194,7 +194,7 @@ href="https://chenxiaosong.com/src/filesystem/lazy-umount.html">《文件系统�
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        rcu_assign_pointer<span class="op">(</span>fdt<span class="op">-&gt;</span>fd<span class="op">[</span>fd<span class="op">],</span> file<span class="op">);</span></span></code></pre></div>
 <p>在内核空间打开文件时，不会把文件描述符加到<code>fdtable</code>中，<code>fuser</code>和<code>lsof</code>无法遍历到文件描述符，所以无法找到打开文件的进程。</p>
 <p>可以用<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/kprobe-fd_install.c"><code>kprobe-fd_install.c</code></a>调试，
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/nfs/src/kprobe-fd_install.c"><code>kprobe-fd_install.c</code></a>调试，
 其中<code>mydebug_dump_stack()</code>相关的用法可以查看<a
 href="https://chenxiaosong.com/course/kernel/debug.html#mydebug">《mydebug模块》</a>。</p>
 <h1 data-number="5" id="mmap-open-file"><span

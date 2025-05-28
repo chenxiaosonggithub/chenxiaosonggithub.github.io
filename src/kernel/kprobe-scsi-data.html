@@ -142,9 +142,9 @@ class="header-section-number">2</span> 问题定位</h1>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=wrong-1page of=/dev/sda2 bs=1 seek=184557568 count=3 <span class="co"># 写第3个错误的页，45056 * 4096 + 8192，只写3个字节</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</span></code></pre></div>
 <p>使用<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/kernel/kprobe-scsi.c"><code>kprobe-scsi.c</code></a>来检测<code>scsi_dispatch_cmd</code>（写）和<code>scsi_finish_command</code>（读）函数中的数据，与预期的数据内容比较，查看内核日志看看是否能正确识别出错误数据。</p>
+href="https://github.com/chenxiaosonggithub/blog/blob/master/src/kernel/kprobe-scsi.c"><code>kprobe-scsi.c</code></a>来检测<code>scsi_dispatch_cmd</code>（写）和<code>scsi_finish_command</code>（读）函数中的数据，与预期的数据内容比较，查看内核日志看看是否能正确识别出错误数据。</p>
 <p><a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/kernel/Makefile"><code>Makefile</code></a>。</p>
+href="https://github.com/chenxiaosonggithub/blog/blob/master/src/kernel/Makefile"><code>Makefile</code></a>。</p>
 <p>再把<code>file</code>文件内容变成正确的，再查看内核日志:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=3rd-right of=/dev/sda2 bs=1 seek=184557568 count=4096 <span class="co"># 写第3个正确的页，45056 * 4096 + 8192</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=file-expect of=/dev/sda2 bs=4096 seek=45056 count=10240 <span class="co"># 或把 file 重置, 全部正确</span></span></code></pre></div>

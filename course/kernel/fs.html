@@ -981,7 +981,7 @@ class="header-section-number">2.11</span> 举几个例子</h2>
 class="header-section-number">2.11.1</span>
 <code>inode</code>的<code>i_nlink</code></h3>
 <p>调试补丁为 <a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/kernel/src/0001-debug-vfs.patch"><code>0001-debug-vfs.patch</code></a>
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/0001-debug-vfs.patch"><code>0001-debug-vfs.patch</code></a>
 ，看其中的<code>debug_inode_nlink()</code>函数。</p>
 <p>在ext2文件系统下测试:</p>
 <div class="sourceCode" id="cb21"><pre
@@ -1018,7 +1018,7 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#
 class="header-section-number">2.11.2</span>
 <code>super_block</code>的<code>s_mounts</code></h3>
 <p>调试补丁为 <a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/kernel/src/0001-debug-vfs.patch"><code>0001-debug-vfs.patch</code></a>
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/0001-debug-vfs.patch"><code>0001-debug-vfs.patch</code></a>
 ，看其中的<code>debug_sb_mounts()</code>函数。</p>
 <p>每个挂载路径下有3个<code>struct mount</code>，分别是一次调用<code>vfs_create_mount()</code>和两次调用<code>clone_mnt()</code>创建的:</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>mount</span>
@@ -1040,7 +1040,7 @@ href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/kernel/src/000
 class="header-section-number">2.11.3</span>
 通过<code>inode</code>得到完整路径</h3>
 <p>调试补丁为 <a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/kernel/src/0001-debug-vfs.patch"><code>0001-debug-vfs.patch</code></a>
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/0001-debug-vfs.patch"><code>0001-debug-vfs.patch</code></a>
 ，看其中的<code>debug_get_full_path()</code>函数。</p>
 <h1 data-number="3" id="ext2文件系统"><span
 class="header-section-number">3</span> ext2文件系统</h1>
@@ -1725,7 +1725,7 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb42-1"><a href="#
 <h2 data-number="4.2" id="独立模块编译"><span
 class="header-section-number">4.2</span> 独立模块编译</h2>
 <p>如果我们要在minix文件系统的基础上再开发，为了方便开发测试，可以<code>fs/minix</code>复制出来，<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/kernel/src/0001-myminix.patch">然后打上补丁<code>0001-myminix.patch</code></a>，这里我把文件系统类型名改为了<code>myminix</code>，挂载时要指定挂载选项，如通过loop设备挂载:</p>
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/0001-myminix.patch">然后打上补丁<code>0001-myminix.patch</code></a>，这里我把文件系统类型名改为了<code>myminix</code>，挂载时要指定挂载选项，如通过loop设备挂载:</p>
 <div class="sourceCode" id="cb43"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> myminix <span class="at">-o</span> loop image /mnt</span></code></pre></div>
 <h2 data-number="4.3" id="util-linux"><span
@@ -1846,7 +1846,7 @@ class="header-section-number">4.6</span> 支持长文件名</h2>
 当文件名（普通文件和文件夹）大于255字节时，在<code>vfs</code>对文件名做hash映射，当文件名（普通文件和文件夹）大于minix
 v3文件系统最大支持的60字节时，在minix文件系统对文件名做hash映射。</p>
 <p>暂时只对最后一个路径名作hash映射，后续再补充支持对中间路径名进行hash映射，补丁为<a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/kernel/src/0001-minix-support-long-file-name.patch"><code>0001-minix-support-long-file-name.patch</code></a>。</p>
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/0001-minix-support-long-file-name.patch"><code>0001-minix-support-long-file-name.patch</code></a>。</p>
 <h1 data-number="5" id="页高速缓存和页回写"><span
 class="header-section-number">5</span> 页高速缓存和页回写</h1>
 <p>页高速缓存（page
