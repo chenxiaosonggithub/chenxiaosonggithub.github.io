@@ -128,8 +128,10 @@ class="toc-section-number">3.3</span> 路径管理</a></li>
 </ul></li>
 <li><a href="#内核态socket" id="toc-内核态socket"><span
 class="toc-section-number">4</span> 内核态socket</a></li>
+<li><a href="#内核中mptcp的应用" id="toc-内核中mptcp的应用"><span
+class="toc-section-number">5</span> 内核中mptcp的应用</a></li>
 <li><a href="#疑问" id="toc-疑问"><span
-class="toc-section-number">5</span> 疑问</a></li>
+class="toc-section-number">6</span> 疑问</a></li>
 </ul>
 </nav>
 <p><a
@@ -234,14 +236,19 @@ class="header-section-number">3.3</span> 路径管理</h2>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ens3:</span> 192.168.53.38</span></code></pre></div>
 <p>server端操作:</p>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ss</span> <span class="at">-ieMl</span> <span class="co"># 只显示mptcp协议的套接字</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ss</span> <span class="at">-iaM</span> <span class="co"># 查看socket状态</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># State   Recv-Q  Send-Q  Local Address:Port  Peer Address:Port</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ESTAB   0       0       192.168.53.37:9734  192.168.53.1:36632</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># LISTEN  0       5             0.0.0.0:9734       0.0.0.0:*</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> mptcp endpoint show <span class="co"># 列出主机上活动 IP 地址的标识符</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 192.168.53.37 id 1 subflow dev ens3</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 192.168.53.209 id 2 subflow dev ens2</span></span></code></pre></div>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -i: 显示内部 TCP 信息。</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -e: 显示详细的套接字信息。</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -M: 显示 MPTCP 套接字。</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># -a: 显示监听和非监听套接字（对于 TCP，这意味着已建立的连接）。</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># -l: 仅显示监听套接字（默认情况下此类套接字被省略）。</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ex">ss</span> <span class="at">-ieMl</span> <span class="co"># 只查看监听的mptcp套接字</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ex">ss</span> <span class="at">-iaM</span>  <span class="co"># 查看监听的套接字和已建立的连接</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># State   Recv-Q  Send-Q  Local Address:Port  Peer Address:Port</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ESTAB   0       0       192.168.53.37:9734  192.168.53.1:36632</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># LISTEN  0       5             0.0.0.0:9734       0.0.0.0:*</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> mptcp endpoint show <span class="co"># 列出主机上活动 IP 地址的标识符</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 192.168.53.37 id 1 subflow dev ens3</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 192.168.53.209 id 2 subflow dev ens2</span></span></code></pre></div>
 <p>client端操作:</p>
 <div class="sourceCode" id="cb11"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ss</span> <span class="at">-iaM</span> <span class="co"># 查看socket状态</span></span>
@@ -274,8 +281,12 @@ href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/kernel/src/ker
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">insmod</span> ./kernel-socket-server.ko</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">insmod</span> ./kernel-socket-client.ko</span></code></pre></div>
-<h1 data-number="5" id="疑问"><span
-class="header-section-number">5</span> 疑问</h1>
+<h1 data-number="5" id="内核中mptcp的应用"><span
+class="header-section-number">5</span> 内核中mptcp的应用</h1>
+<p><a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/mptcp/kernel-create-socket.md">查看<code>kernel-create-socket.md</code></a>。</p>
+<h1 data-number="6" id="疑问"><span
+class="header-section-number">6</span> 疑问</h1>
 <ul>
 <li>不修改应用，使用BPF来修改socket类型，用mptcpize？</li>
 <li>路径管理器，内核内和用户空间，区别？是能相互替代还是各有分工？</li>
