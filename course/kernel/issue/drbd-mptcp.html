@@ -204,7 +204,7 @@ class="header-section-number">2</span> 内核修改</h1>
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/drivers/block/drbd/drbd_receiver.c</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/drivers/block/drbd/drbd_receiver.c</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-620,7</span> +620,7 @@ static struct socket <span class="pp">*</span>drbd_try_connect<span class="er">(</span><span class="ex">struct</span> drbd_connection <span class="pp">*</span>connection<span class="kw">)</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">what</span> = <span class="st">&quot;sock_create_kern&quot;</span><span class="kw">;</span></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">err</span> = sock_create_kern<span class="er">(</span><span class="kw">&amp;</span><span class="ex">init_net,</span> <span class="er">(</span><span class="kw">(</span><span class="ex">struct</span> sockaddr <span class="pp">*</span><span class="kw">)&amp;</span><span class="ex">src_in6</span><span class="kw">)</span><span class="ex">-</span><span class="op">&gt;</span>sa_family,</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>                              SOCK_STREAM, IPPROTO_TCP, <span class="kw">&amp;</span><span class="ex">sock</span><span class="kw">);</span></span>
@@ -213,7 +213,7 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                <span class="ex">sock</span> = NULL<span class="kw">;</span></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                <span class="ex">goto</span> out<span class="kw">;</span></span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-715,7</span> +715,7 @@ static int prepare_listen_socket<span class="er">(</span><span class="ex">struct</span> drbd_connection <span class="pp">*</span>connection, struct acce</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>        <span class="ex">what</span> = <span class="st">&quot;sock_create_kern&quot;</span><span class="kw">;</span></span>
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        <span class="ex">err</span> = sock_create_kern<span class="er">(</span><span class="kw">&amp;</span><span class="ex">init_net,</span> <span class="er">(</span><span class="kw">(</span><span class="ex">struct</span> sockaddr <span class="pp">*</span><span class="kw">)&amp;</span><span class="ex">my_addr</span><span class="kw">)</span><span class="ex">-</span><span class="op">&gt;</span>sa_family,</span>
 <span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>                              SOCK_STREAM, IPPROTO_TCP, <span class="kw">&amp;</span><span class="ex">s_listen</span><span class="kw">);</span></span>
@@ -231,14 +231,14 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">LISTEN</span>  3       5       192.168.53.209:7788       0.0.0.0:<span class="pp">*</span></span></code></pre></div>
 <p>再用<code>ss -iaM</code>命令查看:</p>
 <div class="sourceCode" id="cb12"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">State</span>     Recv-Q   Send-Q    Local Address:Port      Peer Address:Port                          </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:33097   192.168.53.211:7788                          </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:54917   192.168.53.211:7788                          </span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">ESTAB</span>     960      0        192.168.53.209:7788     192.168.53.1:58511                         </span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:39051   192.168.53.211:7788                          </span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:38833   192.168.53.211:7788                          </span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ex">ESTAB</span>     0        0        192.168.53.209:51037   192.168.53.211:7788                          </span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">LISTEN</span>    1        5        192.168.53.209:7788           0.0.0.0:<span class="pp">*</span>                             </span></code></pre></div>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">State</span>     Recv-Q   Send-Q    Local Address:Port      Peer Address:Port</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:33097   192.168.53.211:7788</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:54917   192.168.53.211:7788</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">ESTAB</span>     960      0        192.168.53.209:7788     192.168.53.1:58511</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:39051   192.168.53.211:7788</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:38833   192.168.53.211:7788</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ex">ESTAB</span>     0        0        192.168.53.209:51037   192.168.53.211:7788</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">LISTEN</span>    1        5        192.168.53.209:7788           0.0.0.0:<span class="pp">*</span></span></code></pre></div>
 <p>可以看到，mptcp连接已经建立，但是<code>sock_recvmsg()</code>返回错误:</p>
 <div class="sourceCode" id="cb13"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 1003.627149] drbd r0: <span class="er">sock_recvmsg</span> <span class="ex">returned</span> <span class="at">-11</span></span></code></pre></div>
