@@ -124,8 +124,11 @@ class="toc-section-number">4</span> 内网穿透</a></li>
 class="toc-section-number">5</span> 花生壳</a></li>
 <li><a href="#向日葵和todesk" id="toc-向日葵和todesk"><span
 class="toc-section-number">6</span> 向日葵和ToDesk</a></li>
+<li><a href="#remote-desktopl" id="toc-remote-desktopl"><span
+class="toc-section-number">7</span>
+家里远程桌面到公司ubuntu24.04</a></li>
 <li><a href="#juicessh" id="toc-juicessh"><span
-class="toc-section-number">7</span> JuiceSSH</a></li>
+class="toc-section-number">8</span> JuiceSSH</a></li>
 </ul>
 </nav>
 <p><a
@@ -262,8 +265,20 @@ href="https://service.oray.com/question/11017.html">命令行版本</a>，但是
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">yum</span> install ./sunloginclientshell-10.1.1.28779.x86_64.rpm <span class="at">-y</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> /usr/local/sunlogin/bin/sunloginclient</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">按F12</span> <span class="at">-</span><span class="op">&gt;</span> Bind, 登录向日葵账号密码</span></code></pre></div>
-<h1 data-number="7" id="juicessh"><span
-class="header-section-number">7</span> JuiceSSH</h1>
+<h1 data-number="7" id="remote-desktopl"><span
+class="header-section-number">7</span>
+家里远程桌面到公司ubuntu24.04</h1>
+<p>ubuntu24.04没有vnc协议，只有rdp协议，位置是<code>设置 -&gt; 系统 -&gt; 桌面共享</code>。</p>
+<p>我是这样从家里的苹果电脑连接到公司的ubuntu24.04，macOS通过向日葵连接到virt-manager中的Windows11，Windows11通过“远程桌面连接”连接到ubuntu24.04。</p>
+<p>如果Virt-manager中的Windows11出问题（比如卡死），可以用以下命令在远程操作virt-manager:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> list <span class="co"># 本地活动虚拟机</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> list –all <span class="co"># 本地所有的虚拟机（活动的+不活动的）</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> shutdown Win11_24H2_Chinese_Simplified_x64 <span class="co"># 正常关闭虚拟机</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> destroy Win11_24H2_Chinese_Simplified_x64 <span class="co"># 强制关闭虚拟机</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> start Win11_24H2_Chinese_Simplified_x64 <span class="co"># 启动非活动虚拟机</span></span></code></pre></div>
+<h1 data-number="8" id="juicessh"><span
+class="header-section-number">8</span> JuiceSSH</h1>
 <p>安卓手机上远程登录可以使用<a
 href="https://juicessh.com/changelog">JuiceSSH</a>。</p>
 </body>
