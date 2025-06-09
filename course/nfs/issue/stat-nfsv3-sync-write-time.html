@@ -216,7 +216,7 @@ href="https://chenxiaosong.com/course/kernel/bpf.html#bpftrace">《BPF》</a>。
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>call_transmit</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>call_decode</span></code></pre></div>
 <p><a href="https://dingpenglong.com/">丁鹏龙</a>写的<a
-href="https://gitee.com/youcunhua/blog/tree/master/work/nfs/stat-nfsv3-sync-write-time">bpftrace脚本</a>。</p>
+href="https://gitee.com/youcunhua/blog/tree/master/work/nfs/issue/stat-nfsv3-sync-write-time">bpftrace脚本</a>。</p>
 <p>抓到以下日志:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kprobe:nfs_file_write,</span> name:xxxx inode:1697123520 len:354    offset:132777   time:39290423881392412</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">call_transmit</span> start <span class="at">-</span> XID:0xedc0ad03 OP:GETATTR      time:39290423881405002</span>
@@ -241,7 +241,7 @@ href="https://gitee.com/youcunhua/blog/tree/master/work/nfs/stat-nfsv3-sync-writ
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="ex">31487</span>   824.665249  172.21.3.10 175.20.2.166    NFS 184 V3 GETATTR Reply <span class="er">(</span><span class="ex">Call</span> In 31483<span class="kw">)</span>  <span class="ex">Regular</span> File mode: 0644 uid: 99999 gid: 88888</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">31495</span>   824.665386  175.20.2.166    172.21.3.10 NFS 1372    V3 WRITE Call <span class="er">(</span><span class="ex">Reply</span> In 31501<span class="kw">)</span><span class="ex">,</span> FH: 0x073dd918 Offset: 131072 Len: 9811 FILE_SYNC</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="ex">31501</span>   824.773409  172.21.3.10 175.20.2.166    NFS 232 V3 WRITE Reply <span class="er">(</span><span class="ex">Call</span> In 31495<span class="kw">)</span> <span class="ex">Len:</span> 9811 FILE_SYNC</span></code></pre></div>
-<p>可以看到，write写请求前发送了getattr请求，200多ms都是nfs
+<p>可以看到，<code>nfs_file_write()</code>函数中发送了write和getattr请求，write请求100+ms，getattr请求100+ms，耗时长是nfs
 server端导致的。</p>
 </body>
 </html>
