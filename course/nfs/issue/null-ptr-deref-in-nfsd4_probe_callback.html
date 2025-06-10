@@ -119,7 +119,13 @@ class="toc-section-number">2</span> vmcore分析</a></li>
 <li><a href="#代码分析" id="toc-代码分析"><span
 class="toc-section-number">3</span> 代码分析</a></li>
 <li><a href="#补丁" id="toc-补丁"><span
-class="toc-section-number">4</span> 补丁</a></li>
+class="toc-section-number">4</span> 补丁</a>
+<ul>
+<li><a href="#查找" id="toc-查找"><span
+class="toc-section-number">4.1</span> 查找</a></li>
+<li><a href="#补丁分析" id="toc-补丁分析"><span
+class="toc-section-number">4.2</span> 补丁分析</a></li>
+</ul></li>
 </ul>
 </nav>
 <p><a
@@ -178,37 +184,74 @@ href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/null-ptr-deref-in-
 <p>日志中的<code>... at virtual address 0000000000000000</code>表明解引用的是<code>struct pool_workqueue</code>结构体的第一个成员，所以是在执行到以下代码时发生空指针解引用:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// kernel/workqueue.c: 1400</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1400</span>         <span class="cf">if</span> <span class="op">(</span>last_pool <span class="op">&amp;&amp;</span> last_pool <span class="op">!=</span> pwq<span class="op">-&gt;</span>pool<span class="op">)</span> <span class="op">{</span> <span class="co">// pwq为NULL</span></span></code></pre></div>
+<p><a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/null-ptr-deref-in-nfsd4_probe_callback-vmcore.md">再查看<code>__queue_work()</code>的反汇编</a>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110f74</span> <span class="op">&lt;</span>__queue_work+20<span class="op">&gt;</span>:   mov x24, x1 <span class="co"># 将寄存器 x1 中的值复制到寄存器 x24 中</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110f8c</span> <span class="op">&lt;</span>__queue_work+44<span class="op">&gt;</span>:   ldr w0, <span class="pp">[</span><span class="ss">x24,#256</span><span class="pp">]</span> <span class="co"># 从内存地址 x24 + 256 处加载 32 位数据 到寄存器 w0 中</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110fdc</span> <span class="op">&lt;</span>__queue_work+124<span class="op">&gt;</span>:  add x1, x26, <span class="co">#0xb48 # 将寄存器 x26 的值与立即数 0xb48 相加，结果存入寄存器 x1</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111000</span> <span class="op">&lt;</span>__queue_work+160<span class="op">&gt;</span>:  ldr x19, [x24,x0,lsl <span class="co">#3] # 数组array地址: x24 + (x0 &lt;&lt; 3), 访问以 8 字节为单位的数组array中，第 x0 个元素，然后把它的值存到 x19</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
+<p>aarch64架构下整数参数使用的寄存器依次为:
+<code>x0~x7</code>，<code>__queue_work()</code>的第二个参数<code>struct workqueue_struct *wq</code>的值为<code>X24: ffff80042c343400</code>。</p>
+<p>再查看其中的<code>flags</code>成员的值:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct workqueue_struct ffff80042c343400 <span class="at">-x</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> workqueue_struct {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">flags</span> = 0xa0002, <span class="co"># WQ_UNBOUND == 2</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
 <h1 data-number="3" id="代码分析"><span
 class="header-section-number">3</span> 代码分析</h1>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>svc_process</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  svc_process_common</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    nfsd_dispatch <span class="co">// versp-&gt;vs_dispatch()</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      nfsd4_proc_compound <span class="co">// proc-&gt;pc_func()</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        nfsd4_create_session <span class="co">// op-&gt;opdesc-&gt;op_func()</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>          nfsd4_init_conn</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            nfsd4_probe_callback_sync</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>              nfsd4_probe_callback</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                nfsd4_run_cb</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                  queue_work <span class="co">// include/linux/workqueue.h</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                    queue_work_on</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                      __queue_work</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">if</span> <span class="op">(</span>last_pool <span class="op">&amp;&amp;</span> last_pool <span class="op">!=</span> pwq<span class="op">-&gt;</span>pool<span class="op">)</span> <span class="op">{</span> <span class="co">// pwq为NULL</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>svc_process</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  svc_process_common</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    nfsd_dispatch <span class="co">// versp-&gt;vs_dispatch()</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>      nfsd4_proc_compound <span class="co">// proc-&gt;pc_func()</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        nfsd4_create_session <span class="co">// op-&gt;opdesc-&gt;op_func()</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>          nfsd4_init_conn</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>            nfsd4_probe_callback_sync</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>              nfsd4_probe_callback</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                nfsd4_run_cb</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                  queue_work <span class="co">// include/linux/workqueue.h</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                    queue_work_on</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                      __queue_work</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">if</span> <span class="op">(</span>wq<span class="op">-&gt;</span>flags <span class="op">&amp;</span> WQ_UNBOUND<span class="op">)</span> <span class="op">{</span> <span class="co">// 条件满足</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">if</span> <span class="op">(</span>last_pool <span class="op">&amp;&amp;</span> last_pool <span class="op">!=</span> pwq<span class="op">-&gt;</span>pool<span class="op">)</span> <span class="op">{</span> <span class="co">// pwq为NULL</span></span></code></pre></div>
 <h1 data-number="4" id="补丁"><span
 class="header-section-number">4</span> 补丁</h1>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfsd4_run_cb </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2025-03-10 1054e8ffc5c4 nfsd: prevent callback tasks running concurrently Jeff Layton <span class="op">&lt;</span>jlayton@kernel.org<span class="op">&gt;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2025-03-10 230ca758453c nfsd: put dl_stid if fail to queue dl_recall Li Lingfeng <span class="op">&lt;</span>lilingfeng3@huawei.com<span class="op">&gt;</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2025-02-10 036ac2778f7b NFSD: fix hang in nfsd4_shutdown_callback Dai Ngo <span class="op">&lt;</span>dai.ngo@oracle.com<span class="op">&gt;</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2024-03-01 c1ccfcf1a9bf NFSD: Reschedule CB operations when backchannel rpc_clnt is shut down Chuck Lever <span class="op">&lt;</span>chuck.lever@oracle.com<span class="op">&gt;</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2024-02-05 5ea9a7c5fe41 nfsd: don<span class="st">&#39;t take fi_lock in nfsd_break_deleg_cb() NeilBrown &lt;neilb@suse.de&gt;</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="st">未合入 2022-12-12 3bc8edc98bd4 nfsd: under NFSv4.1, fix double svc_xprt_put on rpc_create failure Dan Aloni &lt;dan.aloni@vastdata.com&gt;</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="st">未合入 2022-09-26 b95239ca4954 nfsd: make nfsd4_run_cb a bool return function Jeff Layton &lt;jlayton@kernel.org&gt;</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="st">已合入 2020-03-27 1a33d8a284b1 svcrdma: Fix leak of transport addresses Chuck Lever &lt;chuck.lever@oracle.com&gt;</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfsd4_probe_callback</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2021-09-17 02579b2ff8b0 nfsd: back channel stuck in SEQ4_STATUS_CB_PATH_DOWN Dai Ngo <span class="op">&lt;</span>dai.ngo@oracle.com<span class="op">&gt;</span></span></code></pre></div>
+<h2 data-number="4.1" id="查找"><span
+class="header-section-number">4.1</span> 查找</h2>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfsd4_create_session</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2024-11-18 d08bf5ea649c NFSD: Remove dead code in nfsd4_create_session<span class="er">(</span><span class="kw">)</span> <span class="ex">Chuck</span> Lever <span class="op">&lt;</span>chuck.lever@oracle.com<span class="op">&gt;</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2024-03-01 e4469c6cc69b NFSD: Fix the NFSv4.1 CREATE_SESSION operation Chuck Lever <span class="op">&lt;</span>chuck.lever@oracle.com<span class="op">&gt;</span></span></code></pre></div>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfsd4_run_cb </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2025-03-10 1054e8ffc5c4 nfsd: prevent callback tasks running concurrently Jeff Layton <span class="op">&lt;</span>jlayton@kernel.org<span class="op">&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2025-03-10 230ca758453c nfsd: put dl_stid if fail to queue dl_recall Li Lingfeng <span class="op">&lt;</span>lilingfeng3@huawei.com<span class="op">&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2025-02-10 036ac2778f7b NFSD: fix hang in nfsd4_shutdown_callback Dai Ngo <span class="op">&lt;</span>dai.ngo@oracle.com<span class="op">&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2024-03-01 c1ccfcf1a9bf NFSD: Reschedule CB operations when backchannel rpc_clnt is shut down Chuck Lever <span class="op">&lt;</span>chuck.lever@oracle.com<span class="op">&gt;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2024-02-05 5ea9a7c5fe41 nfsd: don<span class="st">&#39;t take fi_lock in nfsd_break_deleg_cb() NeilBrown &lt;neilb@suse.de&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="st">未合入 2022-12-12 3bc8edc98bd4 nfsd: under NFSv4.1, fix double svc_xprt_put on rpc_create failure Dan Aloni &lt;dan.aloni@vastdata.com&gt;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="st">未合入 2022-09-26 b95239ca4954 nfsd: make nfsd4_run_cb a bool return function Jeff Layton &lt;jlayton@kernel.org&gt;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="st">已合入 2020-03-27 1a33d8a284b1 svcrdma: Fix leak of transport addresses Chuck Lever &lt;chuck.lever@oracle.com&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfsd4_probe_callback</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2021-09-17 02579b2ff8b0 nfsd: back channel stuck in SEQ4_STATUS_CB_PATH_DOWN Dai Ngo <span class="op">&lt;</span>dai.ngo@oracle.com<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nfsd4_create_session</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2024-11-18 d08bf5ea649c NFSD: Remove dead code in nfsd4_create_session<span class="er">(</span><span class="kw">)</span> <span class="ex">Chuck</span> Lever <span class="op">&lt;</span>chuck.lever@oracle.com<span class="op">&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">未合入</span> 2024-03-01 e4469c6cc69b NFSD: Fix the NFSv4.1 CREATE_SESSION operation Chuck Lever <span class="op">&lt;</span>chuck.lever@oracle.com<span class="op">&gt;</span></span></code></pre></div>
+<p>其中最可能的补丁是<code>2025-03-10 1054e8ffc5c4 nfsd: prevent callback tasks running concurrently Jeff Layton &lt;jlayton@kernel.org&gt;</code>。</p>
+<h2 data-number="4.2" id="补丁分析"><span
+class="header-section-number">4.2</span> 补丁分析</h2>
+<ul>
+<li><a
+href="https://lore.kernel.org/all/20250220-nfsd-callback-v2-0-6a57f46e1c3a@kernel.org/">[PATCH
+v2 0/5] nfsd: don’t allow concurrent queueing of workqueue jobs</a></li>
+<li><a
+href="https://lore.kernel.org/all/20250220-nfsd-callback-v2-1-6a57f46e1c3a@kernel.org/">[PATCH
+v2 1/5] nfsd: prevent callback tasks running concurrently</a></li>
+</ul>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"></code></pre></div>
 </body>
 </html>
