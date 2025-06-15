@@ -119,11 +119,13 @@ class="toc-section-number">2</span> 构造</a>
 <ul>
 <li><a href="#内核修改" id="toc-内核修改"><span
 class="toc-section-number">2.1</span> 内核修改</a></li>
-</ul></li>
 <li><a href="#用户态程序" id="toc-用户态程序"><span
-class="toc-section-number">3</span> 用户态程序</a></li>
+class="toc-section-number">2.2</span> 用户态程序</a></li>
+<li><a href="#测试步骤和结果" id="toc-测试步骤和结果"><span
+class="toc-section-number">2.3</span> 测试步骤和结果</a></li>
+</ul></li>
 <li><a href="#nlm操作" id="toc-nlm操作"><span
-class="toc-section-number">4</span> NLM操作</a></li>
+class="toc-section-number">3</span> NLM操作</a></li>
 </ul>
 </nav>
 <p><a
@@ -169,8 +171,8 @@ class="header-section-number">2.1</span> 内核修改</h2>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        dprintk<span class="op">(</span><span class="st">&quot;lockd: nlmsvc_lock(</span><span class="sc">%s</span><span class="st">/</span><span class="sc">%ld</span><span class="st">, ty=</span><span class="sc">%d</span><span class="st">, pi=</span><span class="sc">%d</span><span class="st">, %Ld-%Ld, bl=</span><span class="sc">%d</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>                                locks_inode<span class="op">(</span>file<span class="op">-&gt;</span>f_file<span class="op">)-&gt;</span>i_sb<span class="op">-&gt;</span>s_id<span class="op">,</span></span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>                                locks_inode<span class="op">(</span>file<span class="op">-&gt;</span>f_file<span class="op">)-&gt;</span>i_ino<span class="op">,</span></span></code></pre></div>
-<h1 data-number="3" id="用户态程序"><span
-class="header-section-number">3</span> 用户态程序</h1>
+<h2 data-number="2.2" id="用户态程序"><span
+class="header-section-number">2.2</span> 用户态程序</h2>
 <p><code>test.c</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
@@ -205,6 +207,8 @@ class="header-section-number">3</span> 用户态程序</h1>
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h2 data-number="2.3" id="测试步骤和结果"><span
+class="header-section-number">2.3</span> 测试步骤和结果</h2>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> rw,relatime,vers=3,rsize=262144,wsize=262144,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountvers=3,mountproto=tcp,local_lock=none,_netdev localhost:/tmp /mnt</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file <span class="co"># 创建文件</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">-o</span> test test.c</span>
@@ -228,8 +232,8 @@ class="header-section-number">3</span> 用户态程序</h1>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  140.403783] lockd: server <span class="er">localhost</span> <span class="ex">not</span> responding, still trying</span></code></pre></div>
 <p>大约90+秒超时打印<code>lockd: server localhost not responding, still trying</code>。</p>
 <p>nfs client会不断重发请求，直到用户态退出进程。</p>
-<h1 data-number="4" id="nlm操作"><span
-class="header-section-number">4</span> NLM操作</h1>
+<h1 data-number="3" id="nlm操作"><span
+class="header-section-number">3</span> NLM操作</h1>
 <p>这里列出NLM (Network Lock Manager) 协议操作。</p>
 <p>nfs client请求:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_NULL            </span><span class="dv">0</span><span class="pp">   </span><span class="co">// 空操作。用于测试服务器是否存活和响应（Ping）</span></span>
