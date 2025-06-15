@@ -21,6 +21,70 @@
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -71,6 +135,11 @@ class="toc-section-number">4</span>
 id="toc-ff383e8f9440-nfsd-handle-errors-from-rpc_call_async"><span
 class="toc-section-number">5</span>
 <code>ff383e8f9440 nfsd: handle errors from rpc_call_async()</code></a></li>
+<li><a
+href="#li-lingfeng-lilingfeng3huawei.com-未合入的补丁nfsd-decrease-cl_cb_inflight-if-fail-to-queue-cb_work"
+id="toc-li-lingfeng-lilingfeng3huawei.com-未合入的补丁nfsd-decrease-cl_cb_inflight-if-fail-to-queue-cb_work"><span
+class="toc-section-number">6</span> Li Lingfeng lilingfeng3@huawei.com
+未合入的补丁<code>nfsd: decrease cl_cb_inflight if fail to queue cb_work</code></a></li>
 </ul>
 </nav>
 <p><a
@@ -126,5 +195,70 @@ id="ff383e8f9440-nfsd-handle-errors-from-rpc_call_async"><span
 class="header-section-number">5</span> <a
 href="https://lore.kernel.org/all/20250220-nfsd-callback-v2-5-6a57f46e1c3a@kernel.org/"><code>ff383e8f9440 nfsd: handle errors from rpc_call_async()</code></a></h1>
 <pre><code>rpc_call_async() 可能会失败（主要是由于内存分配失败）。如果发生这种情况，除了将回调重新排队并稍后重试之外，几乎别无他法。</code></pre>
+<h1 data-number="6"
+id="li-lingfeng-lilingfeng3huawei.com-未合入的补丁nfsd-decrease-cl_cb_inflight-if-fail-to-queue-cb_work"><span
+class="header-section-number">6</span> Li Lingfeng <a
+href="mailto:lilingfeng3@huawei.com"
+class="email">lilingfeng3@huawei.com</a> 未合入的补丁<a
+href="https://lore.kernel.org/linux-nfs/20250218135423.1487309-1-lilingfeng3@huawei.com/"><code>nfsd: decrease cl_cb_inflight if fail to queue cb_work</code></a></h1>
+<pre><code>在 nfsd4_run_cb 中，cl_cb_inflight 会在尝试将 cb_work 入队到 callback_wq 之前就被递增。这个计数可以在以下三种情况下递减：
+
+- 如果在 nfsd4_run_cb 中排队失败，则会相应地将该计数减一；
+- 当 cb_work 正在运行时，在 nfsd4_run_cb_work 的异常分支中通过调用 nfsd41_destroy_cb 将计数减一；
+- 在 rpc_task 的释放回调中减小计数——要么在 nfsd4_cb_probe_release 中直接调用 nfsd41_cb_inflight_end，要么在 nfsd4_cb_release 中调用 nfsd41_destroy_cb。
+
+然而，在 nfsd4_cb_release 中，如果当前的 cb_work 需要重启，该计数并不会被减小，而是期望在 cb_work 真正运行时再做减少处理。如果此时排队失败，就会造成计数泄漏，最终导致 nfsd 服务无法退出，表现如下：
+
+[root@nfs_test2 ~]# cat /proc/2271/stack
+[&lt;0&gt;] nfsd4_shutdown_callback+0x22b/0x290
+[&lt;0&gt;] __destroy_client+0x3cd/0x5c0
+[&lt;0&gt;] nfs4_state_destroy_net+0xd2/0x330
+[&lt;0&gt;] nfs4_state_shutdown_net+0x2ad/0x410
+[&lt;0&gt;] nfsd_shutdown_net+0xb7/0x250
+[&lt;0&gt;] nfsd_last_thread+0x15f/0x2a0
+[&lt;0&gt;] nfsd_svc+0x388/0x3f0
+[&lt;0&gt;] write_threads+0x17e/0x2b0
+[&lt;0&gt;] nfsctl_transaction_write+0x91/0xf0
+[&lt;0&gt;] vfs_write+0x1c4/0x750
+[&lt;0&gt;] ksys_write+0xcb/0x170
+[&lt;0&gt;] do_syscall_64+0x70/0x120
+[&lt;0&gt;] entry_SYSCALL_64_after_hwframe+0x78/0xe2
+
+通过在重启失败时也将 cl_cb_inflight 计数减一即可修复此问题。</code></pre>
+<p><a
+href="https://lore.kernel.org/linux-nfs/04ed0c70b85a1e8b66c25b9ad4d0aa4c2fb91198.camel@kernel.org/">Jeff
+Layton</a>:</p>
+<pre><code>实际上，我认为情况并非如此简单。问题的微妙之处在于，回调的工作队列任务与 RPC 的工作队列任务运行在不同的线程上，因此它们之间可能会发生竞争。
+
+当回调首次被排队时，cl_cb_inflight 会被递增，并且只有在 nfsd41_destroy_cb() 中才会释放。如果排队失败，那一定是因为在此期间，另一个地方已经通过 nfsd4_run_cb() 将该工作队列任务排队了。
+
+这种情况可能发生在两个地方：nfsd4_cb_release() 和 nfsd4_run_cb()。既然问题出现在 nfsd4_cb_release() 中，那么唯一的可能就是有竞争发生，并且该回调已经被 nfsd4_run_cb() 排队了。这也会多次递增 cl_cb_inflight，那么你的补丁在这种情况下就说得通了。
+
+不幸的是，如果之前没有其他地方释放该计数，插槽仍然可能会泄漏。我认为在无法排队时，或许需要调用 nfsd41_destroy_cb()，但这可能又会与实际运行的回调工作队列任务发生竞争。
+
+我觉得我们可能需要考虑添加一个“此回调正在运行”的原子标志：在 nfsd4_run_cb() 中对该标志执行 test_and_set，并且只有当它返回 false 时才将工作队列任务排队。然后，在 nfsd41_destroy_cb() 中清除该标志。
+
+这样就能确保在 nfsd4_cb_release() 中不会因为该标志已设置而无法排队回调任务。
+
+你怎么看？</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>nfsd4_run_cb</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  nfsd41_cb_inflight_begin</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    atomic_inc<span class="op">(&amp;</span>clp<span class="op">-&gt;</span>cl_cb_inflight<span class="op">)</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  nfsd41_cb_inflight_end <span class="co">// 失败时执行</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    atomic_dec_and_wake_up<span class="op">(&amp;</span>clp<span class="op">-&gt;</span>cl_cb_inflight<span class="op">)</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>nfsd4_run_cb_work</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>clnt <span class="op">||</span> clp<span class="op">-&gt;</span>cl_state <span class="op">==</span> NFSD4_COURTESY<span class="op">)</span> <span class="op">{</span> <span class="co">// 异常</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>cb<span class="op">-&gt;</span>cb_ops <span class="op">&amp;&amp;</span> clp<span class="op">-&gt;</span>cl_minorversion<span class="op">)</span> <span class="op">{</span> <span class="co">// 或者nfsv4.1之后的版本不需要发送probe</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  nfsd41_destroy_cb</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    nfsd41_cb_inflight_end</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>nfsd4_cb_release</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  nfsd4_queue_cb <span class="co">// 这里可能失败</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  nfsd41_destroy_cb</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    nfsd41_cb_inflight_end</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>nfsd4_cb_probe_release</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  nfsd41_cb_inflight_end</span></code></pre></div>
 </body>
 </html>
