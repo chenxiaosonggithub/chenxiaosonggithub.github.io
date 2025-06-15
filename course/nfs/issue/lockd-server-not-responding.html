@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>nfsv3 NLM请求超时的问题</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">nfsv3 NLM请求超时的问题</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#构造" id="toc-构造"><span
+class="toc-section-number">2</span> 构造</a>
+<ul>
+<li><a href="#内核修改" id="toc-内核修改"><span
+class="toc-section-number">2.1</span> 内核修改</a></li>
+</ul></li>
+<li><a href="#用户态程序" id="toc-用户态程序"><span
+class="toc-section-number">3</span> 用户态程序</a></li>
+<li><a href="#nlm操作" id="toc-nlm操作"><span
+class="toc-section-number">4</span> NLM操作</a></li>
+</ul>
+</nav>
+<p><a
+href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
+<p>4.19内核打印:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">lockd:</span> server xx.xx.xx.xx not responding, still trying</span></code></pre></div>
+<p>挂载参数:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rw,relatime,vers=3,rsize=262144,wsize=262144,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountvers=3,mountproto=tcp,local_lock=none,_netdev</span></span></code></pre></div>
+<p>需要回答以下问题:</p>
+<ul>
+<li>lockd有哪些请求？哪些请求超时会报lockd信息？</li>
+<li>超时时间参数？</li>
+<li>重传机制？</li>
+</ul>
+<h1 data-number="2" id="构造"><span
+class="header-section-number">2</span> 构造</h1>
+<p>构造内核打印<code>lockd: server xx.xx.xx.xx not responding, still trying</code>。</p>
+<h2 data-number="2.1" id="内核修改"><span
+class="header-section-number">2.1</span> 内核修改</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>fs<span class="op">/</span>lockd<span class="op">/</span>svclock<span class="op">.</span>c</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>fs<span class="op">/</span>lockd<span class="op">/</span>svclock<span class="op">.</span>c</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">31</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">31</span><span class="op">,</span><span class="dv">7</span> @@</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&lt;linux/lockd/nlm.h&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&lt;linux/lockd/lockd.h&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&lt;linux/kthread.h&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>#include <span class="op">&lt;</span>linux<span class="op">/</span>delay<span class="op">.</span>h<span class="op">&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a> <span class="pp">#define NLMDBG_FACILITY                NLMDBG_SVCLOCK</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">404</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">405</span><span class="op">,</span><span class="dv">11</span> @@ nlmsvc_lock<span class="op">(</span><span class="kw">struct</span> svc_rqst <span class="op">*</span>rqstp<span class="op">,</span> <span class="kw">struct</span> nlm_file <span class="op">*</span>file<span class="op">,</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span>                     error<span class="op">;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        __be32                  ret<span class="op">;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       <span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>               printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">, sleep</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">);</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>               msleep<span class="op">(</span><span class="dv">20</span> <span class="op">*</span> <span class="dv">1000</span><span class="op">);</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       <span class="op">}</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="op">+</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        dprintk<span class="op">(</span><span class="st">&quot;lockd: nlmsvc_lock(</span><span class="sc">%s</span><span class="st">/</span><span class="sc">%ld</span><span class="st">, ty=</span><span class="sc">%d</span><span class="st">, pi=</span><span class="sc">%d</span><span class="st">, %Ld-%Ld, bl=</span><span class="sc">%d</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>                                locks_inode<span class="op">(</span>file<span class="op">-&gt;</span>f_file<span class="op">)-&gt;</span>i_sb<span class="op">-&gt;</span>s_id<span class="op">,</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>                                locks_inode<span class="op">(</span>file<span class="op">-&gt;</span>f_file<span class="op">)-&gt;</span>i_ino<span class="op">,</span></span></code></pre></div>
+<h1 data-number="3" id="用户态程序"><span
+class="header-section-number">3</span> 用户态程序</h1>
+<p><code>test.c</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/file.h&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">int</span> argc<span class="op">,</span> <span class="dt">char</span> <span class="op">*</span>argv<span class="op">[])</span> <span class="op">{</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>argc <span class="op">!=</span> <span class="dv">2</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Usage: </span><span class="sc">%s</span><span class="st"> &lt;file_path&gt;</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> argv<span class="op">[</span><span class="dv">0</span><span class="op">]);</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        exit<span class="op">(</span>EXIT_FAILURE<span class="op">);</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>file_path <span class="op">=</span> argv<span class="op">[</span><span class="dv">1</span><span class="op">];</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> fd <span class="op">=</span> open<span class="op">(</span>file_path<span class="op">,</span> O_RDWR<span class="op">);</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>fd <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Error: open </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> file_path<span class="op">);</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        exit<span class="op">(</span>EXIT_FAILURE<span class="op">);</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;open succ </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> file_path<span class="op">);</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> res <span class="op">=</span> flock<span class="op">(</span>fd<span class="op">,</span> LOCK_SH<span class="op">);</span> <span class="co">// 或 LOCK_EX</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>res <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Error: flock </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> file_path<span class="op">);</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        close<span class="op">(</span>fd<span class="op">);</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        exit<span class="op">(</span>EXIT_FAILURE<span class="op">);</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;lock succ </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> file_path<span class="op">);</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Unlock and close the file</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    flock<span class="op">(</span>fd<span class="op">,</span> LOCK_UN<span class="op">);</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    close<span class="op">(</span>fd<span class="op">);</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> rw,relatime,vers=3,rsize=262144,wsize=262144,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountvers=3,mountproto=tcp,local_lock=none,_netdev localhost:/tmp /mnt</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file <span class="co"># 创建文件</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">-o</span> test test.c</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_ALL</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_ALL</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">./test</span> /mnt/file</span></code></pre></div>
+<p>日志如下:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   49.386593] RPC:    49 <span class="er">__rpc_execute</span> <span class="va">flags</span><span class="op">=</span>0x80</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   49.631584] RPC:    49 <span class="er">call_transmit</span> <span class="kw">(</span><span class="ex">status</span> 0<span class="kw">)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   49.696061] RPC:    49 <span class="er">setting</span> <span class="ex">alarm</span> for 20000 ms</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   69.745721] RPC:    49 <span class="er">call_status</span> <span class="kw">(</span><span class="ex">status</span> <span class="at">-110</span><span class="kw">)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   69.747284] RPC:    49 <span class="er">call_timeout</span> <span class="kw">(</span><span class="ex">minor</span><span class="kw">)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   69.752302] RPC:    49 <span class="er">call_transmit</span> <span class="kw">(</span><span class="ex">status</span> 0<span class="kw">)</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   69.771959] RPC:    49 <span class="er">setting</span> <span class="ex">alarm</span> for 30000 ms</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   99.952647] RPC:    49 <span class="er">call_status</span> <span class="kw">(</span><span class="ex">status</span> <span class="at">-110</span><span class="kw">)</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   99.954153] RPC:    49 <span class="er">call_timeout</span> <span class="kw">(</span><span class="ex">minor</span><span class="kw">)</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   99.959084] RPC:    49 <span class="er">call_transmit</span> <span class="kw">(</span><span class="ex">status</span> 0<span class="kw">)</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   99.979495] RPC:    49 <span class="er">setting</span> <span class="ex">alarm</span> for 40000 ms</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  140.400818] RPC:    49 <span class="er">call_status</span> <span class="kw">(</span><span class="ex">status</span> <span class="at">-110</span><span class="kw">)</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  140.402356] RPC:    49 <span class="er">call_timeout</span> <span class="kw">(</span><span class="ex">major</span><span class="kw">)</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  140.403783] lockd: server <span class="er">localhost</span> <span class="ex">not</span> responding, still trying</span></code></pre></div>
+<p>大约90+秒超时打印<code>lockd: server localhost not responding, still trying</code>。</p>
+<p>nfs client会不断重发请求，直到用户态退出进程。</p>
+<h1 data-number="4" id="nlm操作"><span
+class="header-section-number">4</span> NLM操作</h1>
+<p>这里列出NLM (Network Lock Manager) 协议操作。</p>
+<p>nfs client请求:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_NULL            </span><span class="dv">0</span><span class="pp">   </span><span class="co">// 空操作。用于测试服务器是否存活和响应（Ping）</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_TEST            </span><span class="dv">1</span><span class="pp">   </span><span class="co">// 测试锁。客户端询问服务器：如果我现在请求这个锁，能成功吗？(非阻塞，仅查询状态)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_LOCK            </span><span class="dv">2</span><span class="pp">   </span><span class="co">// 请求锁。客户端向服务器申请一个文件锁（可以是阻塞或非阻塞）</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_CANCEL          </span><span class="dv">3</span><span class="pp">   </span><span class="co">// 取消锁请求。客户端取消之前发出的一个阻塞锁请求（在服务器响应 GRANTED 之前）</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_UNLOCK          </span><span class="dv">4</span><span class="pp">   </span><span class="co">// 释放锁。客户端通知服务器释放它持有的一个锁</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_TEST_RES        </span><span class="dv">11</span><span class="pp">  </span><span class="co">// 测试锁响应。客户端对服务器发来的 NLMPROC_TEST_MSG 询问做出响应（是否愿意释放/降级自己的锁）</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_LOCK_RES        </span><span class="dv">12</span><span class="pp">  </span><span class="co">// 锁请求响应。客户端对服务器发来的 NLMPROC_LOCK_MSG 询问做出响应（是否愿意释放/降级自己的锁）</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_CANCEL_RES      </span><span class="dv">13</span><span class="pp">  </span><span class="co">// 取消请求响应。客户端对服务器发来的 NLMPROC_CANCEL_MSG 通知做出响应（确认收到）</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_UNLOCK_RES      </span><span class="dv">14</span><span class="pp">  </span><span class="co">// 解锁响应。客户端对服务器发来的 NLMPROC_UNLOCK_MSG 通知做出响应（确认收到）</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_GRANTED_RES     </span><span class="dv">15</span><span class="pp">  </span><span class="co">// 锁已授予响应。客户端对服务器发来的 NLMPROC_GRANTED_MSG 通知做出响应（确认收到）。</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_SHARE           </span><span class="dv">20</span><span class="pp">  </span><span class="co">// 创建共享保留 (SUN 特定扩展)。客户端在文件上建立一个共享保留（允许多个读者）</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_UNSHARE         </span><span class="dv">21</span><span class="pp">  </span><span class="co">// 释放共享保留 (SUN 特定扩展)。客户端释放之前建立的共享保留</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_NM_LOCK         </span><span class="dv">22</span><span class="pp">  </span><span class="co">// 非监控锁 (SUN 特定扩展)。请求一个锁，但不需要 statd 监控客户端状态（用于短暂或可安全中断的锁）</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_FREE_ALL        </span><span class="dv">23</span><span class="pp">  </span><span class="co">// 释放所有锁。客户端通知服务器释放该客户端持有的所有锁（通常在客户端崩溃后重启或正常关闭时由恢复进程调用）</span></span></code></pre></div>
+<p>nfs server的请求:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_GRANTED         </span><span class="dv">5</span><span class="pp">   </span><span class="co">// 锁已授予。服务器异步通知客户端：之前请求的一个阻塞锁 (NLMPROC_LOCK) 现在可用了（锁已被授予）</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_TEST_MSG        </span><span class="dv">6</span><span class="pp">   </span><span class="co">// 测试锁请求消息。服务器收到 NLMPROC_TEST 请求时，如果需要询问其他持有冲突锁的客户端（通常涉及锁转换），会向该客户端发送此回调</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_LOCK_MSG        </span><span class="dv">7</span><span class="pp">   </span><span class="co">// 锁请求消息。服务器收到 NLMPROC_LOCK 请求时，如果需要询问其他持有冲突锁的客户端（通常涉及锁转换），会向该客户端发送此回调</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_CANCEL_MSG      </span><span class="dv">8</span><span class="pp">   </span><span class="co">// 取消请求消息。服务器收到 NLMPROC_CANCEL 请求时，如果需要通知之前被询问过 (LOCK_MSG) 的客户端这个取消操作，会发送此回调</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_UNLOCK_MSG      </span><span class="dv">9</span><span class="pp">   </span><span class="co">// 解锁消息。服务器收到 NLMPROC_UNLOCK 请求时，如果需要通知之前被询问过 (LOCK_MSG) 的客户端这个解锁操作，会发送此回调</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_GRANTED_MSG     </span><span class="dv">10</span><span class="pp">  </span><span class="co">// 锁已授予消息。服务器授予一个锁后（可能通过 GRANTED 或直接授予），如果需要通知之前被询问过 (LOCK_MSG) 的客户端这个锁已被授予他人，会发送此回调</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NLMPROC_NSM_NOTIFY      </span><span class="dv">16</span><span class="pp">  </span><span class="co">/* statd callback */</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                                    <span class="co">// 状态变更通知。这是 statd 守护进程使用的回调。当 lockd 监测到一个NFS客户端主机崩溃或重启时，</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                                    <span class="co">// statd 会通过此RPC通知该主机上的 lockd，触发 lockd 释放该崩溃/重启客户端持有的所有锁 (NLMPROC_FREE_ALL)。</span></span></code></pre></div>
+</body>
+</html>
