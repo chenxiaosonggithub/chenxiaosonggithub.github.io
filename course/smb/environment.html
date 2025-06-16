@@ -249,14 +249,15 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">nmblookup</span> <span class="at">-U</span> 192.168.53.209 netbios_name</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="ex">nmblookup</span> <span class="at">-S</span> netbios_name</span></code></pre></div>
 <p>挂载命令:</p>
-<pre class="shell"><code>getsebool -a | grep samba
-setsebool -P samba_enable_home_dirs=1
-# 选项: password=密码，iocharset=本机编码（如big5、utf8、cp950），codepage=远程主机编码
-# 指定挂载后文件的所有者: uid=1000,gid=1000，当前用户的id用 id $USER 查看
-mount -t cifs -o username=root,vers=1.0 //localhost/TEST /mnt
-mount -t cifs -o username=root,vers=2.0 //localhost/TEST /mnt
-mount -t cifs -o username=root,vers=2.1 //localhost/TEST /mnt
-mount -t cifs -o username=root,vers=3.0 //localhost/TEST /mnt</code></pre>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">getsebool</span> <span class="at">-a</span> <span class="kw">|</span> <span class="fu">grep</span> samba</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">setsebool</span> <span class="at">-P</span> samba_enable_home_dirs=1</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 选项: password=密码，iocharset=本机编码（如big5、utf8、cp950），codepage=远程主机编码</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 指定挂载后文件的所有者: uid=1000,gid=1000，当前用户的id用 id $USER 查看</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> cifs <span class="at">-o</span> username=root,vers=1.0 //localhost/TEST /mnt</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> cifs <span class="at">-o</span> username=root,vers=2.0 //localhost/TEST /mnt</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> cifs <span class="at">-o</span> username=root,vers=2.1 //localhost/TEST /mnt</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> cifs <span class="at">-o</span> username=root,vers=3.0 //localhost/TEST /mnt</span></code></pre></div>
 <ul>
 <li><code>mount.cifs</code>: 挂载命令。</li>
 <li><code>smbclient</code>: 查询服务器共享了哪些目录。</li>
