@@ -518,10 +518,30 @@ id="cve-2023-52434-af1689a9b770-smb-client-fix-potential-oobs-in-smb2_parse_cont
 class="header-section-number">14</span>
 <code>CVE-2023-52434 af1689a9b770 smb: client: fix potential OOBs in smb2_parse_contexts()</code></h1>
 <p><a
+href="https://nvd.nist.gov/vuln/detail/cve-2023-52434">CVE-2023-52434</a>，<a
 href="https://gitee.com/src-openeuler/kernel/issues/I92HX8">openeuler
-issue</a></p>
+4.19未修复</a>。</p>
+<p>漏洞触发的条件:</p>
+<ul>
+<li>SMB协议交互场景：当客户端（如mount.cifs）处理来自服务器的SMB2_CREATE_RSP响应时，若服务器返回恶意构造的创建上下文（Create
+Context）数据结构（如偏移量或长度字段非法），可能触发越界访问。</li>
+<li>典型操作：文件/目录打开（SMB2_open）、缓存目录操作（open_cached_dir）等涉及解析创建上下文的流程。</li>
+</ul>
+<p>只有在nfs client接收到恶意构造的创建上下文（Create
+Context）数据结构才会触发此漏洞，影响范围有限。</p>
 <p>在<code>smb2_parse_contexts()</code>中解引用create
-contexts时如果没有判断offsets和lengths的有效性，会发生访问越界。</p>
+contexts时如果没有判断offsets和lengths的有效性，会发生访问越界。<code>smb2_parse_contexts()</code>函数引入的补丁是<code>89a5bfa350fa smb3: optimize open to not send query file internal info</code>，4.19要先合入大量的前置补丁才能合入这个cve补丁，合入风险大。</p>
+<p>其他友商的评分:</p>
+<ul>
+<li><a
+href="https://access.redhat.com/security/cve/cve-2023-52434">红帽给5.9分</a></li>
+<li><a
+href="https://linux.oracle.com/cve/CVE-2023-52434.html">oracle给5.9分</a></li>
+<li><a
+href="https://www.suse.com/security/cve/CVE-2023-52434.html">suse给6.5分</a></li>
+<li><a
+href="https://ubuntu.com/security/CVE-2023-52434">ubuntu给Medium</a></li>
+</ul>
 <h2 data-number="14.1" id="合补丁-3"><span
 class="header-section-number">14.1</span> 4.19合补丁</h2>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，4.19要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
@@ -639,9 +659,18 @@ id="cve-2024-53179-343d7fe6df9e-smb-client-fix-use-after-free-of-signing-key"><s
 class="header-section-number">23</span>
 <code>CVE-2024-53179 343d7fe6df9e smb: client: fix use-after-free of signing key</code></h1>
 <p><a
-href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-53179&amp;packageName=kernel">openeuler</a></p>
+href="https://nvd.nist.gov/vuln/detail/CVE-2024-53179">CVE-2024-53179</a>。</p>
 <p>因为主线代码文件夹经过了重命名<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>，4.19要打上这个补丁，必须将<code>.patch</code>文件中的<code>smb/client</code>改成<code>cifs</code>:</p>
 <div class="sourceCode" id="cb22"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-i</span> <span class="st">&#39;s/smb\/client/cifs/g&#39;</span> 0001-smb-client-fix-use-after-free-of-signing-key.patch</span></code></pre></div>
+<p>其他厂商:</p>
+<ul>
+<li><a
+href="https://access.redhat.com/security/cve/CVE-2024-53179">红帽Red Hat
+Enterprise Linux 8 内核4.18未修复</a></li>
+<li><a
+href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-53179&amp;packageName=kernel">openeuler4.19未修复</a></li>
+</ul>
+<p>只有在启用签名的场景下才会触发此漏洞，影响范围有限。</p>
 </body>
 </html>
