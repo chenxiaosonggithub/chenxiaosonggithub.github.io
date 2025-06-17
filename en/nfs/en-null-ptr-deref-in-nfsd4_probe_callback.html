@@ -111,17 +111,15 @@ class="toc-section-number">3</span> Analysis from vmcore</a>
 <ul>
 <li><a href="#bt" id="toc-bt"><span
 class="toc-section-number">3.1</span> <code>bt</code></a></li>
-<li><a href="#struct-workqueue_struct"
-id="toc-struct-workqueue_struct"><span
-class="toc-section-number">3.2</span>
-<code>struct workqueue_struct</code></a></li>
 <li><a href="#disassemble-__queue_work"
 id="toc-disassemble-__queue_work"><span
-class="toc-section-number">3.3</span> Disassemble
+class="toc-section-number">3.2</span> Disassemble
 <code>__queue_work()</code></a></li>
 <li><a href="#where-the-code-crashed"
 id="toc-where-the-code-crashed"><span
-class="toc-section-number">3.4</span> Where the code crashed</a></li>
+class="toc-section-number">3.3</span> Where the code crashed</a></li>
+<li><a href="#callback_wq" id="toc-callback_wq"><span
+class="toc-section-number">3.4</span> <code>callback_wq</code></a></li>
 </ul></li>
 </ul>
 </nav>
@@ -226,47 +224,43 @@ class="header-section-number">3.1</span> <code>bt</code></h2>
 <span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co">#19 [ffff80043786fe00] svc_process at ffff0000425892a4 [sunrpc]</span></span>
 <span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co">#20 [ffff80043786fe20] nfsd at ffff0000429f1884 [nfsd]</span></span>
 <span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co">#21 [ffff80043786fe70] kthread at ffff00004811a870</span></span></code></pre></div>
-<h2 data-number="3.2" id="struct-workqueue_struct"><span
-class="header-section-number">3.2</span>
-<code>struct workqueue_struct</code></h2>
+<h2 data-number="3.2" id="disassemble-__queue_work"><span
+class="header-section-number">3.2</span> Disassemble
+<code>__queue_work()</code></h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> __queue_work</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110f74</span> <span class="op">&lt;</span>__queue_work+20<span class="op">&gt;</span>:   mov x24, x1 <span class="co"># x1 == second arg `wq`</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
-<p><code>x24</code> hasn’t been overwritten, so the value of
-<code>wq</code>(second arg of <code>__queue_work()</code>) is
-<code>X24: ffff80042c343400</code>.</p>
-<p>Then we see the member <code>flags</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct workqueue_struct ffff80042c343400 <span class="at">-x</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> workqueue_struct {</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">flags</span> = 0xa0002, <span class="co"># WQ_UNBOUND == 2</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
-<h2 data-number="3.3" id="disassemble-__queue_work"><span
-class="header-section-number">3.3</span> Disassemble
-<code>__queue_work()</code></h2>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel/workqueue.c:</span> 577</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># unbound_pwq_by_node() -&gt; rcu_dereference_raw()</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110ff8</span> <span class="op">&lt;</span>__queue_work+152<span class="op">&gt;</span>:  sxtw    x0, w0</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110ffc</span> <span class="op">&lt;</span>__queue_work+156<span class="op">&gt;</span>:  add x0, x0, <span class="co">#0x22</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/./include/linux/compiler.h:</span> 310</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># rcu_dereference_raw() -&gt; READ_ONCE() -&gt; __READ_ONCE() -&gt; __read_once_size()</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111000</span> <span class="op">&lt;</span>__queue_work+160<span class="op">&gt;</span>:  ldr x19, [x24,x0,lsl <span class="co">#3] # ==&gt; pwq == X19: 0000000000000000</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel/workqueue.c:</span> 1400</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111010</span> <span class="op">&lt;</span>__queue_work+176<span class="op">&gt;</span>:  cbnz    x0, 0xffff000048111100 <span class="op">&lt;</span>__queue_work+416<span class="op">&gt;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111014</span> <span class="op">&lt;</span>__queue_work+180<span class="op">&gt;</span>:  ldr x2, <span class="pp">[</span><span class="ss">x19</span><span class="pp">]</span> <span class="co"># ==&gt; dereference pwq-&gt;pool</span></span></code></pre></div>
+<h2 data-number="3.3" id="where-the-code-crashed"><span
+class="header-section-number">3.3</span> Where the code crashed</h2>
+<p>Crashed in <code>__queue_work()</code>, <code>pwq == NULL</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1360</span> <span class="dt">static</span> <span class="dt">void</span> __queue_work<span class="op">(</span><span class="dt">int</span> cpu<span class="op">,</span> <span class="kw">struct</span> workqueue_struct <span class="op">*</span>wq<span class="op">,</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1361</span>                          <span class="kw">struct</span> work_struct <span class="op">*</span>work<span class="op">)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1399</span>         last_pool <span class="op">=</span> get_work_pool<span class="op">(</span>work<span class="op">);</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1400</span>         <span class="cf">if</span> <span class="op">(</span>last_pool <span class="op">&amp;&amp;</span> last_pool <span class="op">!=</span> pwq<span class="op">-&gt;</span>pool<span class="op">)</span> <span class="op">{</span> <span class="op">==&gt;</span> pwq <span class="op">==</span> NULL</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1401</span>                 <span class="kw">struct</span> worker <span class="op">*</span>worker<span class="op">;</span></span></code></pre></div>
+<h2 data-number="3.4" id="callback_wq"><span
+class="header-section-number">3.4</span> <code>callback_wq</code></h2>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> __queue_work</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel/workqueue.c:</span> 577</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># unbound_pwq_by_node() -&gt; rcu_dereference_raw()</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110ff8</span> <span class="op">&lt;</span>__queue_work+152<span class="op">&gt;</span>:  sxtw    x0, w0</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110ffc</span> <span class="op">&lt;</span>__queue_work+156<span class="op">&gt;</span>:  add x0, x0, <span class="co">#0x22</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/./include/linux/compiler.h:</span> 310</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># rcu_dereference_raw() -&gt; READ_ONCE() -&gt; __READ_ONCE() -&gt; __read_once_size()</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111000</span> <span class="op">&lt;</span>__queue_work+160<span class="op">&gt;</span>:  ldr x19, [x24,x0,lsl <span class="co">#3] # ==&gt; pwq == X19: 0000000000000000</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel/workqueue.c:</span> 1400</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111010</span> <span class="op">&lt;</span>__queue_work+176<span class="op">&gt;</span>:  cbnz    x0, 0xffff000048111100 <span class="op">&lt;</span>__queue_work+416<span class="op">&gt;</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111014</span> <span class="op">&lt;</span>__queue_work+180<span class="op">&gt;</span>:  ldr x2, <span class="pp">[</span><span class="ss">x19</span><span class="pp">]</span> <span class="co"># ==&gt; dereference pwq-&gt;pool</span></span></code></pre></div>
-<h2 data-number="3.4" id="where-the-code-crashed"><span
-class="header-section-number">3.4</span> Where the code crashed</h2>
-<p>Crashed in <code>__queue_work()</code>, <code>pwq == NULL</code>:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1360</span> <span class="dt">static</span> <span class="dt">void</span> __queue_work<span class="op">(</span><span class="dt">int</span> cpu<span class="op">,</span> <span class="kw">struct</span> workqueue_struct <span class="op">*</span>wq<span class="op">,</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1361</span>                          <span class="kw">struct</span> work_struct <span class="op">*</span>work<span class="op">)</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1399</span>         last_pool <span class="op">=</span> get_work_pool<span class="op">(</span>work<span class="op">);</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1400</span>         <span class="cf">if</span> <span class="op">(</span>last_pool <span class="op">&amp;&amp;</span> last_pool <span class="op">!=</span> pwq<span class="op">-&gt;</span>pool<span class="op">)</span> <span class="op">{</span> <span class="op">==&gt;</span> pwq <span class="op">==</span> NULL</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1401</span>                 <span class="kw">struct</span> worker <span class="op">*</span>worker<span class="op">;</span></span></code></pre></div>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110f74</span> <span class="op">&lt;</span>__queue_work+20<span class="op">&gt;</span>:   mov x24, x1 <span class="co"># x1 == second arg `wq`</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
+<p><code>x24</code> hasn’t been overwritten, so the value of
+<code>wq</code>(second arg of <code>__queue_work()</code>) is
+<code>X24: ffff80042c343400</code>, it is value of
+<code>callback_wq</code>.</p>
+<p>But the current value of <code>callback_wq</code> is:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> rd callback_wq</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff000042a55a70:</span>  ffff80010eb50600</span></code></pre></div>
 </body>
 </html>
