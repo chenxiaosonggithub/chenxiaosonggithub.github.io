@@ -123,10 +123,8 @@ class="toc-section-number">3.4</span> Where the code crashed</a></li>
 <li><a href="#callback_wq" id="toc-callback_wq"><span
 class="toc-section-number">3.5</span> <code>callback_wq</code></a></li>
 </ul></li>
-<li><a href="#code-analysis" id="toc-code-analysis"><span
-class="toc-section-number">4</span> Code analysis</a></li>
 <li><a href="#solution" id="toc-solution"><span
-class="toc-section-number">5</span> Solution</a></li>
+class="toc-section-number">4</span> Solution</a></li>
 </ul>
 </nav>
 <p><a
@@ -275,37 +273,11 @@ class="header-section-number">3.5</span> <code>callback_wq</code></h2>
 <code>X24</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> rd callback_wq</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff000042a55a70:</span>  ffff80010eb50600</span></code></pre></div>
-<h1 data-number="4" id="code-analysis"><span
-class="header-section-number">4</span> Code analysis</h1>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>   <span class="ex">task</span> A <span class="er">(</span><span class="ex">cpu</span> 1<span class="kw">)</span>    <span class="kw">|</span>   <span class="ex">task</span> B <span class="er">(</span><span class="ex">cpu</span> 2<span class="kw">)</span>     <span class="kw">|</span>   <span class="ex">task</span> C <span class="er">(</span><span class="ex">cpu</span> 3<span class="kw">)</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">---------------------</span><span class="kw">|</span><span class="ex">----------------------</span><span class="kw">|</span><span class="ex">---------------------------------</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">nfsd_startup_generic</span> <span class="kw">|</span> <span class="ex">nfsd_startup_generic</span> <span class="kw">|</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nfsd_users</span> == 0    <span class="kw">|</span>  <span class="ex">nfsd_users</span> == 0     <span class="kw">|</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nfsd_users++</span>       <span class="kw">|</span>  <span class="ex">nfsd_users++</span>        <span class="kw">|</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nfsd_users</span> == 1    <span class="kw">|</span>                      <span class="kw">|</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span>                <span class="kw">|</span>                      <span class="kw">|</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">callback_wq</span> == xxx <span class="kw">|</span>                      <span class="kw">|</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="ex">---------------------</span><span class="kw">|</span><span class="ex">----------------------</span><span class="kw">|</span><span class="ex">---------------------------------</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span> <span class="ex">nfsd_shutdown_generic</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">nfsd_users</span> == 1</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">--nfsd_users</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">nfsd_users</span> == 0</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">...</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">callback_wq</span> == xxx</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">destroy_workqueue</span><span class="er">(</span><span class="ex">callback_wq</span><span class="kw">)</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="ex">---------------------</span><span class="kw">|</span><span class="ex">----------------------</span><span class="kw">|</span><span class="ex">---------------------------------</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>  <span class="ex">nfsd_users</span> == 1     <span class="kw">|</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>  <span class="ex">...</span>                 <span class="kw">|</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>  <span class="ex">callback_wq</span> == yyy  <span class="kw">|</span></span></code></pre></div>
-<h1 data-number="5" id="solution"><span
-class="header-section-number">5</span> Solution</h1>
+<h1 data-number="4" id="solution"><span
+class="header-section-number">4</span> Solution</h1>
 <p>Merge the following patches:</p>
 <ul>
 <li><code>38f080f3cd19 NFSD: Move callback_wq into struct nfs4_client</code></li>
-<li><a
-href="https://lore.kernel.org/all/20250618104123.398603-1-chenxiaosong@chenxiaosong.com/">nfsd:
-convert the nfsd_users to atomic_t</a></li>
 </ul>
 </body>
 </html>
