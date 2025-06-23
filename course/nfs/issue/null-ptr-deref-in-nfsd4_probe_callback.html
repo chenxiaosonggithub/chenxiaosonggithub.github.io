@@ -124,8 +124,12 @@ class="toc-section-number">2.2</span> <code>callback_wq</code></a></li>
 </ul></li>
 <li><a href="#代码分析" id="toc-代码分析"><span
 class="toc-section-number">3</span> 代码分析</a></li>
+<li><a href="#相关邮件" id="toc-相关邮件"><span
+class="toc-section-number">4</span> 相关邮件</a></li>
+<li><a href="#补丁分析" id="toc-补丁分析"><span
+class="toc-section-number">5</span> 补丁分析</a></li>
 <li><a href="#解决方案" id="toc-解决方案"><span
-class="toc-section-number">4</span> 解决方案</a></li>
+class="toc-section-number">6</span> 解决方案</a></li>
 </ul>
 </nav>
 <p><a
@@ -265,32 +269,27 @@ class="header-section-number">3</span> 代码分析</h1>
 <span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>                  wq<span class="op">-&gt;</span>dfl_pwq <span class="op">=</span> NULL</span>
 <span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>                  put_pwq_unlocked</span>
 <span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>        printk<span class="op">(</span>KERN_WARNING <span class="st">&quot;nfsd: last server has exited, flushing export cache</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">)</span></span></code></pre></div>
-<p>如果有以下并发的场景，这个问题可能出现，但<code>nfsd_users</code>变量有<code>nfsd_mutex</code>锁保护，所以不会并发，具体讨论请查看<a
+<p>如果<code>nfsd_startup_generic()</code>和<code>nfsd_shutdown_generic()</code>会并发，这个问题可能出现，但<code>nfsd_users</code>变量有<code>nfsd_mutex</code>锁保护，所以不会并发，具体讨论请查看<a
 href="https://lore.kernel.org/all/20250618104123.398603-1-chenxiaosong@chenxiaosong.com/">nfsd:
-convert the nfsd_users to atomic_t</a>:</p>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>   <span class="ex">task</span> A <span class="er">(</span><span class="ex">cpu</span> 1<span class="kw">)</span>    <span class="kw">|</span>   <span class="ex">task</span> B <span class="er">(</span><span class="ex">cpu</span> 2<span class="kw">)</span>     <span class="kw">|</span>   <span class="ex">task</span> C <span class="er">(</span><span class="ex">cpu</span> 3<span class="kw">)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">---------------------</span><span class="kw">|</span><span class="ex">----------------------</span><span class="kw">|</span><span class="ex">---------------------------------</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">nfsd_startup_generic</span> <span class="kw">|</span> <span class="ex">nfsd_startup_generic</span> <span class="kw">|</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nfsd_users</span> == 0    <span class="kw">|</span>  <span class="ex">nfsd_users</span> == 0     <span class="kw">|</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nfsd_users++</span>       <span class="kw">|</span>  <span class="ex">nfsd_users++</span>        <span class="kw">|</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nfsd_users</span> == 1    <span class="kw">|</span>                      <span class="kw">|</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span>                <span class="kw">|</span>                      <span class="kw">|</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">callback_wq</span> == xxx <span class="kw">|</span>                      <span class="kw">|</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ex">---------------------</span><span class="kw">|</span><span class="ex">----------------------</span><span class="kw">|</span><span class="ex">---------------------------------</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span> <span class="ex">nfsd_shutdown_generic</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">nfsd_users</span> == 1</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">--nfsd_users</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">nfsd_users</span> == 0</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">...</span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">callback_wq</span> == xxx</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>                      <span class="kw">|</span>   <span class="ex">destroy_workqueue</span><span class="er">(</span><span class="ex">callback_wq</span><span class="kw">)</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="ex">---------------------</span><span class="kw">|</span><span class="ex">----------------------</span><span class="kw">|</span><span class="ex">---------------------------------</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>  <span class="ex">nfsd_users</span> == 1     <span class="kw">|</span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>  <span class="ex">...</span>                 <span class="kw">|</span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>                     <span class="kw">|</span>  <span class="ex">callback_wq</span> == yyy  <span class="kw">|</span></span></code></pre></div>
-<h1 data-number="4" id="解决方案"><span
-class="header-section-number">4</span> 解决方案</h1>
+convert the nfsd_users to atomic_t</a>。</p>
+<h1 data-number="4" id="相关邮件"><span
+class="header-section-number">4</span> 相关邮件</h1>
+<ul>
+<li><a
+href="https://lore.kernel.org/all/00bac421-cef6-451d-b868-592ed34c15af@oracle.com/">Chuck
+Lever &lt;chuck.lever@oracle.com&gt;
+<code>Re: [PATCH 2/3] nfsd: use kref and new mutex for global config management</code></a></li>
+<li><a
+href="https://lore.kernel.org/all/175042051171.608730.8613669948428192921@noble.neil.brown.name/">NeilBrown
+&lt;neilb@suse.de&gt;
+<code>Re: [RFC PATCH] nfsd: convert the nfsd_users to atomic_t</code></a></li>
+</ul>
+<h1 data-number="5" id="补丁分析"><span
+class="header-section-number">5</span> 补丁分析</h1>
+<p><a
+href="https://chenxiaosong.com/course/nfs/patch/NFSD-Make-it-possible-to-use-svc_set_num_threads_syn.html"><code>[PATCH 00/20 v3] SUNRPC: clean up server thread management</code></a></p>
+<h1 data-number="6" id="解决方案"><span
+class="header-section-number">6</span> 解决方案</h1>
 <p>合入以下补丁:</p>
 <ul>
 <li><code>38f080f3cd19 NFSD: Move callback_wq into struct nfs4_client</code></li>
