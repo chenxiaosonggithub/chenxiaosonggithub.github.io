@@ -133,7 +133,13 @@ class="toc-section-number">3.1</span> NLM操作</a></li>
 class="toc-section-number">3.2</span> 函数流程</a></li>
 </ul></li>
 <li><a href="#抓包数据分析" id="toc-抓包数据分析"><span
-class="toc-section-number">4</span> 抓包数据分析</a></li>
+class="toc-section-number">4</span> 抓包数据分析</a>
+<ul>
+<li><a href="#section" id="toc-section"><span
+class="toc-section-number">4.1</span> 0619</a></li>
+<li><a href="#section-1" id="toc-section-1"><span
+class="toc-section-number">4.2</span> 0622</a></li>
+</ul></li>
 </ul>
 </nav>
 <p><a
@@ -142,13 +148,15 @@ href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套�
 href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
 <h1 data-number="1" id="问题描述"><span
 class="header-section-number">1</span> 问题描述</h1>
-<p>4.19内核打印:</p>
+<p>4.19内核日志:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-r</span> <span class="st">&quot;not responding&quot;</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">messages:Jun</span> 15 11:51:38 xxxxxxxx kernel: <span class="pp">[</span><span class="ss">9386449.117162</span><span class="pp">]</span> lockd: server xx.xx.xx.xx not responding, still trying</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">messages:Jun</span> 16 13:22:47 xxxxxxxx kernel: <span class="pp">[</span><span class="ss">9478316.107045</span><span class="pp">]</span> lockd: server xx.xx.xx.xx not responding, timed out</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">messages:Jun</span> 19 02:22:38 xxxxxxxx kernel: <span class="pp">[</span><span class="ss">9697905.032077</span><span class="pp">]</span> lockd: server xx.xx.xx.xx not responding, still trying</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">messages:Jun</span> 19 03:50:47 xxxxxxxx kernel: <span class="pp">[</span><span class="ss">9703193.915722</span><span class="pp">]</span> lockd: server xx.xx.xx.xx not responding, timed out</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">messages:Jun</span> 19 06:22:05 xxxxxxxx kernel: <span class="pp">[</span><span class="ss">9712271.571929</span><span class="pp">]</span> lockd: server xx.xx.xx.xx not responding, still trying</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 0619</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">messages:Jun</span> 19 02:22:38 xxxxxxxx kernel: <span class="pp">[</span><span class="ss">9697905.032077</span><span class="pp">]</span> lockd: server xx.xx.xx.xx not responding, still trying</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">messages:Jun</span> 19 03:50:47 xxxxxxxx kernel: <span class="pp">[</span><span class="ss">9703193.915722</span><span class="pp">]</span> lockd: server xx.xx.xx.xx not responding, timed out</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">messages:Jun</span> 19 06:22:05 xxxxxxxx kernel: <span class="pp">[</span><span class="ss">9712271.571929</span><span class="pp">]</span> lockd: server xx.xx.xx.xx not responding, still trying</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 另一个环境日志, 0622</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Jun</span> 22 22:55:38 xxxxxxxxxx kernel:<span class="pp">[</span><span class="ss">9263358.933594</span><span class="pp">]</span>lockd: server 11.73.24.85 not responding, still trying</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Jun</span> 22 22:56:18 xxxxxxxxxx kernel:<span class="pp">[</span><span class="ss">9263398.655377</span><span class="pp">]</span>lockd: server 11.73.24.85 0K</span></code></pre></div>
 <p>挂载参数:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rw,relatime,vers=3,rsize=262144,wsize=262144,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountvers=3,mountproto=tcp,local_lock=none,_netdev</span></span></code></pre></div>
 <p>需要回答以下问题:</p>
@@ -389,12 +397,71 @@ class="header-section-number">4</span> 抓包数据分析</h1>
 <li>0x08 (8): 看到正常的 FIN (连接开始关闭)</li>
 <li>0x10 (16): 看到 RST (连接被重置)</li>
 </ul>
+<h2 data-number="4.1" id="section"><span
+class="header-section-number">4.1</span> 0619</h2>
 <p>wireshark用以下条件过滤数据包:</p>
 <ul>
 <li><code>tcp.srcport == 111 || tcp.dstport == 111</code></li>
 <li><code>tcp.completeness == 3</code>: 只看到了 SYN 和
 SYN-ACK，没有看到建立连接的最终 ACK（连接可能建立失败，或 ACK
 丢失未被捕获）</li>
+<li><code>tcp.analysis.retransmission</code>: 重传</li>
 </ul>
+<p><code>02:21:34 ~ 02:22:38</code>一分钟左右的时间，tcp连接没有建立:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">No.</span> Time    Source  Destination Protocol    Length  Info</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">74132</span>   2025-06-19 02:21:34.136390  215.1.39.124    215.2.21.62 TCP 74  33306 → 111 <span class="pp">[</span><span class="ss">SYN</span><span class="pp">]</span> Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM TSval=504648252 TSecr=0 WS=128</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">74133</span>   2025-06-19 02:21:34.136660  215.2.21.62 215.1.39.124    TCP 74  111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196359912 TSecr=504648252 WS=128</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ex">74135</span>   2025-06-19 02:21:35.154937  215.1.39.124    215.2.21.62 TCP 74  [TCP Retransmission] 33306 → 111 <span class="pp">[</span><span class="ss">SYN</span><span class="pp">]</span> Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM TSval=504649270 TSecr=0 WS=128</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">74136</span>   2025-06-19 02:21:35.155190  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196360931 TSecr=504648252 WS=128</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ex">74153</span>   2025-06-19 02:21:36.186955  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196361963 TSecr=504648252 WS=128</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ex">74154</span>   2025-06-19 02:21:37.224931  215.1.39.124    215.2.21.62 TCP 74  [TCP Retransmission] 33306 → 111 <span class="pp">[</span><span class="ss">SYN</span><span class="pp">]</span> Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM TSval=504651340 TSecr=0 WS=128</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ex">74155</span>   2025-06-19 02:21:37.225186  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196363001 TSecr=504648252 WS=128</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="ex">74210</span>   2025-06-19 02:21:39.254932  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196365031 TSecr=504648252 WS=128</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="ex">74237</span>   2025-06-19 02:21:41.304924  215.1.39.124    215.2.21.62 TCP 74  [TCP Retransmission] 33306 → 111 <span class="pp">[</span><span class="ss">SYN</span><span class="pp">]</span> Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM TSval=504655420 TSecr=0 WS=128</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="ex">74238</span>   2025-06-19 02:21:41.305165  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196367081 TSecr=504648252 WS=128</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="ex">74280</span>   2025-06-19 02:21:45.558907  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196371335 TSecr=504648252 WS=128</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="ex">74387</span>   2025-06-19 02:21:49.474920  215.1.39.124    215.2.21.62 TCP 74  [TCP Retransmission] 33306 → 111 <span class="pp">[</span><span class="ss">SYN</span><span class="pp">]</span> Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM TSval=504663590 TSecr=0 WS=128</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="ex">74388</span>   2025-06-19 02:21:49.475187  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196375251 TSecr=504648252 WS=128</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="ex">74487</span>   2025-06-19 02:21:57.594902  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196383371 TSecr=504648252 WS=128</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="ex">74697</span>   2025-06-19 02:22:06.104944  215.1.39.124    215.2.21.62 TCP 74  [TCP Retransmission] 33306 → 111 <span class="pp">[</span><span class="ss">SYN</span><span class="pp">]</span> Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM TSval=504680220 TSecr=0 WS=128</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="ex">74698</span>   2025-06-19 02:22:06.105254  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196391881 TSecr=504648252 WS=128</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="ex">74947</span>   2025-06-19 02:22:22.170729  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196407947 TSecr=504648252 WS=128</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="ex">75214</span>   2025-06-19 02:22:38.754950  215.1.39.124    215.2.21.62 TCP 74  [TCP Retransmission] 33306 → 111 <span class="pp">[</span><span class="ss">SYN</span><span class="pp">]</span> Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM TSval=504712870 TSecr=0 WS=128</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="ex">75216</span>   2025-06-19 02:22:38.755191  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196424531 TSecr=504648252 WS=128</span></code></pre></div>
+<h2 data-number="4.2" id="section-1"><span
+class="header-section-number">4.2</span> 0622</h2>
+<p>wireshark用以下条件过滤数据包:</p>
+<ul>
+<li><code>tcp.srcport == 871 || tcp.dstport == 871</code></li>
+<li><code>tcp.analysis.retransmission</code>: 重传</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">No.</span> Time    Source  Destination Protocol    Length  Info</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">13388</span>   2025-06-22 22:49:12.999433  11.8.68.71  11.73.24.85 TCP 66  [TCP Keep-Alive] 871 → 2052 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=1296 Ack=241 Win=65280 Len=0 TSval=1220605896 TSecr=1453532233</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">13389</span>   2025-06-22 22:49:12.999886  11.73.24.85 11.8.68.71  TCP 66  [TCP Keep-Alive ACK] 2052 → 871 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=241 Ack=1297 Win=64384 Len=0 TSval=1453590835 TSecr=1220544507</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="ex">13970</span>   2025-06-22 22:50:14.439432  11.8.68.71  11.73.24.85 TCP 66  [TCP Keep-Alive] 871 → 2052 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=1296 Ack=241 Win=65280 Len=0 TSval=1220667335 TSecr=1453590835</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ex">13971</span>   2025-06-22 22:50:14.439885  11.73.24.85 11.8.68.71  TCP 66  [TCP Keep-Alive ACK] 2052 → 871 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=241 Ack=1297 Win=64384 Len=0 TSval=1453649428 TSecr=1220544507</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="ex">14560</span>   2025-06-22 22:51:15.879434  11.8.68.71  11.73.24.85 TCP 66  [TCP Keep-Alive] 871 → 2052 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=1296 Ack=241 Win=65280 Len=0 TSval=1220728774 TSecr=1453649428</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="ex">14561</span>   2025-06-22 22:51:15.879881  11.73.24.85 11.8.68.71  TCP 66  [TCP Keep-Alive ACK] 2052 → 871 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=241 Ack=1297 Win=64384 Len=0 TSval=1453708021 TSecr=1220544507</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="ex">15145</span>   2025-06-22 22:52:17.319431  11.8.68.71  11.73.24.85 TCP 66  [TCP Keep-Alive] 871 → 2052 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=1296 Ack=241 Win=65280 Len=0 TSval=1220790214 TSecr=1453708021</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="ex">15146</span>   2025-06-22 22:52:17.319878  11.73.24.85 11.8.68.71  TCP 66  [TCP Keep-Alive ACK] 2052 → 871 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=241 Ack=1297 Win=64384 Len=0 TSval=1453766614 TSecr=1220544507</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="ex">15720</span>   2025-06-22 22:53:13.639471  11.8.68.71  11.73.24.85 TCP 66  871 → 2052 [FIN, ACK] Seq=1297 Ack=241 Win=65280 Len=0 TSval=1220846533 TSecr=1453766614</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="ex">15721</span>   2025-06-22 22:53:13.859428  11.8.68.71  11.73.24.85 TCP 66  [TCP Retransmission] 871 → 2052 [FIN, ACK] Seq=1297 Ack=241 Win=65280 Len=0 TSval=1220846753 TSecr=1453766614</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="ex">15722</span>   2025-06-22 22:53:14.079435  11.8.68.71  11.73.24.85 TCP 66  [TCP Retransmission] 871 → 2052 [FIN, ACK] Seq=1297 Ack=241 Win=65280 Len=0 TSval=1220846973 TSecr=1453766614</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="ex">15723</span>   2025-06-22 22:53:14.519442  11.8.68.71  11.73.24.85 TCP 66  [TCP Retransmission] 871 → 2052 [FIN, ACK] Seq=1297 Ack=241 Win=65280 Len=0 TSval=1220847413 TSecr=1453766614</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="ex">15728</span>   2025-06-22 22:53:15.399441  11.8.68.71  11.73.24.85 TCP 66  [TCP Retransmission] 871 → 2052 [FIN, ACK] Seq=1297 Ack=241 Win=65280 Len=0 TSval=1220848293 TSecr=1453766614</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="ex">15729</span>   2025-06-22 22:53:17.159434  11.8.68.71  11.73.24.85 TCP 66  [TCP Retransmission] 871 → 2052 [FIN, ACK] Seq=1297 Ack=241 Win=65280 Len=0 TSval=1220850053 TSecr=1453766614</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="ex">15734</span>   2025-06-22 22:53:20.599433  11.8.68.71  11.73.24.85 TCP 66  [TCP Retransmission] 871 → 2052 [FIN, ACK] Seq=1297 Ack=241 Win=65280 Len=0 TSval=1220853493 TSecr=1453766614</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="ex">15767</span>   2025-06-22 22:53:27.719444  11.8.68.71  11.73.24.85 TCP 66  [TCP Retransmission] 871 → 2052 [FIN, ACK] Seq=1297 Ack=241 Win=65280 Len=0 TSval=1220860613 TSecr=1453766614</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="ex">16222</span>   2025-06-22 22:53:41.799438  11.8.68.71  11.73.24.85 TCP 66  [TCP Retransmission] 871 → 2052 [FIN, ACK] Seq=1297 Ack=241 Win=65280 Len=0 TSval=1220874693 TSecr=1453766614</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="ex">16310</span>   2025-06-22 22:54:09.319444  11.8.68.71  11.73.24.85 TCP 66  [TCP Retransmission] 871 → 2052 [FIN, ACK] Seq=1297 Ack=241 Win=65280 Len=0 TSval=1220902212 TSecr=1453766614</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="ex">16915</span>   2025-06-22 22:55:06.279438  11.8.68.71  11.73.24.85 TCP 66  [TCP Retransmission] 871 → 2052 [FIN, ACK] Seq=1297 Ack=241 Win=65280 Len=0 TSval=1220959171 TSecr=1453766614</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="ex">17561</span>   2025-06-22 22:56:17.959499  11.8.68.71  11.73.24.85 TCP 74  [TCP Port numbers reused] 871 → 2052 <span class="pp">[</span><span class="ss">SYN</span><span class="pp">]</span> Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM TSval=1221030851 TSecr=0 WS=128</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="ex">17562</span>   2025-06-22 22:56:17.960011  11.73.24.85 11.8.68.71  TCP 74  2052 → 871 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1454018687 TSecr=1221030851 WS=128</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="ex">17563</span>   2025-06-22 22:56:17.960038  11.8.68.71  11.73.24.85 TCP 66  871 → 2052 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=1 Ack=1 Win=64256 Len=0 TSval=1221030851 TSecr=1454018687</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="ex">17564</span>   2025-06-22 22:56:17.960048  11.8.68.71  11.73.24.85 NLM 290 V4 LOCK Call <span class="er">(</span><span class="ex">Reply</span> In 17566<span class="kw">)</span> <span class="ex">FH:0xe7823382</span> svid:224744 pos:0-0</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="ex">17565</span>   2025-06-22 22:56:17.960290  11.73.24.85 11.8.68.71  TCP 66  2052 → 871 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=1 Ack=225 Win=65024 Len=0 TSval=1454018688 TSecr=1221030851</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="ex">17566</span>   2025-06-22 22:56:18.001690  11.73.24.85 11.8.68.71  NLM 106 V4 LOCK Reply <span class="er">(</span><span class="ex">Call</span> In 17564<span class="kw">)</span></span></code></pre></div>
 </body>
 </html>
