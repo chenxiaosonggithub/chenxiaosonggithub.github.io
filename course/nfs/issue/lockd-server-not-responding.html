@@ -464,5 +464,10 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#
 <span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="ex">17564</span>   2025-06-22 22:56:17.960048  11.8.68.71  11.73.24.85 NLM 290 V4 LOCK Call <span class="er">(</span><span class="ex">Reply</span> In 17566<span class="kw">)</span> <span class="ex">FH:0xe7823382</span> svid:224744 pos:0-0</span>
 <span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="ex">17565</span>   2025-06-22 22:56:17.960290  11.73.24.85 11.8.68.71  TCP 66  2052 → 871 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=1 Ack=225 Win=65024 Len=0 TSval=1454018688 TSecr=1221030851</span>
 <span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="ex">17566</span>   2025-06-22 22:56:18.001690  11.73.24.85 11.8.68.71  NLM 106 V4 LOCK Reply <span class="er">(</span><span class="ex">Call</span> In 17564<span class="kw">)</span></span></code></pre></div>
+<p>正常的四次挥手流程如下:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[FIN,</span> ACK] <span class="co"># 这个 ACK 是对历史数据的确认，与挥手本身无关</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[FIN,</span> ACK] <span class="co"># 第 2 步（ACK） 和 第 3 步（FIN） 被合并为一个报文</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[ACK]</span></span></code></pre></div>
 </body>
 </html>
