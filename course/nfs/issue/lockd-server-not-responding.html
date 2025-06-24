@@ -107,10 +107,10 @@
 <li><a href="#nlm操作"><span class="toc-section-number">3.1</span> NLM操作</a></li>
 <li><a href="#函数流程"><span class="toc-section-number">3.2</span> 函数流程</a></li>
 </ul></li>
-<li><a href="#抓包数据分析"><span class="toc-section-number">4</span> 抓包数据分析</a>
+<li><a href="#tcpdump"><span class="toc-section-number">4</span> 抓包数据分析</a>
 <ul>
-<li><a href="#section"><span class="toc-section-number">4.1</span> 0619</a></li>
-<li><a href="#section-1"><span class="toc-section-number">4.2</span> 0622</a></li>
+<li><a href="#section"><span class="toc-section-number">4.1</span> 0619 {#0619}</a></li>
+<li><a href="#section-1"><span class="toc-section-number">4.2</span> 0622 {#0622}</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -349,7 +349,7 @@
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>                  nlmclnt_lock</span>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>                    nlmclnt_call</span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>                    nlmclnt_async_call <span class="co">// 用户态进程退出时执行到这里</span></span></code></pre></div>
-<h1 data-number="4" id="抓包数据分析"><span class="header-section-number">4</span> 抓包数据分析</h1>
+<h1 data-number="4" id="tcpdump"><span class="header-section-number">4</span> 抓包数据分析</h1>
 <p><code>tcp.completeness</code>字段的每一位:</p>
 <ul>
 <li>0x01 (1): 看到 SYN (连接发起)</li>
@@ -358,7 +358,7 @@
 <li>0x08 (8): 看到正常的 FIN (连接开始关闭)</li>
 <li>0x10 (16): 看到 RST (连接被重置)</li>
 </ul>
-<h2 data-number="4.1" id="section"><span class="header-section-number">4.1</span> 0619</h2>
+<h2 data-number="4.1" id="section"><span class="header-section-number">4.1</span> 0619 {#0619}</h2>
 <p>wireshark用以下条件过滤数据包:</p>
 <ul>
 <li><code>tcp.srcport == 111 || tcp.dstport == 111</code></li>
@@ -375,7 +375,7 @@
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="ex">...</span></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a><span class="ex">75214</span>   2025-06-19 02:22:38.754950  215.1.39.124    215.2.21.62 TCP 74  [TCP Retransmission] 33306 → 111 [SYN] Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM TSval=504712870 TSecr=0 WS=128</span>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a><span class="ex">75216</span>   2025-06-19 02:22:38.755191  215.2.21.62 215.1.39.124    TCP 74  [TCP Retransmission] 111 → 33306 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM TSval=1196424531 TSecr=504648252 WS=128</span></code></pre></div>
-<h2 data-number="4.2" id="section-1"><span class="header-section-number">4.2</span> 0622</h2>
+<h2 data-number="4.2" id="section-1"><span class="header-section-number">4.2</span> 0622 {#0622}</h2>
 <p>wireshark用以下条件过滤数据包:</p>
 <ul>
 <li><code>tcp.srcport == 871 || tcp.dstport == 871</code></li>
