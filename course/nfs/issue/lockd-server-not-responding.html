@@ -436,6 +436,7 @@ class="header-section-number">4.2</span> 0622</h2>
 <li><code>tcp.srcport == 871 || tcp.dstport == 871</code></li>
 <li><code>tcp.analysis.retransmission</code>: 重传</li>
 </ul>
+<p><code>22:55:38</code>超时，可能在<code>22:54:38</code>左右发起sunrpc请求，但这时tcp连接正在断开，直到<code>22:56:17</code>tcp连接重新建立，<code>LOCK Call</code>成功发出，收到<code>LOCK Reply</code>时打印<code>lockd: server 11.73.24.85 0K</code>。</p>
 <div class="sourceCode" id="cb11"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">No.</span> Time    Source  Destination Protocol    Length  Info</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">13388</span>   2025-06-22 22:49:12.999433  11.8.68.71  11.73.24.85 TCP 66  [TCP Keep-Alive] 871 → 2052 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=1296 Ack=241 Win=65280 Len=0 TSval=1220605896 TSecr=1453532233</span>
