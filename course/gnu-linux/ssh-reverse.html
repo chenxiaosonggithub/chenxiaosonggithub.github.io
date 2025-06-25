@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,95 +94,124 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">反向ssh和内网穿透</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#安装"><span class="toc-section-number">1</span> 安装</a></li>
-<li><a href="#配置"><span class="toc-section-number">2</span> 配置</a></li>
-<li><a href="#监听"><span class="toc-section-number">3</span> 监听</a></li>
-<li><a href="#内网穿透"><span class="toc-section-number">4</span> 内网穿透</a></li>
-<li><a href="#花生壳"><span class="toc-section-number">5</span> 花生壳</a></li>
-<li><a href="#向日葵和todesk"><span class="toc-section-number">6</span> 向日葵和ToDesk</a></li>
-<li><a href="#remote-desktopl"><span class="toc-section-number">7</span> 家里远程桌面到公司ubuntu24.04</a></li>
-<li><a href="#juicessh"><span class="toc-section-number">8</span> JuiceSSH</a></li>
+<li><a href="#安装" id="toc-安装"><span
+class="toc-section-number">1</span> 安装</a></li>
+<li><a href="#配置" id="toc-配置"><span
+class="toc-section-number">2</span> 配置</a></li>
+<li><a href="#监听" id="toc-监听"><span
+class="toc-section-number">3</span> 监听</a></li>
+<li><a href="#内网穿透" id="toc-内网穿透"><span
+class="toc-section-number">4</span> 内网穿透</a></li>
+<li><a href="#花生壳" id="toc-花生壳"><span
+class="toc-section-number">5</span> 花生壳</a></li>
+<li><a href="#向日葵和todesk" id="toc-向日葵和todesk"><span
+class="toc-section-number">6</span> 向日葵和ToDesk</a></li>
+<li><a href="#remote-desktopl" id="toc-remote-desktopl"><span
+class="toc-section-number">7</span>
+家里远程桌面到公司ubuntu24.04</a></li>
+<li><a href="#juicessh" id="toc-juicessh"><span
+class="toc-section-number">8</span> JuiceSSH</a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
 <p>现在有3台电脑:</p>
 <pre><code>1. 局域网电脑 private-server
 2. 有公网ip的服务器 public-server
 3. 另一个局域网电脑 private-client</code></pre>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>                           <span class="ex">Wide</span> Area Network                         </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>                              <span class="ex">+--------+</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>                              <span class="kw">|</span> <span class="ex">public</span> <span class="kw">|</span>                             </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>             <span class="ex">+---------------</span><span class="op">&gt;</span><span class="kw">|</span> <span class="ex">server</span> <span class="kw">|</span><span class="op">&lt;</span><span class="ex">-------------+</span>              </span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>             <span class="kw">|</span>                <span class="ex">+--------+</span>              <span class="kw">|</span>              </span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>             <span class="kw">|</span>                <span class="ex">public</span> ip               <span class="kw">|</span>              </span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>             <span class="kw">|</span>                                        <span class="kw">|</span>              </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>             <span class="kw">|</span>                                        <span class="kw">|</span>              </span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>             <span class="kw">|</span>                                        <span class="kw">|</span>              </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>             <span class="ex">v</span>                                        v              </span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="ex">+-----------------------+</span>                   +-----------------------+</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="kw">|</span> <span class="ex">Local</span> Area Network A  <span class="kw">|</span>                   <span class="kw">|</span> <span class="ex">Local</span> Area Network B  <span class="kw">|</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="kw">|</span>                       <span class="kw">|</span>                   <span class="kw">|</span>                       <span class="kw">|</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="kw">|</span>       <span class="ex">+---------+</span>     <span class="kw">|</span>                   <span class="kw">|</span>     <span class="ex">+---------+</span>       <span class="kw">|</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="kw">|</span>       <span class="kw">|</span> <span class="ex">private</span> <span class="kw">|</span>     <span class="kw">|</span>                   <span class="kw">|</span>     <span class="kw">|</span> <span class="ex">private</span> <span class="kw">|</span>       <span class="kw">|</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="kw">|</span>       <span class="kw">|</span> <span class="ex">client</span>  <span class="kw">|</span>     <span class="kw">|</span>                   <span class="kw">|</span>     <span class="kw">|</span> <span class="ex">server</span>  <span class="kw">|</span>       <span class="kw">|</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a><span class="kw">|</span>       <span class="ex">+---------+</span>     <span class="kw">|</span>                   <span class="kw">|</span>     <span class="ex">+---------+</span>       <span class="kw">|</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a><span class="kw">|</span>                       <span class="kw">|</span>                   <span class="kw">|</span>                       <span class="kw">|</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a><span class="ex">+-----------------------+</span>                   +-----------------------+</span></code></pre></div>
-<p>由于private-client和private-server处于局域网（Local Area Network），private-client 无法直接访问 private-server，要通过 public-server（有公网ip） 做一个中转。</p>
-<h1 data-number="1" id="安装"><span class="header-section-number">1</span> 安装</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>                           <span class="ex">Wide</span> Area Network                         </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                              <span class="ex">+--------+</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                              <span class="kw">|</span> <span class="ex">public</span> <span class="kw">|</span>                             </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>             <span class="ex">+---------------</span><span class="op">&gt;|</span> server <span class="kw">|</span><span class="op">&lt;</span>-------------+              </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>             <span class="kw">|</span>                <span class="ex">+--------+</span>              <span class="kw">|</span>              </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>             <span class="kw">|</span>                <span class="ex">public</span> ip               <span class="kw">|</span>              </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>             <span class="kw">|</span>                                        <span class="kw">|</span>              </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>             <span class="kw">|</span>                                        <span class="kw">|</span>              </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>             <span class="kw">|</span>                                        <span class="kw">|</span>              </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>             <span class="ex">v</span>                                        v              </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----------------------+</span>                   +-----------------------+</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">Local</span> Area Network A  <span class="kw">|</span>                   <span class="kw">|</span> <span class="ex">Local</span> Area Network B  <span class="kw">|</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>                       <span class="kw">|</span>                   <span class="kw">|</span>                       <span class="kw">|</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>       <span class="ex">+---------+</span>     <span class="kw">|</span>                   <span class="kw">|</span>     <span class="ex">+---------+</span>       <span class="kw">|</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>       <span class="kw">|</span> <span class="ex">private</span> <span class="kw">|</span>     <span class="kw">|</span>                   <span class="kw">|</span>     <span class="kw">|</span> <span class="ex">private</span> <span class="kw">|</span>       <span class="kw">|</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>       <span class="kw">|</span> <span class="ex">client</span>  <span class="kw">|</span>     <span class="kw">|</span>                   <span class="kw">|</span>     <span class="kw">|</span> <span class="ex">server</span>  <span class="kw">|</span>       <span class="kw">|</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>       <span class="ex">+---------+</span>     <span class="kw">|</span>                   <span class="kw">|</span>     <span class="ex">+---------+</span>       <span class="kw">|</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span>                       <span class="kw">|</span>                   <span class="kw">|</span>                       <span class="kw">|</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="ex">+-----------------------+</span>                   +-----------------------+</span></code></pre></div>
+<p>由于private-client和private-server处于局域网（Local Area
+Network），private-client 无法直接访问 private-server，要通过
+public-server（有公网ip） 做一个中转。</p>
+<h1 data-number="1" id="安装"><span
+class="header-section-number">1</span> 安装</h1>
 <p>首先在private-server上安装autossh:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co"># https://www.harding.motd.ca/autossh/ # centos9源码安装, 没法通过包管理器安装</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="fu">sudo</span> apt install autossh -y <span class="co"># ubuntu2204</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># https://www.harding.motd.ca/autossh/ # centos9源码安装, 没法通过包管理器安装</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install autossh <span class="at">-y</span> <span class="co"># ubuntu2204</span></span></code></pre></div>
 <p>private-server安装openssh-server:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="fu">sudo</span> apt install openssh-server -y</span></code></pre></div>
-<h1 data-number="2" id="配置"><span class="header-section-number">2</span> 配置</h1>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install openssh-server <span class="at">-y</span></span></code></pre></div>
+<h1 data-number="2" id="配置"><span
+class="header-section-number">2</span> 配置</h1>
 <p>public-server上做如下更改:</p>
 <pre class="shell"><code>vim /etc/ssh/sshd_config # GatewayPorts yes
 systemctl restart sshd # 重启ssh</code></pre>
-<p>在private-server上执行<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/link.sh"><code>link.sh</code></a>脚本 将<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/ssh-reverse.service"><code>ssh-reverse.service</code></a> 链接到<code>/lib/systemd/system/ssh-reverse.service</code>。</p>
-<p>private-server 在<code>/etc/bashrc</code>或<code>/etc/bash.bashrc</code>(通过<code>/etc/profile</code>查看到底是哪个文件)中添加:</p>
+<p>在private-server上执行<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/link.sh"><code>link.sh</code></a>脚本
+将<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/ssh-reverse.service"><code>ssh-reverse.service</code></a>
+链接到<code>/lib/systemd/system/ssh-reverse.service</code>。</p>
+<p>private-server
+在<code>/etc/bashrc</code>或<code>/etc/bash.bashrc</code>(通过<code>/etc/profile</code>查看到底是哪个文件)中添加:</p>
 <pre class="shell"><code>AUTOSSH_POLL=60</code></pre>
 <p>然后在private-server上执行以下操作:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="fu">sudo</span> -i <span class="co"># 切换成 root, 因为开机运行 ssh-reverse 是 root 用户</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="fu">ssh-keygen</span> <span class="co"># 生成ssh key</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="ex">ssh-copy-id</span> root@chenxiaosong.com # 执行后可以免密登录到 public-server</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="fu">sudo</span> setenforce 0 <span class="co"># centos9 关闭 selinux</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a><span class="fu">sudo</span> vim /etc/selinux/config <span class="co"># centos9 改成 SELINUX=permissive, 开机就关闭selinux</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a><span class="fu">sudo</span> systemctl enable ssh-reverse <span class="co"># 开机启动</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="fu">sudo</span> systemctl restart ssh-reverse <span class="co"># 重启服务</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> <span class="at">-i</span> <span class="co"># 切换成 root, 因为开机运行 ssh-reverse 是 root 用户</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-keygen</span> <span class="co"># 生成ssh key</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">ssh-copy-id</span> root@chenxiaosong.com <span class="co"># 执行后可以免密登录到 public-server</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> setenforce 0 <span class="co"># centos9 关闭 selinux</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> vim /etc/selinux/config <span class="co"># centos9 改成 SELINUX=permissive, 开机就关闭selinux</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable ssh-reverse <span class="co"># 开机启动</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart ssh-reverse <span class="co"># 重启服务</span></span></code></pre></div>
 <p>在public-server上查看是否在监听某些端口:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="co"># -t: 显示 TCP 端口信息。</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="co"># -u: 显示 UDP 端口信息。</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="co"># -l: 仅显示正在监听的端口。</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="co"># -n: 显示数值格式的端口号，而不是尝试解析服务名称。</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="co"># -p: 显示PID/Program</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a><span class="fu">netstat</span> -tunpl <span class="kw">|</span> <span class="fu">grep</span> 5555</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -t: 显示 TCP 端口信息。</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -u: 显示 UDP 端口信息。</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -l: 仅显示正在监听的端口。</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># -n: 显示数值格式的端口号，而不是尝试解析服务名称。</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># -p: 显示PID/Program</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">netstat</span> <span class="at">-tunpl</span> <span class="kw">|</span> <span class="fu">grep</span> 5555</span></code></pre></div>
 <p>这时private-client就可以直接访问private-server了:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="fu">ssh</span> -p 55555 sonvhi@chenxiaosong.com</span></code></pre></div>
-<h1 data-number="3" id="监听"><span class="header-section-number">3</span> 监听</h1>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="at">-p</span> 55555 sonvhi@chenxiaosong.com</span></code></pre></div>
+<h1 data-number="3" id="监听"><span
+class="header-section-number">3</span> 监听</h1>
 <p>有时会因为网络波动出现无法远程连接，可以在private-server上使用脚本监测，当监测到无法连接时，重启服务。</p>
-<p>执行以下命令，运行<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/monitor-ssh.sh"><code>monitor-ssh.sh</code></a>脚本:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="fu">mkdir</span> -p /home/sonvhi/chenxiaosong/monitor-ssh</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="co"># 因为要不断写日志，所以挂载一个tmpfs，避免写入磁盘，否则会降低磁盘寿命</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="fu">sudo</span> mount -t tmpfs -o size=64G monitor-ssh /home/sonvhi/chenxiaosong/monitor-ssh</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="fu">sudo</span> -i <span class="co"># 因为要重启service</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="bu">cd</span> /home/sonvhi/chenxiaosong/code/blog/src/ssh-reverse</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="fu">bash</span> monitor-ssh.sh <span class="kw">&amp;</span></span></code></pre></div>
-<h1 data-number="4" id="内网穿透"><span class="header-section-number">4</span> 内网穿透</h1>
+<p>执行以下命令，运行<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/monitor-ssh.sh"><code>monitor-ssh.sh</code></a>脚本:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> /home/sonvhi/chenxiaosong/monitor-ssh</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 因为要不断写日志，所以挂载一个tmpfs，避免写入磁盘，否则会降低磁盘寿命</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> mount <span class="at">-t</span> tmpfs <span class="at">-o</span> size=64G monitor-ssh /home/sonvhi/chenxiaosong/monitor-ssh</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> <span class="at">-i</span> <span class="co"># 因为要重启service</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/sonvhi/chenxiaosong/code/blog/src/ssh-reverse</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> monitor-ssh.sh <span class="kw">&amp;</span></span></code></pre></div>
+<h1 data-number="4" id="内网穿透"><span
+class="header-section-number">4</span> 内网穿透</h1>
 <p>ssh反向隧道还可以用于内网穿透，比如把内网linux的mysql端口暴露到公网上:</p>
 <pre class="shell"><code># ssh -R &lt;公网服务器IP&gt;:&lt;公网端口&gt;:localhost:&lt;MySQL端口&gt; &lt;公网服务器用户名&gt;@&lt;公网服务器IP&gt;
 ssh -R chenxiaosong.com:22222:localhost:3306 root@chenxiaosong.com
@@ -179,47 +219,71 @@ ssh -N -R 22222:localhost:3306 root@chenxiaosong.com # -M: 启用控制台功能
 # ssh -N -R 远程端口1:目标主机1:目标端口1 -R 远程端口2:目标主机2:目标端口2 用户名@远程主机
 ssh -N -R 3306:localhost:3306 -R 6379:localhost:6379 -R 5001:localhost:5001 -R 5002:localhost:5002 root@chenxiaosong.com # 多个映射</code></pre>
 <p>通过访问<code>chenxiaosong.com</code>的<code>22222</code>端口就能访问到内网mysql的<code>3306</code>端口。</p>
-<h1 data-number="5" id="花生壳"><span class="header-section-number">5</span> 花生壳</h1>
-<p>如果不想自己搭建服务器，可以使用<a href="https://hsk.oray.com/">花生壳</a>，<a href="https://service.oray.com/question/15507.html">查看帮忙文档</a>。</p>
-<p>注意不能用<code>wget</code>命令下载（下载的文件错误），直接访问<a href="https://dl.oray.com/hsk/linux/phddns_5.3.0_amd64.rpm">centos</a>和<a href="https://dl.oray.com/hsk/linux/phddns_5.3.0_amd64.deb">ubuntu</a> 下载链接（<a href="https://hsk.oray.com/download">版本号查看官网</a>）在网页下载。</p>
-<p>Linux安装请<a href="https://service.oray.com/question/11630.html">点击这里查看文档</a>:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="co"># 安装成功后会打印`SN: orayxxxx   Default password: admin`</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="ex">rpm</span> -ivh phddns_5.3.0_amd64.rpm</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="fu">sudo</span> dpkg -i phddns_5.3.0_amd64.deb</span></code></pre></div>
+<h1 data-number="5" id="花生壳"><span
+class="header-section-number">5</span> 花生壳</h1>
+<p>如果不想自己搭建服务器，可以使用<a
+href="https://hsk.oray.com/">花生壳</a>，<a
+href="https://service.oray.com/question/15507.html">查看帮忙文档</a>。</p>
+<p>注意不能用<code>wget</code>命令下载（下载的文件错误），直接访问<a
+href="https://dl.oray.com/hsk/linux/phddns_5.3.0_amd64.rpm">centos</a>和<a
+href="https://dl.oray.com/hsk/linux/phddns_5.3.0_amd64.deb">ubuntu</a>
+下载链接（<a
+href="https://hsk.oray.com/download">版本号查看官网</a>）在网页下载。</p>
+<p>Linux安装请<a
+href="https://service.oray.com/question/11630.html">点击这里查看文档</a>:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 安装成功后会打印`SN: orayxxxx   Default password: admin`</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">rpm</span> <span class="at">-ivh</span> phddns_5.3.0_amd64.rpm</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dpkg <span class="at">-i</span> phddns_5.3.0_amd64.deb</span></code></pre></div>
 <p>启动服务:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="fu">sudo</span> phddns enable <span class="co"># 开机启动</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="fu">sudo</span> phddns start <span class="co"># 启动</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="fu">sudo</span> phddns status <span class="co"># 查看状态</span></span></code></pre></div>
-<p>在<a href="https://console.hsk.oray.com/zh/device">贝锐花生壳管理 - 设备列表</a>添加设备。</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> phddns enable <span class="co"># 开机启动</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> phddns start <span class="co"># 启动</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> phddns status <span class="co"># 查看状态</span></span></code></pre></div>
+<p>在<a href="https://console.hsk.oray.com/zh/device">贝锐花生壳管理 -
+设备列表</a>添加设备。</p>
 <p>注意可能会断开，可以用以下脚本检查重启服务:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="co"># 需要先执行 sudo -i</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="kw">while</span> <span class="fu">true</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a><span class="kw">do</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a>    <span class="fu">ssh</span> -p xxxxx -o ConnectTimeout=3 -q xxx@xxxx.chenxiaosong.com exit</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a>    <span class="kw">if</span><span class="bu"> [</span> <span class="va">$?</span> <span class="ot">!=</span> 0<span class="bu"> ]</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true"></a>    <span class="kw">then</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true"></a>        <span class="bu">echo</span> <span class="kw">`</span><span class="fu">date</span><span class="kw">`</span> fail</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true"></a>        <span class="ex">phddns</span> restart</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true"></a>    <span class="kw">fi</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true"></a></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true"></a>    <span class="fu">sleep</span> 120</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true"></a><span class="kw">done</span></span></code></pre></div>
-<h1 data-number="6" id="向日葵和todesk"><span class="header-section-number">6</span> 向日葵和ToDesk</h1>
-<p>还可以使用<a href="https://sunlogin.oray.com/download?categ=personal">向日葵</a>和<a href="https://www.todesk.com/download.html">ToDesk</a>。</p>
-<p>向日葵有<a href="https://service.oray.com/question/11017.html">命令行版本</a>，但是要付费的，还不如自己买个服务器，下面以centos7为例说明安装过程:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="ex">yum</span> install ./sunloginclientshell-10.1.1.28779.x86_64.rpm -y</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a><span class="fu">sudo</span> /usr/local/sunlogin/bin/sunloginclient</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>按<span class="ex">F12</span> -<span class="op">&gt;</span> Bind, 登录向日葵账号密码</span></code></pre></div>
-<h1 data-number="7" id="remote-desktopl"><span class="header-section-number">7</span> 家里远程桌面到公司ubuntu24.04</h1>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 需要先执行 sudo -i</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="fu">true</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ssh</span> <span class="at">-p</span> xxxxx <span class="at">-o</span> ConnectTimeout=3 <span class="at">-q</span> xxx@xxxx.chenxiaosong.com exit</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">[</span> <span class="va">$?</span> <span class="ot">!=</span> 0 <span class="bu">]</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">then</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="kw">`</span><span class="fu">date</span><span class="kw">`</span> fail</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        <span class="ex">phddns</span> restart</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sleep</span> 120</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<h1 data-number="6" id="向日葵和todesk"><span
+class="header-section-number">6</span> 向日葵和ToDesk</h1>
+<p>还可以使用<a
+href="https://sunlogin.oray.com/download?categ=personal">向日葵</a>和<a
+href="https://www.todesk.com/download.html">ToDesk</a>。</p>
+<p>向日葵有<a
+href="https://service.oray.com/question/11017.html">命令行版本</a>，但是要付费的，还不如自己买个服务器，下面以centos7为例说明安装过程:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">yum</span> install ./sunloginclientshell-10.1.1.28779.x86_64.rpm <span class="at">-y</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> /usr/local/sunlogin/bin/sunloginclient</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">按F12</span> <span class="at">-</span><span class="op">&gt;</span> Bind, 登录向日葵账号密码</span></code></pre></div>
+<h1 data-number="7" id="remote-desktopl"><span
+class="header-section-number">7</span>
+家里远程桌面到公司ubuntu24.04</h1>
 <p>ubuntu24.04没有vnc协议，只有rdp协议，位置是<code>设置 -&gt; 系统 -&gt; 桌面共享</code>，注意物理机上需要连接显示器才能远程桌面控制。</p>
-<p>我是从家里的苹果笑柄连接到公司的ubuntu24.04，macOS通过向日葵连接到virt-manager中的Windows11，Windows11通过“远程桌面连接”连接到ubuntu24.04。 另外，通过<a href="https://chenxiaosong.com/course/gnu-linux/install.html#wake-on-lan">网络唤醒（Wake-on-LAN）</a>另一台Linux。</p>
+<p>我是从家里的苹果笑柄连接到公司的ubuntu24.04，macOS通过向日葵连接到virt-manager中的Windows11，Windows11通过“远程桌面连接”连接到ubuntu24.04。
+另外，通过<a
+href="https://chenxiaosong.com/course/gnu-linux/install.html#wake-on-lan">网络唤醒（Wake-on-LAN）</a>另一台Linux。</p>
 <p>如果Virt-manager中的Windows11出问题（比如卡死），可以用以下命令在远程操作virt-manager:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="ex">virsh</span> list # 本地活动虚拟机</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="ex">virsh</span> list –all # 本地所有的虚拟机（活动的+不活动的）</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="ex">virsh</span> shutdown Win11_24H2_Chinese_Simplified_x64 # 正常关闭虚拟机</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="ex">virsh</span> destroy Win11_24H2_Chinese_Simplified_x64 # 强制关闭虚拟机</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a><span class="ex">virsh</span> start Win11_24H2_Chinese_Simplified_x64 # 启动非活动虚拟机</span></code></pre></div>
-<h1 data-number="8" id="juicessh"><span class="header-section-number">8</span> JuiceSSH</h1>
-<p>安卓手机上远程登录可以使用<a href="https://juicessh.com/changelog">JuiceSSH</a>。</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> list <span class="co"># 本地活动虚拟机</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> list –all <span class="co"># 本地所有的虚拟机（活动的+不活动的）</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> shutdown Win11_24H2_Chinese_Simplified_x64 <span class="co"># 正常关闭虚拟机</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> destroy Win11_24H2_Chinese_Simplified_x64 <span class="co"># 强制关闭虚拟机</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> start Win11_24H2_Chinese_Simplified_x64 <span class="co"># 启动非活动虚拟机</span></span></code></pre></div>
+<h1 data-number="8" id="juicessh"><span
+class="header-section-number">8</span> JuiceSSH</h1>
+<p>安卓手机上远程登录可以使用<a
+href="https://juicessh.com/changelog">JuiceSSH</a>。</p>
 </body>
 </html>
