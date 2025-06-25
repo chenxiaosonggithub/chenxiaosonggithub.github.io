@@ -122,13 +122,15 @@ class="toc-section-number">3</span> 监听</a></li>
 class="toc-section-number">4</span> 内网穿透</a></li>
 <li><a href="#花生壳" id="toc-花生壳"><span
 class="toc-section-number">5</span> 花生壳</a></li>
+<li><a href="#cpolar" id="toc-cpolar"><span
+class="toc-section-number">6</span> cpolar</a></li>
 <li><a href="#向日葵和todesk" id="toc-向日葵和todesk"><span
-class="toc-section-number">6</span> 向日葵和ToDesk</a></li>
+class="toc-section-number">7</span> 向日葵和ToDesk</a></li>
 <li><a href="#remote-desktopl" id="toc-remote-desktopl"><span
-class="toc-section-number">7</span>
+class="toc-section-number">8</span>
 家里远程桌面到公司ubuntu24.04</a></li>
 <li><a href="#juicessh" id="toc-juicessh"><span
-class="toc-section-number">8</span> JuiceSSH</a></li>
+class="toc-section-number">9</span> JuiceSSH</a></li>
 </ul>
 </nav>
 <p><a
@@ -256,33 +258,50 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sleep</span> 120</span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
-<h1 data-number="6" id="向日葵和todesk"><span
-class="header-section-number">6</span> 向日葵和ToDesk</h1>
+<h1 data-number="6" id="cpolar"><span
+class="header-section-number">6</span> cpolar</h1>
+<p>花生壳免费版的可能会出问题，可以使用<a
+href="https://www.cpolar.com/blog/cpolar-quick-start-tutorial-ubuntu-series">cpolar</a>代替:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update <span class="at">-y</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install curl <span class="at">-y</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-L</span> https://www.cpolar.com/static/downloads/install-release-cpolar.sh <span class="kw">|</span> <span class="fu">sudo</span> bash</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="ex">cpolar</span> version</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ex">cpolar</span> authtoken xxxxxxx <span class="co"># https://dashboard.cpolar.com/auth</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable cpolar</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl start cpolar</span></code></pre></div>
+<p>访问<a
+href="http://localhost:9200/">localhost:9200</a>并登录邮箱账号，<a
+href="http://localhost:9200/#/tunnels/create">创建隧道localhost:9200/#/tunnels/create</a>，<a
+href="http://localhost:9200/#/status/online">在线隧道列表localhost:9200/#/status/online</a>查看，或在<a
+href="https://dashboard.cpolar.com/status">cpolar网官</a>查看。</p>
+<h1 data-number="7" id="向日葵和todesk"><span
+class="header-section-number">7</span> 向日葵和ToDesk</h1>
 <p>还可以使用<a
 href="https://sunlogin.oray.com/download?categ=personal">向日葵</a>和<a
 href="https://www.todesk.com/download.html">ToDesk</a>。</p>
 <p>向日葵有<a
-href="https://service.oray.com/question/11017.html">命令行版本</a>，但是要付费的，还不如自己买个服务器，下面以centos7为例说明安装过程:</p>
-<div class="sourceCode" id="cb15"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">yum</span> install ./sunloginclientshell-10.1.1.28779.x86_64.rpm <span class="at">-y</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> /usr/local/sunlogin/bin/sunloginclient</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">按F12</span> <span class="at">-</span><span class="op">&gt;</span> Bind, 登录向日葵账号密码</span></code></pre></div>
-<h1 data-number="7" id="remote-desktopl"><span
-class="header-section-number">7</span>
+href="https://service.oray.com/question/11017.html">命令行版本</a>，但是要付费的（还不如自己买个服务器，当然更推荐用花生壳），下面以centos7为例说明安装过程:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">yum</span> install ./sunloginclientshell-10.1.1.28779.x86_64.rpm <span class="at">-y</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> /usr/local/sunlogin/bin/sunloginclient</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">按F12</span> <span class="at">-</span><span class="op">&gt;</span> Bind, 登录向日葵账号密码</span></code></pre></div>
+<h1 data-number="8" id="remote-desktopl"><span
+class="header-section-number">8</span>
 家里远程桌面到公司ubuntu24.04</h1>
 <p>ubuntu24.04没有vnc协议，只有rdp协议，位置是<code>设置 -&gt; 系统 -&gt; 桌面共享</code>，注意物理机上需要连接显示器才能远程桌面控制。</p>
 <p>我是从家里的苹果笑柄连接到公司的ubuntu24.04，macOS通过向日葵连接到virt-manager中的Windows11，Windows11通过“远程桌面连接”连接到ubuntu24.04。
 另外，通过<a
 href="https://chenxiaosong.com/course/gnu-linux/install.html#wake-on-lan">网络唤醒（Wake-on-LAN）</a>另一台Linux。</p>
 <p>如果Virt-manager中的Windows11出问题（比如卡死），可以用以下命令在远程操作virt-manager:</p>
-<div class="sourceCode" id="cb16"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> list <span class="co"># 本地活动虚拟机</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> list –all <span class="co"># 本地所有的虚拟机（活动的+不活动的）</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> shutdown Win11_24H2_Chinese_Simplified_x64 <span class="co"># 正常关闭虚拟机</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> destroy Win11_24H2_Chinese_Simplified_x64 <span class="co"># 强制关闭虚拟机</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> start Win11_24H2_Chinese_Simplified_x64 <span class="co"># 启动非活动虚拟机</span></span></code></pre></div>
-<h1 data-number="8" id="juicessh"><span
-class="header-section-number">8</span> JuiceSSH</h1>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> list <span class="co"># 本地活动虚拟机</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> list –all <span class="co"># 本地所有的虚拟机（活动的+不活动的）</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> shutdown Win11_24H2_Chinese_Simplified_x64 <span class="co"># 正常关闭虚拟机</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> destroy Win11_24H2_Chinese_Simplified_x64 <span class="co"># 强制关闭虚拟机</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="ex">virsh</span> start Win11_24H2_Chinese_Simplified_x64 <span class="co"># 启动非活动虚拟机</span></span></code></pre></div>
+<h1 data-number="9" id="juicessh"><span
+class="header-section-number">9</span> JuiceSSH</h1>
 <p>安卓手机上远程登录可以使用<a
 href="https://juicessh.com/changelog">JuiceSSH</a>。</p>
 </body>
