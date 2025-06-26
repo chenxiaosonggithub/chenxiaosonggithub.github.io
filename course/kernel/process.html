@@ -302,106 +302,109 @@ href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/f
 class="header-section-number">2</span> 线程</h1>
 <p>一个多线程的程序，所有线程形成一个线程组，线程组中的第一个线程为线程组的pid，
 这个第一个线程叫主线程，也就是调用<code>pthread_create()</code>的线程，<code>struct task_struct</code>中的<code>tgid</code>表示线程组中主线程的pid，<code>getpid()</code>系统调用获得的就是这个值。</p>
+<p>在用户空间，线程id用以下方式获取:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/syscall.h&gt;</span><span class="pp"> </span><span class="co">// 用于 SYS_gettid</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pid_t tid <span class="op">=</span> syscall<span class="op">(</span>SYS_gettid<span class="op">);</span></span></code></pre></div>
 <h2 data-number="2.1" id="创建线程"><span
 class="header-section-number">2.1</span> 创建线程</h2>
 <p>线程是和其他进程共享某些资源（如地址空间等）的进程，创建线程:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 共享: 地址空间、文件系统资源、文件描述符、信号处理程序</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>clone<span class="op">(</span>CLONE_VM <span class="op">|</span> CLONE_FS <span class="op">|</span> CLONE_FILES <span class="op">|</span> CLONE_SIGHAND<span class="op">,</span> <span class="dv">0</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 共享: 地址空间、文件系统资源、文件描述符、信号处理程序</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>clone<span class="op">(</span>CLONE_VM <span class="op">|</span> CLONE_FS <span class="op">|</span> CLONE_FILES <span class="op">|</span> CLONE_SIGHAND<span class="op">,</span> <span class="dv">0</span><span class="op">)</span></span></code></pre></div>
 <p><code>clone</code>系统调用的参数<code>clone_flags</code>可以是如下值的组合:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * cloning flags:</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CSIGNAL     </span><span class="bn">0x000000ff</span><span class="pp">  </span><span class="co">/* 在退出时要发送的信号掩码 */</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_VM    </span><span class="bn">0x00000100</span><span class="pp">  </span><span class="co">/* 设置此标志时，进程之间共享虚拟内存（VM） */</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_FS    </span><span class="bn">0x00000200</span><span class="pp">  </span><span class="co">/* 设置此标志时，进程之间共享文件系统信息 */</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_FILES </span><span class="bn">0x00000400</span><span class="pp">  </span><span class="co">/* 设置此标志时，进程之间共享已打开的文件 */</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_SIGHAND   </span><span class="bn">0x00000800</span><span class="pp">  </span><span class="co">/* 设置此标志时，进程之间共享信号处理程序和被阻塞的信号 */</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_PIDFD </span><span class="bn">0x00001000</span><span class="pp">  </span><span class="co">/* 设置此标志时，在父进程中创建一个 pidfd */</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_PTRACE    </span><span class="bn">0x00002000</span><span class="pp">  </span><span class="co">/* 设置此标志时，允许对子进程的跟踪继续 */</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_VFORK </span><span class="bn">0x00004000</span><span class="pp">  </span><span class="co">/* 设置此标志时，子进程在释放内存管理器（mm_release）时唤醒父进程 */</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_PARENT    </span><span class="bn">0x00008000</span><span class="pp">  </span><span class="co">/* 设置此标志时，子进程与克隆进程拥有相同的父进程 */</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_THREAD    </span><span class="bn">0x00010000</span><span class="pp">  </span><span class="co">/* 同一线程组？ */</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWNS </span><span class="bn">0x00020000</span><span class="pp">  </span><span class="co">/* 新的挂载命名空间组 */</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_SYSVSEM   </span><span class="bn">0x00040000</span><span class="pp">  </span><span class="co">/* 共享 System V 的 SEM_UNDO 语义 */</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_SETTLS    </span><span class="bn">0x00080000</span><span class="pp">  </span><span class="co">/* 为子进程创建新的 TLS */</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_PARENT_SETTID </span><span class="bn">0x00100000</span><span class="pp">  </span><span class="co">/* 在父进程中设置 TID */</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_CHILD_CLEARTID    </span><span class="bn">0x00200000</span><span class="pp">  </span><span class="co">/* 在子进程中清除 TID */</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_DETACHED      </span><span class="bn">0x00400000</span><span class="pp">  </span><span class="co">/* 未使用，忽略 */</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_UNTRACED      </span><span class="bn">0x00800000</span><span class="pp">  </span><span class="co">/* 设置此标志时，跟踪进程不能强制对子进程使用 CLONE_PTRACE */</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_CHILD_SETTID  </span><span class="bn">0x01000000</span><span class="pp">  </span><span class="co">/* 在子进程中设置 TID */</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWCGROUP     </span><span class="bn">0x02000000</span><span class="pp">  </span><span class="co">/* 新的 cgroup 命名空间 */</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWUTS        </span><span class="bn">0x04000000</span><span class="pp">  </span><span class="co">/* 新的 UTS 命名空间 */</span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWIPC        </span><span class="bn">0x08000000</span><span class="pp">  </span><span class="co">/* 新的 IPC 命名空间 */</span></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWUSER       </span><span class="bn">0x10000000</span><span class="pp">  </span><span class="co">/* 新的用户命名空间 */</span></span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWPID        </span><span class="bn">0x20000000</span><span class="pp">  </span><span class="co">/* 新的 PID 命名空间 */</span></span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWNET        </span><span class="bn">0x40000000</span><span class="pp">  </span><span class="co">/* 新的网络命名空间 */</span></span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_IO        </span><span class="bn">0x80000000</span><span class="pp">  </span><span class="co">/* 克隆 IO 上下文 */</span></span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="co">/* clone3() 系统调用的标志。 */</span></span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_CLEAR_SIGHAND </span><span class="bn">0x100000000</span><span class="bu">ULL</span><span class="pp"> </span><span class="co">/* 清除任何信号处理程序并重置为 SIG_DFL。 */</span></span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_INTO_CGROUP </span><span class="bn">0x200000000</span><span class="bu">ULL</span><span class="pp"> </span><span class="co">/* 在具有相应权限的情况下克隆到特定的 cgroup 中。 */</span></span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a><span class="co"> * 克隆标志与 CSIGNAL 交叉，因此只能与 unshare 和 clone3 系统调用一起使用:</span></span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWTIME   </span><span class="bn">0x00000080</span><span class="pp">  </span><span class="co">/* 新的时间命名空间 */</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * cloning flags:</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CSIGNAL     </span><span class="bn">0x000000ff</span><span class="pp">  </span><span class="co">/* 在退出时要发送的信号掩码 */</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_VM    </span><span class="bn">0x00000100</span><span class="pp">  </span><span class="co">/* 设置此标志时，进程之间共享虚拟内存（VM） */</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_FS    </span><span class="bn">0x00000200</span><span class="pp">  </span><span class="co">/* 设置此标志时，进程之间共享文件系统信息 */</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_FILES </span><span class="bn">0x00000400</span><span class="pp">  </span><span class="co">/* 设置此标志时，进程之间共享已打开的文件 */</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_SIGHAND   </span><span class="bn">0x00000800</span><span class="pp">  </span><span class="co">/* 设置此标志时，进程之间共享信号处理程序和被阻塞的信号 */</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_PIDFD </span><span class="bn">0x00001000</span><span class="pp">  </span><span class="co">/* 设置此标志时，在父进程中创建一个 pidfd */</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_PTRACE    </span><span class="bn">0x00002000</span><span class="pp">  </span><span class="co">/* 设置此标志时，允许对子进程的跟踪继续 */</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_VFORK </span><span class="bn">0x00004000</span><span class="pp">  </span><span class="co">/* 设置此标志时，子进程在释放内存管理器（mm_release）时唤醒父进程 */</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_PARENT    </span><span class="bn">0x00008000</span><span class="pp">  </span><span class="co">/* 设置此标志时，子进程与克隆进程拥有相同的父进程 */</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_THREAD    </span><span class="bn">0x00010000</span><span class="pp">  </span><span class="co">/* 同一线程组？ */</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWNS </span><span class="bn">0x00020000</span><span class="pp">  </span><span class="co">/* 新的挂载命名空间组 */</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_SYSVSEM   </span><span class="bn">0x00040000</span><span class="pp">  </span><span class="co">/* 共享 System V 的 SEM_UNDO 语义 */</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_SETTLS    </span><span class="bn">0x00080000</span><span class="pp">  </span><span class="co">/* 为子进程创建新的 TLS */</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_PARENT_SETTID </span><span class="bn">0x00100000</span><span class="pp">  </span><span class="co">/* 在父进程中设置 TID */</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_CHILD_CLEARTID    </span><span class="bn">0x00200000</span><span class="pp">  </span><span class="co">/* 在子进程中清除 TID */</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_DETACHED      </span><span class="bn">0x00400000</span><span class="pp">  </span><span class="co">/* 未使用，忽略 */</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_UNTRACED      </span><span class="bn">0x00800000</span><span class="pp">  </span><span class="co">/* 设置此标志时，跟踪进程不能强制对子进程使用 CLONE_PTRACE */</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_CHILD_SETTID  </span><span class="bn">0x01000000</span><span class="pp">  </span><span class="co">/* 在子进程中设置 TID */</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWCGROUP     </span><span class="bn">0x02000000</span><span class="pp">  </span><span class="co">/* 新的 cgroup 命名空间 */</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWUTS        </span><span class="bn">0x04000000</span><span class="pp">  </span><span class="co">/* 新的 UTS 命名空间 */</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWIPC        </span><span class="bn">0x08000000</span><span class="pp">  </span><span class="co">/* 新的 IPC 命名空间 */</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWUSER       </span><span class="bn">0x10000000</span><span class="pp">  </span><span class="co">/* 新的用户命名空间 */</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWPID        </span><span class="bn">0x20000000</span><span class="pp">  </span><span class="co">/* 新的 PID 命名空间 */</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWNET        </span><span class="bn">0x40000000</span><span class="pp">  </span><span class="co">/* 新的网络命名空间 */</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_IO        </span><span class="bn">0x80000000</span><span class="pp">  </span><span class="co">/* 克隆 IO 上下文 */</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="co">/* clone3() 系统调用的标志。 */</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_CLEAR_SIGHAND </span><span class="bn">0x100000000</span><span class="bu">ULL</span><span class="pp"> </span><span class="co">/* 清除任何信号处理程序并重置为 SIG_DFL。 */</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_INTO_CGROUP </span><span class="bn">0x200000000</span><span class="bu">ULL</span><span class="pp"> </span><span class="co">/* 在具有相应权限的情况下克隆到特定的 cgroup 中。 */</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="co"> * 克隆标志与 CSIGNAL 交叉，因此只能与 unshare 和 clone3 系统调用一起使用:</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="pp">#define CLONE_NEWTIME   </span><span class="bn">0x00000080</span><span class="pp">  </span><span class="co">/* 新的时间命名空间 */</span></span></code></pre></div>
 <h2 data-number="2.2" id="内核线程"><span
 class="header-section-number">2.2</span> 内核线程</h2>
 <p>独立运行在内核空间的进程叫内核线程（kernel
 thread），和普通的用户进程的区别是没有独立的地址空间，也就是<code>task_struct</code>中的<code>mm</code>成员设置为<code>NULL</code>（可使用前一个用户空间进程的<code>mm</code>，用<code>active_mm</code>指向），所有内核线程都是<code>kthreadd</code>内核线程的后代。</p>
 <p>创建新的内核线程:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * kthread_create - 在当前节点上创建一个内核线程，处于不可运行状态，要通过wake_up_process()唤醒</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@threadfn:</span><span class="co"> 要在线程中运行的函数</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@data:</span><span class="co"> 传递给 </span><span class="an">@threadfn()</span><span class="co"> 的数据指针</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@namefmt:</span><span class="co"> 用于线程名称的 printf 风格格式字符串</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@arg</span><span class="co">: 用于 </span><span class="an">@namefmt</span><span class="co"> 的参数</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"> * 该宏将在当前节点上创建一个内核线程，并将其置于停止状态。</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"> * 这只是 kthread_create_on_node() 的一个辅助函数；</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"> * 详细信息请参见 kthread_create_on_node() 的文档。</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="pp">#define kthread_create</span><span class="op">(</span><span class="pp">threadfn</span><span class="op">,</span><span class="pp"> data</span><span class="op">,</span><span class="pp"> namefmt</span><span class="op">,</span><span class="pp"> arg</span><span class="op">...)</span><span class="pp"> \                   </span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        kthread_create_on_node<span class="op">(</span>threadfn<span class="op">,</span> data<span class="op">,</span> NUMA_NO_NODE<span class="op">,</span> namefmt<span class="op">,</span> ##arg<span class="op">)</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co"> * wake_up_process - 唤醒特定进程，唤醒kthread_create()创建的内核线程</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@p</span><span class="cv">:</span><span class="co"> 要唤醒的进程</span></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co"> * 尝试唤醒指定的进程，并将其移到可运行进程集合中。</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co"> * 返回值: 如果进程被唤醒则返回 1，如果进程已经在运行则返回 0。</span></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co"> * 该函数在访问任务状态之前执行一个完整的内存屏障。</span></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> wake_up_process<span class="op">(</span><span class="kw">struct</span> task_struct <span class="op">*</span>p<span class="op">)</span></span></code></pre></div>
-<p>也可以调用以下函数创建内核线程并立刻运行:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * kthread_run - 创建并唤醒一个线程。简单的调用了kthread_create()和wake_up_process()</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@threadfn:</span><span class="co"> 要运行的函数，直到 signal_pending(current) 为止。</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@data:</span><span class="co"> 传递给 </span><span class="an">@threadfn</span><span class="co"> 的数据指针。</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@namefmt:</span><span class="co"> 线程名称的 printf 风格格式。</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"> * 描述: 这是 kthread_create() 后紧跟 wake_up_process() 的便捷包装。</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"> * 返回值: 返回创建的内核线程指针或 ERR_PTR(-ENOMEM)。</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define kthread_run</span><span class="op">(</span><span class="pp">threadfn</span><span class="op">,</span><span class="pp"> data</span><span class="op">,</span><span class="pp"> namefmt</span><span class="op">,</span><span class="pp"> </span><span class="op">...)</span></span></code></pre></div>
-<p><code>threadfn()</code>一直运行直到调用<code>do_exit()</code>退出，或内核其他部分调用以下函数退出:</p>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * kthread_create - 在当前节点上创建一个内核线程，处于不可运行状态，要通过wake_up_process()唤醒</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@threadfn:</span><span class="co"> 要在线程中运行的函数</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@data:</span><span class="co"> 传递给 </span><span class="an">@threadfn()</span><span class="co"> 的数据指针</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@namefmt:</span><span class="co"> 用于线程名称的 printf 风格格式字符串</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@arg</span><span class="co">: 用于 </span><span class="an">@namefmt</span><span class="co"> 的参数</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"> * 该宏将在当前节点上创建一个内核线程，并将其置于停止状态。</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"> * 这只是 kthread_create_on_node() 的一个辅助函数；</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"> * 详细信息请参见 kthread_create_on_node() 的文档。</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="pp">#define kthread_create</span><span class="op">(</span><span class="pp">threadfn</span><span class="op">,</span><span class="pp"> data</span><span class="op">,</span><span class="pp"> namefmt</span><span class="op">,</span><span class="pp"> arg</span><span class="op">...)</span><span class="pp"> \                   </span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        kthread_create_on_node<span class="op">(</span>threadfn<span class="op">,</span> data<span class="op">,</span> NUMA_NO_NODE<span class="op">,</span> namefmt<span class="op">,</span> ##arg<span class="op">)</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co"> * wake_up_process - 唤醒特定进程，唤醒kthread_create()创建的内核线程</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@p</span><span class="cv">:</span><span class="co"> 要唤醒的进程</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="co"> * 尝试唤醒指定的进程，并将其移到可运行进程集合中。</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co"> * 返回值: 如果进程被唤醒则返回 1，如果进程已经在运行则返回 0。</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="co"> * 该函数在访问任务状态之前执行一个完整的内存屏障。</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> wake_up_process<span class="op">(</span><span class="kw">struct</span> task_struct <span class="op">*</span>p<span class="op">)</span></span></code></pre></div>
+<p>也可以调用以下函数创建内核线程并立刻运行:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * kthread_stop - 停止由 kthread_create() 创建的线程。</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@k:</span><span class="co"> 由 kthread_create() 创建的线程。</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"> * 设置 </span><span class="an">@k</span><span class="co"> 线程的 kthread_should_stop() 返回 true，唤醒它，并等待其退出。</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"> * 这也可以在 kthread_create() 之后调用，而不是调用 wake_up_process():</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"> * 线程将会退出而不调用 threadfn()。</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"> * 如果 threadfn() 可能会自己调用 kthread_exit()，则调用者必须确保</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"> * task_struct 不会被释放。</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co"> * 返回值: 返回 threadfn() 的结果，如果从未调用过 wake_up_process()，</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co"> * 则返回 %-EINTR。</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> kthread_stop<span class="op">(</span><span class="kw">struct</span> task_struct <span class="op">*</span>k<span class="op">)</span></span></code></pre></div>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * kthread_run - 创建并唤醒一个线程。简单的调用了kthread_create()和wake_up_process()</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@threadfn:</span><span class="co"> 要运行的函数，直到 signal_pending(current) 为止。</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@data:</span><span class="co"> 传递给 </span><span class="an">@threadfn</span><span class="co"> 的数据指针。</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@namefmt:</span><span class="co"> 线程名称的 printf 风格格式。</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"> * 描述: 这是 kthread_create() 后紧跟 wake_up_process() 的便捷包装。</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co"> * 返回值: 返回创建的内核线程指针或 ERR_PTR(-ENOMEM)。</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define kthread_run</span><span class="op">(</span><span class="pp">threadfn</span><span class="op">,</span><span class="pp"> data</span><span class="op">,</span><span class="pp"> namefmt</span><span class="op">,</span><span class="pp"> </span><span class="op">...)</span></span></code></pre></div>
+<p><code>threadfn()</code>一直运行直到调用<code>do_exit()</code>退出，或内核其他部分调用以下函数退出:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * kthread_stop - 停止由 kthread_create() 创建的线程。</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@k:</span><span class="co"> 由 kthread_create() 创建的线程。</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"> * 设置 </span><span class="an">@k</span><span class="co"> 线程的 kthread_should_stop() 返回 true，唤醒它，并等待其退出。</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"> * 这也可以在 kthread_create() 之后调用，而不是调用 wake_up_process():</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"> * 线程将会退出而不调用 threadfn()。</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"> * 如果 threadfn() 可能会自己调用 kthread_exit()，则调用者必须确保</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co"> * task_struct 不会被释放。</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co"> * 返回值: 返回 threadfn() 的结果，如果从未调用过 wake_up_process()，</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co"> * 则返回 %-EINTR。</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> kthread_stop<span class="op">(</span><span class="kw">struct</span> task_struct <span class="op">*</span>k<span class="op">)</span></span></code></pre></div>
 <h2 data-number="2.3" id="调试-1"><span
 class="header-section-number">2.3</span> 调试</h2>
 <p>内核打上 <a
@@ -409,13 +412,13 @@ href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/0
 补丁，编译运行 <a
 href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/pthread.c"><code>pthread.c</code></a>
 :</p>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext2</span> <span class="at">-F</span> image</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> image /mnt</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">-o</span> pthread pthread.c <span class="at">-lpthread</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="ex">./pthread</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> <span class="at">-L</span> <span class="at">-e</span> <span class="at">-o</span> pid,ppid,lwp,cmd <span class="kw">|</span> <span class="fu">grep</span> pthread <span class="co"># -L 显示线程</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /proc/<span class="op">&lt;</span>thread pid<span class="op">&gt;</span>/task/</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext2</span> <span class="at">-F</span> image</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> image /mnt</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">-o</span> pthread pthread.c <span class="at">-lpthread</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="ex">./pthread</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> <span class="at">-L</span> <span class="at">-e</span> <span class="at">-o</span> pid,ppid,lwp,cmd <span class="kw">|</span> <span class="fu">grep</span> pthread <span class="co"># -L 显示线程</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /proc/<span class="op">&lt;</span>thread pid<span class="op">&gt;</span>/task/</span></code></pre></div>
 <h1 data-number="3" id="进程调度"><span
 class="header-section-number">3</span> 进程调度</h1>
 <h2 data-number="3.1" id="简介-1"><span
@@ -441,9 +444,9 @@ slice），是进程被抢占前能持续运行的时间。时间片的长短会
 class="header-section-number">3.2</span> 用户空间接口</h2>
 <p>nice值表示进程对其他进程的<strong>友好程度</strong>，nice值越高表示占用cpu越低。</p>
 <p>nice值取值范围 0 ~ 39 （对应静态优先级）。</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> nice<span class="op">(</span><span class="dt">int</span> incr<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> nice<span class="op">(</span><span class="dt">int</span> incr<span class="op">)</span></span></code></pre></div>
 <p>这个接口是直接调用nice系统调用:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>SYSCALL_DEFINE1<span class="op">(</span>nice<span class="op">,</span> <span class="dt">int</span><span class="op">,</span> increment<span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>SYSCALL_DEFINE1<span class="op">(</span>nice<span class="op">,</span> <span class="dt">int</span><span class="op">,</span> increment<span class="op">)</span></span></code></pre></div>
 <p>示例文件 <a
 href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/nice.c"><code>nice.c</code></a>
 。两个进程并行运行，各自增加自己的计数器。父进程使用默认nice值，子进程nice值可选。</p>
@@ -457,12 +460,12 @@ href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/n
 <code>./nice 20</code>，子进程nice值高，但父子进程计数值几乎相等。因为父子进程不共享同一cpu，分别在不同cpu上同时运行。</li>
 </ul>
 <p><code>/usr/include/pthread.h</code>或<code>/usr/aarch64-linux-gnu/include/pthread.h</code>头文件中POSIX线程调度相关的函数:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pthread_attr_setschedpolicy</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>pthread_attr_getschedpolicy</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>pthread_attr_getschedparam</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>pthread_attr_setschedparam</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>pthread_attr_getinheritsched</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>pthread_attr_setinheritsched</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>pthread_attr_setschedpolicy</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>pthread_attr_getschedpolicy</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>pthread_attr_getschedparam</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>pthread_attr_setschedparam</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>pthread_attr_getinheritsched</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>pthread_attr_setinheritsched</span></code></pre></div>
 <p>再列出一些调度相关的库函数，也是直接调用同名的系统调用:</p>
 <ul>
 <li><code>getpriority</code>: 获取进程优先级</li>
@@ -481,26 +484,26 @@ href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/n
 <h2 data-number="3.3" id="调度策略"><span
 class="header-section-number">3.3</span> 调度策略</h2>
 <p><code>struct task_struct</code>中的<code>policy</code>表示调度策略。</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * 调度策略</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_NORMAL            </span><span class="dv">0</span><span class="pp">    </span><span class="co">// 普通调度策略</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_FIFO              </span><span class="dv">1</span><span class="pp">    </span><span class="co">// 先入先出调度策略，运行时间比较短的进程</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_RR                </span><span class="dv">2</span><span class="pp">    </span><span class="co">// 轮转调度策略，运行时间比较长的进程</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_BATCH             </span><span class="dv">3</span><span class="pp">    </span><span class="co">// 批处理调度策略，cpu消耗型进程</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">/* SCHED_ISO: 保留但尚未实现 */</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_IDLE              </span><span class="dv">5</span><span class="pp">    </span><span class="co">// 空闲调度策略，极低优先级的后台进程</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_DEADLINE          </span><span class="dv">6</span><span class="pp">    </span><span class="co">// 截止期限调度策略</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * 调度策略</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_NORMAL            </span><span class="dv">0</span><span class="pp">    </span><span class="co">// 普通调度策略</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_FIFO              </span><span class="dv">1</span><span class="pp">    </span><span class="co">// 先入先出调度策略，运行时间比较短的进程</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_RR                </span><span class="dv">2</span><span class="pp">    </span><span class="co">// 轮转调度策略，运行时间比较长的进程</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_BATCH             </span><span class="dv">3</span><span class="pp">    </span><span class="co">// 批处理调度策略，cpu消耗型进程</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co">/* SCHED_ISO: 保留但尚未实现 */</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_IDLE              </span><span class="dv">5</span><span class="pp">    </span><span class="co">// 空闲调度策略，极低优先级的后台进程</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_DEADLINE          </span><span class="dv">6</span><span class="pp">    </span><span class="co">// 截止期限调度策略</span></span></code></pre></div>
 <p>某个进程的调度策略可以用<code>cat /proc/&lt;pid&gt;/sched | grep policy</code>查看。</p>
 <p>调试策略的具体实现用<code>struct sched_class</code>表示，可以查看宏定义<code>DEFINE_SCHED_CLASS</code>的引用。</p>
 <p>比较重要的数据结构还有<code>struct rq</code>（管理可运行状态进程，表示一个可运行队列，也就是就绪队列）和<code>struct sched_entity</code>（调度器中调度实体）。</p>
 <p>CFS相关的函数流程如下:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>schedule</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  __schedule</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    pick_next_task</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>      __pick_next_task</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>        __pick_next_task_fair <span class="co">// class-&gt;pick_next_task</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    context_switch</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>schedule</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  __schedule</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    pick_next_task</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>      __pick_next_task</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>        __pick_next_task_fair <span class="co">// class-&gt;pick_next_task</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    context_switch</span></code></pre></div>
 <p><code>set_tsk_need_resched()</code>、<code>clear_tsk_need_resched()</code>、<code>test_tsk_need_resched()</code>分别用于设置、清除、检查是否需要重新执行一次调度。</p>
 <p>内核即将返回用户空间时（从系统调用返回或中断处理程序返回）会发生用户抢占。Linux内核支持内核抢占，只要没有持有锁，内核就可以抢占，也就是调度器可以挂起一个内核线程。</p>
 <p>Linux内核有两种实时调度策略:
@@ -508,21 +511,21 @@ class="header-section-number">3.3</span> 调度策略</h2>
 <h2 data-number="3.4" id="on和o1调度器"><span
 class="header-section-number">3.4</span> O(n)和O(1)调度器</h2>
 <p><strong>内核2.4</strong>版本的简陋的<strong>O(n)</strong>调度算法,进程数量多时，调度效率非常低:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span>系统中的每个进程<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    重新计算时间片<span class="op">;</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    重新计算优先级<span class="op">;</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span>系统中的每个进程<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    重新计算时间片<span class="op">;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    重新计算优先级<span class="op">;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p><strong>内核2.5</strong>版本引入的O(1)调度现在已经被CFS调度取代，但作为一个经典的调度算法，非常值得介绍，其他改进的调度算法都是基于O(1)调度算法。</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> <span class="op">{</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> prio_array 活跃进程集合，时间片未用完</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> prio_array 过期进程集合，已经用完时间片</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> 可运行队列<span class="op">;</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> <span class="op">{</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  进程个数<span class="op">;</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">uint32_t</span> 位图<span class="op">[</span><span class="dv">5</span><span class="op">];</span> <span class="co">//160位，前140位有用，每一位代表对应的进程链表是否存在进程</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  进程链表<span class="op">[</span><span class="dv">140</span><span class="op">];</span> <span class="co">//对应动态优先级0~139</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> prio_array<span class="op">;</span> <span class="co">// 优先级数组</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> prio_array 活跃进程集合，时间片未用完</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> prio_array 过期进程集合，已经用完时间片</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> 可运行队列<span class="op">;</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  进程个数<span class="op">;</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">uint32_t</span> 位图<span class="op">[</span><span class="dv">5</span><span class="op">];</span> <span class="co">//160位，前140位有用，每一位代表对应的进程链表是否存在进程</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  进程链表<span class="op">[</span><span class="dv">140</span><span class="op">];</span> <span class="co">//对应动态优先级0~139</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> prio_array<span class="op">;</span> <span class="co">// 优先级数组</span></span></code></pre></div>
 <p>进程从活跃数组移动到过期数组前，已经重新计算好了时间片，本质就是采用<strong>分散计算时间片</strong>的方法。当活跃进程数组中没有进程时，只需要交换两个数组的指针，原来的过期数组变为活跃数组。因此只需要<strong>依次遍历</strong>位图的第一位，找到第一个置位，对应的进程链表上的所有进程都是优先级最高的，选取链表头的进程来执行即可。</p>
 <h1 data-number="4" id="完全公平调度器"><span
 class="header-section-number">4</span> 完全公平调度器</h1>
@@ -550,36 +553,36 @@ class="header-section-number">4.1</span> 时间记账</h2>
 <p><code>struct task_struct</code>中有一个<code>struct sched_entity</code>类型的成员<code>se</code>。<code>struct sched_entity</code>的<code>vruntime</code>变量表示进程的虚拟运行时间（virtual
 runtime），这个值的计算是经过了所有可运行进程总数的标准化（被加权），可以帮助逼近CFS模型所追求的”理想多任务处理器”。</p>
 <p>函数调用流程如下:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>update_process_times</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  scheduler_tick</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    task_tick_fair</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>      entity_tick</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>        update_curr</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>          curr<span class="op">-&gt;</span>vruntime <span class="op">+=</span> calc_delta_fair</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>update_process_times</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  scheduler_tick</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    task_tick_fair</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>      entity_tick</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>        update_curr</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>          curr<span class="op">-&gt;</span>vruntime <span class="op">+=</span> calc_delta_fair</span></code></pre></div>
 <h2 data-number="4.2" id="进程选择"><span
 class="header-section-number">4.2</span> 进程选择</h2>
 <p>CFS选择下一个运行进程时，会选择虚拟运行时间最小的进程。CFS使用红黑树来管理可运行进程队列，挑选下一个任务的流程如下:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>schedule</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  __schedule</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    pick_next_task</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>      __pick_next_task</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>        __pick_next_task_fair</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>          pick_next_task_fair</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>            pick_next_entity</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>schedule</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  __schedule</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    pick_next_task</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>      __pick_next_task</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>        __pick_next_task_fair</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>          pick_next_task_fair</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>            pick_next_entity</span></code></pre></div>
 <p>向红黑树中加入进程发生在进程变为可运行状态（被唤醒）或创建进程时，流程如下:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>activate_task</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  enqueue_task</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    enqueue_task_fair</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>      enqueue_entity</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>        __enqueue_entity</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>          rb_add_augmented_cached</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>            rb_insert_augmented_cached</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>              <span class="co">// 维护一个缓存，存放最左叶子节点</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>              root<span class="op">-&gt;</span>rb_leftmost <span class="op">=</span> node</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>activate_task</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  enqueue_task</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    enqueue_task_fair</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>      enqueue_entity</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>        __enqueue_entity</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>          rb_add_augmented_cached</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>            rb_insert_augmented_cached</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>              <span class="co">// 维护一个缓存，存放最左叶子节点</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>              root<span class="op">-&gt;</span>rb_leftmost <span class="op">=</span> node</span></code></pre></div>
 <p>从红黑树中删除进程发生在进程变为不可进行或进程终结时，流程如下:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>pick_next_task_fair</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  set_next_entity</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    __dequeue_entity</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>pick_next_task_fair</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  set_next_entity</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    __dequeue_entity</span></code></pre></div>
 <h1 data-number="5" id="eevdf调度器"><span
 class="header-section-number">5</span> EEVDF调度器</h1>
 <ul>
@@ -594,41 +597,41 @@ First，最早可用虚拟截止时间优先)
 调度器取代，每个进程有一个虚拟截止时间，代表应该运行完成的时间，EEVDF调度器优先选择虚拟截止时间最早的进程运行，虚拟截止时间取决于进程优先级和已经获得的cpu时间，可以保证延迟敏感的进程及时得到cpu时间。和CFS一样，时间片根据进程的优先级和已使用的
 CPU 时间进行综合动态调整。</p>
 <p>挑选下一个任务的流程如下:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>schedule</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  __schedule</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    pick_next_task</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>      __pick_next_task</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>        __pick_next_task_fair</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>          pick_next_task_fair</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>            pick_next_entity</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>              pick_eevdf</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>                __pick_eevdf</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>schedule</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  __schedule</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    pick_next_task</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>      __pick_next_task</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>        __pick_next_task_fair</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>          pick_next_task_fair</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>            pick_next_entity</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>              pick_eevdf</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>                __pick_eevdf</span></code></pre></div>
 <h1 data-number="6" id="休眠和唤醒"><span
 class="header-section-number">6</span> 休眠和唤醒</h1>
 <p>内核用<code>wait_queue_entry</code>表示等待队列，静态创建可以用<code>DECLARE_WAITQUEUE()</code>，动态创建可以用<code>init_waitqueue_head()</code>。</p>
 <p>休眠操作如下:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">// wq 是等待队列</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>DEFINE_WAIT<span class="op">(</span>wait<span class="op">);</span> <span class="co">// 或者用 init_wait()</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>add_wait_queue<span class="op">(&amp;</span>wq<span class="op">,</span> <span class="op">&amp;</span>wait<span class="op">);</span> <span class="co">// 在其他地方用 wake_up()唤醒</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(!</span>condition<span class="op">)</span> <span class="co">// condition是等待的事件</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>        prepare_to_wait<span class="op">(&amp;</span>wq<span class="op">,</span> <span class="op">&amp;</span>wait<span class="op">,</span> TASK_INTERRUPTIBLE<span class="op">);</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>signal_pending<span class="op">(</span>current<span class="op">))</span> <span class="op">{</span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 处理信号</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>        schedule<span class="op">();</span></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>finish_wait<span class="op">(&amp;</span>wq<span class="op">,</span> <span class="op">&amp;</span>wait<span class="op">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">// wq 是等待队列</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>DEFINE_WAIT<span class="op">(</span>wait<span class="op">);</span> <span class="co">// 或者用 init_wait()</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>add_wait_queue<span class="op">(&amp;</span>wq<span class="op">,</span> <span class="op">&amp;</span>wait<span class="op">);</span> <span class="co">// 在其他地方用 wake_up()唤醒</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(!</span>condition<span class="op">)</span> <span class="co">// condition是等待的事件</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>        prepare_to_wait<span class="op">(&amp;</span>wq<span class="op">,</span> <span class="op">&amp;</span>wait<span class="op">,</span> TASK_INTERRUPTIBLE<span class="op">);</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>signal_pending<span class="op">(</span>current<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 处理信号</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>        schedule<span class="op">();</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>finish_wait<span class="op">(&amp;</span>wq<span class="op">,</span> <span class="op">&amp;</span>wait<span class="op">);</span></span></code></pre></div>
 <p><code>inotify_read()</code>函数中相关代码:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>DEFINE_WAIT_FUNC<span class="op">(</span>wait<span class="op">,</span> woken_wake_function<span class="op">);</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>add_wait_queue<span class="op">(&amp;</span>group<span class="op">-&gt;</span>notification_waitq<span class="op">,</span> <span class="op">&amp;</span>wait<span class="op">);</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>condition<span class="op">)</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span><span class="op">;</span> <span class="co">// condition是等待的事件</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>signal_pending<span class="op">(</span>current<span class="op">))</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span><span class="op">;</span></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>        wait_woken<span class="op">(&amp;</span>wait<span class="op">,</span> TASK_INTERRUPTIBLE<span class="op">,</span> MAX_SCHEDULE_TIMEOUT<span class="op">);</span></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>remove_wait_queue<span class="op">(&amp;</span>group<span class="op">-&gt;</span>notification_waitq<span class="op">,</span> <span class="op">&amp;</span>wait<span class="op">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>DEFINE_WAIT_FUNC<span class="op">(</span>wait<span class="op">,</span> woken_wake_function<span class="op">);</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>add_wait_queue<span class="op">(&amp;</span>group<span class="op">-&gt;</span>notification_waitq<span class="op">,</span> <span class="op">&amp;</span>wait<span class="op">);</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>condition<span class="op">)</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span><span class="op">;</span> <span class="co">// condition是等待的事件</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>signal_pending<span class="op">(</span>current<span class="op">))</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>        wait_woken<span class="op">(&amp;</span>wait<span class="op">,</span> TASK_INTERRUPTIBLE<span class="op">,</span> MAX_SCHEDULE_TIMEOUT<span class="op">);</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>remove_wait_queue<span class="op">(&amp;</span>group<span class="op">-&gt;</span>notification_waitq<span class="op">,</span> <span class="op">&amp;</span>wait<span class="op">);</span></span></code></pre></div>
 <p>用<code>wake_up(struct wait_queue_head *wq_head)</code>唤醒。</p>
 <h1 data-number="7" id="多处理器系统中的运行队列平衡"><span
 class="header-section-number">7</span> 多处理器系统中的运行队列平衡</h1>
@@ -732,23 +735,23 @@ Pro，个人和小规模商业使用可以免费在最多 5
 已被接受到主线 Linux 内核中，此前经过了与 printk
 内核日志功能相关的长期开发难题。</p>
 </blockquote>
-<div class="sourceCode" id="cb29"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ex">commit</span> baeb9a7d8b60b021d907127509c44507539c15e5</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Merge:</span> 2004cef11ea07 2638e4e6b1823</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Author:</span> Linus Torvalds <span class="op">&lt;</span>torvalds@linux-foundation.org<span class="op">&gt;</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Date:</span>   Fri Sep 20 06:04:27 2024 +0200</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Merge</span> tag <span class="st">&#39;sched-rt-2024-09-17&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip</span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Pull</span> RT enablement from Thomas Gleixner:</span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>     <span class="st">&quot;在支持的架构上启用PREEMPT_RT：</span></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="st">      经过二十年的开发，我们终于达到了在主线内核中启用PREEMPT_RT支持的阶段。</span></span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="st">      所有先决条件已经合并，因此在支持的架构ARM64、RISCV和X86（32/64位）上启用它。&quot;</span></span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">*</span> tag <span class="st">&#39;sched-rt-2024-09-17&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip:</span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>      <span class="ex">riscv:</span> Allow to enable PREEMPT_RT.</span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>      <span class="ex">arm64:</span> Allow to enable PREEMPT_RT.</span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>      <span class="ex">x86:</span> Allow to enable PREEMPT_RT.</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">commit</span> baeb9a7d8b60b021d907127509c44507539c15e5</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Merge:</span> 2004cef11ea07 2638e4e6b1823</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Author:</span> Linus Torvalds <span class="op">&lt;</span>torvalds@linux-foundation.org<span class="op">&gt;</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Date:</span>   Fri Sep 20 06:04:27 2024 +0200</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Merge</span> tag <span class="st">&#39;sched-rt-2024-09-17&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Pull</span> RT enablement from Thomas Gleixner:</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>     <span class="st">&quot;在支持的架构上启用PREEMPT_RT：</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="st">      经过二十年的开发，我们终于达到了在主线内核中启用PREEMPT_RT支持的阶段。</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="st">      所有先决条件已经合并，因此在支持的架构ARM64、RISCV和X86（32/64位）上启用它。&quot;</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">*</span> tag <span class="st">&#39;sched-rt-2024-09-17&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip:</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>      <span class="ex">riscv:</span> Allow to enable PREEMPT_RT.</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>      <span class="ex">arm64:</span> Allow to enable PREEMPT_RT.</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>      <span class="ex">x86:</span> Allow to enable PREEMPT_RT.</span></code></pre></div>
 <p><a
 href="https://lore.kernel.org/all/20240906111841.562402-1-bigeasy@linutronix.de/"><code>[PATCH 0/3] Allow to enable PREEMPT_RT.</code></a>:</p>
 <pre><code>printk 相关的补丁已经合并到 linux-next，这是 PREEMPT_RT 的最后一个已知障碍。RT 队列中还有针对 8250 UART 的“原子控制台”功能，但这还没有进入 linux-next。这意味着“传统控制台”行为，即在紧急情况下无法从原子上下文中打印。目前，8250 UART 驱动程序是唯一提供“原子控制台”支持的驱动程序。
