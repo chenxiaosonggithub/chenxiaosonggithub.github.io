@@ -280,14 +280,29 @@ ssh -N -R 3306:localhost:3306 -R 6379:localhost:6379 -R 5001:localhost:5001 -R 5
 <li><a href="https://www.todesk.com/download.html">ToDesk</a></li>
 </ul>
 <h1 data-number="7" id="remote-desktop"><span class="header-section-number">7</span> 家里远程桌面到公司ubuntu24.04</h1>
-<p>ubuntu24.04没有vnc协议，只有rdp协议，位置是<code>设置 -&gt; 系统 -&gt; 桌面共享</code>，注意物理机上需要连接显示器才能远程桌面控制。</p>
-<p>我是从家里的苹果笑柄连接到公司的ubuntu24.04，macOS通过向日葵连接到virt-manager中的Windows11，Windows11通过“远程桌面连接”连接到ubuntu24.04。 另外，通过<a href="https://chenxiaosong.com/course/gnu-linux/install.html#wake-on-lan">网络唤醒（Wake-on-LAN）</a>另一台Linux。</p>
+<p>ubuntu24.04没有vnc协议，只有rdp协议，位置是<code>设置 -&gt; 系统 -&gt; 桌面共享</code>，注意物理机上需要连接显示器才能远程桌面控制。 命令行控制rdp:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="ex">grdctl</span> status</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a><span class="ex">grdctl</span> rdp enable</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true"></a><span class="ex">grdctl</span> rdp disable</span></code></pre></div>
+<p>我是从家里的苹果笔记本连接到公司的ubuntu24.04，macOS通过向日葵连接到virt-manager中的Windows11，Windows11通过“远程桌面连接”连接到ubuntu24.04。 另外，通过<a href="https://chenxiaosong.com/course/gnu-linux/install.html#wake-on-lan">网络唤醒（Wake-on-LAN）</a>另一台Linux。</p>
+<p>ubuntu通过命令行操作wifi:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a><span class="ex">nmcli</span> device wifi list          # 列出所有可用 Wi-Fi 网络</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true"></a><span class="ex">nmcli</span> dev status                # 查看设备状态</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true"></a><span class="ex">nmcli</span> connection show --active  # 查看所有活动连接</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true"></a><span class="ex">nmcli</span> -f ALL dev wifi list      # 显示完整信息（包括BSSID）</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true"></a><span class="fu">sudo</span> nmcli dev wifi show-password <span class="co"># 显示当前连接密码（需root）</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true"></a><span class="fu">sudo</span> nmcli dev disconnect wlo2  # 断开指定网卡（替换 wlo2 为你的网卡名）</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true"></a><span class="ex">nmcli</span> con down <span class="st">&quot;HUAWEI-NET&quot;</span>     # 通过连接名称断开</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true"></a><span class="ex">nmcli</span> radio wifi off           # 关闭 Wi-Fi 硬件</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true"></a><span class="fu">sudo</span> nmcli dev connect wlo2.    # 连接</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true"></a><span class="ex">nmcli</span> dev wifi connect <span class="st">&quot;HUAWEI-NET&quot;</span> ifname wlo2 # 连接开放网络（无密码）</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true"></a><span class="ex">nmcli</span> dev wifi connect <span class="st">&quot;HUAWEI-NET&quot;</span> password <span class="st">&quot;your_password&quot;</span> ifname wlo2 # 连接加密网络（WPA/WPA2）</span></code></pre></div>
 <p>如果Virt-manager中的Windows11出问题（比如卡死），可以用以下命令在远程操作virt-manager:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="ex">virsh</span> list # 本地活动虚拟机</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a><span class="ex">virsh</span> list --all # 本地所有的虚拟机（活动的+不活动的）</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true"></a><span class="ex">virsh</span> shutdown Win11_24H2_Chinese_Simplified_x64 # 正常关闭虚拟机</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true"></a><span class="ex">virsh</span> destroy Win11_24H2_Chinese_Simplified_x64 # 强制关闭虚拟机</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true"></a><span class="ex">virsh</span> start Win11_24H2_Chinese_Simplified_x64 # 启动非活动虚拟机</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a><span class="ex">virsh</span> list # 本地活动虚拟机</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true"></a><span class="ex">virsh</span> list --all # 本地所有的虚拟机（活动的+不活动的）</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true"></a><span class="ex">virsh</span> shutdown Win11_24H2_Chinese_Simplified_x64 # 正常关闭虚拟机</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true"></a><span class="ex">virsh</span> destroy Win11_24H2_Chinese_Simplified_x64 # 强制关闭虚拟机</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true"></a><span class="ex">virsh</span> start Win11_24H2_Chinese_Simplified_x64 # 启动非活动虚拟机</span></code></pre></div>
 <h1 data-number="8" id="juicessh"><span class="header-section-number">8</span> JuiceSSH</h1>
 <p>安卓手机上远程登录可以使用<a href="https://juicessh.com/changelog">JuiceSSH</a>。</p>
 </body>
