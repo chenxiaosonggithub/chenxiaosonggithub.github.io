@@ -101,10 +101,11 @@
 <li><a href="#内网穿透"><span class="toc-section-number">4</span> 内网穿透</a></li>
 <li><a href="#内网穿透商业软件"><span class="toc-section-number">5</span> 内网穿透商业软件</a>
 <ul>
-<li><a href="#花生壳"><span class="toc-section-number">5.1</span> 花生壳</a></li>
-<li><a href="#cpolar"><span class="toc-section-number">5.2</span> <span>cpolar</span></a></li>
-<li><a href="#网云穿"><span class="toc-section-number">5.3</span> <span>网云穿</span></a></li>
-<li><a href="#监控"><span class="toc-section-number">5.4</span> 监控</a></li>
+<li><a href="#花生壳域名和端口固定"><span class="toc-section-number">5.1</span> <span>花生壳</span>（域名和端口固定）</a></li>
+<li><a href="#网云穿域名和端口固定"><span class="toc-section-number">5.2</span> <span>网云穿</span>（域名和端口固定）</a></li>
+<li><a href="#cpolar域名和端口不固定"><span class="toc-section-number">5.3</span> <span>cpolar</span>（域名和端口不固定）</a></li>
+<li><a href="#natapp域名和端口不固定"><span class="toc-section-number">5.4</span> <span>natapp</span>（域名和端口不固定）</a></li>
+<li><a href="#监控"><span class="toc-section-number">5.5</span> 监控</a></li>
 </ul></li>
 <li><a href="#远程桌面"><span class="toc-section-number">6</span> 远程桌面</a></li>
 <li><a href="#remote-desktop"><span class="toc-section-number">7</span> 家里远程桌面到公司ubuntu24.04</a></li>
@@ -216,8 +217,8 @@ ssh -N -R 3306:localhost:3306 -R 6379:localhost:6379 -R 5001:localhost:5001 -R 5
 <p>通过访问<code>chenxiaosong.com</code>的<code>22222</code>端口就能访问到内网mysql的<code>3306</code>端口。</p>
 <h1 data-number="5" id="内网穿透商业软件"><span class="header-section-number">5</span> 内网穿透商业软件</h1>
 <p>当然我使用的是能白嫖的免费版。</p>
-<h2 data-number="5.1" id="花生壳"><span class="header-section-number">5.1</span> 花生壳</h2>
-<p>如果不想自己搭建服务器，可以使用<a href="https://hsk.oray.com/">花生壳</a>，<a href="https://service.oray.com/question/15507.html">查看帮忙文档</a>。</p>
+<h2 data-number="5.1" id="花生壳域名和端口固定"><span class="header-section-number">5.1</span> <a href="https://service.oray.com/question/15507.html">花生壳</a>（域名和端口固定）</h2>
+<p>如果不想自己搭建服务器，可以使用<a href="https://hsk.oray.com/">花生壳</a>。</p>
 <p>注意不能用<code>wget</code>命令下载（下载的文件错误），直接访问<a href="https://dl.oray.com/hsk/linux/phddns_5.3.0_amd64.rpm">centos</a>和<a href="https://dl.oray.com/hsk/linux/phddns_5.3.0_amd64.deb">ubuntu</a> 下载链接（<a href="https://hsk.oray.com/download">版本号查看官网</a>）在网页下载。</p>
 <p>Linux安装请<a href="https://service.oray.com/question/11630.html">点击这里查看文档</a>:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="co"># 安装成功后会打印`SN: orayxxxx   Default password: admin`</span></span>
@@ -228,51 +229,77 @@ ssh -N -R 3306:localhost:3306 -R 6379:localhost:6379 -R 5001:localhost:5001 -R 5
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a><span class="fu">sudo</span> phddns start <span class="co"># 启动</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a><span class="fu">sudo</span> phddns status <span class="co"># 查看状态</span></span></code></pre></div>
 <p>在<a href="https://console.hsk.oray.com/zh/device">贝锐花生壳管理 - 设备列表</a>添加设备。</p>
-<h2 data-number="5.2" id="cpolar"><span class="header-section-number">5.2</span> <a href="https://www.cpolar.com/blog/cpolar-quick-start-tutorial-ubuntu-series">cpolar</a></h2>
-<p>花生壳免费版的可能会出问题，可以使用cpolar代替:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="fu">sudo</span> apt-get update -y</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install curl -y</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="ex">curl</span> -L https://www.cpolar.com/static/downloads/install-release-cpolar.sh <span class="kw">|</span> <span class="fu">sudo</span> bash</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="ex">cpolar</span> version</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a><span class="ex">cpolar</span> authtoken xxxxxxx # token访问: https://dashboard.cpolar.com/auth</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a><span class="fu">sudo</span> systemctl enable cpolar</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a><span class="fu">sudo</span> systemctl start cpolar</span></code></pre></div>
-<p>访问<a href="http://localhost:9200/">localhost:9200</a>并登录邮箱账号，<a href="http://localhost:9200/#/tunnels/create">创建隧道localhost:9200/#/tunnels/create</a>，<a href="http://localhost:9200/#/status/online">在线隧道列表localhost:9200/#/status/online</a>查看，或在<a href="https://dashboard.cpolar.com/status">cpolar网官</a>查看。</p>
-<h2 data-number="5.3" id="网云穿"><span class="header-section-number">5.3</span> <a href="https://blog.xiaomy.net/archives/4.html">网云穿</a></h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="bu">cd</span> /home/sonvhi/chenxiaosong/sw</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a><span class="fu">wget</span> https://down.xiaomy.net/linux/wyc_linux_64</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a><span class="fu">chmod</span> -R 777 ./wyc_linux_64</span></code></pre></div>
+<h2 data-number="5.2" id="网云穿域名和端口固定"><span class="header-section-number">5.2</span> <a href="https://blog.xiaomy.net/archives/4.html">网云穿</a>（域名和端口固定）</h2>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="bu">cd</span> /home/sonvhi/chenxiaosong/sw</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="fu">wget</span> https://down.xiaomy.net/linux/wyc_linux_64</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="fu">chmod</span> -R 777 ./wyc_linux_64</span></code></pre></div>
 <p>创建<code>/lib/systemd/system/wangyunchuan.service</code>:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a>[<span class="ex">Unit</span>]</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a><span class="va">Description=</span>wangyunchuan</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a><span class="va">StartLimitIntervalSec=</span>0</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a>[<span class="ex">Service</span>]</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true"></a><span class="va">Type=</span>simple</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true"></a><span class="co"># token访问: https://i.xiaomy.net/#/tunnel</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true"></a><span class="va">ExecStart=</span>/home/sonvhi/chenxiaosong/sw/wyc_linux_64 <span class="ex">-token</span>=xxxxxxxxx</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true"></a><span class="va">Restart=</span>always</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true"></a><span class="va">RestartSec=</span>1</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true"></a></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true"></a>[<span class="ex">Install</span>]</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true"></a><span class="va">WantedBy=</span>multi-user.target</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>[<span class="ex">Unit</span>]</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a><span class="va">Description=</span>wangyunchuan</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a><span class="va">StartLimitIntervalSec=</span>0</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a>[<span class="ex">Service</span>]</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true"></a><span class="va">Type=</span>simple</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true"></a><span class="co"># token访问: https://i.xiaomy.net/#/tunnel</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true"></a><span class="va">ExecStart=</span>/home/sonvhi/chenxiaosong/sw/wyc_linux_64 <span class="ex">-token</span>=xxxxxxxxx</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true"></a><span class="va">Restart=</span>always</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true"></a><span class="va">RestartSec=</span>1</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true"></a>[<span class="ex">Install</span>]</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true"></a><span class="va">WantedBy=</span>multi-user.target</span></code></pre></div>
 <p>再启动服务:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="fu">sudo</span> systemctl restart wangyunchuan.service</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a><span class="fu">sudo</span> systemctl status wangyunchuan.service <span class="co"># 查看状态</span></span></code></pre></div>
-<h2 data-number="5.4" id="监控"><span class="header-section-number">5.4</span> 监控</h2>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="fu">sudo</span> systemctl daemon-reload</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a><span class="fu">sudo</span> systemctl enable wangyunchuan.service</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a><span class="fu">sudo</span> systemctl restart wangyunchuan.service</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a><span class="fu">sudo</span> systemctl status wangyunchuan.service <span class="co"># 查看状态</span></span></code></pre></div>
+<h2 data-number="5.3" id="cpolar域名和端口不固定"><span class="header-section-number">5.3</span> <a href="https://www.cpolar.com/blog/cpolar-quick-start-tutorial-ubuntu-series">cpolar</a>（域名和端口不固定）</h2>
+<p>花生壳免费版的可能会出问题，可以使用cpolar代替:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="fu">sudo</span> apt-get update -y</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install curl -y</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a><span class="ex">curl</span> -L https://www.cpolar.com/static/downloads/install-release-cpolar.sh <span class="kw">|</span> <span class="fu">sudo</span> bash</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true"></a><span class="ex">cpolar</span> version</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true"></a><span class="ex">cpolar</span> authtoken xxxxxxx # token访问: https://dashboard.cpolar.com/auth</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true"></a><span class="fu">sudo</span> systemctl enable cpolar</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true"></a><span class="fu">sudo</span> systemctl start cpolar</span></code></pre></div>
+<p>访问<a href="http://localhost:9200/">localhost:9200</a>并登录邮箱账号，<a href="http://localhost:9200/#/tunnels/create">创建隧道localhost:9200/#/tunnels/create</a>，<a href="http://localhost:9200/#/status/online">在线隧道列表localhost:9200/#/status/online</a>查看，或在<a href="https://dashboard.cpolar.com/status">cpolar网官</a>查看。</p>
+<h2 data-number="5.4" id="natapp域名和端口不固定"><span class="header-section-number">5.4</span> <a href="https://natapp.cn/article/natapp_newbie">natapp</a>（域名和端口不固定）</h2>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a><span class="bu">cd</span> /home/sonvhi/chenxiaosong/sw</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true"></a><span class="co"># https://natapp.cn/#download</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true"></a><span class="fu">wget</span> https://download.natapp.cn/assets/downloads/clients/2_4_0/natapp_linux_amd64/natapp</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true"></a><span class="fu">chmod</span> -R 777 ./natapp</span></code></pre></div>
+<p>创建<code>/lib/systemd/system/natapp.service</code>:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a>[<span class="ex">Unit</span>]</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a><span class="va">Description=</span>natapp</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true"></a><span class="va">StartLimitIntervalSec=</span>0</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true"></a>[<span class="ex">Service</span>]</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true"></a><span class="va">Type=</span>simple</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true"></a><span class="co"># token访问: https://natapp.cn/tunnel/lists</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true"></a><span class="va">ExecStart=</span>/home/sonvhi/chenxiaosong/sw/natapp <span class="ex">-authtoken</span>=xxxxxxxxx</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true"></a><span class="va">Restart=</span>always</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true"></a><span class="va">RestartSec=</span>1</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true"></a></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true"></a>[<span class="ex">Install</span>]</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true"></a><span class="va">WantedBy=</span>multi-user.target</span></code></pre></div>
+<p>再启动服务:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a><span class="fu">sudo</span> systemctl daemon-reload</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true"></a><span class="fu">sudo</span> systemctl enable natapp.service</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true"></a><span class="fu">sudo</span> systemctl restart natapp.service</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true"></a><span class="fu">sudo</span> systemctl status natapp.service <span class="co"># 查看状态</span></span></code></pre></div>
+<h2 data-number="5.5" id="监控"><span class="header-section-number">5.5</span> 监控</h2>
 <p>注意因为网络故障或其他原因连接可能会断开，可以用以下脚本检查重启服务:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a><span class="co"># 需要先执行 sudo -i</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true"></a><span class="kw">while</span> <span class="fu">true</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true"></a><span class="kw">do</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true"></a>    <span class="fu">ssh</span> -p xxxxx -o ConnectTimeout=3 -q xxx@xxxx.chenxiaosong.com exit</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true"></a>    <span class="kw">if</span><span class="bu"> [</span> <span class="va">$?</span> <span class="ot">!=</span> 0<span class="bu"> ]</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true"></a>    <span class="kw">then</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true"></a>        <span class="bu">echo</span> <span class="kw">`</span><span class="fu">date</span><span class="kw">`</span> fail</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true"></a>        <span class="ex">phddns</span> restart</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true"></a>    <span class="kw">fi</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true"></a></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true"></a>    <span class="fu">sleep</span> 300</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true"></a><span class="kw">done</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a><span class="co"># 需要先执行 sudo -i</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true"></a><span class="kw">while</span> <span class="fu">true</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true"></a><span class="kw">do</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true"></a>    <span class="fu">ssh</span> -p xxxxx -o ConnectTimeout=3 -q xxx@xxxx.chenxiaosong.com exit</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true"></a>    <span class="kw">if</span><span class="bu"> [</span> <span class="va">$?</span> <span class="ot">!=</span> 0<span class="bu"> ]</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true"></a>    <span class="kw">then</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true"></a>        <span class="bu">echo</span> <span class="kw">`</span><span class="fu">date</span><span class="kw">`</span> xxx fail</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true"></a>        <span class="ex">phddns</span> restart</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true"></a>    <span class="kw">fi</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true"></a>    <span class="fu">sleep</span> 300</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true"></a><span class="kw">done</span></span></code></pre></div>
 <h1 data-number="6" id="远程桌面"><span class="header-section-number">6</span> 远程桌面</h1>
 <p>远程桌面软件:</p>
 <ul>
@@ -281,28 +308,28 @@ ssh -N -R 3306:localhost:3306 -R 6379:localhost:6379 -R 5001:localhost:5001 -R 5
 </ul>
 <h1 data-number="7" id="remote-desktop"><span class="header-section-number">7</span> 家里远程桌面到公司ubuntu24.04</h1>
 <p>ubuntu24.04没有vnc协议，只有rdp协议，位置是<code>设置 -&gt; 系统 -&gt; 桌面共享</code>，注意物理机上需要连接显示器才能远程桌面控制。 命令行控制rdp:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="ex">grdctl</span> status</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a><span class="ex">grdctl</span> rdp enable</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true"></a><span class="ex">grdctl</span> rdp disable</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true"></a><span class="ex">grdctl</span> status</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true"></a><span class="ex">grdctl</span> rdp enable</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true"></a><span class="ex">grdctl</span> rdp disable</span></code></pre></div>
 <p>我是从家里的苹果笔记本连接到公司的ubuntu24.04，macOS通过向日葵连接到virt-manager中的Windows11，Windows11通过“远程桌面连接”连接到ubuntu24.04。 另外，通过<a href="https://chenxiaosong.com/course/gnu-linux/install.html#wake-on-lan">网络唤醒（Wake-on-LAN）</a>另一台Linux。</p>
 <p>ubuntu通过命令行操作wifi:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a><span class="ex">nmcli</span> device wifi list          # 列出所有可用 Wi-Fi 网络</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true"></a><span class="ex">nmcli</span> dev status                # 查看设备状态</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true"></a><span class="ex">nmcli</span> connection show --active  # 查看所有活动连接</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true"></a><span class="ex">nmcli</span> -f ALL dev wifi list      # 显示完整信息（包括BSSID）</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true"></a><span class="fu">sudo</span> nmcli dev wifi show-password <span class="co"># 显示当前连接密码（需root）</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true"></a><span class="fu">sudo</span> nmcli dev disconnect wlo2  # 断开指定网卡（替换 wlo2 为你的网卡名）</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true"></a><span class="ex">nmcli</span> con down <span class="st">&quot;HUAWEI-NET&quot;</span>     # 通过连接名称断开</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true"></a><span class="ex">nmcli</span> radio wifi off           # 关闭 Wi-Fi 硬件</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true"></a><span class="fu">sudo</span> nmcli dev connect wlo2.    # 连接</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true"></a><span class="ex">nmcli</span> dev wifi connect <span class="st">&quot;HUAWEI-NET&quot;</span> ifname wlo2 # 连接开放网络（无密码）</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true"></a><span class="ex">nmcli</span> dev wifi connect <span class="st">&quot;HUAWEI-NET&quot;</span> password <span class="st">&quot;your_password&quot;</span> ifname wlo2 # 连接加密网络（WPA/WPA2）</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a><span class="ex">nmcli</span> device wifi list          # 列出所有可用 Wi-Fi 网络</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true"></a><span class="ex">nmcli</span> dev status                # 查看设备状态</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true"></a><span class="ex">nmcli</span> connection show --active  # 查看所有活动连接</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true"></a><span class="ex">nmcli</span> -f ALL dev wifi list      # 显示完整信息（包括BSSID）</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true"></a><span class="fu">sudo</span> nmcli dev wifi show-password <span class="co"># 显示当前连接密码（需root）</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true"></a><span class="fu">sudo</span> nmcli dev disconnect wlo2  # 断开指定网卡（替换 wlo2 为你的网卡名）</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true"></a><span class="ex">nmcli</span> con down <span class="st">&quot;HUAWEI-NET&quot;</span>     # 通过连接名称断开</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true"></a><span class="ex">nmcli</span> radio wifi off           # 关闭 Wi-Fi 硬件</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true"></a><span class="fu">sudo</span> nmcli dev connect wlo2.    # 连接</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true"></a><span class="ex">nmcli</span> dev wifi connect <span class="st">&quot;HUAWEI-NET&quot;</span> ifname wlo2 # 连接开放网络（无密码）</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true"></a><span class="ex">nmcli</span> dev wifi connect <span class="st">&quot;HUAWEI-NET&quot;</span> password <span class="st">&quot;your_password&quot;</span> ifname wlo2 # 连接加密网络（WPA/WPA2）</span></code></pre></div>
 <p>如果Virt-manager中的Windows11出问题（比如卡死），可以用以下命令在远程操作virt-manager:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a><span class="ex">virsh</span> list # 本地活动虚拟机</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true"></a><span class="ex">virsh</span> list --all # 本地所有的虚拟机（活动的+不活动的）</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true"></a><span class="ex">virsh</span> shutdown Win11_24H2_Chinese_Simplified_x64 # 正常关闭虚拟机</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true"></a><span class="ex">virsh</span> destroy Win11_24H2_Chinese_Simplified_x64 # 强制关闭虚拟机</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true"></a><span class="ex">virsh</span> start Win11_24H2_Chinese_Simplified_x64 # 启动非活动虚拟机</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true"></a><span class="ex">virsh</span> list # 本地活动虚拟机</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true"></a><span class="ex">virsh</span> list --all # 本地所有的虚拟机（活动的+不活动的）</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true"></a><span class="ex">virsh</span> shutdown Win11_24H2_Chinese_Simplified_x64 # 正常关闭虚拟机</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true"></a><span class="ex">virsh</span> destroy Win11_24H2_Chinese_Simplified_x64 # 强制关闭虚拟机</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true"></a><span class="ex">virsh</span> start Win11_24H2_Chinese_Simplified_x64 # 启动非活动虚拟机</span></code></pre></div>
 <h1 data-number="8" id="juicessh"><span class="header-section-number">8</span> JuiceSSH</h1>
 <p>安卓手机上远程登录可以使用<a href="https://juicessh.com/changelog">JuiceSSH</a>。</p>
 </body>
