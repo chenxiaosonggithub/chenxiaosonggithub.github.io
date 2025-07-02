@@ -175,7 +175,15 @@ href="https://lore.kernel.org/all/163816148553.32298.12054000235093970423.stgit@
 重构<code>svc_destroy()</code>和<code>nfsd_destroy()</code></li>
 <li><a
 href="https://lore.kernel.org/all/163816148554.32298.8307258870002897708.stgit@noble.brown/"><code>[PATCH 04/20] ec52361df99b SUNRPC: stop using -&gt;sv_nrthreads as a refcount</code></a>:
-<code>sv_nrthreads</code>只作为线程计数，新增<code>sv_refcnt</code>作为引用计数</li>
+<code>sv_nrthreads</code>只作为线程计数，新增<code>sv_refcnt</code>作为引用计数
+<ul>
+<li>后续修复补丁: <a
+href="https://lore.kernel.org/all/20231215010030.7580-2-neilb@suse.de/"><code>[PATCH 1/5] 2a501f55cd64 nfsd: call nfsd_last_thread() before final nfsd_put()</code></a>
+<ul>
+<li>前置补丁可不合:
+<code>9f28a971ee9f nfsd: separate nfsd_last_thread() from nfsd_put()</code></li>
+</ul></li>
+</ul></li>
 <li>4.19可不合: <a
 href="https://lore.kernel.org/all/20210106075236.4184-3-amir73il@gmail.com/"><code>[PATCH v2 2/3] e567b98ce9a4 nfsd: protect concurrent access to nfsd stats counters</code></a></li>
 <li><a
