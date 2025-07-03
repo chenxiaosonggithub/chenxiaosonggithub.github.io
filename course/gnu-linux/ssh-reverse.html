@@ -125,16 +125,18 @@ class="toc-section-number">5</span> 内网穿透商业软件</a>
 <ul>
 <li><a href="#花生壳域名和端口固定" id="toc-花生壳域名和端口固定"><span
 class="toc-section-number">5.1</span> 花生壳（域名和端口固定）</a></li>
-<li><a href="#网云穿域名和端口固定" id="toc-网云穿域名和端口固定"><span
-class="toc-section-number">5.2</span> 网云穿（域名和端口固定）</a></li>
 <li><a href="#cpolar域名和端口不固定"
 id="toc-cpolar域名和端口不固定"><span
-class="toc-section-number">5.3</span>
+class="toc-section-number">5.2</span>
 cpolar（域名和端口不固定）</a></li>
 <li><a href="#natapp域名和端口不固定两天自动删除不建议用"
 id="toc-natapp域名和端口不固定两天自动删除不建议用"><span
-class="toc-section-number">5.4</span>
+class="toc-section-number">5.3</span>
 natapp（域名和端口不固定，两天自动删除，不建议用）</a></li>
+<li><a href="#网云穿域名和端口固定但免费版只能用7天如果要充钱可以考虑用"
+id="toc-网云穿域名和端口固定但免费版只能用7天如果要充钱可以考虑用"><span
+class="toc-section-number">5.4</span>
+网云穿（域名和端口固定，但免费版只能用7天，如果要充钱可以考虑用）</a></li>
 <li><a href="#监控" id="toc-监控"><span
 class="toc-section-number">5.5</span> 监控</a></li>
 </ul></li>
@@ -287,74 +289,75 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> phddns status <span class="co"># 查看状态</span></span></code></pre></div>
 <p>在<a href="https://console.hsk.oray.com/zh/device">贝锐花生壳管理 -
 设备列表</a>添加设备。</p>
-<h2 data-number="5.2" id="网云穿域名和端口固定"><span
+<h2 data-number="5.2" id="cpolar域名和端口不固定"><span
 class="header-section-number">5.2</span> <a
-href="https://blog.xiaomy.net/archives/4.html">网云穿</a>（域名和端口固定）</h2>
-<p><a
-href="https://xiaomy.net/pay?type=0">免费版每个月需要手动激活才可使用，每月1g
-流量</a>。</p>
-<div class="sourceCode" id="cb16"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/sonvhi/chenxiaosong/sw</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://down.xiaomy.net/linux/wyc_linux_64</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> <span class="at">-R</span> 777 ./wyc_linux_64</span></code></pre></div>
-<p>创建<code>/lib/systemd/system/wangyunchuan.service</code>:</p>
-<div class="sourceCode" id="cb17"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[Unit]</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="va">Description</span><span class="op">=</span>wangyunchuan</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="va">StartLimitIntervalSec</span><span class="op">=</span>0</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[Service]</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="va">Type</span><span class="op">=</span>simple</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># token访问: https://i.xiaomy.net/#/tunnel</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStart</span><span class="op">=</span>/home/sonvhi/chenxiaosong/sw/wyc_linux_64 <span class="ex">-token=xxxxxxxxx</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="va">Restart</span><span class="op">=</span>always</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="va">RestartSec</span><span class="op">=</span>1</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[Install]</span></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="va">WantedBy</span><span class="op">=</span>multi-user.target</span></code></pre></div>
-<p>再启动服务:</p>
-<div class="sourceCode" id="cb18"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl daemon-reload</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable wangyunchuan.service</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart wangyunchuan.service</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status wangyunchuan.service <span class="co"># 查看状态</span></span></code></pre></div>
-<h2 data-number="5.3" id="cpolar域名和端口不固定"><span
-class="header-section-number">5.3</span> <a
 href="https://www.cpolar.com/blog/cpolar-quick-start-tutorial-ubuntu-series">cpolar</a>（域名和端口不固定）</h2>
 <p>花生壳免费版的可能会出问题，可以使用cpolar代替:</p>
-<div class="sourceCode" id="cb19"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update <span class="at">-y</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install curl <span class="at">-y</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-L</span> https://www.cpolar.com/static/downloads/install-release-cpolar.sh <span class="kw">|</span> <span class="fu">sudo</span> bash</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="ex">cpolar</span> version</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="ex">cpolar</span> authtoken xxxxxxx <span class="co"># token访问: https://dashboard.cpolar.com/auth</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable cpolar</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl start cpolar</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update <span class="at">-y</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install curl <span class="at">-y</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-L</span> https://www.cpolar.com/static/downloads/install-release-cpolar.sh <span class="kw">|</span> <span class="fu">sudo</span> bash</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ex">cpolar</span> version</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="ex">cpolar</span> authtoken xxxxxxx <span class="co"># token访问: https://dashboard.cpolar.com/auth</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable cpolar</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl start cpolar</span></code></pre></div>
 <p>访问<a
 href="http://localhost:9200/">localhost:9200</a>并登录邮箱账号，<a
 href="http://localhost:9200/#/tunnels/create">创建隧道localhost:9200/#/tunnels/create</a>，<a
 href="http://localhost:9200/#/status/online">在线隧道列表localhost:9200/#/status/online</a>查看，或在<a
 href="https://dashboard.cpolar.com/status">cpolar网官</a>查看。</p>
-<h2 data-number="5.4"
+<h2 data-number="5.3"
 id="natapp域名和端口不固定两天自动删除不建议用"><span
-class="header-section-number">5.4</span> <a
+class="header-section-number">5.3</span> <a
 href="https://natapp.cn/article/natapp_newbie">natapp</a>（域名和端口不固定，两天自动删除，不建议用）</h2>
 <p>免费型隧道有效期2天，到期后自动删除，这还玩个毛，还是别用了。</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/sonvhi/chenxiaosong/sw</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># https://natapp.cn/#download</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://download.natapp.cn/assets/downloads/clients/2_4_0/natapp_linux_amd64/natapp</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> <span class="at">-R</span> 777 ./natapp</span></code></pre></div>
+<p>创建<code>/lib/systemd/system/natapp.service</code>:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[Unit]</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="va">Description</span><span class="op">=</span>natapp</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="va">StartLimitIntervalSec</span><span class="op">=</span>0</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[Service]</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="va">Type</span><span class="op">=</span>simple</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># token访问: https://natapp.cn/tunnel/lists</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStart</span><span class="op">=</span>/home/sonvhi/chenxiaosong/sw/natapp <span class="ex">-authtoken=xxxxxxxxx</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="va">Restart</span><span class="op">=</span>always</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="va">RestartSec</span><span class="op">=</span>1</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[Install]</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="va">WantedBy</span><span class="op">=</span>multi-user.target</span></code></pre></div>
+<p>再启动服务:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl daemon-reload</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable natapp.service</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart natapp.service</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status natapp.service <span class="co"># 查看状态</span></span></code></pre></div>
+<h2 data-number="5.4"
+id="网云穿域名和端口固定但免费版只能用7天如果要充钱可以考虑用"><span
+class="header-section-number">5.4</span> <a
+href="https://blog.xiaomy.net/archives/4.html">网云穿</a>（域名和端口固定，但免费版只能用7天，如果要充钱可以考虑用）</h2>
+<p><a
+href="https://xiaomy.net/pay?type=0">免费版每个月需要手动激活才可使用，每月1g
+流量(但实际免费版只能用7天)</a>。</p>
 <div class="sourceCode" id="cb20"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/sonvhi/chenxiaosong/sw</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># https://natapp.cn/#download</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://download.natapp.cn/assets/downloads/clients/2_4_0/natapp_linux_amd64/natapp</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> <span class="at">-R</span> 777 ./natapp</span></code></pre></div>
-<p>创建<code>/lib/systemd/system/natapp.service</code>:</p>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://down.xiaomy.net/linux/wyc_linux_64</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> <span class="at">-R</span> 777 ./wyc_linux_64</span></code></pre></div>
+<p>创建<code>/lib/systemd/system/wangyunchuan.service</code>:</p>
 <div class="sourceCode" id="cb21"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[Unit]</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="va">Description</span><span class="op">=</span>natapp</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="va">Description</span><span class="op">=</span>wangyunchuan</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="va">StartLimitIntervalSec</span><span class="op">=</span>0</span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[Service]</span></span>
 <span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="va">Type</span><span class="op">=</span>simple</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># token访问: https://natapp.cn/tunnel/lists</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStart</span><span class="op">=</span>/home/sonvhi/chenxiaosong/sw/natapp <span class="ex">-authtoken=xxxxxxxxx</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># token访问: https://i.xiaomy.net/#/tunnel</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStart</span><span class="op">=</span>/home/sonvhi/chenxiaosong/sw/wyc_linux_64 <span class="ex">-token=xxxxxxxxx</span></span>
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="va">Restart</span><span class="op">=</span>always</span>
 <span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="va">RestartSec</span><span class="op">=</span>1</span>
 <span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
@@ -363,9 +366,9 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#
 <p>再启动服务:</p>
 <div class="sourceCode" id="cb22"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl daemon-reload</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable natapp.service</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart natapp.service</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status natapp.service <span class="co"># 查看状态</span></span></code></pre></div>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable wangyunchuan.service</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart wangyunchuan.service</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status wangyunchuan.service <span class="co"># 查看状态</span></span></code></pre></div>
 <h2 data-number="5.5" id="监控"><span
 class="header-section-number">5.5</span> 监控</h2>
 <p>注意因为网络故障或其他原因连接可能会断开，可以用以下脚本检查重启服务:</p>

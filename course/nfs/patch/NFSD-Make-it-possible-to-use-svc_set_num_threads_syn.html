@@ -156,11 +156,13 @@ href="https://lore.kernel.org/all/175042051171.608730.8613669948428192921@noble.
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">中得到了修正：在同步模式下，线程会被同步地停止，因此可以确保在移除工作队列之前，所有线程都已经停止运行。</span></span></code></pre></div>
 <p>前置补丁:</p>
 <ul>
-<li>4.19可不合:
-<code>[PATCH 07/10] 97ad4031e295 nfsd4: add a client info file</code>](https://lore.kernel.org/all/1556201060-7947-8-git-send-email-bfields@redhat.com/)</li>
 <li><a
 href="https://lore.kernel.org/all/20210313210847.569041-1-trondmy@kernel.org/"><code>c6c7f2a84da4 nfsd: Ensure knfsd shuts down when the "nfsd" pseudofs is unmounted</code></a>:
-<code>/proc/fs/nfsd</code>卸载时确保所有<code>nfsd</code>线程全部停止</li>
+<code>/proc/fs/nfsd</code>卸载时确保所有<code>nfsd</code>线程全部停止
+<ul>
+<li>前置补丁, 4.19可不合:
+<code>[PATCH 07/10] 97ad4031e295 nfsd4: add a client info file</code>](https://lore.kernel.org/all/1556201060-7947-8-git-send-email-bfields@redhat.com/)</li>
+</ul></li>
 <li><a
 href="https://lore.kernel.org/all/163816148551.32298.1997321981162233125.stgit@noble.brown/"><code>[PATCH 01/20] 89b24336f03a NFSD: handle error better in write_ports_addfd()</code></a>:
 确保<code>nfsd_serv</code>刚创建时才销毁</li>
@@ -168,11 +170,13 @@ href="https://lore.kernel.org/all/163816148551.32298.1997321981162233125.stgit@n
 href="https://lore.kernel.org/all/163816148552.32298.18413679797079617436.stgit@noble.brown/"><code>[PATCH 02/20] df5e49c880ea SUNRPC: change svc_get() to return the svc.</code></a>:
 让<code>svc_get()</code>有返回值</li>
 <li><a
+href="https://lore.kernel.org/all/163816148553.32298.12054000235093970423.stgit@noble.brown/"><code>[PATCH 03/20] 8c62d12740a1 SUNRPC/NFSD: clean up get/put functions.</code></a>:
+重构<code>svc_destroy()</code>和<code>nfsd_destroy()</code>
+<ul>
+<li>前置补丁: <a
 href="https://lore.kernel.org/all/547ee3794ac9678bc20ccb6ec35ba0fca5fe92f2.1633540771.git.bcodding@redhat.com/"><code>[PATCH v2] c20106944eb6 NFSD: Keep existing listeners on portlist error</code></a>:
 如果已经存在sockets就只是减少计数，不调用<code>nfsd_destroy()</code></li>
-<li><a
-href="https://lore.kernel.org/all/163816148553.32298.12054000235093970423.stgit@noble.brown/"><code>[PATCH 03/20] 8c62d12740a1 SUNRPC/NFSD: clean up get/put functions.</code></a>:
-重构<code>svc_destroy()</code>和<code>nfsd_destroy()</code></li>
+</ul></li>
 <li><a
 href="https://lore.kernel.org/all/163816148554.32298.8307258870002897708.stgit@noble.brown/"><code>[PATCH 04/20] ec52361df99b SUNRPC: stop using -&gt;sv_nrthreads as a refcount</code></a>:
 <code>sv_nrthreads</code>只作为线程计数，新增<code>sv_refcnt</code>作为引用计数
@@ -180,21 +184,43 @@ href="https://lore.kernel.org/all/163816148554.32298.8307258870002897708.stgit@n
 <li>后续修复补丁: <a
 href="https://lore.kernel.org/all/20231215010030.7580-2-neilb@suse.de/"><code>[PATCH 1/5] 2a501f55cd64 nfsd: call nfsd_last_thread() before final nfsd_put()</code></a>
 <ul>
-<li>前置补丁可不合:
-<code>9f28a971ee9f nfsd: separate nfsd_last_thread() from nfsd_put()</code></li>
+<li>前置补丁: <a
+href="https://lore.kernel.org/all/20230731064839.7729-6-neilb@suse.de/"><code>[PATCH 05/12] 9f28a971ee9f nfsd: separate nfsd_last_thread() from nfsd_put()</code></a>:
+<ul>
+<li>前置补丁, 4.19可不合:
+<code>87cdd8641c8a SUNRPC: Remove svo_shutdown method</code></li>
+<li>前置补丁, 4.19可不合:
+<code>c7d7ec8f043e SUNRPC: Remove svc_shutdown_net()</code></li>
+<li>后续修复补丁: <a
+href="https://lore.kernel.org/all/169448190063.19905.9707641304438290692@noble.neil.brown.name/"><code>[PATCH] 88956eabfdea NFSD: fix possible oops when nfsd/pool_stats is closed.</code></a></li>
+</ul></li>
+<li>后续修复补丁: <a
+href="https://lore.kernel.org/all/20240103-nfsd-fixes-v1-1-4f4f9d7edd0d@kernel.org/"><code>[PATCH] 64e6304169f1 nfsd: drop the nfsd_put helper</code></a></li>
 </ul></li>
 </ul></li>
-<li>4.19可不合: <a
-href="https://lore.kernel.org/all/20210106075236.4184-3-amir73il@gmail.com/"><code>[PATCH v2 2/3] e567b98ce9a4 nfsd: protect concurrent access to nfsd stats counters</code></a></li>
 <li><a
 href="https://lore.kernel.org/all/163816148555.32298.5422275287728622222.stgit@noble.brown/"><code>[PATCH 05/20] 9b6c8c9bebcc nfsd: make nfsd_stats.th_cnt atomic_t</code></a>:
-把<code>nfsd_stats.th_cnt</code>变成原子变量</li>
+把<code>nfsd_stats.th_cnt</code>变成原子变量
+<ul>
+<li>前置补丁, 4.19可不合: <a
+href="https://lore.kernel.org/all/20210106075236.4184-3-amir73il@gmail.com/"><code>[PATCH v2 2/3] e567b98ce9a4 nfsd: protect concurrent access to nfsd stats counters</code></a></li>
+</ul></li>
 <li><a
 href="https://lore.kernel.org/all/163816148556.32298.17419698380488869158.stgit@noble.brown/"><code>[PATCH 06/20] 2a36395fac3b SUNRPC: use sv_lock to protect updates to sv_nrthreads.</code></a>:
 对<code>sv_nrthreads</code>加锁</li>
 <li><a
 href="https://lore.kernel.org/all/163816148556.32298.7308512506129152207.stgit@noble.brown/"><code>[PATCH 07/20] 9d3792aefdcd NFSD: narrow nfsd_mutex protection in nfsd thread</code></a>:
 缩小<code>nfsd_mutex</code>加锁的范围</li>
+<li><a
+href="https://lore.kernel.org/all/163816148558.32298.2182168040527421256.stgit@noble.brown/"><code>[PATCH 09/20] 3ebdbe5203a8 SUNRPC: discard svo_setup and rename svc_set_num_threads_sync()</code></a>:
+函数改名为<code>svc_set_num_threads()</code></li>
+<li><a
+href="https://lore.kernel.org/all/163816148559.32298.4434140851292696444.stgit@noble.brown/"><code>[PATCH 10/20] d057cfec4940 NFSD: simplify locking for network notifier.</code></a>:
+使用自旋锁<code>nfsd_notifier_lock</code>
+<ul>
+<li>前置补丁（修改<code>nfsd_reset_versions()</code>），4.19可不合:
+<code>e333f3bbefe3 nfsd: Allow containers to set supported nfs versions</code></li>
+</ul></li>
 </ul>
 </body>
 </html>
