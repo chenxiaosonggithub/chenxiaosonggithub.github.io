@@ -131,6 +131,8 @@ class="toc-section-number">1.3.1</span>
 class="toc-section-number">2</span> tracepoint</a></li>
 <li><a href="#tcpdump抓包" id="toc-tcpdump抓包"><span
 class="toc-section-number">3</span> tcpdump抓包</a></li>
+<li><a href="#client端重连" id="toc-client端重连"><span
+class="toc-section-number">4</span> client端重连</a></li>
 </ul>
 </nav>
 <p><a
@@ -276,5 +278,19 @@ server的代码还没有使用任何的tracepoint，但以后可能会用，你�
 class="header-section-number">3</span> tcpdump抓包</h1>
 <p>请查看<a
 href="https://chenxiaosong.com/course/nfs/debug.html#tcpdump">《nfs调试方法》</a>。</p>
+<h1 data-number="4" id="client端重连"><span
+class="header-section-number">4</span> client端重连</h1>
+<p>在测试和复现bug时，我们需要构造client端重连的场景。</p>
+<p>client挂载指定<code>-o echo_interval=1</code>（默认是<code>60</code>秒）:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> cifs <span class="at">-o</span> echo_interval=1 //192.168.53.211/TEST /mnt</span></code></pre></div>
+<p>server端操作:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 方法1: 停掉网卡</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ifconfig</span> ens2 up <span class="co"># client会打印: CIFS: VFS: \\192.168.53.211 has not responded in 3 seconds. Reconnecting...</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 方法2: 也可以直接停掉服务</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> stop smb.service <span class="co"># 用户态samba</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> stop ksmbd.service <span class="co"># 内核态ksmbd</span></span></code></pre></div>
+<p><code>server_unresponsive()</code>中判断当server端<code>3 * server-&gt;echo_interval</code>时间不回复时，打印<code>has not responded in %lu seconds. Reconnecting...</code>。</p>
 </body>
 </html>
