@@ -182,19 +182,27 @@ href="https://lore.kernel.org/all/163816148554.32298.8307258870002897708.stgit@n
 <code>sv_nrthreads</code>只作为线程计数，新增<code>sv_refcnt</code>作为引用计数
 <ul>
 <li>后续修复补丁: <a
-href="https://lore.kernel.org/all/20231215010030.7580-2-neilb@suse.de/"><code>[PATCH 1/5] 2a501f55cd64 nfsd: call nfsd_last_thread() before final nfsd_put()</code></a>
+href="https://lore.kernel.org/all/20231215010030.7580-2-neilb@suse.de/"><code>[PATCH 1/5] 2a501f55cd64 nfsd: call nfsd_last_thread() before final nfsd_put()</code></a>:
+失败时调用<code>nfsd_last_thread()</code>
 <ul>
 <li>前置补丁: <a
 href="https://lore.kernel.org/all/20230731064839.7729-6-neilb@suse.de/"><code>[PATCH 05/12] 9f28a971ee9f nfsd: separate nfsd_last_thread() from nfsd_put()</code></a>:
+从<code>nfsd_put()</code>中分离出函数<code>nfsd_last_thread()</code>
 <ul>
-<li>前置补丁, 4.19可不合:
-<code>87cdd8641c8a SUNRPC: Remove svo_shutdown method</code></li>
-<li>前置补丁, 4.19可不合:
-<code>c7d7ec8f043e SUNRPC: Remove svc_shutdown_net()</code></li>
+<li>前置补丁: <a
+href="https://lore.kernel.org/all/164511393711.1361.3789898013043466921.stgit@klimt.1015granger.net/"><code>[PATCH v2 3/8] 87cdd8641c8a SUNRPC: Remove svo_shutdown method</code></a>:
+删除结构体的<code>.svo_shutdown()</code>，在使用的地方直接调用函数</li>
+<li>前置补丁: <a
+href="https://lore.kernel.org/all/164511394380.1361.15753264922295129414.stgit@klimt.1015granger.net/"><code>[PATCH v2 4/8] 352ad31448fe SUNRPC: Rename svc_create_xprt()</code></a>:
+函数重命名成<code>svc_xprt_create()</code></li>
+<li>前置补丁: <a
+href="https://lore.kernel.org/all/164511395701.1361.2321498517172060697.stgit@klimt.1015granger.net/"><code>[PATCH v2 6/8] c7d7ec8f043e SUNRPC: Remove svc_shutdown_net()</code></a>:
+<code>svc_shutdown_net()</code>换成<code>svc_xprt_destroy_all()</code></li>
 <li>前置补丁（头文件<code>nfsd.h</code>）, 4.19可不合:
 <code>73598a0cfb21 nfsd: don't allocate the versions array.</code></li>
 <li>后续修复补丁: <a
-href="https://lore.kernel.org/all/169448190063.19905.9707641304438290692@noble.neil.brown.name/"><code>[PATCH] 88956eabfdea NFSD: fix possible oops when nfsd/pool_stats is closed.</code></a></li>
+href="https://lore.kernel.org/all/169448190063.19905.9707641304438290692@noble.neil.brown.name/"><code>[PATCH] 88956eabfdea NFSD: fix possible oops when nfsd/pool_stats is closed.</code></a>:
+修复可能的空指针解引用</li>
 </ul></li>
 <li>后续修复补丁: <a
 href="https://lore.kernel.org/all/20240103-nfsd-fixes-v1-1-4f4f9d7edd0d@kernel.org/"><code>[PATCH] 64e6304169f1 nfsd: drop the nfsd_put helper</code></a></li>
