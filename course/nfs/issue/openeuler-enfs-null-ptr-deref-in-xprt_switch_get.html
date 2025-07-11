@@ -188,8 +188,8 @@ href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/openeuler-enfs-nul
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/sonvhi/chenxiaosong/code/openeuler-kernel/x86_64-build/../arch/x86/include/asm/atomic.h:</span> 23</span>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffff81fa318a</span> <span class="op">&lt;</span>xprt_switch_get+26<span class="op">&gt;</span>:        mov    0x4<span class="er">(</span><span class="ex">%rbx</span><span class="kw">)</span><span class="ex">,%edx</span> <span class="co"># 将内存地址 %rbx + 4 处的 32 位值加载到寄存器 %edx 中</span></span></code></pre></div>
 <p>x86_64下整数参数使用的寄存器依次为:
-RDI，RSI，RDX，RCX，R8，R9，所以<code>xprt_switch_get()</code>的第一个参数是<code>%rdi</code>，而从<code>bt</code>输出中可以看到<code>RBX: 0000000000000100</code>，
-再结合<code>xps_kref</code>的偏移:</p>
+RDI，RSI，RDX，RCX，R8，R9，所以<code>xprt_switch_get()</code>的第一个参数是<code>%rdi</code>，
+通过<code>mov %rdi,%rbx</code>把值赋给<code>%rbx</code>，而从<code>bt</code>输出中可以看到<code>RBX: 0000000000000100</code>，再结合<code>xps_kref</code>的偏移:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_xprt_switch <span class="at">-o</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> rpc_xprt_switch {</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>   <span class="ex">[0]</span> spinlock_t xps_lock<span class="kw">;</span></span>
