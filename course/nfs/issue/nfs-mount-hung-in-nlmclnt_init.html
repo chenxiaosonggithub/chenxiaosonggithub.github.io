@@ -116,6 +116,8 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 class="toc-section-number">1</span> 问题描述</a></li>
 <li><a href="#调试" id="toc-调试"><span
 class="toc-section-number">2</span> 调试</a></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">3</span> 代码分析</a></li>
 </ul>
 </nav>
 <p><a
@@ -209,5 +211,20 @@ class="header-section-number">2</span> 调试</h1>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># nfs_free_server+0x22/0x90:</span></span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># nfs_free_server at /usr/src/debug/kernel-4.19.90/linux-4.19.90-24.4.v2101.ky10.x86_64/fs/nfs/client.c:924</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 924: if (!IS_ERR(server-&gt;client_acl))</span></span></code></pre></div>
+<h1 data-number="3" id="代码分析"><span
+class="header-section-number">3</span> 代码分析</h1>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>mount</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  ksys_mount</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    do_mount</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      vfs_kern_mount</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        mount_fs</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>          nfs_fs_mount</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            nfs_try_mount</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>              nfs3_create_server</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                nfs_create_server</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                  nfs_init_server</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                    nfs_start_lockd</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>                      nlmclnt_init</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>                        lockd_up <span class="co">// 等待锁释放</span></span></code></pre></div>
 </body>
 </html>
