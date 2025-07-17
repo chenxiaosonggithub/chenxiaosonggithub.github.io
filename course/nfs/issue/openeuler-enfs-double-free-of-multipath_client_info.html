@@ -174,35 +174,37 @@ class="header-section-number">2</span> 构造复现</h1>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>                       // kzalloc<span class="er">(</span><span class="ex">sizeof</span><span class="er">(</span><span class="ex">struct</span> nfs_ip_list<span class="kw">)</span><span class="ex">,</span> GFP_KERNEL<span class="kw">);</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="kw">(</span><span class="ex">!client_info-</span><span class="op">&gt;</span>local_ip_list<span class="kw">)</span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">return</span> <span class="ex">-ENOMEM</span><span class="kw">;</span></span></code></pre></div>
+<p>然后挂载，必现的哦:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=3,localaddrs=192.168.53.57~192.168.53.214,remoteaddrs=192.168.53.68~192.168.53.225 192.168.53.225:/tmp/s_test /mnt/</span></code></pre></div>
 <h1 data-number="3" id="代码分析"><span
 class="header-section-number">3</span> 代码分析</h1>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>vfs_get_tree</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  nfs_get_tree</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    nfs_try_get_tree</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      nfs_try_mount_request</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        nfs3_create_server</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>          nfs_create_server</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            nfs_init_server</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>              nfs_get_client</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                nfs_init_client</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                  nfs_create_multi_path_client</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// 这里client-&gt;cl_multipath_data为NULL</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                    nfs_multipath_client_info_init<span class="op">(&amp;</span>client<span class="op">-&gt;</span>cl_multipath_data<span class="op">,</span> <span class="op">...)</span> <span class="co">// ops-&gt;client_info_free</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                      <span class="op">*</span>enfs_info <span class="op">=</span> kzalloc<span class="op">()</span> <span class="co">// 这里 client-&gt;cl_multipath_data 不为NULL</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                      info <span class="op">=</span> <span class="op">*</span>enfs_info</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                      nfs_multipath_client_mount_info_init</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>                        client_info<span class="op">-&gt;</span>local_ip_list <span class="op">=</span> NULL <span class="co">// 直接赋值NULL，模拟kzalloc()内存分配失败</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                      <span class="co">// 这里被inline了</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>                      nfs_multipath_client_info_free</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>                        nfs_multipath_client_info_free_work <span class="co">// INIT_WORK(&amp;clp_info-&gt;work,</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>                          enfs_free_client_info</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>                      info <span class="op">!=</span> NULL <span class="co">// 注意这里 client-&gt;cl_multipath_data 不为 NULL</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// 执行完nfs_multipath_client_info_init()后client-&gt;cl_multipath_data 当然也不为 NULL</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>                  nfs_put_client</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                    nfs_free_client</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>                      nfs_free_multi_path_client</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                        <span class="co">// 这里没被inline</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>                        nfs_multipath_client_info_free<span class="op">(</span>clp<span class="op">-&gt;</span>cl_multipath_data<span class="op">)</span> <span class="co">// ops-&gt;client_info_free</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>                          <span class="co">// clp-&gt;cl_multipath_data 不为 NULL，就发生double free了</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>vfs_get_tree</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  nfs_get_tree</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    nfs_try_get_tree</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>      nfs_try_mount_request</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        nfs3_create_server</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>          nfs_create_server</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>            nfs_init_server</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>              nfs_get_client</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                nfs_init_client</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                  nfs_create_multi_path_client</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// 这里client-&gt;cl_multipath_data为NULL</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                    nfs_multipath_client_info_init<span class="op">(&amp;</span>client<span class="op">-&gt;</span>cl_multipath_data<span class="op">,</span> <span class="op">...)</span> <span class="co">// ops-&gt;client_info_free</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                      <span class="op">*</span>enfs_info <span class="op">=</span> kzalloc<span class="op">()</span> <span class="co">// 这里 client-&gt;cl_multipath_data 不为NULL</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>                      info <span class="op">=</span> <span class="op">*</span>enfs_info</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                      nfs_multipath_client_mount_info_init</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>                        client_info<span class="op">-&gt;</span>local_ip_list <span class="op">=</span> NULL <span class="co">// 直接赋值NULL，模拟kzalloc()内存分配失败</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>                      <span class="co">// 这里被inline了</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>                      nfs_multipath_client_info_free</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>                        nfs_multipath_client_info_free_work <span class="co">// INIT_WORK(&amp;clp_info-&gt;work,</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>                          enfs_free_client_info</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>                      info <span class="op">!=</span> NULL <span class="co">// 注意这里 client-&gt;cl_multipath_data 不为 NULL</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// 执行完nfs_multipath_client_info_init()后client-&gt;cl_multipath_data 当然也不为 NULL</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>                  nfs_put_client</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>                    nfs_free_client</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>                      nfs_free_multi_path_client</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>                        <span class="co">// 这里没被inline</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>                        nfs_multipath_client_info_free<span class="op">(</span>clp<span class="op">-&gt;</span>cl_multipath_data<span class="op">)</span> <span class="co">// ops-&gt;client_info_free</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>                          <span class="co">// clp-&gt;cl_multipath_data 不为 NULL，就发生double free了</span></span></code></pre></div>
 </body>
 </html>
