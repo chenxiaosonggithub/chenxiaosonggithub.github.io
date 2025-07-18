@@ -130,9 +130,9 @@ class="header-section-number">1</span> 问题描述</h1>
 <p>挂载时报以下信息然后panic（后面panic的日志没啥卵用就省略了）:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">list_add</span> corruption. prev-<span class="op">&gt;</span>next should be next <span class="er">(</span><span class="ex">ffff88813bbf2ca8</span><span class="kw">)</span><span class="ex">,</span> but was ffff888102e348b0. <span class="er">(</span><span class="va">prev</span><span class="op">=</span>ffff888102e348b0<span class="kw">)</span><span class="bu">.</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">WARNING:</span> CPU: 7 PID: 419 at lib/list_debug.c:32 __list_add_valid_or_report+0x95/0xc0</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">RIP:</span> 0010:__list_add_valid_or_report+0x95/0xc0</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Call</span> Trace:</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a> <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a> <span class="ex">insert_work+0x42/0x80</span></span>
@@ -178,6 +178,7 @@ class="header-section-number">2</span> 构造复现</h1>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=3,localaddrs=192.168.53.57~192.168.53.214,remoteaddrs=192.168.53.68~192.168.53.225 192.168.53.225:/tmp/s_test /mnt/</span></code></pre></div>
 <h1 data-number="3" id="代码分析"><span
 class="header-section-number">3</span> 代码分析</h1>
+<p>在<code>nfs_multipath_client_mount_info_init()</code>中构造内存分配失败，由于<code>-&gt;cl_multipath_data</code>释放后指针未置空，重复释放导致panic。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>vfs_get_tree</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  nfs_get_tree</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    nfs_try_get_tree</span>
