@@ -157,6 +157,7 @@ class="header-section-number">1</span> 日志</h1>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      <span class="co">// include/linux/lockd/debug.h</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>unlikely<span class="op">(</span>nlm_debug <span class="op">&amp;</span> NLMDBG_FACILITY<span class="op">))</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    printk<span class="op">(</span>KERN_DEFAULT fmt<span class="op">,</span> ##__VA_ARGS__<span class="op">);</span></span></code></pre></div>
+<p>当然也可直接调用<code>dfprintk()</code>、<code>dfprintk_cont()</code>、<code>dfprintk_rcu()</code>、<code>dfprintk_rcu_cont()</code>。</p>
 <p>以下是打开全部日志的命令，注意这将会打印大量日志，请先把<code>/var/log/messages*</code>复制保存到其他位置，避免错误日志被覆盖:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_ALL</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_ALL</span></span>
