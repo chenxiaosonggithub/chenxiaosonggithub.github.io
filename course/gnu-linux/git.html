@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -94,119 +83,97 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">git分布式版本控制系统</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#log" id="toc-log"><span
-class="toc-section-number">1</span> <code>log</code></a></li>
-<li><a href="#name-rev" id="toc-name-rev"><span
-class="toc-section-number">2</span> <code>name-rev</code></a></li>
-<li><a href="#两个github账号" id="toc-两个github账号"><span
-class="toc-section-number">3</span> 两个github账号</a></li>
-<li><a href="#cherry-pick-or-am" id="toc-cherry-pick-or-am"><span
-class="toc-section-number">4</span>
-<code>cherry-pick</code>或<code>am</code></a></li>
-<li><a href="#format-patch" id="toc-format-patch"><span
-class="toc-section-number">5</span> <code>format-patch</code></a></li>
+<li><a href="#log"><span class="toc-section-number">1</span> <code>log</code></a></li>
+<li><a href="#name-rev"><span class="toc-section-number">2</span> <code>name-rev</code></a></li>
+<li><a href="#两个github账号"><span class="toc-section-number">3</span> 两个github账号</a></li>
+<li><a href="#cherry-pick-or-am"><span class="toc-section-number">4</span> <code>cherry-pick</code>或<code>am</code></a></li>
+<li><a href="#format-patch"><span class="toc-section-number">5</span> <code>format-patch</code></a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
-<h1 data-number="1" id="log"><span
-class="header-section-number">1</span> <code>log</code></h1>
+<p><a href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
+<h1 data-number="1" id="log"><span class="header-section-number">1</span> <code>log</code></h1>
 <p>单行显示补丁，前面再加上时间:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --oneline：简化每条提交的显示。</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># --date=short：以简短的日期格式（YYYY-MM-DD）显示时间。</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --format=&quot;%ad %h %s&quot;：自定义输出格式，其中：</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># %a Author, %c Commit</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># %ad %cd：显示提交的日期（由 --date 指定的格式），%d: 不包含时分秒</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># %ai %ci：显示提交的 日期和时间，%i: 包含时分秒</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># %h：显示提交的简短哈希值。</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># %s：显示提交的信息。</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># %an：提交者的名字。</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># %ae：提交者的邮箱。</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--author</span><span class="op">=</span>yourname</span></code></pre></div>
-<p><code>git log -L&lt;start&gt;,&lt;end&gt;:&lt;file&gt;, -L:&lt;funcname&gt;:&lt;file&gt;</code>（查看帮助文档<code>man 1 git log</code>），以内核主线代码<a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/fs/namespace.c?id=8f6f76a6a29f">fs/namespace.c</a>文件为例，查看<code>do_new_mount</code>函数:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">-L:do_new_mount:fs</span>/namespace.c</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co"># --oneline：简化每条提交的显示。</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co"># --date=short：以简短的日期格式（YYYY-MM-DD）显示时间。</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co"># --format=&quot;%ad %h %s&quot;：自定义输出格式，其中：</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="co"># %a Author, %c Commit</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co"># %ad %cd：显示提交的日期（由 --date 指定的格式），%d: 不包含时分秒</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="co"># %ai %ci：显示提交的 日期和时间，%i: 包含时分秒</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="co"># %h：显示提交的简短哈希值。</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="co"># %s：显示提交的信息。</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co"># %an：提交者的名字。</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="co"># %ae：提交者的邮箱。</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="fu">git</span> log --oneline --date=short --format=<span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> --author=yourname</span></code></pre></div>
+<p><code>git log -L&lt;start&gt;,&lt;end&gt;:&lt;file&gt;, -L:&lt;funcname&gt;:&lt;file&gt;</code>（查看帮助文档<code>man 1 git log</code>），以内核主线代码<a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/fs/namespace.c?id=8f6f76a6a29f">fs/namespace.c</a>文件为例，查看<code>do_new_mount</code>函数:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="fu">git</span> log -L:do_new_mount:fs/namespace.c</span></code></pre></div>
 <p>我们发现列出的却是<code>do_new_mount_fc</code>的修改记录，因为<code>do_new_mount_fc</code>包含字符串<code>do_new_mount</code>，又在<code>do_new_mount()</code>函数前面，解决方法是在<code>do_new_mount</code>后面再加个<code>\(</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">-L:do_new_mount\(:fs</span>/namespace.c</span></code></pre></div>
-<h1 data-number="2" id="name-rev"><span
-class="header-section-number">2</span> <code>name-rev</code></h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="fu">git</span> log -L:do_new_mount<span class="dt">\(</span>:fs/namespace.c</span></code></pre></div>
+<h1 data-number="2" id="name-rev"><span class="header-section-number">2</span> <code>name-rev</code></h1>
 <p>在内核开发过程中我们经常需要找某个commit提交记录是哪个版本引入的，使用以下命令</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> name-rev <span class="op">&lt;</span>commit<span class="op">&gt;</span></span></code></pre></div>
-<h1 data-number="3" id="两个github账号"><span
-class="header-section-number">3</span> 两个github账号</h1>
-<p>如果我们有两个github账号，两个账号不能在网站上添加同一个ssh
-key，这时我们就要再生成一个ssh key:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 生成id_rsa_2和id_rsa_2.pub</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-keygen</span> <span class="at">-f</span> ~/.ssh/id_rsa_2</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建配置文件</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&lt;&lt;EOF</span> <span class="op">&gt;</span> ~/.ssh/config</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st"># 10.42.20.225 改成本机的ip</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">Host 10.42.20.225</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="st">  HostName 10.42.20.225</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="st">  User sonvhi</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="st">Host github.com</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="st">  HostName github.com</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="st">  User git</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="st">  IdentityFile ~/.ssh/id_rsa</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="st">  IdentitiesOnly yes</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="st"># 指定账号: specifiedaccount</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="st">Host github.com-specifiedaccount</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="st">  HostName github.com</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="st">  User git</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="st">  IdentityFile ~/.ssh/id_rsa_2</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="st">  IdentitiesOnly yes</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 重新设置url，specifiedaccount为指定的账号名</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> remote set-url origin git@github.com-specifiedaccount:specifiedaccount/repo-name.git</span></code></pre></div>
-<h1 data-number="4" id="cherry-pick-or-am"><span
-class="header-section-number">4</span>
-<code>cherry-pick</code>或<code>am</code></h1>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="fu">git</span> name-rev <span class="op">&lt;</span>commit<span class="op">&gt;</span></span></code></pre></div>
+<h1 data-number="3" id="两个github账号"><span class="header-section-number">3</span> 两个github账号</h1>
+<p>如果我们有两个github账号，两个账号不能在网站上添加同一个ssh key，这时我们就要再生成一个ssh key:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co"># 生成id_rsa_2和id_rsa_2.pub</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="fu">ssh-keygen</span> -f ~/.ssh/id_rsa_2</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="co"># 创建配置文件</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="fu">cat</span> <span class="op">&lt;&lt;EOF</span> <span class="op">&gt;</span> <span class="ex">~/.ssh/config</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a># 10.42.20.225 改成本机的ip</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>Host 10.42.20.225</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>  HostName 10.42.20.225</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>  User sonvhi</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>Host <span class="op">g</span><span class="ex">ithub.com</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>  HostName github.com</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>  User git</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>  IdentityFile ~/.ssh/id_rsa</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>  IdentitiesOnly yes</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a># 指定账号: specifiedaccount</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>Host github.com-specifiedaccount</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a>  HostName github.com</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a>  User git</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a>  IdentityFile ~/.ssh/id_rsa_2</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a>  IdentitiesOnly yes</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a>EOF</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a># 重新设置url，specifiedaccount为指定的账号名</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a>git remote set-url origin git@github.com-specifiedaccount:specifiedaccount/repo-name.git</span></code></pre></div>
+<h1 data-number="4" id="cherry-pick-or-am"><span class="header-section-number">4</span> <code>cherry-pick</code>或<code>am</code></h1>
 <p><code>cherry-pick</code>多个<code>commit</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> cherry-pick <span class="op">&lt;</span>commit1<span class="op">&gt;</span>..<span class="op">&lt;</span>commitN<span class="op">&gt;</span> # 不包含commit1</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="fu">git</span> cherry-pick <span class="op">&lt;</span>commit1<span class="op">&gt;</span>..<span class="op">&lt;</span>commitN<span class="op">&gt;</span> <span class="co"># 不包含commit1</span></span></code></pre></div>
 <p>如果多个commit中包含有Merge的commit，直接cherry-pick多个会报错<code>error: 提交 xxxx 是一个合并提交但未提供 -m 选项</code>，可以把<code>git log --oneline</code>的输出放到文件<code>commits.txt</code>中，把Merge相关的commit删除，并删除掉每行的后面的commit信息，每行只保留commit号，然后用以下脚本<code>cherry-pick</code>（各位朋友如果有什么更好的方法请一定要联系告诉我）:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tac 从最后一行开始 cherry-pick</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tac</span> commits.txt <span class="kw">|</span> <span class="cf">while</span> <span class="va">IFS</span><span class="op">=</span> <span class="bu">read</span> <span class="at">-r</span> <span class="va">commit</span><span class="kw">;</span> <span class="cf">do</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">git</span> cherry-pick <span class="va">$commit</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">[</span> <span class="va">$?</span> <span class="ot">-eq</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;合并成功&quot;</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;合并失败&quot;</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;全部合并成功&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co"># tac 从最后一行开始 cherry-pick</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="fu">tac</span> commits.txt <span class="kw">|</span> <span class="kw">while</span> <span class="va">IFS=</span> <span class="bu">read</span> -r <span class="va">commit</span>; <span class="kw">do</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>    <span class="fu">git</span> cherry-pick <span class="va">$commit</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>    <span class="kw">if</span><span class="bu"> [</span> <span class="va">$?</span> <span class="ot">-eq</span> 0<span class="bu"> ]</span>; <span class="kw">then</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>        <span class="bu">echo</span> <span class="st">&quot;合并成功&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>    <span class="kw">else</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>        <span class="bu">echo</span> <span class="st">&quot;合并失败&quot;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>        <span class="bu">return</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>    <span class="kw">fi</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="kw">done</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="bu">echo</span> <span class="st">&quot;全部合并成功&quot;</span></span></code></pre></div>
 <p><code>git cherry-pick</code>或<code>git am</code>合补丁时如果有冲突，在解决完冲突后，在<code>commit</code>信息中在<code>Conflicts:</code>后列出冲突文件，如:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Conflicts:</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>        <span class="ex">include/linux/sunrpc/clnt.h</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[Commit</span> xxxxxxxxx <span class="er">(</span><span class="st">&quot;xxx: here is subject&quot;</span><span class="kw">)</span> <span class="ex">这里描述冲突的原因，如果后面还有补丁就用封号</span><span class="kw">;</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a> <span class="ex">Commit</span> xxxxxxxxx <span class="er">(</span><span class="st">&quot;xxx: here is subject&quot;</span><span class="kw">)</span> <span class="ex">最后一个补丁用点号.]</span></span></code></pre></div>
-<h1 data-number="5" id="format-patch"><span
-class="header-section-number">5</span> <code>format-patch</code></h1>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ex">Conflicts</span>:</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>        <span class="ex">include/linux/sunrpc/clnt.h</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>[<span class="ex">Commit</span> xxxxxxxxx (<span class="st">&quot;xxx: here is subject&quot;</span>) 这里描述冲突的原因，如果后面还有补丁就用封号;</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a> <span class="ex">Commit</span> xxxxxxxxx (<span class="st">&quot;xxx: here is subject&quot;</span>) 最后一个补丁用点号<span class="ex">.</span>]</span></code></pre></div>
+<h1 data-number="5" id="format-patch"><span class="header-section-number">5</span> <code>format-patch</code></h1>
 <p>查看帮助文档<code>man git format-patch</code>:</p>
 <pre><code>--stat[=&lt;width&gt;[,&lt;name-width&gt;[,&lt;count&gt;]]]
            生成一个 diffstat。默认情况下，文件名部分将使用尽可能多的空间，其余部分用于图形部分。最大宽度默认为终端宽度，如果未连接终端则为 80 列，可以通过 &lt;width&gt; 覆盖。文件名部分的宽度可以通过在逗号后提供另一个宽度 &lt;name-width&gt; 来限制。图形部分的宽度可以通过使用 --stat-graph-width=&lt;width&gt; 来限制（影响所有生成统计图的命令），或通过设置 diff.statGraphWidth=&lt;width&gt;（不影响 git format-patch）。通过提供第三个参数 &lt;count&gt;，可以限制输出到前 &lt;count&gt; 行，如果有更多行，则以 ... 结尾。
 
            这些参数也可以单独设置，使用 --stat-width=&lt;width&gt;、--stat-name-width=&lt;name-width&gt; 和 --stat-count=&lt;count&gt;。</code></pre>
 <p>如果文件名较长，可以用以下命令让补丁中的路径显示完整:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> format-patch <span class="at">-3</span> <span class="at">--cover-letter</span> <span class="at">--stat</span><span class="op">=</span>300,200</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="fu">git</span> format-patch -3 --cover-letter --stat=300,200</span></code></pre></div>
 </body>
 </html>
