@@ -113,7 +113,7 @@
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>                <span class="bu">return</span> 0<span class="kw">;</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a> </span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="ex">+</span>       printk(<span class="st">&quot;delay begin\n&quot;</span>);</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="ex">+</span>       mdelay(10 * 1000);</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="ex">+</span>       mdelay(5 * 1000);</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="ex">+</span>       printk(<span class="st">&quot;delay end\n&quot;</span>);</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="ex">+</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>        <span class="ex">ops</span> = nfs_multipath_router_get();</span>
@@ -123,7 +123,7 @@
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="fu">mount</span> -t nfs -o vers=3,localaddrs=192.168.53.57~192.168.53.214,remoteaddrs=192.168.53.68~192.168.53.225 192.168.53.225:/tmp/s_test /mnt/ <span class="kw">&amp;</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="fu">sleep</span> 1</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ex">modprobe</span> -r enfs</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="fu">sleep</span> 10</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="fu">sleep</span> 5</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="fu">mount</span> <span class="kw">|</span> <span class="fu">grep</span> nfs <span class="co"># 看不到nfs+相关的挂载选项</span></span></code></pre></div>
 <h1 data-number="3" id="代码分析"><span class="header-section-number">3</span> 代码分析</h1>
 <p>只有在<code>enfs_parse_mount_options()</code>中会自动加载<code>enfs</code>模块，如果在初始化客户端（<code>nfs_create_multi_path_client()</code>函数）之前 执行了<code>modprobe -r enfs</code>移除了模块，就无法初始化多路径客户端，因为这时找不到<code>enfs</code>模块，也不会自动加载<code>enfs</code>模块。</p>
