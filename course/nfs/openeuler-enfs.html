@@ -120,10 +120,6 @@ class="toc-section-number">2</span> 问题分析</a></li>
 class="toc-section-number">3</span> 多个网卡环境</a></li>
 <li><a href="#openeuler-nfs的使用" id="toc-openeuler-nfs的使用"><span
 class="toc-section-number">4</span> openeuler nfs+的使用</a></li>
-<li><a href="#调试日志功能" id="toc-调试日志功能"><span
-class="toc-section-number">5</span> 调试日志功能</a></li>
-<li><a href="#代码分析" id="toc-代码分析"><span
-class="toc-section-number">6</span> 代码分析</a></li>
 </ul>
 </nav>
 <p><a
@@ -201,25 +197,5 @@ client端支持enfs就可以，<code>/etc/enfs/config.ini</code>默认配置如�
 <p>除了<code>mount</code>命令查看之外，还可以用以下方式:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/enfs/192.168.53.216_0/path</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/enfs/192.168.53.216_0/stat</span></code></pre></div>
-<h1 data-number="5" id="调试日志功能"><span
-class="header-section-number">5</span> 调试日志功能</h1>
-<p>使用到的打印函数:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dprintk</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>dfprintk</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>enfs_log_debug</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>enfs_log_info</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>enfs_log_error</span></code></pre></div>
-<h1 data-number="6" id="代码分析"><span
-class="header-section-number">6</span> 代码分析</h1>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// struct enfs_adapter_ops-&gt;owner 的引用计数参考</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> nfs_client</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> nfs_subversion <span class="op">*</span> cl_nfs_mod</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> module <span class="op">*</span>owner</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">// nfs_multipath_router_get 修改参考</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>get_nfs_version</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  request_module</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>nfs_rename flag overlayfs</span></code></pre></div>
 </body>
 </html>
