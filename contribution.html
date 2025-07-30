@@ -8,10 +8,19 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -21,45 +30,85 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">陈孝松自由软件贡献</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#linux-kernel"><span class="toc-section-number">1</span> Linux内核贡献</a></li>
-<li><a href="#openharmony"><span class="toc-section-number">2</span> 鸿蒙操作系统贡献</a></li>
-<li><a href="#openeuler-enfs"><span class="toc-section-number">3</span> openEuler的nfs多路径（nfs+）</a></li>
-<li><a href="#lorawan"><span class="toc-section-number">4</span> LoRaWAN协议翻译</a></li>
-<li><a href="#ghostwriter"><span class="toc-section-number">5</span> ghostwriter: markdown编辑器</a></li>
-<li><a href="#博客"><span class="toc-section-number">6</span> 博客</a></li>
+<li><a href="#linux-kernel" id="toc-linux-kernel"><span
+class="toc-section-number">1</span> Linux内核贡献</a></li>
+<li><a href="#openharmony" id="toc-openharmony"><span
+class="toc-section-number">2</span> 鸿蒙操作系统贡献</a></li>
+<li><a href="#openeuler-enfs" id="toc-openeuler-enfs"><span
+class="toc-section-number">3</span>
+openEuler的nfs多路径（nfs+）</a></li>
+<li><a href="#lorawan" id="toc-lorawan"><span
+class="toc-section-number">4</span> LoRaWAN协议翻译</a></li>
+<li><a href="#ghostwriter" id="toc-ghostwriter"><span
+class="toc-section-number">5</span> ghostwriter: markdown编辑器</a></li>
+<li><a href="#博客" id="toc-博客"><span
+class="toc-section-number">6</span> 博客</a></li>
 </ul>
 </nav>
 <p>这里列出我所有的自由软件项目贡献。</p>
-<h1 data-number="1" id="linux-kernel"><span class="header-section-number">1</span> Linux内核贡献</h1>
-<p><a href="https://lore.kernel.org/all/?q=chenxiaosong">点击查看kernel.org网站上我的Linux内核邮件列表</a></p>
-<p><a href="https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log/?qt=grep&amp;q=chenxiaosong">点击查看kernel.org网站上我的Linux内核仓库提交记录</a>（加载需要一丢丢时间哈）</p>
+<h1 data-number="1" id="linux-kernel"><span
+class="header-section-number">1</span> Linux内核贡献</h1>
+<p><a
+href="https://lore.kernel.org/all/?q=chenxiaosong">点击查看kernel.org网站上我的Linux内核邮件列表</a></p>
+<p><a
+href="https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log/?qt=grep&amp;q=chenxiaosong">点击查看kernel.org网站上我的Linux内核仓库提交记录</a>（加载需要一丢丢时间哈）</p>
 <p>Linux内核是我现在的工作，更是我的兴趣和信仰（自由软件），在内核社区里可以让我这个小菜鸟直接和世上最顶尖的程序员交流。</p>
-<p>主要从事的方向是<strong>文件系统</strong>（nfs，smb等），贡献过40+个文件系统相关内核补丁（截止2024年09月），修复多个<strong>内核社区CVE</strong>（通用漏洞披露，Common Vulnerabilities and Exposures）。</p>
-<h1 data-number="2" id="openharmony"><span class="header-section-number">2</span> 鸿蒙操作系统贡献</h1>
-<p><a href="https://chenxiaosong.com/course/harmony/contribution.html">点击这里查看具体的代码</a></p>
-<p>OpenHarmony是华为“鸿蒙操作系统”的底座，包含: 华为捐献的“鸿蒙操作系统”的基础能力 和 其他参与者的贡献。</p>
-<p>华为的HarmonyOS（鸿蒙操作系统）与OpenHarmony的关系，相当于谷歌的Android（安卓系统）与AOSP(Android Open Source Project)的关系。</p>
-<p>我个人曾经主要从事开发<strong>端云协同</strong>功能，也就是端设备（如手机、智能设备等）与云端（云服务、云计算资源）之间的协同工作和通信，工作内容有 <strong>内核hmdfs（鸿蒙分布式文件系统）</strong> 、 <strong>fuse（用户态文件系统）</strong> 和 <strong>媒体库</strong> 等开发。</p>
-<h1 data-number="3" id="openeuler-enfs"><span class="header-section-number">3</span> openEuler的nfs多路径（nfs+）</h1>
-<p><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs.html">请点击这里查看</a>。</p>
-<h1 data-number="4" id="lorawan"><span class="header-section-number">4</span> LoRaWAN协议翻译</h1>
-<p><a href="https://github.com/twowinter/LoRaWAN-Specification_ZH_CN/pulls?q=is%3Apr+author%3Achenxiaosonggithub+is%3Aclosed">点击查看我提交的pull requests</a></p>
-<p><a href="https://github.com/twowinter/LoRaWAN-Specification_ZH_CN">twowinter/LoRaWAN-Specification_ZH_CN</a>是由腾讯LoRaWAN专家<a href="https://github.com/twowinter">twowinter</a>发起的<a href="https://resources.lora-alliance.org/technical-specifications/lorawan-specification-v1-1">LoRaWAN-Specification</a>的翻译项目。我主要参与了<a href="https://github.com/twowinter/LoRaWAN-Specification_ZH_CN/tree/V1.1">V1.1版本</a>的翻译，lionChen是我曾经的签名。</p>
-<h1 data-number="5" id="ghostwriter"><span class="header-section-number">5</span> ghostwriter: markdown编辑器</h1>
-<p>ghostwriter是KDE（K桌面环境，全称K Desktop Environment，著名的运行于类UNIX系统上的自由图形桌面环境）的markdown编辑器，关于我贡献的内容可以查看<a href="https://chenxiaosong.com/src/userspace-environment/ghostwriter-makdown.html">《ghostwriter: 一款makdown编辑器》</a>。</p>
-<h1 data-number="6" id="博客"><span class="header-section-number">6</span> 博客</h1>
-<p>更多的内容，请查看我的博客，记录自己学到的一些知识点，<a href="https://chenxiaosong.com/blog">点击查看具体的文章: chenxiaosong.com/blog</a>。</p>
+<p>主要从事的方向是<strong>文件系统</strong>（nfs，smb等），贡献过40+个文件系统相关内核补丁（截止2024年09月），修复多个<strong>内核社区CVE</strong>（通用漏洞披露，Common
+Vulnerabilities and Exposures）。</p>
+<h1 data-number="2" id="openharmony"><span
+class="header-section-number">2</span> 鸿蒙操作系统贡献</h1>
+<p><a
+href="https://chenxiaosong.com/course/harmony/contribution.html">点击这里查看具体的代码</a></p>
+<p>OpenHarmony是华为“鸿蒙操作系统”的底座，包含:
+华为捐献的“鸿蒙操作系统”的基础能力 和 其他参与者的贡献。</p>
+<p>华为的HarmonyOS（鸿蒙操作系统）与OpenHarmony的关系，相当于谷歌的Android（安卓系统）与AOSP(Android
+Open Source Project)的关系。</p>
+<p>我个人曾经主要从事开发<strong>端云协同</strong>功能，也就是端设备（如手机、智能设备等）与云端（云服务、云计算资源）之间的协同工作和通信，工作内容有
+<strong>内核hmdfs（鸿蒙分布式文件系统）</strong> 、
+<strong>fuse（用户态文件系统）</strong> 和 <strong>媒体库</strong>
+等开发。</p>
+<h1 data-number="3" id="openeuler-enfs"><span
+class="header-section-number">3</span> openEuler的nfs多路径（nfs+）</h1>
+<p><a
+href="https://chenxiaosong.com/course/nfs/openeuler-enfs.html">请点击这里查看</a>。</p>
+<h1 data-number="4" id="lorawan"><span
+class="header-section-number">4</span> LoRaWAN协议翻译</h1>
+<p><a
+href="https://github.com/twowinter/LoRaWAN-Specification_ZH_CN/pulls?q=is%3Apr+author%3Achenxiaosonggithub+is%3Aclosed">点击查看我提交的pull
+requests</a></p>
+<p><a
+href="https://github.com/twowinter/LoRaWAN-Specification_ZH_CN">twowinter/LoRaWAN-Specification_ZH_CN</a>是由腾讯LoRaWAN专家<a
+href="https://github.com/twowinter">twowinter</a>发起的<a
+href="https://resources.lora-alliance.org/technical-specifications/lorawan-specification-v1-1">LoRaWAN-Specification</a>的翻译项目。我主要参与了<a
+href="https://github.com/twowinter/LoRaWAN-Specification_ZH_CN/tree/V1.1">V1.1版本</a>的翻译，lionChen是我曾经的签名。</p>
+<h1 data-number="5" id="ghostwriter"><span
+class="header-section-number">5</span> ghostwriter: markdown编辑器</h1>
+<p>ghostwriter是KDE（K桌面环境，全称K Desktop
+Environment，著名的运行于类UNIX系统上的自由图形桌面环境）的markdown编辑器，关于我贡献的内容可以查看<a
+href="https://chenxiaosong.com/src/userspace-environment/ghostwriter-makdown.html">《ghostwriter:
+一款makdown编辑器》</a>。</p>
+<h1 data-number="6" id="博客"><span
+class="header-section-number">6</span> 博客</h1>
+<p>更多的内容，请查看我的博客，记录自己学到的一些知识点，<a
+href="https://chenxiaosong.com/blog">点击查看具体的文章:
+chenxiaosong.com/blog</a>。</p>
 </body>
 </html>
