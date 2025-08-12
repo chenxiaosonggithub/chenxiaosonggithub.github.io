@@ -171,6 +171,12 @@ openEuler Kernel 补丁合入规范</a>，可以用 <a
 href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/script/create-openeuler-git-msg.sh">脚本<code>create-openeuler-git-msg.sh</code></a>
 生成openEuler补丁需要的格式。</p>
 <p>注意openEuler门禁会检查修改前后的kabi变化，如果想自己本地检查，可以对比修改前后的<code>vmlinux.symvers</code>和<code>Module.symvers</code>。</p>
+<p>openEuler的LTS有kabi白名单，使用脚本<a
+href="https://gitee.com/src-openeuler/kernel/blob/openEuler-24.03-LTS-SP2/check-kabi"><code>check-kabi</code></a>（注意不能使用<a
+href="https://gitee.com/openeuler/kernel/blob/OLK-6.6/scripts/check-kabi">openeuler/kernel仓库的脚本</a>）对比<a
+href="https://gitee.com/src-openeuler/kernel/blob/openEuler-24.03-LTS-SP2/Module.kabi_x86_64"><code>Module.kabi_x86_64</code></a>或<a
+href="https://gitee.com/src-openeuler/kernel/blob/openEuler-24.03-LTS-SP2/Module.kabi_aarch64"><code>Module.kabi_aarch64</code></a>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">../src-openeuler-kernel/check-kabi</span> <span class="at">-k</span> ../src-openeuler-kernel/Module.kabi_x86_64 <span class="at">-s</span> kabi-build/Module.symvers</span></code></pre></div>
 <h1 data-number="3" id="内核源码树"><span
 class="header-section-number">3</span> 内核源码树</h1>
 <p>我们以社区最近的一个LTS（longterm
@@ -299,30 +305,30 @@ FAQ</a>。</p>
 <h2 data-number="4.4" id="git发送邮件"><span
 class="header-section-number">4.4</span> git发送邮件</h2>
 <p>安装软件:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install git-email <span class="at">-y</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install git-email <span class="at">-y</span></span></code></pre></div>
 <p>163邮箱<code>~/.gitconfig</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[sendemail]</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">from</span> = your_name@163.com</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">smtpserver</span> = smtp.163.com</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">smtpuser</span> = your_name@163.com</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">smtpencryption</span> = ssl </span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">smtppass</span> = 此处填写163邮箱的授权密码</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">smtpserverport</span> = 994 </span></code></pre></div>
-<p>foxmail(qq)邮箱<code>~/.gitconfig</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[sendemail]</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>        <span class="ex">from</span> = your_name@foxmail.com</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpserver</span> = smtp.qq.com</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpuser</span> = your_name@foxmail.com</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpencryption</span> = ssl </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtppass</span> = 此处填写qq邮箱的授权密码</span></code></pre></div>
-<p>腾讯企业邮箱<code>~/.gitconfig</code>:</p>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">from</span> = your_name@163.com</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">smtpserver</span> = smtp.163.com</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">smtpuser</span> = your_name@163.com</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">smtpencryption</span> = ssl </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">smtppass</span> = 此处填写163邮箱的授权密码</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">smtpserverport</span> = 994 </span></code></pre></div>
+<p>foxmail(qq)邮箱<code>~/.gitconfig</code>:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[sendemail]</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        <span class="ex">from</span> = your_name@your_name.com</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpserver</span> = smtp.exmail.qq.com</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpuser</span> = your_name@your_name.com</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        <span class="ex">from</span> = your_name@foxmail.com</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpserver</span> = smtp.qq.com</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpuser</span> = your_name@foxmail.com</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpencryption</span> = ssl </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtppass</span> = 此处填写腾讯企业邮箱的授权密码</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpserverport</span> = 465</span></code></pre></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtppass</span> = 此处填写qq邮箱的授权密码</span></code></pre></div>
+<p>腾讯企业邮箱<code>~/.gitconfig</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[sendemail]</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="ex">from</span> = your_name@your_name.com</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpserver</span> = smtp.exmail.qq.com</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpuser</span> = your_name@your_name.com</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpencryption</span> = ssl </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtppass</span> = 此处填写腾讯企业邮箱的授权密码</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="ex">smtpserverport</span> = 465</span></code></pre></div>
 <p>获取maintainer邮箱:</p>
 <pre class="shell"><code>./scripts/get_maintainer.pl file1.patch</code></pre>
 <p>发送邮件:</p>
@@ -330,7 +336,7 @@ class="header-section-number">4.4</span> git发送邮件</h2>
 git send-email --to=to1@example.com,to2@example.com --cc=cc1@example.com,cc2@example.com file1.patch file2.patch</code></pre>
 <p>可以使用脚本<a
 href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/script/get-maintainer-email.sh"><code>get-maintainer-email.sh</code></a>来获取邮箱:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> format-patch <span class="at">-1</span> 1aee9158bc97</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> get-maintainer-email.sh fs/nfs/ fs/nfsd fs/nfs_common 0001-nfsd-lock_rename-needs-both-directories-to-live-on-t.patch</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> format-patch <span class="at">-1</span> 1aee9158bc97</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> get-maintainer-email.sh fs/nfs/ fs/nfsd fs/nfs_common 0001-nfsd-lock_rename-needs-both-directories-to-live-on-t.patch</span></code></pre></div>
 </body>
 </html>
