@@ -124,7 +124,7 @@
 <li><a href="https://support.huawei.com/supportindex/index">support.huawei.com</a>选择“企业技术支持”</li>
 </ul>
 <p>6.6内核可直接切换到<a href="https://gitee.com/openeuler/kernel/tree/OLK-6.6/"><code>OLK-6.6</code>分支</a>。</p>
-<p>4.19内核切换到<code>openEuler-1.0-LTS</code>分支，可以使用脚本<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/nfs/src/create-enfs-patchset.sh"><code>create-enfs-patchset.sh</code></a>生成完整的补丁文件， <a href="https://github.com/chenxiaosonggithub/tmp/tree/master/nfs/enfs-4.19-patch">再打上我修改的补丁</a>。编译前打开配置<code>CONFIG_ENFS</code>，可能还要关闭配置<code>CONFIG_NET_VENDOR_NETRONOME</code>。</p>
+<p>4.19内核切换到<code>openEuler-1.0-LTS</code>分支，可以使用脚本<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/nfs/src/create-enfs-patchset.sh"><code>create-enfs-patchset.sh</code></a>生成完整的补丁文件， <a href="https://github.com/chenxiaosonggithub/tmp/tree/master/nfs/enfs-4.19-patch">再打上我修改的补丁</a>， 也可以直接用<a href="https://gitee.com/chenxiaosonggitee/kernel-enfs/tree/openEuler-1.0-LTS/">我的仓库kernel-enfs</a>。 编译前打开配置<code>CONFIG_ENFS</code>，可能还要关闭配置<code>CONFIG_NET_VENDOR_NETRONOME</code>。</p>
 <p>挂载:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">modprobe</span> enfs</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="fu">mount</span> -t nfs -o localaddrs=192.168.53.40~192.168.53.53,remoteaddrs=192.168.53.215~192.168.53.216 192.168.53.216:/s_test /mnt/</span></code></pre></div>

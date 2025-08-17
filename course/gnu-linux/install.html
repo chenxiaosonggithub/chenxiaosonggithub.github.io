@@ -165,10 +165,11 @@
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="fu">sudo</span> pm-suspend <span class="co"># 挂起</span></span></code></pre></div>
 <p>客户端:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install wakeonlan -y</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="fu">sudo</span> arp -s 10.42.20.225 b4:2e:99:a8:55:9e <span class="co"># ARP缓存过期会导致无法唤醒</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="fu">sudo</span> wakeonlan -i 10.42.20.225 b4:2e:99:a8:55:9e <span class="co"># 唤醒</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="fu">sudo</span> arp -d 10.42.20.225 <span class="co"># 如果清除ARP缓存后无法唤醒</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="ex">arp</span> <span class="kw">|</span> <span class="fu">grep</span> 225 <span class="co"># 这时就看不到ARP缓存</span></span></code></pre></div>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co"># ip可以不填，验证过了换成其他任何ip都可以</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="fu">sudo</span> arp -s 10.42.20.225 b4:2e:99:a8:55:9e <span class="co"># ARP缓存过期会导致无法唤醒</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="fu">sudo</span> wakeonlan -i 10.42.20.225 b4:2e:99:a8:55:9e <span class="co"># 唤醒</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="fu">sudo</span> arp -d 10.42.20.225 <span class="co"># 如果清除ARP缓存后无法唤醒</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="ex">arp</span> <span class="kw">|</span> <span class="fu">grep</span> 225 <span class="co"># 这时就看不到ARP缓存</span></span></code></pre></div>
 <h1 data-number="3" id="virt-manager安装虚拟机"><span class="header-section-number">3</span> virt-manager安装虚拟机</h1>
 <p><code>/etc/libvirt/qemu.conf</code>文件配置:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">user</span> = <span class="st">&quot;root&quot;</span></span>
