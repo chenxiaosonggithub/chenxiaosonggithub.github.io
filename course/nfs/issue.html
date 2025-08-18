@@ -8,10 +8,19 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -21,43 +30,91 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">nfs问题分析</h1>
 </header>
-<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
 <p>我刚做内核时，最开始定位的就是nfs问题，在这里把所有解决过的问题列出来。</p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/nfs-clients-same-hostname-clientid-expire.html">多个NFS客户端使用相同的hostname导致clientid过期</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-nfs-no-iterate_shared.html">4.19 nfs没实现iterate_shared()导致的遍历目录无法并发问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-null-ptr-deref-in-nfs_updatepage.html">4.19 nfs_updatepage()空指针解引用问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-aarch64-null-ptr-deref-in-nfs_readpage_async.html">aarch64架构 4.19 nfs_readpage_async()空指针解引用问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-null-ptr-deref-in-nfs_readpage_async.html">4.19 nfs_readpage_async()空指针解引用问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-warning-in-nfs4_put_stid-and-panic.html">4.19 nfs4_put_stid()报warning紧接着panic的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-null-ptr-deref-in-__nfs3_proc_setacls.html">4.19 __nfs3_proc_setacls()空指针解引用问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/nfs-df-long-time.html">nfs df命令执行时间长的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-nfs-soft-lockup-in-nfs_wb_page.html">4.19 nfs_wb_page() soft lockup的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/nfsiostat-queue-long-time.html">nfsiostat命令queue时间长的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/null-ptr-deref-in-nfs_ctx_key_to_expire.html">nfs_ctx_key_to_expire()引用计数泄露和空指针解引用的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/cthon-nfs-tests.html">Connectathon NFS tests测试用例失败问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-nfs-soft-lockup-in-__rpc_execute.html">4.19 __rpc_execute() soft lockup的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/nfs-hung-task.html">nfs hung task问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-ll-time-longer-than-suse-4.12.html">4.19内核执行ll时间比4.12内核(suse)长的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-bug-in-nfs_unlock_request.html">4.19内核nfs_unlock_request()报BUG()的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-__rpc_execute-ERESTARTSYS.html">sunrpc __rpc_execute()出现ERESTARTSYS的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/4.19-rdma-not-supported.html">4.19 nfs rdma协议不支持的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/ganesha-not-support-tmpfs.html">nfs-ganesha不支持导出tmpfs的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/nfs-umount-device-is-busy.html">umount nfs报错device is busy的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/stat-nfsv3-sync-write-time.html">统计nfsv3同步写的时间</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/null-ptr-deref-in-nfsd4_probe_callback.html">nfsd4_probe_callback()空指针解引用问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/lockd-server-not-responding.html">nfsv3 NLM请求超时的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/issue/nfs-mount-hung-in-nlmclnt_init.html">nfsv3挂载卡在nlmclnt_init()的问题</a></p>
-<p><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs.html#issue">openEuler的nfs+问题分析</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/nfs-clients-same-hostname-clientid-expire.html">多个NFS客户端使用相同的hostname导致clientid过期</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-nfs-no-iterate_shared.html">4.19
+nfs没实现iterate_shared()导致的遍历目录无法并发问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-null-ptr-deref-in-nfs_updatepage.html">4.19
+nfs_updatepage()空指针解引用问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-aarch64-null-ptr-deref-in-nfs_readpage_async.html">aarch64架构
+4.19 nfs_readpage_async()空指针解引用问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-null-ptr-deref-in-nfs_readpage_async.html">4.19
+nfs_readpage_async()空指针解引用问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-warning-in-nfs4_put_stid-and-panic.html">4.19
+nfs4_put_stid()报warning紧接着panic的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-null-ptr-deref-in-__nfs3_proc_setacls.html">4.19
+__nfs3_proc_setacls()空指针解引用问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/nfs-df-long-time.html">nfs
+df命令执行时间长的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-nfs-soft-lockup-in-nfs_wb_page.html">4.19
+nfs_wb_page() soft lockup的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/nfsiostat-queue-long-time.html">nfsiostat命令queue时间长的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/null-ptr-deref-in-nfs_ctx_key_to_expire.html">nfs_ctx_key_to_expire()引用计数泄露和空指针解引用的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/cthon-nfs-tests.html">Connectathon
+NFS tests测试用例失败问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-nfs-soft-lockup-in-__rpc_execute.html">4.19
+__rpc_execute() soft lockup的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/nfs-hung-task.html">nfs
+hung task问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-ll-time-longer-than-suse-4.12.html">4.19内核执行ll时间比4.12内核(suse)长的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-bug-in-nfs_unlock_request.html">4.19内核nfs_unlock_request()报BUG()的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-__rpc_execute-ERESTARTSYS.html">sunrpc
+__rpc_execute()出现ERESTARTSYS的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/4.19-rdma-not-supported.html">4.19
+nfs rdma协议不支持的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/ganesha-not-support-tmpfs.html">nfs-ganesha不支持导出tmpfs的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/nfs-umount-device-is-busy.html">umount
+nfs报错device is busy的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/stat-nfsv3-sync-write-time.html">统计nfsv3同步写的时间</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/null-ptr-deref-in-nfsd4_probe_callback.html">nfsd4_probe_callback()空指针解引用问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/lockd-server-not-responding.html">nfsv3
+NLM请求超时的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/issue/nfs-mount-hung-in-nlmclnt_init.html">nfsv3挂载卡在nlmclnt_init()的问题</a></p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/openeuler-enfs.html#issue">openEuler的nfs+问题分析</a></p>
 </body>
 </html>

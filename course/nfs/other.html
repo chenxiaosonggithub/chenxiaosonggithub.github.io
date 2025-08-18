@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,44 +94,72 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">nfs未分类的内容</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#df命令"><span class="toc-section-number">1</span> <code>df</code>命令</a></li>
-<li><a href="#网络超时"><span class="toc-section-number">2</span> 网络超时</a></li>
-<li><a href="#delegation"><span class="toc-section-number">3</span> delegation</a></li>
-<li><a href="#procedures和operations"><span class="toc-section-number">4</span> Procedures和Operations</a>
+<li><a href="#df命令" id="toc-df命令"><span
+class="toc-section-number">1</span> <code>df</code>命令</a></li>
+<li><a href="#网络超时" id="toc-网络超时"><span
+class="toc-section-number">2</span> 网络超时</a></li>
+<li><a href="#delegation" id="toc-delegation"><span
+class="toc-section-number">3</span> delegation</a></li>
+<li><a href="#procedures和operations"
+id="toc-procedures和operations"><span
+class="toc-section-number">4</span> Procedures和Operations</a>
 <ul>
-<li><a href="#nfsv2-procedures"><span class="toc-section-number">4.1</span> NFSv2 Procedures</a></li>
-<li><a href="#nfsv3-procedures"><span class="toc-section-number">4.2</span> NFSv3 Procedures</a></li>
-<li><a href="#nfsv4-procedures和operations"><span class="toc-section-number">4.3</span> NFSv4 Procedures和Operations</a></li>
-<li><a href="#反向通道operations"><span class="toc-section-number">4.4</span> 反向通道Operations</a></li>
+<li><a href="#nfsv2-procedures" id="toc-nfsv2-procedures"><span
+class="toc-section-number">4.1</span> NFSv2 Procedures</a></li>
+<li><a href="#nfsv3-procedures" id="toc-nfsv3-procedures"><span
+class="toc-section-number">4.2</span> NFSv3 Procedures</a></li>
+<li><a href="#nfsv4-procedures和operations"
+id="toc-nfsv4-procedures和operations"><span
+class="toc-section-number">4.3</span> NFSv4
+Procedures和Operations</a></li>
+<li><a href="#反向通道operations" id="toc-反向通道operations"><span
+class="toc-section-number">4.4</span> 反向通道Operations</a></li>
 </ul></li>
-<li><a href="#exportfs"><span class="toc-section-number">5</span> exportfs</a></li>
-<li><a href="#文件句柄"><span class="toc-section-number">6</span> 文件句柄</a></li>
-<li><a href="#idmap"><span class="toc-section-number">7</span> idmap</a></li>
-<li><a href="#函数流程"><span class="toc-section-number">8</span> 函数流程</a>
+<li><a href="#exportfs" id="toc-exportfs"><span
+class="toc-section-number">5</span> exportfs</a></li>
+<li><a href="#文件句柄" id="toc-文件句柄"><span
+class="toc-section-number">6</span> 文件句柄</a></li>
+<li><a href="#idmap" id="toc-idmap"><span
+class="toc-section-number">7</span> idmap</a></li>
+<li><a href="#函数流程" id="toc-函数流程"><span
+class="toc-section-number">8</span> 函数流程</a>
 <ul>
-<li><a href="#rpc"><span class="toc-section-number">8.1</span> rpc</a></li>
-<li><a href="#mount"><span class="toc-section-number">8.2</span> mount</a></li>
-<li><a href="#umount"><span class="toc-section-number">8.3</span> umount</a></li>
-<li><a href="#read"><span class="toc-section-number">8.4</span> read</a></li>
+<li><a href="#rpc" id="toc-rpc"><span
+class="toc-section-number">8.1</span> rpc</a></li>
+<li><a href="#mount" id="toc-mount"><span
+class="toc-section-number">8.2</span> mount</a></li>
+<li><a href="#umount" id="toc-umount"><span
+class="toc-section-number">8.3</span> umount</a></li>
+<li><a href="#read" id="toc-read"><span
+class="toc-section-number">8.4</span> read</a></li>
 </ul></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
 <p>正在更新的内容都放到这篇文章中，等到有些知识点达到一定量时，会把这些知识点整理成专门的一章。</p>
-<h1 data-number="1" id="df命令"><span class="header-section-number">1</span> <code>df</code>命令</h1>
+<h1 data-number="1" id="df命令"><span
+class="header-section-number">1</span> <code>df</code>命令</h1>
 <p>client会发送两个<code>GETATTR</code>请求，第一个<code>GETATTR</code>请求以下内容:</p>
 <ul>
 <li><code>Attr mask[0]: 0x0010011a (Type, Change, Size, FSID, FileId)</code></li>
@@ -132,214 +171,236 @@
 <li><code>Attr mask[1]: 0x00001c00 (Space_Avail, Space_Free, Space_Total)</code></li>
 </ul>
 <p>执行<code>df</code>命令后，再执行<code>echo 3 &gt; /proc/sys/vm/drop_caches</code>后立刻执行<code>df</code>命令，不会执行到<code>__nfs_revalidate_inode()</code>。</p>
-<h1 data-number="2" id="网络超时"><span class="header-section-number">2</span> 网络超时</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">systemctl</span> stop nfs-server</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="fu">stat</span> /mnt/file</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>[<span class="ex">100196.619028</span>] nfs: server localhost not responding, still trying</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>[<span class="ex">100216.521372</span>] nfs: server localhost not responding, timed out</span></code></pre></div>
-<h1 data-number="3" id="delegation"><span class="header-section-number">3</span> delegation</h1>
+<h1 data-number="2" id="网络超时"><span
+class="header-section-number">2</span> 网络超时</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> stop nfs-server</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stat</span> /mnt/file</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[100196.619028]</span> nfs: server localhost not responding, still trying</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[100216.521372]</span> nfs: server localhost not responding, timed out</span></code></pre></div>
+<h1 data-number="3" id="delegation"><span
+class="header-section-number">3</span> delegation</h1>
 <p><code>echo something &gt; /mnt/file; echo 3 &gt; /proc/sys/vm/drop_caches; cat &gt; /mnt/file</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>nfsd4_open</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>  nfsd4_process_open2</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    nfs4_open_delegation</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>      nfs4_set_delegation</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>        alloc_init_deleg</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>          nfs4_alloc_stid</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>      nfs4_put_stid(&amp;dp-&gt;dl_stid)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>nfsd4_open</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  nfsd4_process_open2</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    nfs4_open_delegation</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      nfs4_set_delegation</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        alloc_init_deleg</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>          nfs4_alloc_stid</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      nfs4_put_stid<span class="op">(&amp;</span>dp<span class="op">-&gt;</span>dl_stid<span class="op">)</span></span></code></pre></div>
 <p><code>echo 3 &gt; /proc/sys/vm/drop_caches</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>nfsd4_delegreturn</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  destroy_delegation</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    destroy_unhashed_deleg</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>      nfs4_put_stid</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>  nfs4_put_stid</span></code></pre></div>
-<h1 data-number="4" id="procedures和operations"><span class="header-section-number">4</span> Procedures和Operations</h1>
-<h2 data-number="4.1" id="nfsv2-procedures"><span class="header-section-number">4.1</span> NFSv2 Procedures</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nfsd4_delegreturn</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  destroy_delegation</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    destroy_unhashed_deleg</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      nfs4_put_stid</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  nfs4_put_stid</span></code></pre></div>
+<h1 data-number="4" id="procedures和operations"><span
+class="header-section-number">4</span> Procedures和Operations</h1>
+<h2 data-number="4.1" id="nfsv2-procedures"><span
+class="header-section-number">4.1</span> NFSv2 Procedures</h2>
 <p>NFSv2的Procedures定义在<code>include/uapi/linux/nfs2.h</code>中的<code>NFSPROC_NULL ~ NFSPROC_STATFS</code>，编码解码函数定义在<code>nfs_procedures</code>和<code>nfsd_procedures2</code>。</p>
-<h2 data-number="4.2" id="nfsv3-procedures"><span class="header-section-number">4.2</span> NFSv3 Procedures</h2>
+<h2 data-number="4.2" id="nfsv3-procedures"><span
+class="header-section-number">4.2</span> NFSv3 Procedures</h2>
 <p>NFSv3的Procedures定义在<code>include/uapi/linux/nfs3.h</code>中的<code>NFS3PROC_NULL ~ NFS3PROC_COMMIT</code>，编码解码函数定义在<code>nfs3_procedures</code>和<code>nfsd_procedures3</code>。</p>
-<h2 data-number="4.3" id="nfsv4-procedures和operations"><span class="header-section-number">4.3</span> NFSv4 Procedures和Operations</h2>
+<h2 data-number="4.3" id="nfsv4-procedures和operations"><span
+class="header-section-number">4.3</span> NFSv4
+Procedures和Operations</h2>
 <p>NFSv4的Procedures定义在<code>include/linux/nfs4.h</code>中的<code>NFSPROC4_NULL</code>和<code>NFSPROC4_COMPOUND</code>，server编码解码函数定义在<code>nfsd_procedures4</code>。</p>
-<p>NFSv4 server详细的Operations定义在<code>include/linux/nfs4.h</code>中的<code>enum nfs_opnum4</code>，处理函数定义在<code>nfsd4_ops</code>，编码解码函数定义在<code>nfsd4_enc_ops</code>和<code>nfsd4_dec_ops</code>。</p>
-<p>NFSv4 client详细的Operations定义在<code>include/linux/nfs4.h</code>中的<code>NFSPROC4_CLNT_NULL ~ NFSPROC4_CLNT_READ_PLUS</code>，编码解码函数定义在<code>nfs4_procedures</code>。</p>
-<h2 data-number="4.4" id="反向通道operations"><span class="header-section-number">4.4</span> 反向通道Operations</h2>
-<p>NFSv4反向通道的Operations定义在<code>include/linux/nfs4.h</code>中的<code>enum nfs_cb_opnum4</code>(老版本内核还重复定义在<code>fs/nfs/callback.h</code>中的<code>enum nfs4_callback_opnum</code>，我已经提补丁移到公共头文件: <a href="https://lore.kernel.org/all/tencent_03EDD0CAFBF93A9667CFCA1B68EDB4C4A109@qq.com/">NFSv4, NFSD: move enum nfs_cb_opnum4 to include/linux/nfs4.h</a>)，server在<code>fs/nfsd/state.h</code>中还定义了<code>nfsd4_cb_op</code>，编码解码函数定义在<code>nfs4_cb_procedures</code>。client的编码解码函数定义在<code>callback_ops</code>。</p>
-<h1 data-number="5" id="exportfs"><span class="header-section-number">5</span> exportfs</h1>
+<p>NFSv4
+server详细的Operations定义在<code>include/linux/nfs4.h</code>中的<code>enum nfs_opnum4</code>，处理函数定义在<code>nfsd4_ops</code>，编码解码函数定义在<code>nfsd4_enc_ops</code>和<code>nfsd4_dec_ops</code>。</p>
+<p>NFSv4
+client详细的Operations定义在<code>include/linux/nfs4.h</code>中的<code>NFSPROC4_CLNT_NULL ~ NFSPROC4_CLNT_READ_PLUS</code>，编码解码函数定义在<code>nfs4_procedures</code>。</p>
+<h2 data-number="4.4" id="反向通道operations"><span
+class="header-section-number">4.4</span> 反向通道Operations</h2>
+<p>NFSv4反向通道的Operations定义在<code>include/linux/nfs4.h</code>中的<code>enum nfs_cb_opnum4</code>(老版本内核还重复定义在<code>fs/nfs/callback.h</code>中的<code>enum nfs4_callback_opnum</code>，我已经提补丁移到公共头文件:
+<a
+href="https://lore.kernel.org/all/tencent_03EDD0CAFBF93A9667CFCA1B68EDB4C4A109@qq.com/">NFSv4,
+NFSD: move enum nfs_cb_opnum4 to
+include/linux/nfs4.h</a>)，server在<code>fs/nfsd/state.h</code>中还定义了<code>nfsd4_cb_op</code>，编码解码函数定义在<code>nfs4_cb_procedures</code>。client的编码解码函数定义在<code>callback_ops</code>。</p>
+<h1 data-number="5" id="exportfs"><span
+class="header-section-number">5</span> exportfs</h1>
 <p><code>struct export_operations</code></p>
-<h1 data-number="6" id="文件句柄"><span class="header-section-number">6</span> 文件句柄</h1>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>                    <span class="ex">1.</span>  +------------+ 6.</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>                   <span class="ex">+----</span><span class="kw">|</span>   <span class="ex">client</span>   <span class="kw">|</span><span class="op">&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span><span class="ex">+</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>                   <span class="kw">|</span>    <span class="ex">+------------+</span>          <span class="kw">|</span> </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>           <span class="ex">hey</span> man,<span class="kw">|</span>          ^               你好像在逗我</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>    <span class="ex">can</span> you tell me<span class="kw">|</span>          <span class="kw">|</span>额，你猜？</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a> <span class="ex">whose</span> inode is 12?<span class="kw">|</span>        <span class="ex">5.</span><span class="kw">|</span>                 <span class="kw">|</span>         </span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>                   <span class="kw">|</span>    <span class="ex">+------------+</span>          <span class="kw">|</span>   </span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>                   <span class="ex">+---</span><span class="op">&gt;</span><span class="kw">|</span>   <span class="ex">server</span>   <span class="kw">|</span><span class="op">&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span><span class="ex">+</span>  </span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>                        <span class="ex">+------------+</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>                         <span class="kw">|</span>  ^    ^  <span class="kw">|</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>                     <span class="ex">2.1.</span><span class="kw">|</span>  <span class="kw">|</span>    <span class="kw">|</span>  <span class="kw">|</span><span class="ex">2.2.</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>               <span class="ex">+---------+</span>  <span class="kw">|</span>    <span class="kw">|</span>  <span class="ex">+---------+</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>               <span class="kw">|</span>            <span class="kw">|</span>    <span class="kw">|</span>            <span class="kw">|</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>       <span class="ex">hey</span> boy <span class="kw">|</span>       <span class="ex">i</span> know   i know too    <span class="kw">|</span><span class="ex">hey</span> girl</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>   <span class="kw">do</span> <span class="ex">you</span> know?<span class="kw">|</span>            <span class="kw">|</span>    <span class="kw">|</span>            <span class="kw">|do</span> <span class="ex">you</span> know?</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>               <span class="ex">v</span>            <span class="kw">|</span>    <span class="kw">|</span>            <span class="ex">v</span>      </span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>          <span class="ex">+----------+</span> 4.1. <span class="kw">|</span>    <span class="kw">|</span><span class="ex">4.2.</span>   +----------+ </span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>          <span class="kw">|</span> <span class="ex">/dev/sda</span> <span class="kw">|</span><span class="ex">------+</span>    +-------<span class="kw">|</span> <span class="ex">/dev/sdb</span> <span class="kw">|</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>          <span class="ex">+----------+</span>                   +----------+</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>               ^                              ^      </span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>        <span class="ex">i</span> am 12<span class="kw">|</span>                              <span class="kw">|</span><span class="ex">i</span> am 12</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a>               <span class="kw">|</span><span class="ex">3.1.</span>                      3.2.<span class="kw">|</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a>          <span class="ex">+----------+</span>                   +----------+</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>          <span class="kw">|</span>   <span class="fu">file</span>   <span class="kw">|</span>                   <span class="kw">|</span>   <span class="fu">file</span>   <span class="kw">|</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>          <span class="ex">+----------+</span>                   +----------+</span></code></pre></div>
-<h1 data-number="7" id="idmap"><span class="header-section-number">7</span> idmap</h1>
+<h1 data-number="6" id="文件句柄"><span
+class="header-section-number">6</span> 文件句柄</h1>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>                    <span class="ex">1.</span>  +------------+ 6.</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                   <span class="ex">+----</span><span class="kw">|</span>   <span class="ex">client</span>   <span class="kw">|</span><span class="op">&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span>+</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                   <span class="kw">|</span>    <span class="ex">+------------+</span>          <span class="kw">|</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>           <span class="ex">hey</span> man,<span class="kw">|</span>          <span class="ex">^</span>               你好像在逗我</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">can</span> you tell me<span class="kw">|</span>          <span class="kw">|</span><span class="ex">额，你猜？</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a> <span class="ex">whose</span> inode is 12<span class="pp">?</span><span class="kw">|</span>        <span class="ex">5.</span><span class="kw">|</span>                 <span class="kw">|</span>         </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                   <span class="kw">|</span>    <span class="ex">+------------+</span>          <span class="kw">|</span>   </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                   <span class="ex">+---</span><span class="op">&gt;|</span>   server   <span class="kw">|</span><span class="op">&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span>+  </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                        <span class="ex">+------------+</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                         <span class="kw">|</span>  <span class="ex">^</span>    ^  <span class="kw">|</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                     <span class="ex">2.1.</span><span class="kw">|</span>  <span class="kw">|</span>    <span class="kw">|</span>  <span class="kw">|</span><span class="ex">2.2.</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>               <span class="ex">+---------+</span>  <span class="kw">|</span>    <span class="kw">|</span>  <span class="ex">+---------+</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>               <span class="kw">|</span>            <span class="kw">|</span>    <span class="kw">|</span>            <span class="kw">|</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>       <span class="ex">hey</span> boy <span class="kw">|</span>       <span class="ex">i</span> know   i know too    <span class="kw">|</span><span class="ex">hey</span> girl</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>   <span class="cf">do</span> <span class="ex">you</span> know<span class="pp">?</span><span class="kw">|</span>            <span class="kw">|</span>    <span class="kw">|</span>            <span class="kw">|</span><span class="cf">do</span> <span class="ex">you</span> know<span class="pp">?</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>               <span class="ex">v</span>            <span class="kw">|</span>    <span class="kw">|</span>            <span class="ex">v</span>      </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>          <span class="ex">+----------+</span> 4.1. <span class="kw">|</span>    <span class="kw">|</span><span class="ex">4.2.</span>   +----------+ </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>          <span class="kw">|</span> <span class="ex">/dev/sda</span> <span class="kw">|</span><span class="ex">------+</span>    +-------<span class="kw">|</span> <span class="ex">/dev/sdb</span> <span class="kw">|</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>          <span class="ex">+----------+</span>                   +----------+</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>               <span class="ex">^</span>                              ^      </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        <span class="ex">i</span> am 12<span class="kw">|</span>                              <span class="kw">|</span><span class="ex">i</span> am 12</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>               <span class="kw">|</span><span class="ex">3.1.</span>                      3.2.<span class="kw">|</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>          <span class="ex">+----------+</span>                   +----------+</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>          <span class="kw">|</span>   <span class="fu">file</span>   <span class="kw">|</span>                   <span class="kw">|</span>   <span class="fu">file</span>   <span class="kw">|</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>          <span class="ex">+----------+</span>                   +----------+</span></code></pre></div>
+<h1 data-number="7" id="idmap"><span
+class="header-section-number">7</span> idmap</h1>
 <p>启用idmap:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="bu">echo</span> N <span class="op">&gt;</span> /sys/module/nfsd/parameters/nfs4_disable_idmapping <span class="co"># server，默认为Y</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="bu">echo</span> N <span class="op">&gt;</span> /sys/module/nfs/parameters/nfs4_disable_idmapping <span class="co"># client，默认为Y</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> N <span class="op">&gt;</span> /sys/module/nfsd/parameters/nfs4_disable_idmapping <span class="co"># server，默认为Y</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> N <span class="op">&gt;</span> /sys/module/nfs/parameters/nfs4_disable_idmapping <span class="co"># client，默认为Y</span></span></code></pre></div>
 <p>server端<code>/etc/idmapd.conf</code>文件配置:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>[<span class="ex">General</span>]</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="ex">Verbosity</span> = 0</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="ex">Pipefs-Directory</span> = /run/rpc_pipefs</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co"># set your own domain here, if it differs from FQDN minus hostname</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co"># 修改成其他值，客户端nfs_map_name_to_uid和nfs_map_group_to_gid函数中的id不为0</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="ex">Domain</span> = localdomain</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>[<span class="ex">Mapping</span>]</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="ex">Nobody-User</span> = nobody</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="ex">Nobody-Group</span> = nogroup</span></code></pre></div>
-<h1 data-number="8" id="函数流程"><span class="header-section-number">8</span> 函数流程</h1>
-<h2 data-number="8.1" id="rpc"><span class="header-section-number">8.1</span> rpc</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co">// 挂载时</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>nfs4_alloc_client</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>  nfs_create_rpc_client</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>    rpc_create</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>      rpc_create_xprt <span class="co">// 只会在挂载时执行到</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>        rpc_ping</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>          rpc_call_null_helper</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>            rpc_call_null_helper</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>              rpc_run_task</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a>rpc_run_task / rpc_run_bc_task</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a>  rpc_new_task</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a>    rpc_init_task</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a>      rpc_task_get_xprt</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a>  rpc_execute</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true"></a>    rpc_make_runnable</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true"></a>      INIT_WORK(&amp;task-&gt;u.tk_work, rpc_async_schedule) <span class="co">// 异步执行</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true"></a>    __rpc_execute <span class="co">// 同步执行，异步在内核线程执行到这个函数</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true"></a></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true"></a>rpc_task_release_client / nfs4_async_handle_exception</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true"></a>  rpc_task_release_transport</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true"></a></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true"></a>rpc_task_set_client / call_start</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true"></a>  rpc_task_set_transport</span></code></pre></div>
-<h2 data-number="8.2" id="mount"><span class="header-section-number">8.2</span> mount</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>vfs_parse_fs_param</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>  <span class="co">// 不指定版本号挂载时，默认用哪个版本由 `mount.nfs` 程序决定</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>  nfs_fs_context_parse_param</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="co">// v3</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>vfs_get_tree</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>  nfs_get_tree</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>    nfs_try_get_tree</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>      nfs_try_mount_request</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a>        nfs3_create_server</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a>          nfs_create_server</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true"></a>            nfs_init_server</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true"></a>              nfs_get_client</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true"></a>                nfs_match_client</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true"></a>                nfs_alloc_client</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true"></a>                nfs_init_client</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true"></a></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true"></a><span class="co">// v4</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true"></a>vfs_get_tree</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true"></a>  nfs_get_tree</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true"></a>    nfs4_try_get_tree</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true"></a>      nfs4_create_server</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true"></a>        nfs4_init_server</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true"></a>          nfs4_set_client</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true"></a>            nfs_get_client</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true"></a>              nfs_match_client</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true"></a>              nfs4_alloc_client</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true"></a>                nfs_create_rpc_client</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true"></a>                  rpc_create</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true"></a>              nfs4_init_client</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true"></a>                nfs4_discover_server_trunking</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true"></a>                  nfs41_discover_server_trunking <span class="co">// 返回的 nfs_client 未就绪</span></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true"></a>                    nfs4_proc_exchange_id</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true"></a>              nfs4_add_trunk <span class="co">// 主线的多路径？</span></span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true"></a>                rpc_clnt_add_xprt</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true"></a></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true"></a>kthread</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true"></a>  nfs4_run_state_manager</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true"></a>    nfs4_state_manager</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true"></a>      nfs4_reclaim_lease</span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true"></a>        nfs4_establish_lease</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true"></a>          nfs41_init_clientid</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true"></a>            nfs4_proc_exchange_id</span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true"></a>            nfs4_proc_create_session</span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true"></a>            nfs_mark_client_ready(clp, NFS_CS_READY) <span class="co">// 设置成就绪状态</span></span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true"></a>      nfs4_state_end_reclaim_reboot</span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true"></a>        nfs4_reclaim_complete</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true"></a>          nfs41_proc_reclaim_complete</span></code></pre></div>
-<h2 data-number="8.3" id="umount"><span class="header-section-number">8.3</span> umount</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co">// v4</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>task_work_run</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>  __cleanup_mnt</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>    cleanup_mnt</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>      deactivate_super</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>        deactivate_locked_super</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>          nfs_kill_super</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>            nfs_free_server</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>              rpc_shutdown_client</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>              nfs_put_client</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>                nfs4_free_client</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>                  nfs4_shutdown_client</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>                    nfs41_shutdown_client</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a>                      nfs4_destroy_session</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a>                        nfs4_proc_destroy_session</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true"></a>                      nfs4_destroy_clientid</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true"></a>                        nfs4_proc_destroy_clientid</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true"></a>                          _nfs4_proc_destroy_clientid</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true"></a>                  nfs_free_client</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true"></a>                    rpc_shutdown_client</span></code></pre></div>
-<h2 data-number="8.4" id="read"><span class="header-section-number">8.4</span> read</h2>
-<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>read</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>  ksys_read</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>    vfs_read</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>      new_sync_read</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>        nfs_file_read</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>          generic_file_read_iter</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>            filemap_read</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>              filemap_get_pages</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>                page_cache_sync_readahead</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>                  page_cache_sync_ra</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>                    page_cache_ra_order</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a>                      read_pages</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a>                        nfs_readahead <span class="co">// 低版本是 nfs_readpages</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a>                          nfs_pageio_complete_read</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true"></a>                            nfs_pageio_complete</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true"></a>                              nfs_pageio_complete_mirror</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true"></a>                                nfs_pageio_doio</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true"></a>                                  nfs_generic_pg_pgios</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true"></a>                                    nfs_initiate_pgio</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true"></a>                                      atomic_set(&amp;task-&gt;tk_count, <span class="dv">1</span>) <span class="co">// 引用计数</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true"></a>                                      .flags = RPC_TASK_ASYNC | flags, <span class="co">// 异步</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true"></a>                                      nfs_initiate_read</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true"></a>                                        nfs3_proc_read_setup</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true"></a>                                          &amp;nfs3_procedures[NFS3PROC_READ]</span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true"></a>                                      rpc_run_task</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true"></a>                                        rpc_new_task</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true"></a>                                          rpc_init_task</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true"></a>                                            task-&gt;tk_flags  = task_setup_data-&gt;flags <span class="co">// flag在这里赋值</span></span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true"></a>                                        atomic_inc(&amp;task-&gt;tk_count) <span class="co">// 引用计数加1</span></span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true"></a>                                        rpc_execute</span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true"></a>                                          rpc_make_runnable</span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true"></a>                                            INIT_WORK(&amp;task-&gt;u.tk_work, rpc_async_schedule)</span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true"></a>                filemap_update_page</span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true"></a>                  folio_put_wait_locked <span class="co">// folio_unlock()唤醒？</span></span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true"></a>                    folio_wait_bit_common</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[General]</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Verbosity</span> = 0</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Pipefs-Directory</span> = /run/rpc_pipefs</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># set your own domain here, if it differs from FQDN minus hostname</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 修改成其他值，客户端nfs_map_name_to_uid和nfs_map_group_to_gid函数中的id不为0</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Domain</span> = localdomain</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[Mapping]</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ex">Nobody-User</span> = nobody</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="ex">Nobody-Group</span> = nogroup</span></code></pre></div>
+<h1 data-number="8" id="函数流程"><span
+class="header-section-number">8</span> 函数流程</h1>
+<h2 data-number="8.1" id="rpc"><span
+class="header-section-number">8.1</span> rpc</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 挂载时</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>nfs4_alloc_client</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  nfs_create_rpc_client</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    rpc_create</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>      rpc_create_xprt <span class="co">// 只会在挂载时执行到</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        rpc_ping</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>          rpc_call_null_helper</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>            rpc_call_null_helper</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>              rpc_run_task</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>rpc_run_task <span class="op">/</span> rpc_run_bc_task</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  rpc_new_task</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    rpc_init_task</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>      rpc_task_get_xprt</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  rpc_execute</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    rpc_make_runnable</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>      INIT_WORK<span class="op">(&amp;</span>task<span class="op">-&gt;</span>u<span class="op">.</span>tk_work<span class="op">,</span> rpc_async_schedule<span class="op">)</span> <span class="co">// 异步执行</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    __rpc_execute <span class="co">// 同步执行，异步在内核线程执行到这个函数</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>rpc_task_release_client <span class="op">/</span> nfs4_async_handle_exception</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  rpc_task_release_transport</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>rpc_task_set_client <span class="op">/</span> call_start</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  rpc_task_set_transport</span></code></pre></div>
+<h2 data-number="8.2" id="mount"><span
+class="header-section-number">8.2</span> mount</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>vfs_parse_fs_param</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 不指定版本号挂载时，默认用哪个版本由 `mount.nfs` 程序决定</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  nfs_fs_context_parse_param</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">// v3</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>vfs_get_tree</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  nfs_get_tree</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    nfs_try_get_tree</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      nfs_try_mount_request</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        nfs3_create_server</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>          nfs_create_server</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>            nfs_init_server</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>              nfs_get_client</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                nfs_match_client</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>                nfs_alloc_client</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>                nfs_init_client</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">// v4</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>vfs_get_tree</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  nfs_get_tree</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    nfs4_try_get_tree</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>      nfs4_create_server</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>        nfs4_init_server</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>          nfs4_set_client</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>            nfs_get_client</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>              nfs_match_client</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>              nfs4_alloc_client</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>                nfs_create_rpc_client</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>                  rpc_create</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>              nfs4_init_client</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>                nfs4_discover_server_trunking</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>                  nfs41_discover_server_trunking <span class="co">// 返回的 nfs_client 未就绪</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>                    nfs4_proc_exchange_id</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>              nfs4_add_trunk <span class="co">// 主线的多路径？</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>                rpc_clnt_add_xprt</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>kthread</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>  nfs4_run_state_manager</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>    nfs4_state_manager</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>      nfs4_reclaim_lease</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>        nfs4_establish_lease</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>          nfs41_init_clientid</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>            nfs4_proc_exchange_id</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>            nfs4_proc_create_session</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>            nfs_mark_client_ready<span class="op">(</span>clp<span class="op">,</span> NFS_CS_READY<span class="op">)</span> <span class="co">// 设置成就绪状态</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>      nfs4_state_end_reclaim_reboot</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>        nfs4_reclaim_complete</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>          nfs41_proc_reclaim_complete</span></code></pre></div>
+<h2 data-number="8.3" id="umount"><span
+class="header-section-number">8.3</span> umount</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// v4</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>task_work_run</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  __cleanup_mnt</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    cleanup_mnt</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      deactivate_super</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        deactivate_locked_super</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>          nfs_kill_super</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>            nfs_free_server</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>              rpc_shutdown_client</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>              nfs_put_client</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                nfs4_free_client</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                  nfs4_shutdown_client</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                    nfs41_shutdown_client</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>                      nfs4_destroy_session</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>                        nfs4_proc_destroy_session</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                      nfs4_destroy_clientid</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                        nfs4_proc_destroy_clientid</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                          _nfs4_proc_destroy_clientid</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                  nfs_free_client</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                    rpc_shutdown_client</span></code></pre></div>
+<h2 data-number="8.4" id="read"><span
+class="header-section-number">8.4</span> read</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>read</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  ksys_read</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    vfs_read</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>      new_sync_read</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        nfs_file_read</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>          generic_file_read_iter</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>            filemap_read</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>              filemap_get_pages</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                page_cache_sync_readahead</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                  page_cache_sync_ra</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                    page_cache_ra_order</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                      read_pages</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                        nfs_readahead <span class="co">// 低版本是 nfs_readpages</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                          nfs_pageio_complete_read</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>                            nfs_pageio_complete</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>                              nfs_pageio_complete_mirror</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>                                nfs_pageio_doio</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>                                  nfs_generic_pg_pgios</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>                                    nfs_initiate_pgio</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>                                      atomic_set<span class="op">(&amp;</span>task<span class="op">-&gt;</span>tk_count<span class="op">,</span> <span class="dv">1</span><span class="op">)</span> <span class="co">// 引用计数</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="op">.</span>flags <span class="op">=</span> RPC_TASK_ASYNC <span class="op">|</span> flags<span class="op">,</span> <span class="co">// 异步</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>                                      nfs_initiate_read</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>                                        nfs3_proc_read_setup</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>                                          <span class="op">&amp;</span>nfs3_procedures<span class="op">[</span>NFS3PROC_READ<span class="op">]</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>                                      rpc_run_task</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>                                        rpc_new_task</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>                                          rpc_init_task</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>                                            task<span class="op">-&gt;</span>tk_flags  <span class="op">=</span> task_setup_data<span class="op">-&gt;</span>flags <span class="co">// flag在这里赋值</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>                                        atomic_inc<span class="op">(&amp;</span>task<span class="op">-&gt;</span>tk_count<span class="op">)</span> <span class="co">// 引用计数加1</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>                                        rpc_execute</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>                                          rpc_make_runnable</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>                                            INIT_WORK<span class="op">(&amp;</span>task<span class="op">-&gt;</span>u<span class="op">.</span>tk_work<span class="op">,</span> rpc_async_schedule<span class="op">)</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>                filemap_update_page</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>                  folio_put_wait_locked <span class="co">// folio_unlock()唤醒？</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>                    folio_wait_bit_common</span></code></pre></div>
 </body>
 </html>

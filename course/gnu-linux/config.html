@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,75 +94,120 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">GNU/Linux配置文件</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#脚本"><span class="toc-section-number">1</span> 脚本</a></li>
-<li><a href="#bash_profile"><span class="toc-section-number">2</span> <code>.bash_profile</code></a></li>
-<li><a href="#emacs"><span class="toc-section-number">3</span> <code>.emacs</code></a></li>
-<li><a href="#gitconfig"><span class="toc-section-number">4</span> <code>.gitconfig</code></a></li>
-<li><a href="#origin_xmodmap.txt-和-.xmodmap.txt"><span class="toc-section-number">5</span> <code>.origin_xmodmap.txt</code> 和 <code>.xmodmap.txt</code></a></li>
-<li><a href="#set_proxy.sh"><span class="toc-section-number">6</span> <code>.set_proxy.sh</code></a></li>
-<li><a href="#tmux.conf"><span class="toc-section-number">7</span> <code>.tmux.conf</code></a></li>
-<li><a href="#vimrc"><span class="toc-section-number">8</span> <code>.vimrc</code></a></li>
+<li><a href="#脚本" id="toc-脚本"><span
+class="toc-section-number">1</span> 脚本</a></li>
+<li><a href="#bash_profile" id="toc-bash_profile"><span
+class="toc-section-number">2</span> <code>.bash_profile</code></a></li>
+<li><a href="#emacs" id="toc-emacs"><span
+class="toc-section-number">3</span> <code>.emacs</code></a></li>
+<li><a href="#gitconfig" id="toc-gitconfig"><span
+class="toc-section-number">4</span> <code>.gitconfig</code></a></li>
+<li><a href="#origin_xmodmap.txt-和-.xmodmap.txt"
+id="toc-origin_xmodmap.txt-和-.xmodmap.txt"><span
+class="toc-section-number">5</span> <code>.origin_xmodmap.txt</code> 和
+<code>.xmodmap.txt</code></a></li>
+<li><a href="#set_proxy.sh" id="toc-set_proxy.sh"><span
+class="toc-section-number">6</span> <code>.set_proxy.sh</code></a></li>
+<li><a href="#tmux.conf" id="toc-tmux.conf"><span
+class="toc-section-number">7</span> <code>.tmux.conf</code></a></li>
+<li><a href="#vimrc" id="toc-vimrc"><span
+class="toc-section-number">8</span> <code>.vimrc</code></a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
 <p>Linux下一切皆文件，所有的配置选项也都是文件。</p>
 <p>这篇文章列出了我所使用的配置，各位朋友如果有更好的配置建议，请务必联系我哦。</p>
-<h1 data-number="1" id="脚本"><span class="header-section-number">1</span> 脚本</h1>
+<h1 data-number="1" id="脚本"><span
+class="header-section-number">1</span> 脚本</h1>
 <p>如果每次重装系统或到一个新的开发环境上都要重新配置一次，我们肯定会不开心的呢，特别是像我这种爱折腾系统的人。</p>
 <p>所以，脚本一键搞定是多么的寂寞，哦不对，是多么的重要。</p>
-<p>把我的<a href="https://github.com/chenxiaosonggithub/blog">个人笔记仓库</a>clone到本地， 进入到目录<a href="https://github.com/chenxiaosonggithub/blog/tree/master/course/gnu-linux/src/config-file"><code>config-file</code></a>， 执行脚本<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/cp-to.sh"><code>cp-to.sh</code></a> 复制配置文件到家目录下。</p>
-<h1 data-number="2" id="bash_profile"><span class="header-section-number">2</span> <code>.bash_profile</code></h1>
-<p>.bash_profile 是一个用于配置用户的 Bash shell 环境的文件。它通常位于用户的主目录（$HOME）下。当用户登录到系统时，Bash shell 会尝试执行 .bash_profile 文件中包含的命令和设置。这使得用户能够自定义其 shell 环境和行为。</p>
-<p>具体请查看<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/bash_profile"><code>.bash_profile</code></a>。</p>
-<h1 data-number="3" id="emacs"><span class="header-section-number">3</span> <code>.emacs</code></h1>
+<p>把我的<a
+href="https://github.com/chenxiaosonggithub/blog">个人笔记仓库</a>clone到本地，
+进入到目录<a
+href="https://github.com/chenxiaosonggithub/blog/tree/master/course/gnu-linux/src/config-file"><code>config-file</code></a>，
+执行脚本<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/cp-to.sh"><code>cp-to.sh</code></a>
+复制配置文件到家目录下。</p>
+<h1 data-number="2" id="bash_profile"><span
+class="header-section-number">2</span> <code>.bash_profile</code></h1>
+<p>.bash_profile 是一个用于配置用户的 Bash shell
+环境的文件。它通常位于用户的主目录（$HOME）下。当用户登录到系统时，Bash
+shell 会尝试执行 .bash_profile
+文件中包含的命令和设置。这使得用户能够自定义其 shell 环境和行为。</p>
+<p>具体请查看<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/bash_profile"><code>.bash_profile</code></a>。</p>
+<h1 data-number="3" id="emacs"><span
+class="header-section-number">3</span> <code>.emacs</code></h1>
 <p>配置我最喜欢的编辑器emacs，配合着gtags，然后用hhkb键盘看内核代码，真的没有比这更爽的事情了。</p>
-<p>具体请查看<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/emacs"><code>.emacs</code></a>。</p>
-<h1 data-number="4" id="gitconfig"><span class="header-section-number">4</span> <code>.gitconfig</code></h1>
+<p>具体请查看<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/emacs"><code>.emacs</code></a>。</p>
+<h1 data-number="4" id="gitconfig"><span
+class="header-section-number">4</span> <code>.gitconfig</code></h1>
 <p>当没有配置时，无法进行git的提交。</p>
 <p>配置名字和邮箱:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">git</span> config --global user.name <span class="st">&quot;ChenXiaoSong&quot;</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="fu">git</span> config --global user.email <span class="st">&quot;chenxiaosongemail@foxmail.com&quot;</span></span></code></pre></div>
-<p>具体请查看<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/gitconfig"><code>.gitconfig</code></a>。</p>
-<h1 data-number="5" id="origin_xmodmap.txt-和-.xmodmap.txt"><span class="header-section-number">5</span> <code>.origin_xmodmap.txt</code> 和 <code>.xmodmap.txt</code></h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> user.name <span class="st">&quot;ChenXiaoSong&quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> user.email <span class="st">&quot;chenxiaosongemail@foxmail.com&quot;</span></span></code></pre></div>
+<p>具体请查看<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/gitconfig"><code>.gitconfig</code></a>。</p>
+<h1 data-number="5" id="origin_xmodmap.txt-和-.xmodmap.txt"><span
+class="header-section-number">5</span> <code>.origin_xmodmap.txt</code>
+和 <code>.xmodmap.txt</code></h1>
 <p>xmodmap是Linux桌面系统用于更改键位分布的软件。</p>
-<p><a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/origin_xmodmap.txt"><code>.origin_xmodmap.txt</code></a>是用于还原我当年买的xps13笔记本的键位布局，<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/xmodmap.txt"><code>.xmodmap.txt</code></a>是用于xps13的键位更改，符合我的个人习惯。</p>
+<p><a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/origin_xmodmap.txt"><code>.origin_xmodmap.txt</code></a>是用于还原我当年买的xps13笔记本的键位布局，<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/xmodmap.txt"><code>.xmodmap.txt</code></a>是用于xps13的键位更改，符合我的个人习惯。</p>
 <p>使用的方法是:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="fu">xmodmap</span> .origin_xmodmap.txt <span class="co"># 还原，需要点时间</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="fu">xmodmap</span> .xmodmap.txt</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">xmodmap</span> .origin_xmodmap.txt <span class="co"># 还原，需要点时间</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">xmodmap</span> .xmodmap.txt</span></code></pre></div>
 <p>帮助命令:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="fu">xmodmap</span> -h</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="fu">xmodmap</span> -pm <span class="co"># 打印修饰键</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="fu">xmodmap</span> -pke <span class="co"># 除修饰键外的其他键</span></span></code></pre></div>
-<h1 data-number="6" id="set_proxy.sh"><span class="header-section-number">6</span> <code>.set_proxy.sh</code></h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">xmodmap</span> <span class="at">-h</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">xmodmap</span> <span class="at">-pm</span> <span class="co"># 打印修饰键</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">xmodmap</span> <span class="at">-pke</span> <span class="co"># 除修饰键外的其他键</span></span></code></pre></div>
+<h1 data-number="6" id="set_proxy.sh"><span
+class="header-section-number">6</span> <code>.set_proxy.sh</code></h1>
 <p>用于设置代理或取消代理。</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co"># 注意要用&lt;点号&gt;，而不能用 bash .set_proxy.sh</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="bu">.</span> <span class="ex">.set_proxy.sh</span> 1 # 设置代理</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="bu">.</span> <span class="ex">.set_proxy.sh</span> 0 # 取消代理</span></code></pre></div>
-<p>具体请查看<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/set_proxy.sh"><code>.set_proxy.sh</code></a>。</p>
-<h1 data-number="7" id="tmux.conf"><span class="header-section-number">7</span> <code>.tmux.conf</code></h1>
-<p>Tmux（缩写自“Terminal Multiplexer”）是一个在命令行界面下运行的终端复用工具，我主要是用tmux的会话附加和分离功能，在一个Tmux会话中分离，然后重新附加，这意味着可以从一个终端窗口断开，然后在另一个终端窗口中继续工作，或者甚至在断开后重新连接。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 注意要用&lt;点号&gt;，而不能用 bash .set_proxy.sh</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">.</span> .set_proxy.sh 1 <span class="co"># 设置代理</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">.</span> .set_proxy.sh 0 <span class="co"># 取消代理</span></span></code></pre></div>
+<p>具体请查看<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/set_proxy.sh"><code>.set_proxy.sh</code></a>。</p>
+<h1 data-number="7" id="tmux.conf"><span
+class="header-section-number">7</span> <code>.tmux.conf</code></h1>
+<p>Tmux（缩写自”Terminal
+Multiplexer”）是一个在命令行界面下运行的终端复用工具，我主要是用tmux的会话附加和分离功能，在一个Tmux会话中分离，然后重新附加，这意味着可以从一个终端窗口断开，然后在另一个终端窗口中继续工作，或者甚至在断开后重新连接。</p>
 <p>安装:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="fu">sudo</span> apt update -y</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="fu">sudo</span> apt install tmux -y</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update <span class="at">-y</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install tmux <span class="at">-y</span></span></code></pre></div>
 <p><code>set -g prefix none</code>表示将prefix键设置为空，因此您无需按下任何键即可执行tmux命令。这通常是为了防止键冲突或简化tmux的使用。</p>
-<p><code>unbind C-b</code>将取消绑定 C-b 作为 prefix 键，从而使其不再触发 tmux 命令。</p>
+<p><code>unbind C-b</code>将取消绑定 C-b 作为 prefix
+键，从而使其不再触发 tmux 命令。</p>
 <p>如果已经运行了tmux，要重新加载配置，在终端中输入<code>tmux source-file ~/.tmux.conf</code>，使新的prefix设置生效。</p>
-<p>具体请查看<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/tmux.conf"><code>.tmux.conf</code></a>。</p>
+<p>具体请查看<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/tmux.conf"><code>.tmux.conf</code></a>。</p>
 <p>要查看终端的所有输出，可以使用<code>tmux copy-mode</code>。</p>
-<h1 data-number="8" id="vimrc"><span class="header-section-number">8</span> <code>.vimrc</code></h1>
+<h1 data-number="8" id="vimrc"><span
+class="header-section-number">8</span> <code>.vimrc</code></h1>
 <p>vim就是方便小巧，是Linux下最常用的编辑器了，以前我挺喜欢用的，现在我更多的是用emacs看代码。</p>
-<p>具体请查看<a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/vimrc"><code>.vimrc</code></a>。</p>
+<p>具体请查看<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/gnu-linux/src/config-file/vimrc"><code>.vimrc</code></a>。</p>
 </body>
 </html>

@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,411 +94,437 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
-<h1 class="title">a2b0b205d125 ext4: fix symlink file size not match to file content</h1>
+<h1 class="title">a2b0b205d125 ext4: fix symlink file size not match to
+file content</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#内核构造补丁"><span class="toc-section-number">2</span> 内核构造补丁</a></li>
-<li><a href="#修复补丁合入之前的现象"><span class="toc-section-number">3</span> 修复补丁合入之前的现象</a></li>
-<li><a href="#修复补丁合入之后的现象"><span class="toc-section-number">4</span> 修复补丁合入之后的现象</a></li>
-<li><a href="#代码流程"><span class="toc-section-number">5</span> 代码流程</a></li>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#内核构造补丁" id="toc-内核构造补丁"><span
+class="toc-section-number">2</span> 内核构造补丁</a></li>
+<li><a href="#修复补丁合入之前的现象"
+id="toc-修复补丁合入之前的现象"><span
+class="toc-section-number">3</span> 修复补丁合入之前的现象</a></li>
+<li><a href="#修复补丁合入之后的现象"
+id="toc-修复补丁合入之后的现象"><span
+class="toc-section-number">4</span> 修复补丁合入之后的现象</a></li>
+<li><a href="#代码流程" id="toc-代码流程"><span
+class="toc-section-number">5</span> 代码流程</a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
-<p><a href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
-<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>[<span class="ex">home</span>]# fsck.ext4  -fn  ram0yb</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ex">e2fsck</span> 1.45.6 (20-Mar-2020)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ex">Pass</span> 1: Checking inodes, blocks, and sizes</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="ex">Pass</span> 2: Checking directory structure</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ex">Symlink</span> /p3/d14/d1a/l3d (inode #3494) <span class="ex">is</span> invalid.</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="ex">Clear?</span> no</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="ex">Entry</span> <span class="st">&#39;l3d&#39;</span> in /p3/d14/d1a (3383) <span class="ex">has</span> an incorrect filetype (was 7, should be 0)<span class="ex">.</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="ex">Fix?</span> no</span></code></pre></div>
-<h1 data-number="2" id="内核构造补丁"><span class="header-section-number">2</span> 内核构造补丁</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>From edd845db91cb201343ce26bf4827a08dec213dac Mon Sep <span class="dv">17</span> <span class="bn">00</span>:<span class="bn">00</span>:<span class="bn">00</span> <span class="dv">2001</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>From: ChenXiaoSong &lt;chenxiaosongemail@foxmail.com&gt;</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>Date: Sun, <span class="dv">1</span> May <span class="dv">2022</span> <span class="dv">18</span>:<span class="dv">54</span>:<span class="dv">12</span> +<span class="er">0800</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>Subject: [PATCH] reproduce symlink file size <span class="cf">do</span> not match to file content</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>Signed-off-by: ChenXiaoSong &lt;chenxiaosongemail@foxmail.com&gt;</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>---</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a> block/blk-core.c       | <span class="dv">34</span> +++++++++++++++++++++++++++++-----</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a> fs/ext4/ext4.h         |  <span class="dv">1</span> +</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a> fs/ext4/inode.c        |  <span class="dv">8</span> +++++++-</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a> fs/ext4/page-io.c      | <span class="dv">18</span> +++++++++++++++---</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a> include/linux/bio.h    |  <span class="dv">1</span> +</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a> include/linux/blkdev.h |  <span class="dv">1</span> +</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a> <span class="dv">6</span> files changed, <span class="dv">54</span> insertions(+), <span class="dv">9</span> deletions(-)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>diff --git a/block/blk-core.c b/block/blk-core.c</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>index <span class="dv">937</span><span class="er">bb6b86331</span>.<span class="fl">.40979511</span><span class="er">c0cf</span> <span class="dv">100644</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>--- a/block/blk-core.c</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>+++ b/block/blk-core.c</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a>@@ -<span class="dv">771</span>,<span class="dv">7</span> +<span class="dv">771</span>,<span class="dv">7</span> @@ <span class="dt">void</span> submit_bio_noacct_nocheck(<span class="kw">struct</span> bio *bio)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>  * systems and other upper level users of the block layer should use</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a>  * submit_bio() instead.</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a>  */</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>-<span class="dt">void</span> submit_bio_noacct(<span class="kw">struct</span> bio *bio)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a>+<span class="dt">void</span> origin_submit_bio_noacct(<span class="kw">struct</span> bio *bio, <span class="dt">char</span> fault)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a> {</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a>    <span class="kw">struct</span> block_device *bdev = bio-&gt;bi_bdev;</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a>    <span class="kw">struct</span> request_queue *q = bdev_get_queue(bdev);</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a>@@ -<span class="dv">791</span>,<span class="dv">8</span> +<span class="dv">791</span>,<span class="dv">10</span> @@ <span class="dt">void</span> submit_bio_noacct(<span class="kw">struct</span> bio *bio)</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a>    <span class="cf">if</span> ((bio-&gt;bi_opf &amp; REQ_NOWAIT) &amp;&amp; !blk_queue_nowait(q))</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a>        <span class="cf">goto</span> not_supported;</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true"></a> </span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true"></a>-   <span class="cf">if</span> (should_fail_bio(bio))</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true"></a>+   <span class="cf">if</span> (should_fail_bio(bio) || fault) {</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true"></a>+       printk(<span class="st">&quot;%s:%d,inject fault,fault:%d</span><span class="sc">\n</span><span class="st">&quot;</span>, __func__, __LINE__, fault);</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true"></a>        <span class="cf">goto</span> end_io;</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true"></a>+   }</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true"></a>    <span class="cf">if</span> (unlikely(bio_check_ro(bio)))</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true"></a>        <span class="cf">goto</span> end_io;</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true"></a>    <span class="cf">if</span> (!bio_flagged(bio, BIO_REMAPPED)) {</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true"></a>@@ -<span class="dv">873</span>,<span class="dv">8</span> +<span class="dv">875</span>,<span class="dv">19</span> @@ <span class="dt">void</span> submit_bio_noacct(<span class="kw">struct</span> bio *bio)</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true"></a>    bio-&gt;bi_status = status;</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true"></a>    bio_endio(bio);</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true"></a> }</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true"></a>+</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true"></a>+<span class="dt">void</span> submit_bio_noacct(<span class="kw">struct</span> bio *bio)</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true"></a>+{</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true"></a>+   origin_submit_bio_noacct(bio, <span class="dv">0</span>);</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true"></a>+}</span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true"></a> EXPORT_SYMBOL(submit_bio_noacct);</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true"></a> </span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true"></a>+<span class="dt">void</span> submit_bio_noacct2(<span class="kw">struct</span> bio *bio, <span class="dt">char</span> fault)</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true"></a>+{</span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true"></a>+   origin_submit_bio_noacct(bio, fault);</span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true"></a>+}</span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true"></a>+EXPORT_SYMBOL(submit_bio_noacct2);</span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true"></a>+</span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true"></a> <span class="co">/**</span></span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true"></a><span class="co">  * submit_bio - submit a bio to the block device layer for I/O</span></span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true"></a><span class="co">  * </span><span class="an">@bio:</span><span class="co"> The &amp;struct bio which describes the I/O</span></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true"></a><span class="an">@@</span><span class="co"> -888,7 +901,7 </span><span class="an">@@</span><span class="co"> EXPORT_SYMBOL(submit_bio_noacct);</span></span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true"></a><span class="co">  * in </span><span class="an">@bio.</span><span class="co">  The bio must NOT be touched by thecaller until -&gt;bi_end_io() has</span></span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true"></a><span class="co">  * been called.</span></span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true"></a><span class="co">  */</span></span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true"></a>-<span class="dt">void</span> submit_bio(<span class="kw">struct</span> bio *bio)</span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true"></a>+<span class="dt">void</span> origin_submit_bio(<span class="kw">struct</span> bio *bio, <span class="dt">char</span> fault)</span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true"></a> {</span>
-<span id="cb2-68"><a href="#cb2-68" aria-hidden="true"></a>    <span class="cf">if</span> (blkcg_punt_bio_submit(bio))</span>
-<span id="cb2-69"><a href="#cb2-69" aria-hidden="true"></a>        <span class="cf">return</span>;</span>
-<span id="cb2-70"><a href="#cb2-70" aria-hidden="true"></a>@@ -<span class="dv">919</span>,<span class="dv">15</span> +<span class="dv">932</span>,<span class="dv">26</span> @@ <span class="dt">void</span> submit_bio(<span class="kw">struct</span> bio *bio)</span>
-<span id="cb2-71"><a href="#cb2-71" aria-hidden="true"></a>        <span class="dt">unsigned</span> <span class="dt">long</span> pflags;</span>
-<span id="cb2-72"><a href="#cb2-72" aria-hidden="true"></a> </span>
-<span id="cb2-73"><a href="#cb2-73" aria-hidden="true"></a>        psi_memstall_enter(&amp;pflags);</span>
-<span id="cb2-74"><a href="#cb2-74" aria-hidden="true"></a>-       submit_bio_noacct(bio);</span>
-<span id="cb2-75"><a href="#cb2-75" aria-hidden="true"></a>+       submit_bio_noacct2(bio, fault);</span>
-<span id="cb2-76"><a href="#cb2-76" aria-hidden="true"></a>        psi_memstall_leave(&amp;pflags);</span>
-<span id="cb2-77"><a href="#cb2-77" aria-hidden="true"></a>        <span class="cf">return</span>;</span>
-<span id="cb2-78"><a href="#cb2-78" aria-hidden="true"></a>    }</span>
-<span id="cb2-79"><a href="#cb2-79" aria-hidden="true"></a> </span>
-<span id="cb2-80"><a href="#cb2-80" aria-hidden="true"></a>-   submit_bio_noacct(bio);</span>
-<span id="cb2-81"><a href="#cb2-81" aria-hidden="true"></a>+   submit_bio_noacct2(bio, fault);</span>
-<span id="cb2-82"><a href="#cb2-82" aria-hidden="true"></a>+}</span>
-<span id="cb2-83"><a href="#cb2-83" aria-hidden="true"></a>+</span>
-<span id="cb2-84"><a href="#cb2-84" aria-hidden="true"></a>+<span class="dt">void</span> submit_bio(<span class="kw">struct</span> bio *bio)</span>
-<span id="cb2-85"><a href="#cb2-85" aria-hidden="true"></a>+{</span>
-<span id="cb2-86"><a href="#cb2-86" aria-hidden="true"></a>+   origin_submit_bio(bio, <span class="dv">0</span>);</span>
-<span id="cb2-87"><a href="#cb2-87" aria-hidden="true"></a> }</span>
-<span id="cb2-88"><a href="#cb2-88" aria-hidden="true"></a> EXPORT_SYMBOL(submit_bio);</span>
-<span id="cb2-89"><a href="#cb2-89" aria-hidden="true"></a> </span>
-<span id="cb2-90"><a href="#cb2-90" aria-hidden="true"></a>+<span class="dt">void</span> submit_bio2(<span class="kw">struct</span> bio *bio, <span class="dt">char</span> fault)</span>
-<span id="cb2-91"><a href="#cb2-91" aria-hidden="true"></a>+{</span>
-<span id="cb2-92"><a href="#cb2-92" aria-hidden="true"></a>+   origin_submit_bio(bio, fault);</span>
-<span id="cb2-93"><a href="#cb2-93" aria-hidden="true"></a>+}</span>
-<span id="cb2-94"><a href="#cb2-94" aria-hidden="true"></a>+EXPORT_SYMBOL(submit_bio2);</span>
-<span id="cb2-95"><a href="#cb2-95" aria-hidden="true"></a>+</span>
-<span id="cb2-96"><a href="#cb2-96" aria-hidden="true"></a> <span class="co">/**</span></span>
-<span id="cb2-97"><a href="#cb2-97" aria-hidden="true"></a><span class="co">  * bio_poll - poll for BIO completions</span></span>
-<span id="cb2-98"><a href="#cb2-98" aria-hidden="true"></a><span class="co">  * </span><span class="an">@bio:</span><span class="co"> bio to poll for</span></span>
-<span id="cb2-99"><a href="#cb2-99" aria-hidden="true"></a><span class="co">diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h</span></span>
-<span id="cb2-100"><a href="#cb2-100" aria-hidden="true"></a><span class="co">index 3f87cca49f0c..375bf9eefab8 100644</span></span>
-<span id="cb2-101"><a href="#cb2-101" aria-hidden="true"></a><span class="co">--- a/fs/ext4/ext4.h</span></span>
-<span id="cb2-102"><a href="#cb2-102" aria-hidden="true"></a><span class="co">+++ b/fs/ext4/ext4.h</span></span>
-<span id="cb2-103"><a href="#cb2-103" aria-hidden="true"></a><span class="an">@@</span><span class="co"> -3793,6 +3793,7 </span><span class="an">@@</span><span class="co"> extern void ext4_io_submit_init(struct ext4_io_submit *io,</span></span>
-<span id="cb2-104"><a href="#cb2-104" aria-hidden="true"></a><span class="co">                struct writeback_control *wbc);</span></span>
-<span id="cb2-105"><a href="#cb2-105" aria-hidden="true"></a><span class="co"> extern void ext4_end_io_rsv_work(struct work_struct *work);</span></span>
-<span id="cb2-106"><a href="#cb2-106" aria-hidden="true"></a><span class="co"> extern void ext4_io_submit(struct ext4_io_submit *io);</span></span>
-<span id="cb2-107"><a href="#cb2-107" aria-hidden="true"></a><span class="co">+extern void ext4_io_submit2(struct ext4_io_submit *io, char fault);</span></span>
-<span id="cb2-108"><a href="#cb2-108" aria-hidden="true"></a><span class="co"> extern int ext4_bio_write_page(struct ext4_io_submit *io,</span></span>
-<span id="cb2-109"><a href="#cb2-109" aria-hidden="true"></a><span class="co">                   struct page *page,</span></span>
-<span id="cb2-110"><a href="#cb2-110" aria-hidden="true"></a><span class="co">                   int len,</span></span>
-<span id="cb2-111"><a href="#cb2-111" aria-hidden="true"></a><span class="co">diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c</span></span>
-<span id="cb2-112"><a href="#cb2-112" aria-hidden="true"></a><span class="co">index 1ce13f69fbec..0c4c061fc59c 100644</span></span>
-<span id="cb2-113"><a href="#cb2-113" aria-hidden="true"></a><span class="co">--- a/fs/ext4/inode.c</span></span>
-<span id="cb2-114"><a href="#cb2-114" aria-hidden="true"></a><span class="co">+++ b/fs/ext4/inode.c</span></span>
-<span id="cb2-115"><a href="#cb2-115" aria-hidden="true"></a><span class="an">@@</span><span class="co"> -1979,6 +1979,7 </span><span class="an">@@</span><span class="co"> static int ext4_writepage(struct page *page,</span></span>
-<span id="cb2-116"><a href="#cb2-116" aria-hidden="true"></a><span class="co">    struct inode *inode = page-&gt;mapping-&gt;host;</span></span>
-<span id="cb2-117"><a href="#cb2-117" aria-hidden="true"></a><span class="co">    struct ext4_io_submit io_submit;</span></span>
-<span id="cb2-118"><a href="#cb2-118" aria-hidden="true"></a><span class="co">    bool keep_towrite = false;</span></span>
-<span id="cb2-119"><a href="#cb2-119" aria-hidden="true"></a><span class="co">+   int fault = 0;</span></span>
-<span id="cb2-120"><a href="#cb2-120" aria-hidden="true"></a><span class="co"> </span></span>
-<span id="cb2-121"><a href="#cb2-121" aria-hidden="true"></a><span class="co">    if (unlikely(ext4_forced_shutdown(EXT4_SB(inode-&gt;i_sb)))) {</span></span>
-<span id="cb2-122"><a href="#cb2-122" aria-hidden="true"></a><span class="co">        folio_invalidate(folio, 0, folio_size(folio));</span></span>
-<span id="cb2-123"><a href="#cb2-123" aria-hidden="true"></a><span class="an">@@</span><span class="co"> -2054,7 +2055,12 </span><span class="an">@@</span><span class="co"> static int ext4_writepage(struct page *page,</span></span>
-<span id="cb2-124"><a href="#cb2-124" aria-hidden="true"></a><span class="co">        return -ENOMEM;</span></span>
-<span id="cb2-125"><a href="#cb2-125" aria-hidden="true"></a><span class="co">    }</span></span>
-<span id="cb2-126"><a href="#cb2-126" aria-hidden="true"></a><span class="co">    ret = ext4_bio_write_page(&amp;io_submit, page, len, keep_towrite);</span></span>
-<span id="cb2-127"><a href="#cb2-127" aria-hidden="true"></a><span class="co">-   ext4_io_submit(&amp;io_submit);</span></span>
-<span id="cb2-128"><a href="#cb2-128" aria-hidden="true"></a><span class="co">+   if (io_submit.io_bio &amp;&amp; page-&gt;mapping &amp;&amp; page-&gt;mapping-&gt;host &amp;&amp;</span></span>
-<span id="cb2-129"><a href="#cb2-129" aria-hidden="true"></a><span class="co">+       S_ISLNK(page-&gt;mapping-&gt;host-&gt;i_mode)) {</span></span>
-<span id="cb2-130"><a href="#cb2-130" aria-hidden="true"></a><span class="co">+       printk(&quot;%s:%d,inject fault,inode num:%ld</span><span class="an">\n&quot;,</span><span class="co"> __func__, __LINE__, page-&gt;mapping-&gt;host-&gt;i_ino);</span></span>
-<span id="cb2-131"><a href="#cb2-131" aria-hidden="true"></a><span class="co">+       fault = 1;</span></span>
-<span id="cb2-132"><a href="#cb2-132" aria-hidden="true"></a><span class="co">+   }</span></span>
-<span id="cb2-133"><a href="#cb2-133" aria-hidden="true"></a><span class="co">+   ext4_io_submit2(&amp;io_submit, fault);</span></span>
-<span id="cb2-134"><a href="#cb2-134" aria-hidden="true"></a><span class="co">    /* Drop io_end reference we got from init */</span></span>
-<span id="cb2-135"><a href="#cb2-135" aria-hidden="true"></a>    ext4_put_io_end_defer(io_submit.io_end);</span>
-<span id="cb2-136"><a href="#cb2-136" aria-hidden="true"></a>    <span class="cf">return</span> ret;</span>
-<span id="cb2-137"><a href="#cb2-137" aria-hidden="true"></a>diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c</span>
-<span id="cb2-138"><a href="#cb2-138" aria-hidden="true"></a>index <span class="dv">495</span><span class="er">ce59fb4ad</span>.<span class="fl">.8e1</span><span class="er">b367ac002</span> <span class="dv">100644</span></span>
-<span id="cb2-139"><a href="#cb2-139" aria-hidden="true"></a>--- a/fs/ext4/page-io.c</span>
-<span id="cb2-140"><a href="#cb2-140" aria-hidden="true"></a>+++ b/fs/ext4/page-io.c</span>
-<span id="cb2-141"><a href="#cb2-141" aria-hidden="true"></a>@@ -<span class="dv">134</span>,<span class="dv">8</span> +<span class="dv">134</span>,<span class="dv">10</span> @@ <span class="dt">static</span> <span class="dt">void</span> ext4_finish_bio(<span class="kw">struct</span> bio *bio)</span>
-<span id="cb2-142"><a href="#cb2-142" aria-hidden="true"></a>                <span class="cf">continue</span>;</span>
-<span id="cb2-143"><a href="#cb2-143" aria-hidden="true"></a>            }</span>
-<span id="cb2-144"><a href="#cb2-144" aria-hidden="true"></a>            clear_buffer_async_write(bh);</span>
-<span id="cb2-145"><a href="#cb2-145" aria-hidden="true"></a>-           <span class="cf">if</span> (bio-&gt;bi_status)</span>
-<span id="cb2-146"><a href="#cb2-146" aria-hidden="true"></a>+           <span class="cf">if</span> (bio-&gt;bi_status) {</span>
-<span id="cb2-147"><a href="#cb2-147" aria-hidden="true"></a>+               <span class="co">// set_buffer_write_io_error(bh);</span></span>
-<span id="cb2-148"><a href="#cb2-148" aria-hidden="true"></a>                buffer_io_error(bh);</span>
-<span id="cb2-149"><a href="#cb2-149" aria-hidden="true"></a>+           }</span>
-<span id="cb2-150"><a href="#cb2-150" aria-hidden="true"></a>        } <span class="cf">while</span> ((bh = bh-&gt;b_this_page) != head);</span>
-<span id="cb2-151"><a href="#cb2-151" aria-hidden="true"></a>        spin_unlock_irqrestore(&amp;head-&gt;b_uptodate_lock, flags);</span>
-<span id="cb2-152"><a href="#cb2-152" aria-hidden="true"></a>        <span class="cf">if</span> (!under_io) {</span>
-<span id="cb2-153"><a href="#cb2-153" aria-hidden="true"></a>@@ -<span class="dv">366</span>,<span class="dv">18</span> +<span class="dv">368</span>,<span class="dv">28</span> @@ <span class="dt">static</span> <span class="dt">void</span> ext4_end_bio(<span class="kw">struct</span> bio *bio)</span>
-<span id="cb2-154"><a href="#cb2-154" aria-hidden="true"></a>    }</span>
-<span id="cb2-155"><a href="#cb2-155" aria-hidden="true"></a> }</span>
-<span id="cb2-156"><a href="#cb2-156" aria-hidden="true"></a> </span>
-<span id="cb2-157"><a href="#cb2-157" aria-hidden="true"></a>-<span class="dt">void</span> ext4_io_submit(<span class="kw">struct</span> ext4_io_submit *io)</span>
-<span id="cb2-158"><a href="#cb2-158" aria-hidden="true"></a>+<span class="dt">void</span> origin_ext4_io_submit(<span class="kw">struct</span> ext4_io_submit *io, <span class="dt">char</span> fault)</span>
-<span id="cb2-159"><a href="#cb2-159" aria-hidden="true"></a> {</span>
-<span id="cb2-160"><a href="#cb2-160" aria-hidden="true"></a>    <span class="kw">struct</span> bio *bio = io-&gt;io_bio;</span>
-<span id="cb2-161"><a href="#cb2-161" aria-hidden="true"></a> </span>
-<span id="cb2-162"><a href="#cb2-162" aria-hidden="true"></a>    <span class="cf">if</span> (bio) {</span>
-<span id="cb2-163"><a href="#cb2-163" aria-hidden="true"></a>        <span class="cf">if</span> (io-&gt;io_wbc-&gt;sync_mode == WB_SYNC_ALL)</span>
-<span id="cb2-164"><a href="#cb2-164" aria-hidden="true"></a>            io-&gt;io_bio-&gt;bi_opf |= REQ_SYNC;</span>
-<span id="cb2-165"><a href="#cb2-165" aria-hidden="true"></a>-       submit_bio(io-&gt;io_bio);</span>
-<span id="cb2-166"><a href="#cb2-166" aria-hidden="true"></a>+       submit_bio2(io-&gt;io_bio, fault);</span>
-<span id="cb2-167"><a href="#cb2-167" aria-hidden="true"></a>    }</span>
-<span id="cb2-168"><a href="#cb2-168" aria-hidden="true"></a>    io-&gt;io_bio = NULL;</span>
-<span id="cb2-169"><a href="#cb2-169" aria-hidden="true"></a> }</span>
-<span id="cb2-170"><a href="#cb2-170" aria-hidden="true"></a> </span>
-<span id="cb2-171"><a href="#cb2-171" aria-hidden="true"></a>+<span class="dt">void</span> ext4_io_submit(<span class="kw">struct</span> ext4_io_submit *io)</span>
-<span id="cb2-172"><a href="#cb2-172" aria-hidden="true"></a>+{</span>
-<span id="cb2-173"><a href="#cb2-173" aria-hidden="true"></a>+   origin_ext4_io_submit(io, <span class="dv">0</span>);</span>
-<span id="cb2-174"><a href="#cb2-174" aria-hidden="true"></a>+}</span>
-<span id="cb2-175"><a href="#cb2-175" aria-hidden="true"></a>+</span>
-<span id="cb2-176"><a href="#cb2-176" aria-hidden="true"></a>+<span class="dt">void</span> ext4_io_submit2(<span class="kw">struct</span> ext4_io_submit *io, <span class="dt">char</span> fault)</span>
-<span id="cb2-177"><a href="#cb2-177" aria-hidden="true"></a>+{</span>
-<span id="cb2-178"><a href="#cb2-178" aria-hidden="true"></a>+   origin_ext4_io_submit(io, fault);</span>
-<span id="cb2-179"><a href="#cb2-179" aria-hidden="true"></a>+}</span>
-<span id="cb2-180"><a href="#cb2-180" aria-hidden="true"></a>+</span>
-<span id="cb2-181"><a href="#cb2-181" aria-hidden="true"></a> <span class="dt">void</span> ext4_io_submit_init(<span class="kw">struct</span> ext4_io_submit *io,</span>
-<span id="cb2-182"><a href="#cb2-182" aria-hidden="true"></a>             <span class="kw">struct</span> writeback_control *wbc)</span>
-<span id="cb2-183"><a href="#cb2-183" aria-hidden="true"></a> {</span>
-<span id="cb2-184"><a href="#cb2-184" aria-hidden="true"></a>diff --git a/include/linux/bio.h b/include/linux/bio.h</span>
-<span id="cb2-185"><a href="#cb2-185" aria-hidden="true"></a>index <span class="dv">278</span><span class="er">cc81cc1e7</span>..e102c4afbf70 <span class="dv">100644</span></span>
-<span id="cb2-186"><a href="#cb2-186" aria-hidden="true"></a>--- a/include/linux/bio.h</span>
-<span id="cb2-187"><a href="#cb2-187" aria-hidden="true"></a>+++ b/include/linux/bio.h</span>
-<span id="cb2-188"><a href="#cb2-188" aria-hidden="true"></a>@@ -<span class="dv">424</span>,<span class="dv">6</span> +<span class="dv">424</span>,<span class="dv">7</span> @@ <span class="dt">static</span> <span class="kw">inline</span> <span class="kw">struct</span> bio *bio_alloc(<span class="kw">struct</span> block_device *bdev,</span>
-<span id="cb2-189"><a href="#cb2-189" aria-hidden="true"></a> }</span>
-<span id="cb2-190"><a href="#cb2-190" aria-hidden="true"></a> </span>
-<span id="cb2-191"><a href="#cb2-191" aria-hidden="true"></a> <span class="dt">void</span> submit_bio(<span class="kw">struct</span> bio *bio);</span>
-<span id="cb2-192"><a href="#cb2-192" aria-hidden="true"></a>+<span class="dt">void</span> submit_bio2(<span class="kw">struct</span> bio *bio, <span class="dt">char</span> fault);</span>
-<span id="cb2-193"><a href="#cb2-193" aria-hidden="true"></a> </span>
-<span id="cb2-194"><a href="#cb2-194" aria-hidden="true"></a> <span class="kw">extern</span> <span class="dt">void</span> bio_endio(<span class="kw">struct</span> bio *);</span>
-<span id="cb2-195"><a href="#cb2-195" aria-hidden="true"></a> </span>
-<span id="cb2-196"><a href="#cb2-196" aria-hidden="true"></a>diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h</span>
-<span id="cb2-197"><a href="#cb2-197" aria-hidden="true"></a>index <span class="dv">60</span><span class="er">d016138997</span>..e46f41c3e9a2 <span class="dv">100644</span></span>
-<span id="cb2-198"><a href="#cb2-198" aria-hidden="true"></a>--- a/include/linux/blkdev.h</span>
-<span id="cb2-199"><a href="#cb2-199" aria-hidden="true"></a>+++ b/include/linux/blkdev.h</span>
-<span id="cb2-200"><a href="#cb2-200" aria-hidden="true"></a>@@ -<span class="dv">860</span>,<span class="dv">6</span> +<span class="dv">860</span>,<span class="dv">7</span> @@ <span class="dt">void</span> blk_request_module(dev_t devt);</span>
-<span id="cb2-201"><a href="#cb2-201" aria-hidden="true"></a> <span class="kw">extern</span> <span class="dt">int</span> blk_register_queue(<span class="kw">struct</span> gendisk *disk);</span>
-<span id="cb2-202"><a href="#cb2-202" aria-hidden="true"></a> <span class="kw">extern</span> <span class="dt">void</span> blk_unregister_queue(<span class="kw">struct</span> gendisk *disk);</span>
-<span id="cb2-203"><a href="#cb2-203" aria-hidden="true"></a> <span class="dt">void</span> submit_bio_noacct(<span class="kw">struct</span> bio *bio);</span>
-<span id="cb2-204"><a href="#cb2-204" aria-hidden="true"></a>+<span class="dt">void</span> submit_bio_noacct2(<span class="kw">struct</span> bio *bio, <span class="dt">char</span> fault);</span>
-<span id="cb2-205"><a href="#cb2-205" aria-hidden="true"></a> </span>
-<span id="cb2-206"><a href="#cb2-206" aria-hidden="true"></a> <span class="kw">extern</span> <span class="dt">int</span> blk_lld_busy(<span class="kw">struct</span> request_queue *q);</span>
-<span id="cb2-207"><a href="#cb2-207" aria-hidden="true"></a> <span class="kw">extern</span> <span class="dt">void</span> blk_queue_split(<span class="kw">struct</span> bio **);</span>
-<span id="cb2-208"><a href="#cb2-208" aria-hidden="true"></a>-- </span>
-<span id="cb2-209"><a href="#cb2-209" aria-hidden="true"></a><span class="fl">2.25</span><span class="er">.1</span></span></code></pre></div>
-<h1 data-number="3" id="修复补丁合入之前的现象"><span class="header-section-number">3</span> 修复补丁合入之前的现象</h1>
-<p>修复补丁: <a href="https://lore.kernel.org/all/20220321144438.201685-1-yebin10@huawei.com/"><code>a2b0b205d125 ext4: fix symlink file size not match to file content</code></a></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="fu">umount</span> /mnt</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">mkfs.ext4</span> -E lazy_itable_init=0,lazy_journal_init=0 -b 4096 -F /dev/sda</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="fu">mount</span> /dev/sda /mnt</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co"># 路径名大于60个字符</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="fu">ln</span> -s 1234567890123456789012345678901234567890123456789012345678901234567890 /mnt/link</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="co"># ln -s abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz /mnt/link</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="fu">sync</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="fu">umount</span> /mnt</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="co"># [   30.532593] ext4_writepage:2059,inject fault,inode num:12,fault:0</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="co"># [   30.533290] submit_bio_noacct:795,inject fault,fault:88</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="co"># [   30.533874] EXT4-fs warning (device sda): ext4_end_bio:341: I/O error 10 writing to inode 12 starting block 1847)</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="co"># [   30.534963] Buffer I/O error on device sda, logical block 1847</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a><span class="fu">mount</span> /dev/sda /mnt</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a><span class="fu">ls</span> -lh /mnt <span class="co"># 重新挂载后, symlink 内容错误</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a><span class="co"># lrwxrwxrwx. 1 root root  78 May  1 19:18 link -&gt; 1234567890123456789012345678901234567890123456789012345678901234567890</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a><span class="co"># 在物理机上执行</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a><span class="ex">fsck.ext4</span> -fn 1 # 文件 1 是对应虚拟机中 /dev/sda 的物理机文件</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a><span class="co"># e2fsck 1.45.5 (07-Jan-2020)</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a><span class="co"># 1: recovering journal</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a><span class="co"># Pass 1: Checking inodes, blocks, and sizes</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a><span class="co"># Pass 2: Checking directory structure</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a><span class="co"># Pass 3: Checking directory connectivity</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a><span class="co"># Pass 4: Checking reference counts</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a><span class="co"># Pass 5: Checking group summary information</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a><span class="co"># 1: 12/25600 files (8.3% non-contiguous), 1848/25600 blocks</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a><span class="bu">echo</span> <span class="va">$?</span> <span class="co"># 0</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a><span class="ex">debugfs</span> 1</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a><span class="ex">debugfs</span>:  stat <span class="op">&lt;12&gt;</span> # Symlink /link (inode #12) <span class="ex">is</span> invalid.</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a><span class="co"># (0):1847</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a><span class="ex">debugfs</span>:  bd 1847</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a><span class="co"># 0000  3132 3334 3536 3738 3930 3132 3334 3536  1234567890123456</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a><span class="co"># 0020  3738 3930 3132 3334 3536 3738 3930 3132  7890123456789012</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a><span class="co"># 0040  3334 3536 3738 3930 3132 3334 3536 3738  3456789012345678</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a><span class="co"># 0060  3930 3132 3334 3536 3738 3930 3132 3334  9012345678901234</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true"></a><span class="co"># 0100  3536 3738 3930 0000 0000 0000 0000 0000  567890..........</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true"></a><span class="co"># 0120  0000 0000 0000 0000 0000 0000 0000 0000  ................</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true"></a><span class="co"># *</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true"></a><span class="ex">debugfs</span>:  logdump -S</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true"></a><span class="co"># Journal features:         journal_64bit</span></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true"></a><span class="co"># Journal size:             4096k</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true"></a><span class="co"># Journal length:           1024</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true"></a><span class="co"># Journal sequence:         0x00000004</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true"></a><span class="co"># Journal start:            0</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true"></a><span class="co"># </span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true"></a><span class="co"># Journal starts at block 0, transaction 4</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true"></a></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true"></a><span class="co"># 删除链接文件</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true"></a><span class="ex">fsck.ext4</span> -fy 1 # 文件 1 是对应虚拟机中 /dev/sda 的物理机文件</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true"></a><span class="co"># e2fsck 1.45.5 (07-Jan-2020)</span></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true"></a><span class="co"># Pass 1: Checking inodes, blocks, and sizes</span></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true"></a><span class="co"># Pass 2: Checking directory structure</span></span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true"></a><span class="co"># Symlink /link (inode #12) is invalid.</span></span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true"></a><span class="co"># Clear? yes</span></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true"></a><span class="co">#</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true"></a><span class="co"># Pass 3: Checking directory connectivity</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true"></a><span class="co"># Pass 4: Checking reference counts</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true"></a><span class="co"># Pass 5: Checking group summary information</span></span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true"></a><span class="co">#</span></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true"></a><span class="co"># 1: ***** FILE SYSTEM WAS MODIFIED *****</span></span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true"></a><span class="co"># 1: 11/25600 files (9.1% non-contiguous), 1846/25600 blocks</span></span></code></pre></div>
-<h1 data-number="4" id="修复补丁合入之后的现象"><span class="header-section-number">4</span> 修复补丁合入之后的现象</h1>
-<p>修复补丁: <a href="https://lore.kernel.org/all/20220321144438.201685-1-yebin10@huawei.com/">a2b0b205d125 ext4: fix symlink file size not match to file content</a></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="fu">umount</span> /mnt</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">mkfs.ext4</span> -E lazy_itable_init=0,lazy_journal_init=0 -b 4096 -F /dev/sda </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="fu">mount</span> /dev/sda /mnt </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="fu">ln</span> -s 1234567890123456789012345678901234567890123456789012345678901234567890 /mnt/link</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="fu">sync</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="fu">umount</span> /mnt</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="co"># [   47.614676] ext4_writepage:2060,inject fault,inode num:12</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="co"># [   47.615308] origin_submit_bio_noacct:795,inject fault,fault:1</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="co"># [   47.615936] EXT4-fs warning (device sda): ext4_end_bio:343: I/O error 10 writing to inode 12 starting block 1847)</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="co"># [   47.617037] Buffer I/O error on device sda, logical block 1847</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="co"># [   47.622963] Aborting journal on device sda-8.</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="co"># [   47.624524] EXT4-fs error (device sda): ext4_put_super:1221: comm umount: Couldn&#39;t clean up the journal</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="co"># [   47.627310] EXT4-fs (sda): Remounting filesystem read-only</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="ex">debugfs</span>:  logdump -S</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="co"># Journal features:         journal_64bit</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="co"># Journal size:             4096k</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a><span class="co"># Journal length:           1024</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a><span class="co"># Journal sequence:         0x00000002</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a><span class="co"># Journal start:            1</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a><span class="co"># Journal errno:            -5</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a><span class="co">#</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a><span class="co"># Journal starts at block 1, transaction 2</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a><span class="co"># Found expected sequence 2, type 1 (descriptor block) at block 1</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a><span class="co"># Found expected sequence 2, type 2 (commit block) at block 10</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a><span class="co"># No magic number at block 11: end of journal.</span></span></code></pre></div>
-<h1 data-number="5" id="代码流程"><span class="header-section-number">5</span> 代码流程</h1>
-<p>修复补丁: <a href="https://lore.kernel.org/all/20220321144438.201685-1-yebin10@huawei.com/">a2b0b205d125 ext4: fix symlink file size not match to file content</a></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>kthread</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>  worker_thread</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    process_one_work</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>      wb_workfn</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>        wb_do_writeback</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>          wb_check_start_all</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>            wb_writeback</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>              __writeback_inodes_wb</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>                writeback_sb_inodes</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>                  __writeback_single_inode</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>                    do_writepages</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>                      ext4_writepages</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>                        generic_writepages</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a>                          write_cache_pages</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>                            __writepage</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a>                              ext4_writepage</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a>                                ext4_io_submit</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a>                                  submit_bio</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a>                                    submit_bio_noacct</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a>                                      bio_endio</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a>                                        ext4_end_bio</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a>                                          ext4_finish_bio</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a>                                            <span class="cf">if</span> (bio-&gt;bi_status) { </span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a>                                            <span class="co">// PAGEFLAG(Dirty, dirty, PF_HEAD)</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a>                                            SetPageError(page)</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a>                                            mapping_set_error(page-&gt;mapping, -EIO)</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true"></a>                                            <span class="cf">if</span> (bio-&gt;bi_status)</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true"></a>                                            <span class="co">// BUFFER_FNS(Write_EIO, write_io_error)</span></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true"></a>                                            set_buffer_write_io_error <span class="co">// 解决方案</span></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true"></a>                                            buffer_io_error <span class="co">// fs/ext4/page-io.c</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true"></a>                                              printk_ratelimited(KERN_ERR <span class="st">&quot;Buffer I/O error on device %pg, logical block %llu</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true"></a></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true"></a>task_work_run</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true"></a>  __cleanup_mnt</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true"></a>    cleanup_mnt</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true"></a>      deactivate_super</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true"></a>        deactivate_locked_super</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true"></a>          kill_block_super</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true"></a>            generic_shutdown_super</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true"></a>              evict_inodes</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true"></a>                dispose_list</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true"></a>                  evict</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true"></a>                    ext4_evict_inode</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true"></a>                      truncate_inode_pages_final</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true"></a>                        truncate_inode_pages</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true"></a>                          truncate_inode_pages_range</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true"></a>                            truncate_cleanup_folio</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true"></a>                              folio_invalidate</span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true"></a>                                ext4_journalled_invalidate_folio</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true"></a>                                  __ext4_journalled_invalidate_folio</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true"></a>                                    jbd2_journal_invalidate_folio</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true"></a>                                      journal_unmap_buffer</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true"></a>                                        <span class="co">// 如果 jbd2_journal_commit_transaction 没有执行过 set_bit(JBD2_CHECKPOINT_IO_ERROR,就在卸载时执行到这里</span></span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true"></a>                                        __jbd2_journal_remove_checkpoint</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true"></a>                                          <span class="cf">if</span> (buffer_write_io_error(bh))</span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true"></a>                                          set_bit(JBD2_CHECKPOINT_IO_ERROR, &amp;journal-&gt;j_atomic_flags)</span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true"></a>              ext4_put_super</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true"></a>                jbd2_journal_destroy</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true"></a>                  jbd2_log_do_checkpoint</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true"></a>                    jbd2_cleanup_journal_tail</span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true"></a>                      __jbd2_update_log_tail</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true"></a>                        jbd2_journal_update_sb_log_tail</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true"></a>                          <span class="cf">if</span> (test_bit(JBD2_CHECKPOINT_IO_ERROR, &amp;journal-&gt;j_atomic_flags)) {</span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true"></a>                          jbd2_journal_abort(journal, -EIO)</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true"></a>                ext4_abort(sb, -err, <span class="st">&quot;Couldn&#39;t clean up the journal&quot;</span>)</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true"></a></span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true"></a>kthread</span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true"></a>  kjournald2</span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true"></a>    jbd2_journal_commit_transaction</span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true"></a>      __jbd2_journal_clean_checkpoint_list</span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true"></a>        journal_clean_one_cp_list</span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true"></a>          __jbd2_journal_remove_checkpoint</span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true"></a>            <span class="cf">if</span> (buffer_write_io_error(bh))</span>
-<span id="cb5-74"><a href="#cb5-74" aria-hidden="true"></a>            set_bit(JBD2_CHECKPOINT_IO_ERROR, &amp;journal-&gt;j_atomic_flags)</span></code></pre></div>
+<p><a
+href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[home]#</span> fsck.ext4  <span class="at">-fn</span>  ram0yb</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">e2fsck</span> 1.45.6 <span class="er">(</span><span class="ex">20-Mar-2020</span><span class="kw">)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Pass</span> 1: Checking inodes, blocks, and sizes</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Pass</span> 2: Checking directory structure</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Symlink</span> /p3/d14/d1a/l3d <span class="er">(</span><span class="ex">inode</span> <span class="co">#3494) is invalid.</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Clear?</span> no</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Entry</span> <span class="st">&#39;l3d&#39;</span> in /p3/d14/d1a <span class="er">(</span><span class="ex">3383</span><span class="kw">)</span> <span class="ex">has</span> an incorrect filetype <span class="er">(</span><span class="ex">was</span> 7, should be 0<span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Fix?</span> no</span></code></pre></div>
+<h1 data-number="2" id="内核构造补丁"><span
+class="header-section-number">2</span> 内核构造补丁</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>From edd845db91cb201343ce26bf4827a08dec213dac Mon Sep <span class="dv">17</span> <span class="bn">00</span><span class="op">:</span><span class="bn">00</span><span class="op">:</span><span class="bn">00</span> <span class="dv">2001</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>From<span class="op">:</span> ChenXiaoSong <span class="op">&lt;</span>chenxiaosongemail@foxmail<span class="op">.</span>com<span class="op">&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Date<span class="op">:</span> Sun<span class="op">,</span> <span class="dv">1</span> May <span class="dv">2022</span> <span class="dv">18</span><span class="op">:</span><span class="dv">54</span><span class="op">:</span><span class="dv">12</span> <span class="op">+</span><span class="dv">0</span><span class="er">800</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>Subject<span class="op">:</span> <span class="op">[</span>PATCH<span class="op">]</span> reproduce symlink file size <span class="cf">do</span> not match to file content</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>Signed<span class="op">-</span>off<span class="op">-</span>by<span class="op">:</span> ChenXiaoSong <span class="op">&lt;</span>chenxiaosongemail@foxmail<span class="op">.</span>com<span class="op">&gt;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">---</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a> block<span class="op">/</span>blk<span class="op">-</span>core<span class="op">.</span>c       <span class="op">|</span> <span class="dv">34</span> <span class="op">+++++++++++++++++++++++++++++-----</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a> fs<span class="op">/</span>ext4<span class="op">/</span>ext4<span class="op">.</span>h         <span class="op">|</span>  <span class="dv">1</span> <span class="op">+</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a> fs<span class="op">/</span>ext4<span class="op">/</span>inode<span class="op">.</span>c        <span class="op">|</span>  <span class="dv">8</span> <span class="op">+++++++-</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a> fs<span class="op">/</span>ext4<span class="op">/</span>page<span class="op">-</span>io<span class="op">.</span>c      <span class="op">|</span> <span class="dv">18</span> <span class="op">+++++++++++++++---</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a> include<span class="op">/</span>linux<span class="op">/</span>bio<span class="op">.</span>h    <span class="op">|</span>  <span class="dv">1</span> <span class="op">+</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a> include<span class="op">/</span>linux<span class="op">/</span>blkdev<span class="op">.</span>h <span class="op">|</span>  <span class="dv">1</span> <span class="op">+</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a> <span class="dv">6</span> files changed<span class="op">,</span> <span class="dv">54</span> insertions<span class="op">(+),</span> <span class="dv">9</span> deletions<span class="op">(-)</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>diff <span class="op">--</span>git a<span class="op">/</span>block<span class="op">/</span>blk<span class="op">-</span>core<span class="op">.</span>c b<span class="op">/</span>block<span class="op">/</span>blk<span class="op">-</span>core<span class="op">.</span>c</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>index <span class="dv">937</span><span class="er">bb6b86331..40979511c0cf</span> <span class="dv">100644</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>block<span class="op">/</span>blk<span class="op">-</span>core<span class="op">.</span>c</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>block<span class="op">/</span>blk<span class="op">-</span>core<span class="op">.</span>c</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">771</span><span class="op">,</span><span class="dv">7</span> <span class="op">+</span><span class="dv">771</span><span class="op">,</span><span class="dv">7</span> @@ <span class="dt">void</span> submit_bio_noacct_nocheck<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">)</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span> systems and other upper level users of the block layer should use</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span> submit_bio<span class="op">()</span> instead<span class="op">.</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="op">*/</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="op">-</span><span class="dt">void</span> submit_bio_noacct<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">)</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="op">+</span><span class="dt">void</span> origin_submit_bio_noacct<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">,</span> <span class="dt">char</span> fault<span class="op">)</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a> <span class="op">{</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> block_device <span class="op">*</span>bdev <span class="op">=</span> bio<span class="op">-&gt;</span>bi_bdev<span class="op">;</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> request_queue <span class="op">*</span>q <span class="op">=</span> bdev_get_queue<span class="op">(</span>bdev<span class="op">);</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">791</span><span class="op">,</span><span class="dv">8</span> <span class="op">+</span><span class="dv">791</span><span class="op">,</span><span class="dv">10</span> @@ <span class="dt">void</span> submit_bio_noacct<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">)</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">((</span>bio<span class="op">-&gt;</span>bi_opf <span class="op">&amp;</span> REQ_NOWAIT<span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="op">!</span>blk_queue_nowait<span class="op">(</span>q<span class="op">))</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">goto</span> not_supported<span class="op">;</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="op">-</span>   <span class="cf">if</span> <span class="op">(</span>should_fail_bio<span class="op">(</span>bio<span class="op">))</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   <span class="cf">if</span> <span class="op">(</span>should_fail_bio<span class="op">(</span>bio<span class="op">)</span> <span class="op">||</span> fault<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,inject fault,fault:</span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">,</span> fault<span class="op">);</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">goto</span> end_io<span class="op">;</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   <span class="op">}</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>unlikely<span class="op">(</span>bio_check_ro<span class="op">(</span>bio<span class="op">)))</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">goto</span> end_io<span class="op">;</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(!</span>bio_flagged<span class="op">(</span>bio<span class="op">,</span> BIO_REMAPPED<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">873</span><span class="op">,</span><span class="dv">8</span> <span class="op">+</span><span class="dv">875</span><span class="op">,</span><span class="dv">19</span> @@ <span class="dt">void</span> submit_bio_noacct<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">)</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    bio<span class="op">-&gt;</span>bi_status <span class="op">=</span> status<span class="op">;</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    bio_endio<span class="op">(</span>bio<span class="op">);</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a> <span class="op">}</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="op">+</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="op">+</span><span class="dt">void</span> submit_bio_noacct<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">)</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="op">+{</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   origin_submit_bio_noacct<span class="op">(</span>bio<span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="op">+}</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a> EXPORT_SYMBOL<span class="op">(</span>submit_bio_noacct<span class="op">);</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="op">+</span><span class="dt">void</span> submit_bio_noacct2<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">,</span> <span class="dt">char</span> fault<span class="op">)</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="op">+{</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   origin_submit_bio_noacct<span class="op">(</span>bio<span class="op">,</span> fault<span class="op">);</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="op">+}</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>EXPORT_SYMBOL<span class="op">(</span>submit_bio_noacct2<span class="op">);</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="op">+</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a> <span class="co">/**</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a><span class="co">  * submit_bio - submit a bio to the block device layer for I/O</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="co">  * </span><span class="an">@bio:</span><span class="co"> The &amp;struct bio which describes the I/O</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a><span class="sc">@@</span><span class="co"> -888,7 +901,7 </span><span class="sc">@@</span><span class="co"> EXPORT_SYMBOL(submit_bio_noacct);</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="co">  * in </span><span class="an">@bio.</span><span class="co">  The bio must NOT be touched by thecaller until -&gt;bi_end_io() has</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="co">  * been called.</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="co">  */</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="op">-</span><span class="dt">void</span> submit_bio<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">)</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="op">+</span><span class="dt">void</span> origin_submit_bio<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">,</span> <span class="dt">char</span> fault<span class="op">)</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a> <span class="op">{</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>blkcg_punt_bio_submit<span class="op">(</span>bio<span class="op">))</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">919</span><span class="op">,</span><span class="dv">15</span> <span class="op">+</span><span class="dv">932</span><span class="op">,</span><span class="dv">26</span> @@ <span class="dt">void</span> submit_bio<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">)</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        <span class="dt">unsigned</span> <span class="dt">long</span> pflags<span class="op">;</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>        psi_memstall_enter<span class="op">(&amp;</span>pflags<span class="op">);</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a><span class="op">-</span>       submit_bio_noacct<span class="op">(</span>bio<span class="op">);</span></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       submit_bio_noacct2<span class="op">(</span>bio<span class="op">,</span> fault<span class="op">);</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>        psi_memstall_leave<span class="op">(&amp;</span>pflags<span class="op">);</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a><span class="op">-</span>   submit_bio_noacct<span class="op">(</span>bio<span class="op">);</span></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   submit_bio_noacct2<span class="op">(</span>bio<span class="op">,</span> fault<span class="op">);</span></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a><span class="op">+}</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a><span class="op">+</span></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a><span class="op">+</span><span class="dt">void</span> submit_bio<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">)</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a><span class="op">+{</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   origin_submit_bio<span class="op">(</span>bio<span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a> <span class="op">}</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a> EXPORT_SYMBOL<span class="op">(</span>submit_bio<span class="op">);</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a><span class="op">+</span><span class="dt">void</span> submit_bio2<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">,</span> <span class="dt">char</span> fault<span class="op">)</span></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="op">+{</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   origin_submit_bio<span class="op">(</span>bio<span class="op">,</span> fault<span class="op">);</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a><span class="op">+}</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>EXPORT_SYMBOL<span class="op">(</span>submit_bio2<span class="op">);</span></span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a><span class="op">+</span></span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a> <span class="co">/**</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a><span class="co">  * bio_poll - poll for BIO completions</span></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a><span class="co">  * </span><span class="an">@bio:</span><span class="co"> bio to poll for</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a><span class="co">diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a><span class="co">index 3f87cca49f0c..375bf9eefab8 100644</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a><span class="co">--- a/fs/ext4/ext4.h</span></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a><span class="co">+++ b/fs/ext4/ext4.h</span></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a><span class="sc">@@</span><span class="co"> -3793,6 +3793,7 </span><span class="sc">@@</span><span class="co"> extern void ext4_io_submit_init(struct ext4_io_submit *io,</span></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a><span class="co">                struct writeback_control *wbc);</span></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a><span class="co"> extern void ext4_end_io_rsv_work(struct work_struct *work);</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a><span class="co"> extern void ext4_io_submit(struct ext4_io_submit *io);</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a><span class="co">+extern void ext4_io_submit2(struct ext4_io_submit *io, char fault);</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a><span class="co"> extern int ext4_bio_write_page(struct ext4_io_submit *io,</span></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a><span class="co">                   struct page *page,</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a><span class="co">                   int len,</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a><span class="co">diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c</span></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a><span class="co">index 1ce13f69fbec..0c4c061fc59c 100644</span></span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a><span class="co">--- a/fs/ext4/inode.c</span></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a><span class="co">+++ b/fs/ext4/inode.c</span></span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a><span class="sc">@@</span><span class="co"> -1979,6 +1979,7 </span><span class="sc">@@</span><span class="co"> static int ext4_writepage(struct page *page,</span></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a><span class="co">    struct inode *inode = page-&gt;mapping-&gt;host;</span></span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a><span class="co">    struct ext4_io_submit io_submit;</span></span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a><span class="co">    bool keep_towrite = false;</span></span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a><span class="co">+   int fault = 0;</span></span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a><span class="co"> </span></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a><span class="co">    if (unlikely(ext4_forced_shutdown(EXT4_SB(inode-&gt;i_sb)))) {</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a><span class="co">        folio_invalidate(folio, 0, folio_size(folio));</span></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a><span class="sc">@@</span><span class="co"> -2054,7 +2055,12 </span><span class="sc">@@</span><span class="co"> static int ext4_writepage(struct page *page,</span></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a><span class="co">        return -ENOMEM;</span></span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a><span class="co">    }</span></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a><span class="co">    ret = ext4_bio_write_page(&amp;io_submit, page, len, keep_towrite);</span></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a><span class="co">-   ext4_io_submit(&amp;io_submit);</span></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a><span class="co">+   if (io_submit.io_bio &amp;&amp; page-&gt;mapping &amp;&amp; page-&gt;mapping-&gt;host &amp;&amp;</span></span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a><span class="co">+       S_ISLNK(page-&gt;mapping-&gt;host-&gt;i_mode)) {</span></span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a><span class="co">+       printk(&quot;%s:%d,inject fault,inode num:%ld</span><span class="an">\n&quot;,</span><span class="co"> __func__, __LINE__, page-&gt;mapping-&gt;host-&gt;i_ino);</span></span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a><span class="co">+       fault = 1;</span></span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a><span class="co">+   }</span></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a><span class="co">+   ext4_io_submit2(&amp;io_submit, fault);</span></span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a><span class="co">    /* Drop io_end reference we got from init */</span></span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>    ext4_put_io_end_defer<span class="op">(</span>io_submit<span class="op">.</span>io_end<span class="op">);</span></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ret<span class="op">;</span></span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>diff <span class="op">--</span>git a<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>page<span class="op">-</span>io<span class="op">.</span>c b<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>page<span class="op">-</span>io<span class="op">.</span>c</span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>index <span class="dv">495</span><span class="er">ce59fb4ad..8e1b367ac002</span> <span class="dv">100644</span></span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>page<span class="op">-</span>io<span class="op">.</span>c</span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>page<span class="op">-</span>io<span class="op">.</span>c</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">134</span><span class="op">,</span><span class="dv">8</span> <span class="op">+</span><span class="dv">134</span><span class="op">,</span><span class="dv">10</span> @@ <span class="dt">static</span> <span class="dt">void</span> ext4_finish_bio<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">)</span></span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span><span class="op">;</span></span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>            clear_buffer_async_write<span class="op">(</span>bh<span class="op">);</span></span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a><span class="op">-</span>           <span class="cf">if</span> <span class="op">(</span>bio<span class="op">-&gt;</span>bi_status<span class="op">)</span></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>           <span class="cf">if</span> <span class="op">(</span>bio<span class="op">-&gt;</span>bi_status<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>               <span class="co">// set_buffer_write_io_error(bh);</span></span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>                buffer_io_error<span class="op">(</span>bh<span class="op">);</span></span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>           <span class="op">}</span></span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span> <span class="cf">while</span> <span class="op">((</span>bh <span class="op">=</span> bh<span class="op">-&gt;</span>b_this_page<span class="op">)</span> <span class="op">!=</span> head<span class="op">);</span></span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a>        spin_unlock_irqrestore<span class="op">(&amp;</span>head<span class="op">-&gt;</span>b_uptodate_lock<span class="op">,</span> flags<span class="op">);</span></span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(!</span>under_io<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">366</span><span class="op">,</span><span class="dv">18</span> <span class="op">+</span><span class="dv">368</span><span class="op">,</span><span class="dv">28</span> @@ <span class="dt">static</span> <span class="dt">void</span> ext4_end_bio<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">)</span></span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a> <span class="op">}</span></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a><span class="op">-</span><span class="dt">void</span> ext4_io_submit<span class="op">(</span><span class="kw">struct</span> ext4_io_submit <span class="op">*</span>io<span class="op">)</span></span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a><span class="op">+</span><span class="dt">void</span> origin_ext4_io_submit<span class="op">(</span><span class="kw">struct</span> ext4_io_submit <span class="op">*</span>io<span class="op">,</span> <span class="dt">char</span> fault<span class="op">)</span></span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a> <span class="op">{</span></span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> bio <span class="op">*</span>bio <span class="op">=</span> io<span class="op">-&gt;</span>io_bio<span class="op">;</span></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>bio<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>io<span class="op">-&gt;</span>io_wbc<span class="op">-&gt;</span>sync_mode <span class="op">==</span> WB_SYNC_ALL<span class="op">)</span></span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>            io<span class="op">-&gt;</span>io_bio<span class="op">-&gt;</span>bi_opf <span class="op">|=</span> REQ_SYNC<span class="op">;</span></span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a><span class="op">-</span>       submit_bio<span class="op">(</span>io<span class="op">-&gt;</span>io_bio<span class="op">);</span></span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>       submit_bio2<span class="op">(</span>io<span class="op">-&gt;</span>io_bio<span class="op">,</span> fault<span class="op">);</span></span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>    io<span class="op">-&gt;</span>io_bio <span class="op">=</span> NULL<span class="op">;</span></span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a> <span class="op">}</span></span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a><span class="op">+</span><span class="dt">void</span> ext4_io_submit<span class="op">(</span><span class="kw">struct</span> ext4_io_submit <span class="op">*</span>io<span class="op">)</span></span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a><span class="op">+{</span></span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   origin_ext4_io_submit<span class="op">(</span>io<span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a><span class="op">+}</span></span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a><span class="op">+</span></span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a><span class="op">+</span><span class="dt">void</span> ext4_io_submit2<span class="op">(</span><span class="kw">struct</span> ext4_io_submit <span class="op">*</span>io<span class="op">,</span> <span class="dt">char</span> fault<span class="op">)</span></span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a><span class="op">+{</span></span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   origin_ext4_io_submit<span class="op">(</span>io<span class="op">,</span> fault<span class="op">);</span></span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a><span class="op">+}</span></span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a><span class="op">+</span></span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a> <span class="dt">void</span> ext4_io_submit_init<span class="op">(</span><span class="kw">struct</span> ext4_io_submit <span class="op">*</span>io<span class="op">,</span></span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>             <span class="kw">struct</span> writeback_control <span class="op">*</span>wbc<span class="op">)</span></span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a> <span class="op">{</span></span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>diff <span class="op">--</span>git a<span class="op">/</span>include<span class="op">/</span>linux<span class="op">/</span>bio<span class="op">.</span>h b<span class="op">/</span>include<span class="op">/</span>linux<span class="op">/</span>bio<span class="op">.</span>h</span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>index <span class="dv">278</span><span class="er">cc81cc1e7..e102c4afbf70</span> <span class="dv">100644</span></span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>include<span class="op">/</span>linux<span class="op">/</span>bio<span class="op">.</span>h</span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>include<span class="op">/</span>linux<span class="op">/</span>bio<span class="op">.</span>h</span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">424</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">424</span><span class="op">,</span><span class="dv">7</span> @@ <span class="dt">static</span> <span class="kw">inline</span> <span class="kw">struct</span> bio <span class="op">*</span>bio_alloc<span class="op">(</span><span class="kw">struct</span> block_device <span class="op">*</span>bdev<span class="op">,</span></span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a> <span class="op">}</span></span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a> <span class="dt">void</span> submit_bio<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">);</span></span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a><span class="op">+</span><span class="dt">void</span> submit_bio2<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">,</span> <span class="dt">char</span> fault<span class="op">);</span></span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a> <span class="kw">extern</span> <span class="dt">void</span> bio_endio<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*);</span></span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>diff <span class="op">--</span>git a<span class="op">/</span>include<span class="op">/</span>linux<span class="op">/</span>blkdev<span class="op">.</span>h b<span class="op">/</span>include<span class="op">/</span>linux<span class="op">/</span>blkdev<span class="op">.</span>h</span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a>index <span class="dv">60</span><span class="er">d016138997..e46f41c3e9a2</span> <span class="dv">100644</span></span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>include<span class="op">/</span>linux<span class="op">/</span>blkdev<span class="op">.</span>h</span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>include<span class="op">/</span>linux<span class="op">/</span>blkdev<span class="op">.</span>h</span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">860</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">860</span><span class="op">,</span><span class="dv">7</span> @@ <span class="dt">void</span> blk_request_module<span class="op">(</span>dev_t devt<span class="op">);</span></span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a> <span class="kw">extern</span> <span class="dt">int</span> blk_register_queue<span class="op">(</span><span class="kw">struct</span> gendisk <span class="op">*</span>disk<span class="op">);</span></span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a> <span class="kw">extern</span> <span class="dt">void</span> blk_unregister_queue<span class="op">(</span><span class="kw">struct</span> gendisk <span class="op">*</span>disk<span class="op">);</span></span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a> <span class="dt">void</span> submit_bio_noacct<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">);</span></span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a><span class="op">+</span><span class="dt">void</span> submit_bio_noacct2<span class="op">(</span><span class="kw">struct</span> bio <span class="op">*</span>bio<span class="op">,</span> <span class="dt">char</span> fault<span class="op">);</span></span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a> <span class="kw">extern</span> <span class="dt">int</span> blk_lld_busy<span class="op">(</span><span class="kw">struct</span> request_queue <span class="op">*</span>q<span class="op">);</span></span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a> <span class="kw">extern</span> <span class="dt">void</span> blk_queue_split<span class="op">(</span><span class="kw">struct</span> bio <span class="op">**);</span></span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a><span class="op">--</span> </span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a><span class="fl">2.25</span><span class="er">.1</span></span></code></pre></div>
+<h1 data-number="3" id="修复补丁合入之前的现象"><span
+class="header-section-number">3</span> 修复补丁合入之前的现象</h1>
+<p>修复补丁: <a
+href="https://lore.kernel.org/all/20220321144438.201685-1-yebin10@huawei.com/"><code>a2b0b205d125 ext4: fix symlink file size not match to file content</code></a></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext4</span> <span class="at">-E</span> lazy_itable_init=0,lazy_journal_init=0 <span class="at">-b</span> 4096 <span class="at">-F</span> /dev/sda</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> /dev/sda /mnt</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 路径名大于60个字符</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> 1234567890123456789012345678901234567890123456789012345678901234567890 /mnt/link</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ln -s abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz /mnt/link</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># [   30.532593] ext4_writepage:2059,inject fault,inode num:12,fault:0</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># [   30.533290] submit_bio_noacct:795,inject fault,fault:88</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># [   30.533874] EXT4-fs warning (device sda): ext4_end_bio:341: I/O error 10 writing to inode 12 starting block 1847)</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># [   30.534963] Buffer I/O error on device sda, logical block 1847</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> /dev/sda /mnt</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-lh</span> /mnt <span class="co"># 重新挂载后, symlink 内容错误</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># lrwxrwxrwx. 1 root root  78 May  1 19:18 link -&gt; 1234567890123456789012345678901234567890123456789012345678901234567890</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 在物理机上执行</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="ex">fsck.ext4</span> <span class="at">-fn</span> 1 <span class="co"># 文件 1 是对应虚拟机中 /dev/sda 的物理机文件</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># e2fsck 1.45.5 (07-Jan-2020)</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 1: recovering journal</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Pass 1: Checking inodes, blocks, and sizes</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Pass 2: Checking directory structure</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Pass 3: Checking directory connectivity</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Pass 4: Checking reference counts</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Pass 5: Checking group summary information</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 1: 12/25600 files (8.3% non-contiguous), 1848/25600 blocks</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$?</span> <span class="co"># 0</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="ex">debugfs</span> 1</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="ex">debugfs:</span>  stat <span class="op">&lt;</span>12<span class="op">&gt;</span> # Symlink /link <span class="er">(</span><span class="ex">inode</span> <span class="co">#12) is invalid.</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co"># (0):1847</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="ex">debugfs:</span>  bd 1847</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co"># 0000  3132 3334 3536 3738 3930 3132 3334 3536  1234567890123456</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co"># 0020  3738 3930 3132 3334 3536 3738 3930 3132  7890123456789012</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 0040  3334 3536 3738 3930 3132 3334 3536 3738  3456789012345678</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co"># 0060  3930 3132 3334 3536 3738 3930 3132 3334  9012345678901234</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co"># 0100  3536 3738 3930 0000 0000 0000 0000 0000  567890..........</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co"># 0120  0000 0000 0000 0000 0000 0000 0000 0000  ................</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="co"># *</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="ex">debugfs:</span>  logdump <span class="at">-S</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal features:         journal_64bit</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal size:             4096k</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal length:           1024</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal sequence:         0x00000004</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal start:            0</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal starts at block 0, transaction 4</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="co"># 删除链接文件</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="ex">fsck.ext4</span> <span class="at">-fy</span> 1 <span class="co"># 文件 1 是对应虚拟机中 /dev/sda 的物理机文件</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="co"># e2fsck 1.45.5 (07-Jan-2020)</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="co"># Pass 1: Checking inodes, blocks, and sizes</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Pass 2: Checking directory structure</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Symlink /link (inode #12) is invalid.</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Clear? yes</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Pass 3: Checking directory connectivity</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Pass 4: Checking reference counts</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="co"># Pass 5: Checking group summary information</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="co"># 1: ***** FILE SYSTEM WAS MODIFIED *****</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="co"># 1: 11/25600 files (9.1% non-contiguous), 1846/25600 blocks</span></span></code></pre></div>
+<h1 data-number="4" id="修复补丁合入之后的现象"><span
+class="header-section-number">4</span> 修复补丁合入之后的现象</h1>
+<p>修复补丁: <a
+href="https://lore.kernel.org/all/20220321144438.201685-1-yebin10@huawei.com/">a2b0b205d125
+ext4: fix symlink file size not match to file content</a></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext4</span> <span class="at">-E</span> lazy_itable_init=0,lazy_journal_init=0 <span class="at">-b</span> 4096 <span class="at">-F</span> /dev/sda </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> /dev/sda /mnt </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> 1234567890123456789012345678901234567890123456789012345678901234567890 /mnt/link</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># [   47.614676] ext4_writepage:2060,inject fault,inode num:12</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># [   47.615308] origin_submit_bio_noacct:795,inject fault,fault:1</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># [   47.615936] EXT4-fs warning (device sda): ext4_end_bio:343: I/O error 10 writing to inode 12 starting block 1847)</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># [   47.617037] Buffer I/O error on device sda, logical block 1847</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># [   47.622963] Aborting journal on device sda-8.</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># [   47.624524] EXT4-fs error (device sda): ext4_put_super:1221: comm umount: Couldn&#39;t clean up the journal</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># [   47.627310] EXT4-fs (sda): Remounting filesystem read-only</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ex">debugfs:</span>  logdump <span class="at">-S</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal features:         journal_64bit</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal size:             4096k</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal length:           1024</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal sequence:         0x00000002</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal start:            1</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal errno:            -5</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Journal starts at block 1, transaction 2</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Found expected sequence 2, type 1 (descriptor block) at block 1</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Found expected sequence 2, type 2 (commit block) at block 10</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co"># No magic number at block 11: end of journal.</span></span></code></pre></div>
+<h1 data-number="5" id="代码流程"><span
+class="header-section-number">5</span> 代码流程</h1>
+<p>修复补丁: <a
+href="https://lore.kernel.org/all/20220321144438.201685-1-yebin10@huawei.com/">a2b0b205d125
+ext4: fix symlink file size not match to file content</a></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>kthread</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  worker_thread</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    process_one_work</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      wb_workfn</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        wb_do_writeback</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>          wb_check_start_all</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            wb_writeback</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>              __writeback_inodes_wb</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                writeback_sb_inodes</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                  __writeback_single_inode</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                    do_writepages</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                      ext4_writepages</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                        generic_writepages</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                          write_cache_pages</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                            __writepage</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                              ext4_writepage</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                                ext4_io_submit</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                                  submit_bio</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                                    submit_bio_noacct</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>                                      bio_endio</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>                                        ext4_end_bio</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>                                          ext4_finish_bio</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>                                            <span class="cf">if</span> <span class="op">(</span>bio<span class="op">-&gt;</span>bi_status<span class="op">)</span> <span class="op">{</span> </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>                                            <span class="co">// PAGEFLAG(Dirty, dirty, PF_HEAD)</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>                                            SetPageError<span class="op">(</span>page<span class="op">)</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>                                            mapping_set_error<span class="op">(</span>page<span class="op">-&gt;</span>mapping<span class="op">,</span> <span class="op">-</span>EIO<span class="op">)</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>                                            <span class="cf">if</span> <span class="op">(</span>bio<span class="op">-&gt;</span>bi_status<span class="op">)</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>                                            <span class="co">// BUFFER_FNS(Write_EIO, write_io_error)</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>                                            set_buffer_write_io_error <span class="co">// 解决方案</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>                                            buffer_io_error <span class="co">// fs/ext4/page-io.c</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>                                              printk_ratelimited<span class="op">(</span>KERN_ERR <span class="st">&quot;Buffer I/O error on device </span><span class="sc">%p</span><span class="st">g, logical block </span><span class="sc">%llu\n</span><span class="st">&quot;</span><span class="op">,</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>task_work_run</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  __cleanup_mnt</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    cleanup_mnt</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>      deactivate_super</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        deactivate_locked_super</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>          kill_block_super</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>            generic_shutdown_super</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>              evict_inodes</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>                dispose_list</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>                  evict</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>                    ext4_evict_inode</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>                      truncate_inode_pages_final</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>                        truncate_inode_pages</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>                          truncate_inode_pages_range</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>                            truncate_cleanup_folio</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>                              folio_invalidate</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>                                ext4_journalled_invalidate_folio</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>                                  __ext4_journalled_invalidate_folio</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>                                    jbd2_journal_invalidate_folio</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>                                      journal_unmap_buffer</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>                                        <span class="co">// 如果 jbd2_journal_commit_transaction 没有执行过 set_bit(JBD2_CHECKPOINT_IO_ERROR,就在卸载时执行到这里</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>                                        __jbd2_journal_remove_checkpoint</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>                                          <span class="cf">if</span> <span class="op">(</span>buffer_write_io_error<span class="op">(</span>bh<span class="op">))</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>                                          set_bit<span class="op">(</span>JBD2_CHECKPOINT_IO_ERROR<span class="op">,</span> <span class="op">&amp;</span>journal<span class="op">-&gt;</span>j_atomic_flags<span class="op">)</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>              ext4_put_super</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>                jbd2_journal_destroy</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>                  jbd2_log_do_checkpoint</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>                    jbd2_cleanup_journal_tail</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>                      __jbd2_update_log_tail</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>                        jbd2_journal_update_sb_log_tail</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>                          <span class="cf">if</span> <span class="op">(</span>test_bit<span class="op">(</span>JBD2_CHECKPOINT_IO_ERROR<span class="op">,</span> <span class="op">&amp;</span>journal<span class="op">-&gt;</span>j_atomic_flags<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>                          jbd2_journal_abort<span class="op">(</span>journal<span class="op">,</span> <span class="op">-</span>EIO<span class="op">)</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>                ext4_abort<span class="op">(</span>sb<span class="op">,</span> <span class="op">-</span>err<span class="op">,</span> <span class="st">&quot;Couldn&#39;t clean up the journal&quot;</span><span class="op">)</span></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>kthread</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>  kjournald2</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>    jbd2_journal_commit_transaction</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>      __jbd2_journal_clean_checkpoint_list</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>        journal_clean_one_cp_list</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>          __jbd2_journal_remove_checkpoint</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>buffer_write_io_error<span class="op">(</span>bh<span class="op">))</span></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>            set_bit<span class="op">(</span>JBD2_CHECKPOINT_IO_ERROR<span class="op">,</span> <span class="op">&amp;</span>journal<span class="op">-&gt;</span>j_atomic_flags<span class="op">)</span></span></code></pre></div>
 </body>
 </html>
