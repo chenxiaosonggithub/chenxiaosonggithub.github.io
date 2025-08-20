@@ -245,6 +245,8 @@ href="#cve-2024-53179-343d7fe6df9e-smb-client-fix-use-after-free-of-signing-key"
 id="toc-cve-2024-53179-343d7fe6df9e-smb-client-fix-use-after-free-of-signing-key"><span
 class="toc-section-number">23</span>
 <code>CVE-2024-53179 343d7fe6df9e smb: client: fix use-after-free of signing key</code></a></li>
+<li><a href="#cve-2025-22077" id="toc-cve-2025-22077"><span
+class="toc-section-number">24</span> CVE-2025-22077</a></li>
 </ul>
 </nav>
 <h1 data-number="1"
@@ -672,5 +674,16 @@ Enterprise Linux 8 内核4.18未修复</a></li>
 href="https://www.openeuler.org/en/security/cve/detail/?cveId=CVE-2024-53179&amp;packageName=kernel">openeuler4.19未修复</a></li>
 </ul>
 <p>只有在启用签名的场景下才会触发此漏洞，影响范围有限。</p>
+<h1 data-number="24" id="cve-2025-22077"><span
+class="header-section-number">24</span> CVE-2025-22077</h1>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">5b888c0b217d</span> Revert <span class="st">&quot;smb: client: Fix netns refcount imbalance causing leaks and use-after-free&quot;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="ex">95d2b9f693ff</span> Revert <span class="st">&quot;smb: client: fix TCP timers deadlock after rmmod&quot;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="ex">0bb2f7a1ad1f</span> net: Fix null-ptr-deref by sock_lock_init_class_and_name<span class="er">(</span><span class="kw">)</span> <span class="ex">and</span> rmmod.</span></code></pre></div>
+<p>万恶之源问题的修复补丁: <a
+href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=0bb2f7a1ad1f11d861f58e5ee5051c8974ff9569">0bb2f7a1ad1f
+net: Fix null-ptr-deref by sock_lock_init_class_and_name() and
+rmmod.</a>, <a
+href="https://lore.kernel.org/all/2025050125-CVE-2025-23143-6019@gregkh/">邮件列表</a></p>
 </body>
 </html>
