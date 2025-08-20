@@ -238,6 +238,7 @@ class="header-section-number">2</span> 调试</h1>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 924: if (!IS_ERR(server-&gt;client_acl))</span></span></code></pre></div>
 <h1 data-number="3" id="代码分析"><span
 class="header-section-number">3</span> 代码分析</h1>
+<p>进程<code>17310</code>在<code>lockd_up_net()</code>中发生错误，在<code>lockd_unregister_notifiers()</code>中一直休眠:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 进程 17310</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>nfs_init_server</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  nfs_start_lockd</span>
@@ -250,29 +251,30 @@ class="header-section-number">3</span> 代码分析</h1>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>          <span class="co">// 当前 nlm_ntf_refcnt 值为 1</span></span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>          wait_event<span class="op">(</span>nlm_ntf_wq<span class="op">,</span> atomic_read<span class="op">(&amp;</span>nlm_ntf_refcnt<span class="op">)</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        lockd_start_svc <span class="co">// nlm_ntf_refcnt增加，未执行到</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>          atomic_inc<span class="op">(&amp;</span>nlm_ntf_refcnt<span class="op">)</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">// 进程 65384</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>nfs_init_server</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  nfs_start_lockd</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    nlmclnt_init</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>      lockd_up</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        mutex_lock<span class="op">(&amp;</span>nlmsvc_mutex<span class="op">)</span> <span class="co">// 等待进程 17310 释放锁</span></span></code></pre></div>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>          atomic_inc<span class="op">(&amp;</span>nlm_ntf_refcnt<span class="op">)</span></span></code></pre></div>
+<p>进程
+<code>65384</code>以及其他执行到<code>nfs_init_server()</code>的进程都在<code>lockd_up()</code>中等待进程
+17310 释放锁:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 进程 65384</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>nfs_init_server</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  nfs_start_lockd</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    nlmclnt_init</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      lockd_up</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        mutex_lock<span class="op">(&amp;</span>nlmsvc_mutex<span class="op">)</span> <span class="co">// 等待进程 17310 释放锁</span></span></code></pre></div>
 <h1 data-number="4" id="补丁"><span
 class="header-section-number">4</span> 补丁</h1>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">2018-10-22</span> 84df9525b0c2 Linux 4.19 Greg Kroah-Hartman <span class="op">&lt;</span>gregkh@linuxfoundation.org<span class="op">&gt;</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nlm_ntf_refcnt</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nlm_ntf_wq</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2021-12-13 5a8a7ff57421 lockd: simplify management of network status notifiers NeilBrown &lt;neilb@suse.de&gt;</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2018-03-19 554faf281988 lockd: make nlm_ntf_refcnt and nlm_ntf_wq static Colin Ian King &lt;colin.king@canonical.com&gt;</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>lockd_unregister_notifiers</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2017-11-07 dc3033e16c59 lockd: double unregister of inetaddr notifiers Vasily Averin &lt;vvs@virtuozzo.com&gt;</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>lockd_up</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2021-12-13 865b674069e0 lockd: introduce lockd_put() NeilBrown &lt;neilb@suse.de&gt;</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2021-12-13 b73a2972041b lockd: move lockd_start_svc() call into lockd_create_svc() NeilBrown &lt;neilb@suse.de&gt;</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2021-12-13 5a8a7ff57421 lockd: simplify management of network status notifiers NeilBrown &lt;neilb@suse.de&gt;</span></span></code></pre></div>
-<p>修复补丁集: <a
-href="https://chenxiaosong.com/course/nfs/patch/NFSD-Make-it-possible-to-use-svc_set_num_threads_syn.html"><code>[PATCH 00/20 v3] SUNRPC: clean up server thread management</code></a></p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">2018-10-22</span> 84df9525b0c2 Linux 4.19 Greg Kroah-Hartman <span class="op">&lt;</span>gregkh@linuxfoundation.org<span class="op">&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nlm_ntf_refcnt</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>nlm_ntf_wq</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2021-12-13 5a8a7ff57421 lockd: simplify management of network status notifiers NeilBrown &lt;neilb@suse.de&gt;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2018-03-19 554faf281988 lockd: make nlm_ntf_refcnt and nlm_ntf_wq static Colin Ian King &lt;colin.king@canonical.com&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>lockd_unregister_notifiers</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2017-11-07 dc3033e16c59 lockd: double unregister of inetaddr notifiers Vasily Averin &lt;vvs@virtuozzo.com&gt;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log origin/master <span class="at">--oneline</span> <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> <span class="at">--grep</span><span class="op">=</span>lockd_up</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2021-12-13 865b674069e0 lockd: introduce lockd_put() NeilBrown &lt;neilb@suse.de&gt;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2021-12-13 b73a2972041b lockd: move lockd_start_svc() call into lockd_create_svc() NeilBrown &lt;neilb@suse.de&gt;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2021-12-13 5a8a7ff57421 lockd: simplify management of network status notifiers NeilBrown &lt;neilb@suse.de&gt;</span></span></code></pre></div>
 </body>
 </html>
