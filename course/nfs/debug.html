@@ -133,6 +133,8 @@ class="toc-section-number">8</span> 调试脚本</a>
 class="toc-section-number">8.1</span> nfs client调试脚本</a></li>
 <li><a href="#server-script" id="toc-server-script"><span
 class="toc-section-number">8.2</span> nfs server调试脚本</a></li>
+<li><a href="#get-all_stack" id="toc-get-all_stack"><span
+class="toc-section-number">8.3</span> 获取所有线程的栈</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -374,5 +376,38 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#
 <span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /var/log/dmesg<span class="pp">*</span> <span class="va">${log_dir}</span></span>
 <span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="va">${cap_file}</span> <span class="va">${log_dir}</span></span>
 <span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;日志已保存到 </span><span class="va">${log_dir}</span><span class="st">/ 目录下&quot;</span></span></code></pre></div>
+<h2 data-number="8.3" id="get-all_stack"><span
+class="header-section-number">8.3</span> 获取所有线程的栈</h2>
+<p>用以下脚本保存所有线程的栈:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="va">output_file</span><span class="op">=</span>stacks.txt</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># grep_string=&quot;mount&quot; # 进程关键字</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># full_cmd_result=$(ps aux | grep &quot;${grep_string}&quot; | grep -v &quot;grep ${grep_string}&quot;) # 过滤关键字</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="va">full_cmd_result</span><span class="op">=</span><span class="va">$(</span><span class="fu">ps</span> aux <span class="kw">|</span> <span class="fu">sed</span> <span class="st">&#39;1d&#39;</span><span class="va">)</span> <span class="co"># 所有进程，输出要删除第一行标题行</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="va">pids</span><span class="op">=</span><span class="va">$(</span><span class="bu">echo</span> <span class="st">&quot;</span><span class="va">${full_cmd_result}</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $2}&#39;</span><span class="va">)</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="va">${output_file}</span> <span class="co"># 清空</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">-z</span> <span class="st">&quot;</span><span class="va">$pids</span><span class="st">&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;没有找到进程&quot;</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">exit</span> 0</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;找到以下进程：&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;</span><span class="va">${full_cmd_result}</span><span class="st">&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-e</span> <span class="st">&quot;\n获取进程栈信息：&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> pid <span class="kw">in</span> <span class="va">$pids</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">[</span> <span class="ot">-d</span> <span class="st">&quot;/proc/</span><span class="va">$pid</span><span class="st">&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 遍历该进程的所有线程</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> task <span class="kw">in</span> /proc/<span class="va">$pid</span>/task/<span class="pp">*</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>            <span class="va">tid</span><span class="op">=</span><span class="va">$(</span><span class="fu">basename</span> <span class="st">&quot;</span><span class="va">$task</span><span class="st">&quot;</span><span class="va">)</span>  <span class="co"># 提取线程ID</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>            <span class="bu">echo</span> <span class="at">-e</span> <span class="st">&quot;\n=============== 进程 </span><span class="va">$pid</span><span class="st"> 线程 </span><span class="va">$tid</span><span class="st"> </span><span class="va">$(</span><span class="bu">echo</span> <span class="at">-n</span> <span class="st">&quot;</span><span class="va">$(</span><span class="op">&lt;</span>/proc/<span class="va">$pid</span>/task/<span class="va">$tid</span>/comm<span class="va">)</span><span class="st">&quot;</span><span class="va">)</span><span class="st"> 栈信息 ===============&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sudo</span> cat /proc/<span class="va">$pid</span>/task/<span class="va">$tid</span>/stack <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>            <span class="bu">echo</span> <span class="st">&quot;=======================================================&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">done</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;进程 </span><span class="va">$pid</span><span class="st"> 已退出&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
 </body>
 </html>
