@@ -124,6 +124,8 @@ class="toc-section-number">2.2</span> 获取所有进程的栈</a></li>
 </ul></li>
 <li><a href="#代码分析" id="toc-代码分析"><span
 class="toc-section-number">3</span> 代码分析</a></li>
+<li><a href="#规避方案" id="toc-规避方案"><span
+class="toc-section-number">4</span> 规避方案</a></li>
 </ul>
 </nav>
 <p><a
@@ -215,8 +217,32 @@ class="header-section-number">3</span> 代码分析</h1>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                      down_write <span class="co">// 其他挂载点对应的同一超级块的锁已经被其他进程持有</span></span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>                    alloc_super <span class="co">// 只有挂载选项不同时，才会分配新的超级块</span></span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>nfs_parse_mount_options</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  mnt<span class="op">-&gt;</span>flags <span class="op">|=</span> NFS_MOUNT_SOFT<span class="op">;</span> <span class="co">// soft</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  mnt<span class="op">-&gt;</span>acregmin <span class="op">=</span> mnt<span class="op">-&gt;</span>acregmax <span class="op">=</span> mnt<span class="op">-&gt;</span>acdirmin <span class="op">=</span> mnt<span class="op">-&gt;</span>acdirmax <span class="op">=</span> option<span class="op">;</span> <span class="co">// actimeo</span></span></code></pre></div>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>wb_workfn</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  wb_writeback</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    __writeback_inodes_wb</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>      trylock_super<span class="op">(</span>sb<span class="op">)</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        down_read_trylock<span class="op">(&amp;</span>sb<span class="op">-&gt;</span>s_umount<span class="op">)</span> <span class="co">// 持有超级块写锁</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>      writeback_sb_inodes</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        __writeback_single_inode</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>          do_writepages</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>            nfs_writepages</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>              write_cache_pages</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>                nfs_writepages_callback</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>                  nfs_do_writepage</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>                    nfs_release_request</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>                      nfs_free_request</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>                        __put_nfs_open_context</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>                          dput</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>                            dentry_kill</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>                              __dentry_kill</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>                                evict</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>                                  inode_wait_for_writeback</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>nfs_parse_mount_options</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  mnt<span class="op">-&gt;</span>flags <span class="op">|=</span> NFS_MOUNT_SOFT<span class="op">;</span> <span class="co">// soft</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>  mnt<span class="op">-&gt;</span>acregmin <span class="op">=</span> mnt<span class="op">-&gt;</span>acregmax <span class="op">=</span> mnt<span class="op">-&gt;</span>acdirmin <span class="op">=</span> mnt<span class="op">-&gt;</span>acdirmax <span class="op">=</span> option<span class="op">;</span> <span class="co">// actimeo</span></span></code></pre></div>
+<h1 data-number="4" id="规避方案"><span
+class="header-section-number">4</span> 规避方案</h1>
+<p>默认选项值<code>acregmin=3,acregmax=60,acdirmin=30,acdirmax=60</code>，只需要更改其中一个选项，如<code>acdirmax=59</code>就能在挂载时生成新的超级块，从而挂载成功。</p>
 </body>
 </html>
