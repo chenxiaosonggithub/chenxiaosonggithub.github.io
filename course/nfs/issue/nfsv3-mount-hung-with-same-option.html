@@ -164,8 +164,9 @@ class="header-section-number">2.2</span> 获取所有进程的栈</h2>
 <p>脚本查看<a
 href="https://chenxiaosong.com/course/nfs/debug.html#get-all_stack">《nfs调试方法》</a>。</p>
 <p>vim删除某个重复的栈:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">:%s/\[</span><span class="op">&lt;</span>0<span class="op">&gt;</span><span class="dt">\]</span> grab_super+0x2b\/0x90\_.\{-}=======================================================//g</span></code></pre></div>
-<p>有以下可疑栈:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">:%s/\[</span><span class="op">&lt;</span>0<span class="op">&gt;</span><span class="dt">\]</span> grab_super+0x2b\/0x90\_.\{-}=======================================================//g</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">:%s/\[</span><span class="op">&lt;</span>0<span class="op">&gt;</span><span class="dt">\]</span> iterate_supers+0x7f\/0x100\_.\{-}=======================================================//g</span></code></pre></div>
+<p>找到以下可疑的nfs相关的栈:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">===============</span> 进程 1232699 线程 1232699 kworker/u256:0+flush-0:48 栈信息 ===============</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] inode_wait_for_writeback+0x21/0x30</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] evict+0xbc/0x1a0</span>
