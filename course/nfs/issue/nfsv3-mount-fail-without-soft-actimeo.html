@@ -192,6 +192,7 @@ href="https://chenxiaosong.com/course/nfs/debug.html#get-all_stack">《nfs调试
 <span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="ex">=======================================================</span></span></code></pre></div>
 <h1 data-number="3" id="代码分析"><span
 class="header-section-number">3</span> 代码分析</h1>
+<p>在<code>sget_userns()</code>中，如果指定不一样的挂载选项时（比如加了<code>soft</code>），会生成新的超级块；而如果挂载选项和其他挂载点一样，就会尝试获取已有的超级块，但其他挂载点对应的同一超级块的锁已经被其他进程持有，所以就出现hung住的情况:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mount</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  ksys_mount</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    do_mount</span>
@@ -209,11 +210,12 @@ class="header-section-number">3</span> 代码分析</h1>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                          nfs_init_client</span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                nfs_fs_mount_common</span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                  sget_userns</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                    grab_super</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                      down_write</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>nfs_parse_mount_options</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  mnt<span class="op">-&gt;</span>flags <span class="op">|=</span> NFS_MOUNT_SOFT<span class="op">;</span> <span class="co">// soft</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  mnt<span class="op">-&gt;</span>acregmin <span class="op">=</span> mnt<span class="op">-&gt;</span>acregmax <span class="op">=</span> mnt<span class="op">-&gt;</span>acdirmin <span class="op">=</span> mnt<span class="op">-&gt;</span>acdirmax <span class="op">=</span> option<span class="op">;</span> <span class="co">// actimeo</span></span></code></pre></div>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                    grab_super <span class="co">// 当挂载选项一样时，尝试获取已有的超级块</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                      down_write <span class="co">// 其他挂载点对应的同一超级块的锁已经被其他进程持有</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>                    alloc_super <span class="co">// 只有挂载选项不同时，才会分配新的超级块</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>nfs_parse_mount_options</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  mnt<span class="op">-&gt;</span>flags <span class="op">|=</span> NFS_MOUNT_SOFT<span class="op">;</span> <span class="co">// soft</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  mnt<span class="op">-&gt;</span>acregmin <span class="op">=</span> mnt<span class="op">-&gt;</span>acregmax <span class="op">=</span> mnt<span class="op">-&gt;</span>acdirmin <span class="op">=</span> mnt<span class="op">-&gt;</span>acdirmax <span class="op">=</span> option<span class="op">;</span> <span class="co">// actimeo</span></span></code></pre></div>
 </body>
 </html>
