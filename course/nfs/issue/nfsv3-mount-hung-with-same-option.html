@@ -221,7 +221,7 @@ class="header-section-number">3</span> 代码分析</h1>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  wb_writeback</span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    __writeback_inodes_wb</span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>      trylock_super<span class="op">(</span>sb<span class="op">)</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        down_read_trylock<span class="op">(&amp;</span>sb<span class="op">-&gt;</span>s_umount<span class="op">)</span> <span class="co">// 持有超级块写锁</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        down_read_trylock<span class="op">(&amp;</span>sb<span class="op">-&gt;</span>s_umount<span class="op">)</span> <span class="co">// 持有超级块读锁</span></span>
 <span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>      writeback_sb_inodes</span>
 <span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        __writeback_single_inode</span>
 <span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>          do_writepages</span>
