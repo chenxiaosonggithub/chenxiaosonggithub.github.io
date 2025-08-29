@@ -127,7 +127,13 @@ class="header-section-number">1</span> 问题描述</h1>
 <p>按以下步骤操作，报错<code>nfs: server 192.168.53.210 not responding, timed out</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=3,localaddrs=192.168.53.209~192.168.53.46,remoteaddrs=192.168.53.210~192.168.53.47 192.168.53.210:/tmp/s_test /mnt/</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">modprobe</span> <span class="at">-r</span> enfs</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">modprobe</span> enfs <span class="co"># 报错 nfs: server 192.168.53.210 not responding, timed out</span></span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">modprobe</span> enfs</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># nfs: server 10.42.43.92 not responding, timed out</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ...</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.209} remoteip{10.42.43.93} path state change from {1} to {2}.</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.46} remoteip{10.42.43.92} path state change from {1} to {2}.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.209} remoteip{10.42.43.92} path state change from {1} to {2}.</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.46} remoteip{10.42.43.93} path state change from {1} to {2}.</span></span></code></pre></div>
 <h1 data-number="2" id="代码分析"><span
 class="header-section-number">2</span> 代码分析</h1>
 <p>client端的null包的发送流程如下:</p>
