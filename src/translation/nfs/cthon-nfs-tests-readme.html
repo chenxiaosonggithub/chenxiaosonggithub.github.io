@@ -8,10 +8,19 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -21,38 +30,68 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">Connectathon NFS tests README</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#connectathon-nfs测试套件简介"><span class="toc-section-number">1</span> Connectathon NFS测试套件简介</a></li>
-<li><a href="#准备运行测试套件"><span class="toc-section-number">2</span> 准备运行测试套件</a></li>
-<li><a href="#如何运行测试套件"><span class="toc-section-number">3</span> 如何运行测试套件</a>
+<li><a href="#connectathon-nfs测试套件简介"
+id="toc-connectathon-nfs测试套件简介"><span
+class="toc-section-number">1</span> Connectathon
+NFS测试套件简介</a></li>
+<li><a href="#准备运行测试套件" id="toc-准备运行测试套件"><span
+class="toc-section-number">2</span> 准备运行测试套件</a></li>
+<li><a href="#如何运行测试套件" id="toc-如何运行测试套件"><span
+class="toc-section-number">3</span> 如何运行测试套件</a>
 <ul>
-<li><a href="#服务器脚本"><span class="toc-section-number">3.1</span> 服务器脚本</a></li>
-<li><a href="#自行运行测试"><span class="toc-section-number">3.2</span> 自行运行测试</a></li>
+<li><a href="#服务器脚本" id="toc-服务器脚本"><span
+class="toc-section-number">3.1</span> 服务器脚本</a></li>
+<li><a href="#自行运行测试" id="toc-自行运行测试"><span
+class="toc-section-number">3.2</span> 自行运行测试</a></li>
 </ul></li>
-<li><a href="#如何在connectathon运行测试套件"><span class="toc-section-number">4</span> 如何在Connectathon运行测试套件</a></li>
-<li><a href="#测试描述"><span class="toc-section-number">5</span> 测试描述</a>
+<li><a href="#如何在connectathon运行测试套件"
+id="toc-如何在connectathon运行测试套件"><span
+class="toc-section-number">4</span>
+如何在Connectathon运行测试套件</a></li>
+<li><a href="#测试描述" id="toc-测试描述"><span
+class="toc-section-number">5</span> 测试描述</a>
 <ul>
-<li><a href="#基本测试"><span class="toc-section-number">5.1</span> 基本测试</a></li>
-<li><a href="#general-用于测试服务器负载的一般测试"><span class="toc-section-number">5.2</span> GENERAL: 用于测试服务器负载的一般测试</a></li>
-<li><a href="#special-与特殊测试相关的信息"><span class="toc-section-number">5.3</span> SPECIAL: 与特殊测试相关的信息</a></li>
-<li><a href="#lock"><span class="toc-section-number">5.4</span> LOCK</a></li>
-<li><a href="#misc"><span class="toc-section-number">5.5</span> MISC</a></li>
+<li><a href="#基本测试" id="toc-基本测试"><span
+class="toc-section-number">5.1</span> 基本测试</a></li>
+<li><a href="#general-用于测试服务器负载的一般测试"
+id="toc-general-用于测试服务器负载的一般测试"><span
+class="toc-section-number">5.2</span> GENERAL:
+用于测试服务器负载的一般测试</a></li>
+<li><a href="#special-与特殊测试相关的信息"
+id="toc-special-与特殊测试相关的信息"><span
+class="toc-section-number">5.3</span> SPECIAL:
+与特殊测试相关的信息</a></li>
+<li><a href="#lock" id="toc-lock"><span
+class="toc-section-number">5.4</span> LOCK</a></li>
+<li><a href="#misc" id="toc-misc"><span
+class="toc-section-number">5.5</span> MISC</a></li>
 </ul></li>
 </ul>
 </nav>
-<p>本文档翻译自<a href="https://github.com/dkruchinin/cthon-nfs-tests/blob/master/README">dkruchinin/cthon-nfs-tests 的 README 文件</a>，翻译时文件的最新提交是<code>0acf9a75ebc467e9b2563b09f057aae297769d21 As published in 2004 on http://www.connectathon.org/nfstests.html</code>，大部分借助于ChatGPT，当然有一丢丢是经过了我的修改。仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
-<h1 data-number="1" id="connectathon-nfs测试套件简介"><span class="header-section-number">1</span> Connectathon NFS测试套件简介</h1>
+<p>本文档翻译自<a
+href="https://github.com/dkruchinin/cthon-nfs-tests/blob/master/README">dkruchinin/cthon-nfs-tests
+的 README
+文件</a>，翻译时文件的最新提交是<code>0acf9a75ebc467e9b2563b09f057aae297769d21 As published in 2004 on http://www.connectathon.org/nfstests.html</code>，大部分借助于ChatGPT，当然有一丢丢是经过了我的修改。仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<h1 data-number="1" id="connectathon-nfs测试套件简介"><span
+class="header-section-number">1</span> Connectathon NFS测试套件简介</h1>
 <pre><code>这些目录包含可用于测试NFS协议实现的程序。测试在UNIX客户端和测试服务器和客户端功能上运行（有关在DOS和Windows上运行的信息，请参见READWIN.txt）。测试分为三组:
 
     basic   - 基本文件系统操作测试
@@ -64,7 +103,8 @@
 
 此测试套件应该在BSD和基于System V的系统上运行。Connectathon测试套件的System V Release 3端口由Lachman Technology，Incorporated提供，地址为1901 N. Naper Blvd.,
 Naperville, IL.  60563。</code></pre>
-<h1 data-number="2" id="准备运行测试套件"><span class="header-section-number">2</span> 准备运行测试套件</h1>
+<h1 data-number="2" id="准备运行测试套件"><span
+class="header-section-number">2</span> 准备运行测试套件</h1>
 <pre><code>为了准备在您的计算机上运行测试套件，请更改到最高级别的测试套件目录（它应该与包含此README文件的目录相同），根据您所在的平台编辑tests.init，并键入“make”以编译测试程序。如果您不确定是否在正确的目录中，请键入“ls -CF”，您应该看到以下文件和目录:
 
 Makefile    basic/      lock/       tests.h
@@ -81,9 +121,11 @@ Makefiles中包含两个特殊目标: copy和dist。命令“make copy DESTDIR=&
 可能需要修改程序以便在您的计算机上进行编译。如果是这样，请告诉我们，以便我们可以将它们合并到我们的发布中。
 
 使用默认值时，测试程序期望服务器上存在目录/server。测试驱动程序将在客户端上使用目录/mnt/&#39;server_name&#39;，如果需要的话将首先创建它（其中&#39;server_name&#39;是您正在测试的服务器的名称）。这些默认值可以在运行时被覆盖。如何执行此操作的说明包含在下一部分中。</code></pre>
-<h1 data-number="3" id="如何运行测试套件"><span class="header-section-number">3</span> 如何运行测试套件</h1>
+<h1 data-number="3" id="如何运行测试套件"><span
+class="header-section-number">3</span> 如何运行测试套件</h1>
 <pre><code>有两种运行测试的方式: 使用服务器shell脚本或挂载、自行运行测试，然后卸载。我们建议您使用服务器脚本来运行测试。</code></pre>
-<h2 data-number="3.1" id="服务器脚本"><span class="header-section-number">3.1</span> 服务器脚本</h2>
+<h2 data-number="3.1" id="服务器脚本"><span
+class="header-section-number">3.1</span> 服务器脚本</h2>
 <pre><code>服务器脚本根据给定的选项执行一个或多个测试集（请参阅下文）。它被设置为挂载、使用runtests程序运行测试，然后卸载。在尝试挂载服务器文件系统之前，它将尝试卸载挂载点上的任何内容。如果测试失败，运行将被中止，并保留文件系统已挂载，以协助故障排除。
 
 服务器脚本使用domount程序挂载和卸载测试文件系统。由于只能由root执行挂载，domount必须具有root权限。Makefile将尝试将domount程序设置为root的setuid。服务器脚本可以作为非特权用户运行。或者，您可以在运行服务器之前以root身份登录。
@@ -119,7 +161,8 @@ eddie％server -o hard,intr,rw slartibartfarst
 eddie％
 
 有关更多详细信息，请参阅脚本。</code></pre>
-<h2 data-number="3.2" id="自行运行测试"><span class="header-section-number">3.2</span> 自行运行测试</h2>
+<h2 data-number="3.2" id="自行运行测试"><span
+class="header-section-number">3.2</span> 自行运行测试</h2>
 <pre><code>在最高级别目录（主runtests）中有一个runtest脚本，它使用tests.init设置测试环境，然后在基本、一般和/或特殊子目录中执行runtest脚本。
 
 runtests [-a|-b|-g|-s|-l] [-f|-n|-t] [-N numpasses] [test-directory]
@@ -140,7 +183,9 @@ test-directory - 测试程序在客户端上创建的测试目录的名称。run
 在将NFS服务器挂载到/mnt之前运行测试将在本地运行测试（如果/mnt是本地磁盘）。我们建议您在使用它们测试NFS之前执行此操作，以确保测试套件正常运行。
 
 基本目录、一般目录和特殊目录中的runtests可以使用与主runtests相同的参数进行调用，如果您希望分别运行每个测试套件。</code></pre>
-<h1 data-number="4" id="如何在connectathon运行测试套件"><span class="header-section-number">4</span> 如何在Connectathon运行测试套件</h1>
+<h1 data-number="4" id="如何在connectathon运行测试套件"><span
+class="header-section-number">4</span>
+如何在Connectathon运行测试套件</h1>
 <pre><code>应按以下顺序运行测试: basic、general和special。在尝试其他测试之前，应完全通过基本测试。
 
 NFS测试套件应分为三个阶段运行:
@@ -150,9 +195,11 @@ NFS测试套件应分为三个阶段运行:
 第二阶段 - 对Sun运行测试。在使用Sun作为服务器的情况下在您的机器上运行它们，然后在Sun上使用您的机器作为服务器运行它们。
 
 第三阶段 - NxN测试。在使用每台其他机器作为服务器的情况下在您的机器上运行测试，一次一台。在成功完成使用特定服务器的测试之后，请在提供的电子板软件上记录下来。检查电子板以确保测试在使用您的机器作为服务器的每台其他机器上都成功运行。</code></pre>
-<h1 data-number="5" id="测试描述"><span class="header-section-number">5</span> 测试描述</h1>
+<h1 data-number="5" id="测试描述"><span
+class="header-section-number">5</span> 测试描述</h1>
 <pre><code>在括号中包含了测试套件使用的系统和库调用。如果您对如何记录时间统计感兴趣，可以查看源代码，因为这里没有包含。</code></pre>
-<h2 data-number="5.1" id="基本测试"><span class="header-section-number">5.1</span> 基本测试</h2>
+<h2 data-number="5.1" id="基本测试"><span
+class="header-section-number">5.1</span> 基本测试</h2>
 <pre><code>下面列出的许多程序都有可选的调用参数，可以用来覆盖现有参数。目前没有使用这些参数，因此不予描述。
 
 test1: 文件和目录创建测试
@@ -312,9 +359,13 @@ test8: symlink和readlink
 test9: statfs
 
 此程序更改目录到测试目录（chdir和/或mkdir），并获取当前目录的文件系统状态（statfs）。对于-f选项，执行一次statfs。对于其他选项，执行1500次statfs。</code></pre>
-<h2 data-number="5.2" id="general-用于测试服务器负载的一般测试"><span class="header-section-number">5.2</span> GENERAL: 用于测试服务器负载的一般测试</h2>
+<h2 data-number="5.2" id="general-用于测试服务器负载的一般测试"><span
+class="header-section-number">5.2</span> GENERAL:
+用于测试服务器负载的一般测试</h2>
 <pre><code>运行小型编译、tbl、nroff、大型编译、四个同时运行的大型编译和make。</code></pre>
-<h2 data-number="5.3" id="special-与特殊测试相关的信息"><span class="header-section-number">5.3</span> SPECIAL: 与特殊测试相关的信息</h2>
+<h2 data-number="5.3" id="special-与特殊测试相关的信息"><span
+class="header-section-number">5.3</span> SPECIAL:
+与特殊测试相关的信息</h2>
 <pre><code>special目录设置为测试过去出现的特殊问题。这些测试旨在提供建议，注意事项。虽然不要求通过这些测试，但强烈建议这样做。
 
 这些测试尝试:
@@ -326,13 +377,15 @@ test9: statfs
     测试独占创建
     测试负偏移查找
     测试重命名</code></pre>
-<h2 data-number="5.4" id="lock"><span class="header-section-number">5.4</span> LOCK</h2>
+<h2 data-number="5.4" id="lock"><span
+class="header-section-number">5.4</span> LOCK</h2>
 <pre><code>lock目录包含一个测试程序，可用于测试内核文件和记录锁定功能。这是为了测试网络锁定管理器。
 
 测试程序包含13组锁定测试。它们测试基本的锁定功能。
 
 默认情况下，不测试强制锁定。通常不支持在NFS文件上进行强制锁定。</code></pre>
-<h2 data-number="5.5" id="misc"><span class="header-section-number">5.5</span> MISC</h2>
+<h2 data-number="5.5" id="misc"><span
+class="header-section-number">5.5</span> MISC</h2>
 <pre><code>&#39;Testitems&#39;是用于参考的NFS功能列表。
 
 在&#39;tools&#39;中提供的程序可根据需要自行使用。请随时添加到此目录（或任何其他目录）！如果这样做，请确保将其副本发送给Mike Kupfer &lt;mike.kupfer@sun.com&gt;，以便将其添加到主测试分发中。
@@ -343,52 +396,91 @@ test9: statfs
 有关在DOS或Windows下运行测试的信息，请参见READWIN.txt。</code></pre>
 <p>2004年的更改包括以下内容:</p>
 <ol type="1">
-<li><p>修复lock/tlock.c，以便在何时使用stdarg和何时使用varargs方面保持一致；由Samuel Sha <a href="mailto:sam@austin.ibm.com" class="email">sam@austin.ibm.com</a>报告。</p></li>
-<li><p>更改“make all”，使各种“runtests”脚本具有执行位设置；由Erik Deumens <a href="mailto:deumens@qtp.ufl.edu" class="email">deumens@qtp.ufl.edu</a>报告。</p></li>
-<li><p>从James Peach <a href="mailto:jpeach@sgi.com" class="email">jpeach@sgi.com</a>删除了一些lint。</p></li>
-<li><p>来自James Peach <a href="mailto:jpeach@sgi.com" class="email">jpeach@sgi.com</a>的Irix 6.5.19支持。</p></li>
-<li><p>“server”脚本现在导出MNTOPTIONS，以便可以检测到添加到“server”的选项。来自Chuck Lever <a href="mailto:Charles.Lever@netapp.com" class="email">Charles.Lever@netapp.com</a>。</p></li>
-<li><p>测试现在正确地检查了从mmap()返回的错误。来自David Robinson <a href="mailto:david.robinson@sun.com" class="email">david.robinson@sun.com</a>。</p></li>
-<li><p>来自Mike Mackovitch <a href="mailto:macko@apple.com" class="email">macko@apple.com</a>的MacOS X支持。</p></li>
-<li><p>对Linux的tests.init现在包括一个CC=行，以防您的发行版不包括“cc”。由Rodney Brown <a href="mailto:rodney@lehman.com" class="email">rodney@lehman.com</a>报告。</p></li>
-<li><p>来自Erik Deumens <a href="mailto:deumens@qtp.ufl.edu" class="email">deumens@qtp.ufl.edu</a>的AIX更改。</p></li>
-<li><p>来自Eric Werme <a href="mailto:werme@hp.com" class="email">werme@hp.com</a>的最新Tru64 Unix更改。</p></li>
-<li><p>一般测试在面对make(1)错误时应更加健壮。基于Chuck Lever <a href="mailto:Charles.Lever@netapp.com" class="email">Charles.Lever@netapp.com</a>的评论和Mike Mackovitch <a href="mailto:macko@apple.com" class="email">macko@apple.com</a>的补丁。</p></li>
-<li><p>用于基本测试的“make lint”目标现在包括subr.c。</p></li>
+<li><p>修复lock/tlock.c，以便在何时使用stdarg和何时使用varargs方面保持一致；由Samuel
+Sha <a href="mailto:sam@austin.ibm.com"
+class="email">sam@austin.ibm.com</a>报告。</p></li>
+<li><p>更改”make all”，使各种”runtests”脚本具有执行位设置；由Erik
+Deumens <a href="mailto:deumens@qtp.ufl.edu"
+class="email">deumens@qtp.ufl.edu</a>报告。</p></li>
+<li><p>从James Peach <a href="mailto:jpeach@sgi.com"
+class="email">jpeach@sgi.com</a>删除了一些lint。</p></li>
+<li><p>来自James Peach <a href="mailto:jpeach@sgi.com"
+class="email">jpeach@sgi.com</a>的Irix 6.5.19支持。</p></li>
+<li><p>“server”脚本现在导出MNTOPTIONS，以便可以检测到添加到”server”的选项。来自Chuck
+Lever <a href="mailto:Charles.Lever@netapp.com"
+class="email">Charles.Lever@netapp.com</a>。</p></li>
+<li><p>测试现在正确地检查了从mmap()返回的错误。来自David Robinson <a
+href="mailto:david.robinson@sun.com"
+class="email">david.robinson@sun.com</a>。</p></li>
+<li><p>来自Mike Mackovitch <a href="mailto:macko@apple.com"
+class="email">macko@apple.com</a>的MacOS X支持。</p></li>
+<li><p>对Linux的tests.init现在包括一个CC=行，以防您的发行版不包括”cc”。由Rodney
+Brown <a href="mailto:rodney@lehman.com"
+class="email">rodney@lehman.com</a>报告。</p></li>
+<li><p>来自Erik Deumens <a href="mailto:deumens@qtp.ufl.edu"
+class="email">deumens@qtp.ufl.edu</a>的AIX更改。</p></li>
+<li><p>来自Eric Werme <a href="mailto:werme@hp.com"
+class="email">werme@hp.com</a>的最新Tru64 Unix更改。</p></li>
+<li><p>一般测试在面对make(1)错误时应更加健壮。基于Chuck Lever <a
+href="mailto:Charles.Lever@netapp.com"
+class="email">Charles.Lever@netapp.com</a>的评论和Mike Mackovitch <a
+href="mailto:macko@apple.com"
+class="email">macko@apple.com</a>的补丁。</p></li>
+<li><p>用于基本测试的”make lint”目标现在包括subr.c。</p></li>
 <li><p>对special/bigfile2的改进:</p>
 <ul>
-<li>错误消息现在打印完整的低阶字（来自Mike Mackovitch <a href="mailto:macko@apple.com" class="email">macko@apple.com</a>。</li>
+<li>错误消息现在打印完整的低阶字（来自Mike Mackovitch <a
+href="mailto:macko@apple.com" class="email">macko@apple.com</a>。</li>
 <li>使用O_SYNC打开了测试文件，以便立即检测到问题。</li>
 </ul></li>
-<li><p>修复special/op_chmod，使其使用CHMOD_NONE而不是0。来自Pascal Schmidt <a href="mailto:der.eremit@email.de" class="email">der.eremit@email.de</a>。</p></li>
+<li><p>修复special/op_chmod，使其使用CHMOD_NONE而不是0。来自Pascal
+Schmidt <a href="mailto:der.eremit@email.de"
+class="email">der.eremit@email.de</a>。</p></li>
 </ol>
 <p>2003年的更改包括以下内容:</p>
 <ol type="1">
-<li><p>来自Brian Love <a href="mailto:blove@rlmsoftware.com" class="email">blove@rlmsoftware.com</a>和Brian McEntire <a href="mailto:brianm@fsg1.nws.noaa.gov" class="email">brianm@fsg1.nws.noaa.gov</a>的HPUX修复。</p></li>
-<li><p>基于<a href="mailto:saul@exanet.com" class="email">saul@exanet.com</a>的补丁的AIX支持。</p></li>
-<li><p>用于构建64位二进制文件的gcc命令行选项，来自Sergey Klyushin <a href="mailto:sergey.klyushin@hummingbird.com" class="email">sergey.klyushin@hummingbird.com</a>。</p></li>
-<li><p>现在服务器脚本的消息在测试失败后关于保留服务器挂载的清晰度稍有提高。感谢Vincent McIntyre <a href="mailto:Vince.McIntyre@atnf.csiro.au" class="email">Vince.McIntyre@atnf.csiro.au</a>的建议。</p></li>
-<li><p>锁定测试现在应该适用于NFS版本4和实施强制锁定的服务器。感谢Bill Baker <a href="mailto:bill.baker@sun.com" class="email">bill.baker@sun.com</a>的test12修复。</p></li>
-<li><p>一般测试已经修复，使用了测试附带的“stat”程序，而不是任何系统的“stat”程序。</p></li>
+<li><p>来自Brian Love <a href="mailto:blove@rlmsoftware.com"
+class="email">blove@rlmsoftware.com</a>和Brian McEntire <a
+href="mailto:brianm@fsg1.nws.noaa.gov"
+class="email">brianm@fsg1.nws.noaa.gov</a>的HPUX修复。</p></li>
+<li><p>基于<a href="mailto:saul@exanet.com"
+class="email">saul@exanet.com</a>的补丁的AIX支持。</p></li>
+<li><p>用于构建64位二进制文件的gcc命令行选项，来自Sergey Klyushin <a
+href="mailto:sergey.klyushin@hummingbird.com"
+class="email">sergey.klyushin@hummingbird.com</a>。</p></li>
+<li><p>现在服务器脚本的消息在测试失败后关于保留服务器挂载的清晰度稍有提高。感谢Vincent
+McIntyre <a href="mailto:Vince.McIntyre@atnf.csiro.au"
+class="email">Vince.McIntyre@atnf.csiro.au</a>的建议。</p></li>
+<li><p>锁定测试现在应该适用于NFS版本4和实施强制锁定的服务器。感谢Bill
+Baker <a href="mailto:bill.baker@sun.com"
+class="email">bill.baker@sun.com</a>的test12修复。</p></li>
+<li><p>一般测试已经修复，使用了测试附带的”stat”程序，而不是任何系统的”stat”程序。</p></li>
 </ol>
 <p>2002年的更改包括以下内容:</p>
 <ol type="1">
-<li><p>特殊测试更好地识别了何时指定了NFS版本2（基于Jay Weber <a href="mailto:jweber@mail.thatnet.net" class="email">jweber@mail.thatnet.net</a>的补丁）。</p></li>
-<li><p>根据Marty Johnson <a href="mailto:martyj@traakan.com" class="email">martyj@traakan.com</a>的补丁，修复*BSD系统的编译和运行时问题。</p></li>
+<li><p>特殊测试更好地识别了何时指定了NFS版本2（基于Jay Weber <a
+href="mailto:jweber@mail.thatnet.net"
+class="email">jweber@mail.thatnet.net</a>的补丁）。</p></li>
+<li><p>根据Marty Johnson <a href="mailto:martyj@traakan.com"
+class="email">martyj@traakan.com</a>的补丁，修复*BSD系统的编译和运行时问题。</p></li>
 <li><p>将默认本地挂载点从/mnt.’server_name’更改为/mnt/‘server_name’。这样，如果服务器死机或挂起，它更不太可能在客户端上引起操作问题。</p></li>
-<li><p>“server”脚本将尝试使用“mkdir -p”（如果可用）。</p></li>
+<li><p>“server”脚本将尝试使用”mkdir -p”（如果可用）。</p></li>
 <li><p>一般测试和特殊测试在初始化期间更好地检查错误。</p></li>
 <li><p>由于运行时间可能很长，将bigfile测试移至special测试的末尾。</p></li>
 <li><p>修复了Tru64 UNIX的信号处理程序的定义。</p></li>
-<li><p>从Jay Weber <a href="mailto:jweber@mail.thatnet.net" class="email">jweber@mail.thatnet.net</a>获取的Linux配置信息进行了更新。</p></li>
+<li><p>从Jay Weber <a href="mailto:jweber@mail.thatnet.net"
+class="email">jweber@mail.thatnet.net</a>获取的Linux配置信息进行了更新。</p></li>
 </ol>
 <p>2001年的更改包括以下内容:</p>
 <ol type="1">
-<li><p>为顶级“server”和“runtests”脚本添加了“-N numpasses”选项。</p></li>
-<li><p>根据Anand Paladugu <a href="mailto:paladugu_anand@emc.com" class="email">paladugu_anand@emc.com</a>的建议，更新了HPUX的编译标志，以提高special/bigfile2测试的性能。</p></li>
+<li><p>为顶级”server”和”runtests”脚本添加了”-N numpasses”选项。</p></li>
+<li><p>根据Anand Paladugu <a href="mailto:paladugu_anand@emc.com"
+class="email">paladugu_anand@emc.com</a>的建议，更新了HPUX的编译标志，以提高special/bigfile2测试的性能。</p></li>
 <li><p>对special/bigfile2.c进行了轻微的可移植性修复。</p></li>
-<li><p>基本测试不再假定“.”在$PATH中。</p></li>
-<li><p>在Windows下更容易构建基本测试和special测试（来自Rick Hopkins <a href="mailto:rhopkins@ssc-corp.com" class="email">rhopkins@ssc-corp.com</a>）。</p></li>
+<li><p>基本测试不再假定”.”在$PATH中。</p></li>
+<li><p>在Windows下更容易构建基本测试和special测试（来自Rick Hopkins <a
+href="mailto:rhopkins@ssc-corp.com"
+class="email">rhopkins@ssc-corp.com</a>）。</p></li>
 </ol>
 </body>
 </html>
