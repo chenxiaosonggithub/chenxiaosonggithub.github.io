@@ -50,6 +50,8 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 <ul>
 <li><a href="#套接字" id="toc-套接字"><span
 class="toc-section-number">1</span> 套接字</a></li>
+<li><a href="#网络设备驱动" id="toc-网络设备驱动"><span
+class="toc-section-number">2</span> 网络设备驱动</a></li>
 </ul>
 </nav>
 <p><a
@@ -65,5 +67,19 @@ Sockets技术规范（简称WinSock）实现套接字接口，套接字服务由
 <p><a
 href="https://gitee.com/chenxiaosonggitee/tmp/tree/master/book-src/beginning-linux-programming-4th-edition/780470147627-code-ch15/chapter15">可以试试《Linux程序设计（第4版）》的代码例子</a>。至于用户态的使用，这里就不介绍了，感兴趣的朋友可以查看《Linux程序设计（第4版）》和《UNIX环境高级编程（第3版）》，<a
 href="https://chenxiaosong.com/baidunetdisk">点击这里从百度网盘下载pdf电子书</a>。</p>
+<h1 data-number="2" id="网络设备驱动"><span
+class="header-section-number">2</span> 网络设备驱动</h1>
+<p>参考《Linux设备驱动开发详解：基于最新的Linux 4.0内核》。</p>
+<p>Linux网络设备程序的体系结构分为4层:</p>
+<ul>
+<li>网络协议接口层:
+<code>dev_queue_xmit()</code>发送数据，<code>netif_rx()</code>接收数据。</li>
+<li>网络设备接口层:
+描述具体网络设备属性和操作的<code>struct net_device</code>。</li>
+<li>设备驱动功能层:
+通过<code>struct net_device_ops</code>中的<code>ndo_start_xmit()</code>启动发送操作，通过中断处理（如<code>dm9000_interrupt()</code>）触发接收操作，如<code>dm9000_rx()</code>完成数据包的生成及递交给上层。<code>netdev_priv()</code>获取私有数据。</li>
+<li>网络设备与媒介层:
+完成数据包发送和接收的物理实体，可以是虚拟的。</li>
+</ul>
 </body>
 </html>
