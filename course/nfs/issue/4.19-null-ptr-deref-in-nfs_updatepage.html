@@ -219,7 +219,7 @@
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>      spin_lock(&amp;mapping-&gt;private_lock)</span></code></pre></div>
 <h2 data-number="4.2" id="回退的补丁"><span class="header-section-number">4.2</span> 回退的补丁</h2>
 <p>补丁<a href="https://lore.kernel.org/all/20190407175912.23528-20-trond.myklebust@hammerspace.com/"><code>14bebe3c90b3 NFS: Don't interrupt file writeout due to fatal errors</code></a>里描述的: 不立刻上报回写错误，而是让<code>fsync</code>上报。</p>
-<p>要说明一下，maintainer自己都没想好这个机制有没问题，具体可以参考我的另一篇文章: <a href="https://chenxiaosong.com/course/nfs/patch/nfs-handle-writeback-errors-incorrectly.html">《nfs回写错误处理不正确的问题》</a>，这里就不做过多展开。</p>
+<p>要说明一下，maintainer自己都没想好这个机制有没问题，具体可以参考我的另一篇文章: <a href="https://chenxiaosong.com/course/kernel/my-patch/nfs-handle-writeback-errors-incorrectly.html">《nfs回写错误处理不正确的问题》</a>，这里就不做过多展开。</p>
 <p>而且这是一个重构补丁集，根本就没必要在这里加一个“Fixes:”标签，补丁集是为了改变一个机制，并不是为了解决一个bug。这个补丁之所以会被Greg Kroah-Hartman错误的单独合入到4.19中，就是因为nfs maintainer喜欢乱加“Fixes:”标签，这已经不是他第一次这样做了。</p>
 <h1 data-number="5" id="构造复现"><span class="header-section-number">5</span> 构造复现</h1>
 <p>4.19代码合入补丁<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/0001-reproduce-4.19-null-ptr-deref-in-nfs_updatepage.patch">0001-reproduce-4.19-null-ptr-deref-in-nfs_updatepage.patch</a>。</p>
