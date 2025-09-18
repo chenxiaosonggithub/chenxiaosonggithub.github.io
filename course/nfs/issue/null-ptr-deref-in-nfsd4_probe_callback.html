@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,171 +94,212 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">nfsd4_probe_callback()空指针解引用问题</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#vmcore分析"><span class="toc-section-number">2</span> vmcore分析</a>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#vmcore分析" id="toc-vmcore分析"><span
+class="toc-section-number">2</span> vmcore分析</a>
 <ul>
-<li><a href="#崩溃的地方"><span class="toc-section-number">2.1</span> 崩溃的地方</a></li>
-<li><a href="#callback_wq"><span class="toc-section-number">2.2</span> <code>callback_wq</code></a></li>
+<li><a href="#崩溃的地方" id="toc-崩溃的地方"><span
+class="toc-section-number">2.1</span> 崩溃的地方</a></li>
+<li><a href="#callback_wq" id="toc-callback_wq"><span
+class="toc-section-number">2.2</span> <code>callback_wq</code></a></li>
 </ul></li>
-<li><a href="#代码分析"><span class="toc-section-number">3</span> 代码分析</a></li>
-<li><a href="#相关邮件"><span class="toc-section-number">4</span> 相关邮件</a></li>
-<li><a href="#解决方案"><span class="toc-section-number">5</span> 解决方案</a></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">3</span> 代码分析</a></li>
+<li><a href="#相关邮件" id="toc-相关邮件"><span
+class="toc-section-number">4</span> 相关邮件</a></li>
+<li><a href="#解决方案" id="toc-解决方案"><span
+class="toc-section-number">5</span> 解决方案</a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<p><a href="https://chenxiaosong.com/en/nfs/en-null-ptr-deref-in-nfsd4_probe_callback.html">与社区交流的英文网页</a>。</p>
-<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p><a
+href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p><a
+href="https://chenxiaosong.com/en/nfs/en-null-ptr-deref-in-nfsd4_probe_callback.html">与社区交流的英文网页</a>。</p>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
 <p>环境信息:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> sys</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>      <span class="ex">KERNEL</span>: usr/lib/debug/lib/modules/4.19.90-52.39.v2207.ky10.aarch64/vmlinux</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    <span class="ex">DUMPFILE</span>: vmcore  [PARTIAL DUMP]</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>        <span class="ex">CPUS</span>: 32</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>        <span class="ex">DATE</span>: Wed May 28 02:04:57 CST 2025</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>      <span class="ex">UPTIME</span>: 06:43:45</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="ex">LOAD</span> AVERAGE: 4.08, 4.00, 3.83</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>       <span class="ex">TASKS</span>: 4811</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    <span class="ex">NODENAME</span>: k8s-node01</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>     <span class="ex">RELEASE</span>: 4.19.90-52.39.v2207.ky10.aarch64</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>     <span class="ex">VERSION</span>: #4 SMP Wed Jun 5 15:52:50 CST 2024</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>     <span class="ex">MACHINE</span>: aarch64  (unknown Mhz)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>      <span class="ex">MEMORY</span>: 64 GB</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>       <span class="ex">PANIC</span>: <span class="st">&quot;Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000&quot;</span></span></code></pre></div>
-<p><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/null-ptr-deref-in-nfsd4_probe_callback-vmcore.md">点击这里查看日志</a>。</p>
-<h1 data-number="2" id="vmcore分析"><span class="header-section-number">2</span> vmcore分析</h1>
-<p><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/null-ptr-deref-in-nfsd4_probe_callback-vmcore.md">详细的crash命令的输出请点击这里查看</a>。</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">rpm2cpio</span> kernel-debuginfo-4.19.90-52.39.v2207.ky10.aarch64.rpm <span class="kw">|</span> <span class="fu">cpio</span> -div</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">crash</span> usr/lib/debug/lib/modules/4.19.90-52.39.v2207.ky10.aarch64/vmlinux vmcore</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfsd</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> mod -s sunrpc</span></code></pre></div>
-<h2 data-number="2.1" id="崩溃的地方"><span class="header-section-number">2.1</span> 崩溃的地方</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> sys</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>      <span class="ex">KERNEL:</span> usr/lib/debug/lib/modules/4.19.90-52.39.v2207.ky10.aarch64/vmlinux</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">DUMPFILE:</span> vmcore  [PARTIAL DUMP]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">CPUS:</span> 32</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">DATE:</span> Wed May 28 02:04:57 CST 2025</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      <span class="ex">UPTIME:</span> 06:43:45</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">LOAD</span> AVERAGE: 4.08, 4.00, 3.83</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>       <span class="ex">TASKS:</span> 4811</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">NODENAME:</span> k8s-node01</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>     <span class="ex">RELEASE:</span> 4.19.90-52.39.v2207.ky10.aarch64</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>     <span class="ex">VERSION:</span> <span class="co">#4 SMP Wed Jun 5 15:52:50 CST 2024</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>     <span class="ex">MACHINE:</span> aarch64  <span class="er">(</span><span class="ex">unknown</span> Mhz<span class="kw">)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      <span class="ex">MEMORY:</span> 64 GB</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>       <span class="ex">PANIC:</span> <span class="st">&quot;Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000&quot;</span></span></code></pre></div>
+<p><a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/null-ptr-deref-in-nfsd4_probe_callback-vmcore.md">点击这里查看日志</a>。</p>
+<h1 data-number="2" id="vmcore分析"><span
+class="header-section-number">2</span> vmcore分析</h1>
+<p><a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/null-ptr-deref-in-nfsd4_probe_callback-vmcore.md">详细的crash命令的输出请点击这里查看</a>。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rpm2cpio</span> kernel-debuginfo-4.19.90-52.39.v2207.ky10.aarch64.rpm <span class="kw">|</span> <span class="fu">cpio</span> <span class="at">-div</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span> usr/lib/debug/lib/modules/4.19.90-52.39.v2207.ky10.aarch64/vmlinux vmcore</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> nfsd</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> sunrpc</span></code></pre></div>
+<h2 data-number="2.1" id="崩溃的地方"><span
+class="header-section-number">2.1</span> 崩溃的地方</h2>
 <p>查看崩溃的栈:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>     <span class="ex">PC</span>: ffff000048111014  [__queue_work+180]</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>     <span class="ex">PC:</span> ffff000048111014  <span class="pp">[</span><span class="ss">__queue_work+180</span><span class="pp">]</span></span></code></pre></div>
 <p>反汇编:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dis -l __queue_work</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel</span>/workqueue.c: <span class="ex">577</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co"># unbound_pwq_by_node() -&gt; rcu_dereference_raw()</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="ex">0xffff000048110ff8</span> <span class="op">&lt;</span>__queue_work+<span class="op">152&gt;</span>:  sxtw    x0, w0</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="ex">0xffff000048110ffc</span> <span class="op">&lt;</span>__queue_work+<span class="op">156&gt;</span>:  add x0, x0, #0x22</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/./include/linux</span>/compiler.h: <span class="ex">310</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="co"># rcu_dereference_raw() -&gt; READ_ONCE() -&gt; __READ_ONCE() -&gt; __read_once_size()</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="ex">0xffff000048111000</span> <span class="op">&lt;</span>__queue_work+<span class="op">160&gt;</span>:  ldr x19, [x24,x0,lsl #3] # pwq的值</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel</span>/workqueue.c: <span class="ex">1400</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="ex">0xffff000048111010</span> <span class="op">&lt;</span>__queue_work+<span class="op">176&gt;</span>:  cbnz    x0, 0xffff000048111100 <span class="op">&lt;</span>__queue_work+<span class="op">416&gt;</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="co"># 将寄存器 X19 中的值作为内存地址，从该地址读取 64 位数据，并将其存入寄存器 X2</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="ex">0xffff000048111014</span> <span class="op">&lt;</span>__queue_work+<span class="op">180&gt;</span>:  ldr x2, [x19] # 访问pwq-<span class="op">&gt;</span>pool</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> __queue_work</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel/workqueue.c:</span> 577</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># unbound_pwq_by_node() -&gt; rcu_dereference_raw()</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110ff8</span> <span class="op">&lt;</span>__queue_work+152<span class="op">&gt;</span>:  sxtw    x0, w0</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110ffc</span> <span class="op">&lt;</span>__queue_work+156<span class="op">&gt;</span>:  add x0, x0, <span class="co">#0x22</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/./include/linux/compiler.h:</span> 310</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># rcu_dereference_raw() -&gt; READ_ONCE() -&gt; __READ_ONCE() -&gt; __read_once_size()</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111000</span> <span class="op">&lt;</span>__queue_work+160<span class="op">&gt;</span>:  ldr x19, [x24,x0,lsl <span class="co">#3] # pwq的值</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel/workqueue.c:</span> 1400</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111010</span> <span class="op">&lt;</span>__queue_work+176<span class="op">&gt;</span>:  cbnz    x0, 0xffff000048111100 <span class="op">&lt;</span>__queue_work+416<span class="op">&gt;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 将寄存器 X19 中的值作为内存地址，从该地址读取 64 位数据，并将其存入寄存器 X2</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111014</span> <span class="op">&lt;</span>__queue_work+180<span class="op">&gt;</span>:  ldr x2, <span class="pp">[</span><span class="ss">x19</span><span class="pp">]</span> <span class="co"># 访问pwq-&gt;pool</span></span></code></pre></div>
 <p>所以崩溃发生在<code>nfsd4_run_cb() -&gt; queue_work() -&gt; queue_work_on() -&gt; __queue_work()</code>。</p>
 <p>再结合:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct pool_workqueue -o</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">struct</span> pool_workqueue {</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    [<span class="ex">0</span>] struct worker_pool *pool<span class="kw">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct pool_workqueue <span class="at">-o</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> pool_workqueue {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">[0]</span> struct worker_pool <span class="pp">*</span>pool<span class="kw">;</span></span></code></pre></div>
 <p>日志中的<code>... at virtual address 0000000000000000</code>表明解引用的是<code>struct pool_workqueue</code>结构体的第一个成员，所以是在执行到以下代码时发生空指针解引用:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co">// kernel/workqueue.c: 1400</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="dv">1400</span>         <span class="cf">if</span> (last_pool &amp;&amp; last_pool != pwq-&gt;pool) { <span class="co">// pwq为NULL</span></span></code></pre></div>
-<h2 data-number="2.2" id="callback_wq"><span class="header-section-number">2.2</span> <code>callback_wq</code></h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> rd callback_wq</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="ex">ffff000042a55a70</span>:  ffff80010eb50600</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// kernel/workqueue.c: 1400</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1400</span>         <span class="cf">if</span> <span class="op">(</span>last_pool <span class="op">&amp;&amp;</span> last_pool <span class="op">!=</span> pwq<span class="op">-&gt;</span>pool<span class="op">)</span> <span class="op">{</span> <span class="co">// pwq为NULL</span></span></code></pre></div>
+<h2 data-number="2.2" id="callback_wq"><span
+class="header-section-number">2.2</span> <code>callback_wq</code></h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> rd callback_wq</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff000042a55a70:</span>  ffff80010eb50600</span></code></pre></div>
 <p>再查看<code>__queue_work()</code>的反汇编:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="ex">0xffff000048110f74</span> <span class="op">&lt;</span>__queue_work+<span class="op">20&gt;</span>:   mov x24, x1 # 将寄存器 x1 中的值复制到寄存器 x24 中</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="ex">0xffff000048110f8c</span> <span class="op">&lt;</span>__queue_work+<span class="op">44&gt;</span>:   ldr w0, [x24,#256] # 从内存地址 x24 + 256 处加载 32 位数据 到寄存器 w0 中</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a><span class="ex">0xffff000048110fdc</span> <span class="op">&lt;</span>__queue_work+<span class="op">124&gt;</span>:  add x1, x26, #0xb48 # 将寄存器 x26 的值与立即数 0xb48 相加，结果存入寄存器 x1</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a><span class="ex">0xffff000048111000</span> <span class="op">&lt;</span>__queue_work+<span class="op">160&gt;</span>:  ldr x19, [x24,x0,lsl #3] # 数组array地址: x24 + (x0 <span class="op">&lt;&lt; 3</span>), 访问以 <span class="ex">8</span> 字节为单位的数组array中，第 x0 个元素，然后把它的值存到 x19</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>...</span></code></pre></div>
-<p>aarch64架构下整数参数使用的寄存器依次为: <code>x0~x7</code>，<code>__queue_work()</code>的第二个参数<code>struct workqueue_struct *wq</code>的值为<code>X24: ffff80042c343400</code>。</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110f74</span> <span class="op">&lt;</span>__queue_work+20<span class="op">&gt;</span>:   mov x24, x1 <span class="co"># 将寄存器 x1 中的值复制到寄存器 x24 中</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110f8c</span> <span class="op">&lt;</span>__queue_work+44<span class="op">&gt;</span>:   ldr w0, <span class="pp">[</span><span class="ss">x24,#256</span><span class="pp">]</span> <span class="co"># 从内存地址 x24 + 256 处加载 32 位数据 到寄存器 w0 中</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110fdc</span> <span class="op">&lt;</span>__queue_work+124<span class="op">&gt;</span>:  add x1, x26, <span class="co">#0xb48 # 将寄存器 x26 的值与立即数 0xb48 相加，结果存入寄存器 x1</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111000</span> <span class="op">&lt;</span>__queue_work+160<span class="op">&gt;</span>:  ldr x19, [x24,x0,lsl <span class="co">#3] # 数组array地址: x24 + (x0 &lt;&lt; 3), 访问以 8 字节为单位的数组array中，第 x0 个元素，然后把它的值存到 x19</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
+<p>aarch64架构下整数参数使用的寄存器依次为:
+<code>x0~x7</code>，<code>__queue_work()</code>的第二个参数<code>struct workqueue_struct *wq</code>的值为<code>X24: ffff80042c343400</code>。</p>
 <p>和当前的<code>callback_wq</code>的值不一样。</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct workqueue_struct ffff80042c343400</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="ex">struct</span> workqueue_struct {</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>  <span class="ex">dfl_pwq</span> = 0x0,</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="ex">...</span></span></code></pre></div>
-<h1 data-number="3" id="代码分析"><span class="header-section-number">3</span> 代码分析</h1>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct workqueue_struct ffff80042c343400</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> workqueue_struct {</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">dfl_pwq</span> = 0x0,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
+<h1 data-number="3" id="代码分析"><span
+class="header-section-number">3</span> 代码分析</h1>
 <p>在<code>__queue_work()</code>中发生空指针解引用:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>svc_process</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>  svc_process_common</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>    nfsd_dispatch <span class="co">// versp-&gt;vs_dispatch()</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>      nfsd4_proc_compound <span class="co">// proc-&gt;pc_func()</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>        nfsd4_create_session <span class="co">// op-&gt;opdesc-&gt;op_func()</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>          nfsd4_init_conn</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>            nfsd4_probe_callback_sync</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>              nfsd4_probe_callback</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>                nfsd4_run_cb</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>                  queue_work <span class="co">// include/linux/workqueue.h</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>                    queue_work_on</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a>                      __queue_work</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a>                        <span class="cf">if</span> (wq-&gt;flags &amp; WQ_UNBOUND) { <span class="co">// 条件满足</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a>                        <span class="cf">if</span> (last_pool &amp;&amp; last_pool != pwq-&gt;pool) { <span class="co">// pwq为NULL</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>svc_process</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  svc_process_common</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    nfsd_dispatch <span class="co">// versp-&gt;vs_dispatch()</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>      nfsd4_proc_compound <span class="co">// proc-&gt;pc_func()</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        nfsd4_create_session <span class="co">// op-&gt;opdesc-&gt;op_func()</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>          nfsd4_init_conn</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>            nfsd4_probe_callback_sync</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>              nfsd4_probe_callback</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                nfsd4_run_cb</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                  queue_work <span class="co">// include/linux/workqueue.h</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                    queue_work_on</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                      __queue_work</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">if</span> <span class="op">(</span>wq<span class="op">-&gt;</span>flags <span class="op">&amp;</span> WQ_UNBOUND<span class="op">)</span> <span class="op">{</span> <span class="co">// 条件满足</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">if</span> <span class="op">(</span>last_pool <span class="op">&amp;&amp;</span> last_pool <span class="op">!=</span> pwq<span class="op">-&gt;</span>pool<span class="op">)</span> <span class="op">{</span> <span class="co">// pwq为NULL</span></span></code></pre></div>
 <p><code>nfsd: last server has exited</code>短时间打印了两次，说明有两个进程同时执行到<code>nfsd_last_thread()</code>:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>write</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>  ksys_write</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>    vfs_write</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a>      __vfs_write</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a>        nfsctl_transaction_write</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>          write_threads</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a>            nfsd_svc</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true"></a>              nfsd_startup_net</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true"></a>                nfsd_startup_generic</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true"></a>                  nfsd_users++</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true"></a>                  nfs4_state_start</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true"></a>                    nfsd4_create_callback_queue</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true"></a>                      callback_wq = alloc_ordered_workqueue()</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true"></a>                nfs4_state_start_net</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true"></a>                  printk(KERN_INFO <span class="st">&quot;NFSD: starting %ld-second grace period (net %x)</span><span class="sc">\n</span><span class="st">&quot;</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true"></a></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true"></a>nfsd</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true"></a>  nfsd_destroy</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true"></a>    svc_shutdown_net</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true"></a>      nfsd_last_thread</span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true"></a>        nfsd_shutdown_net</span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true"></a>          nfs4_state_shutdown_net</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true"></a>            nfs4_state_destroy_net</span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true"></a>              destroy_client</span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true"></a>                __destroy_client</span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true"></a>                  nfsd4_shutdown_callback</span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true"></a>                    flush_workqueue</span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true"></a>          nfsd_shutdown_generic</span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true"></a>            --nfsd_users</span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true"></a>            nfs4_state_shutdown</span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true"></a>              nfsd4_destroy_callback_queue</span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true"></a>                destroy_workqueue(callback_wq)</span>
-<span id="cb11-33"><a href="#cb11-33" aria-hidden="true"></a>                  <span class="cf">if</span> (!(wq-&gt;flags &amp; WQ_UNBOUND)) { <span class="co">// 条件不满足</span></span>
-<span id="cb11-34"><a href="#cb11-34" aria-hidden="true"></a>                  wq-&gt;dfl_pwq = NULL</span>
-<span id="cb11-35"><a href="#cb11-35" aria-hidden="true"></a>                  put_pwq_unlocked</span>
-<span id="cb11-36"><a href="#cb11-36" aria-hidden="true"></a>        printk(KERN_WARNING <span class="st">&quot;nfsd: last server has exited, flushing export cache</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
-<p>如果<code>nfsd_startup_generic()</code>和<code>nfsd_shutdown_generic()</code>会并发，这个问题可能出现，但<code>nfsd_users</code>变量有<code>nfsd_mutex</code>锁保护，所以不会并发，具体讨论请查看<a href="https://lore.kernel.org/all/20250618104123.398603-1-chenxiaosong@chenxiaosong.com/">nfsd: convert the nfsd_users to atomic_t</a>。</p>
-<h1 data-number="4" id="相关邮件"><span class="header-section-number">4</span> 相关邮件</h1>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>write</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  ksys_write</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    vfs_write</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      __vfs_write</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        nfsctl_transaction_write</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>          write_threads</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>            nfsd_svc</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>              nfsd_startup_net</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                nfsd_startup_generic</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                  nfsd_users<span class="op">++</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                  nfs4_state_start</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                    nfsd4_create_callback_queue</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                      callback_wq <span class="op">=</span> alloc_ordered_workqueue<span class="op">()</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>                nfs4_state_start_net</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                  printk<span class="op">(</span>KERN_INFO <span class="st">&quot;NFSD: starting </span><span class="sc">%ld</span><span class="st">-second grace period (net </span><span class="sc">%x</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>nfsd</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  nfsd_destroy</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    svc_shutdown_net</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>      nfsd_last_thread</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>        nfsd_shutdown_net</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>          nfs4_state_shutdown_net</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>            nfs4_state_destroy_net</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>              destroy_client</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>                __destroy_client</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>                  nfsd4_shutdown_callback</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>                    flush_workqueue</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>          nfsd_shutdown_generic</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>            <span class="op">--</span>nfsd_users</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>            nfs4_state_shutdown</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>              nfsd4_destroy_callback_queue</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>                destroy_workqueue<span class="op">(</span>callback_wq<span class="op">)</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>                  <span class="cf">if</span> <span class="op">(!(</span>wq<span class="op">-&gt;</span>flags <span class="op">&amp;</span> WQ_UNBOUND<span class="op">))</span> <span class="op">{</span> <span class="co">// 条件不满足</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>                  wq<span class="op">-&gt;</span>dfl_pwq <span class="op">=</span> NULL</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>                  put_pwq_unlocked</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>        printk<span class="op">(</span>KERN_WARNING <span class="st">&quot;nfsd: last server has exited, flushing export cache</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">)</span></span></code></pre></div>
+<p>如果<code>nfsd_startup_generic()</code>和<code>nfsd_shutdown_generic()</code>会并发，这个问题可能出现，但<code>nfsd_users</code>变量有<code>nfsd_mutex</code>锁保护，所以不会并发，具体讨论请查看<a
+href="https://lore.kernel.org/all/20250618104123.398603-1-chenxiaosong@chenxiaosong.com/">nfsd:
+convert the nfsd_users to atomic_t</a>。</p>
+<h1 data-number="4" id="相关邮件"><span
+class="header-section-number">4</span> 相关邮件</h1>
 <ul>
-<li><a href="https://lore.kernel.org/all/00bac421-cef6-451d-b868-592ed34c15af@oracle.com/">Chuck Lever &lt;chuck.lever@oracle.com&gt; <code>Re: [PATCH 2/3] nfsd: use kref and new mutex for global config management</code></a></li>
-<li><a href="https://lore.kernel.org/all/175042051171.608730.8613669948428192921@noble.neil.brown.name/">NeilBrown &lt;neilb@suse.de&gt; <code>Re: [RFC PATCH] nfsd: convert the nfsd_users to atomic_t</code></a></li>
+<li><a
+href="https://lore.kernel.org/all/00bac421-cef6-451d-b868-592ed34c15af@oracle.com/">Chuck
+Lever &lt;chuck.lever@oracle.com&gt;
+<code>Re: [PATCH 2/3] nfsd: use kref and new mutex for global config management</code></a></li>
+<li><a
+href="https://lore.kernel.org/all/175042051171.608730.8613669948428192921@noble.neil.brown.name/">NeilBrown
+&lt;neilb@suse.de&gt;
+<code>Re: [RFC PATCH] nfsd: convert the nfsd_users to atomic_t</code></a></li>
 </ul>
-<h1 data-number="5" id="解决方案"><span class="header-section-number">5</span> 解决方案</h1>
+<h1 data-number="5" id="解决方案"><span
+class="header-section-number">5</span> 解决方案</h1>
 <p>合入以下补丁:</p>
 <ul>
-<li><a href="https://chenxiaosong.com/course/nfs/patch/patchset-nfsd-dont-allow-concurrent-queueing-of-workqueue-jobs.html"><code>[PATCH v2 1/5] 1054e8ffc5c4 nfsd: prevent callback tasks running concurrently</code></a>: 增加一个flag防止nfsd4_callback工作队列并发</li>
-<li><a href="https://lore.kernel.org/all/171200183231.5439.7855646322906072619.stgit@klimt.1015granger.net/"><code>[PATCH 38f080f3cd19 NFSD: Move callback_wq into struct nfs4_client</code></a>: 原本只有一个工作队列callback_wq，改成让每个nfs4_client结构体都有一个工作队列
+<li><a
+href="https://chenxiaosong.com/course/nfs/patch/patchset-nfsd-dont-allow-concurrent-queueing-of-workqueue-jobs.html"><code>[PATCH v2 1/5] 1054e8ffc5c4 nfsd: prevent callback tasks running concurrently</code></a>:
+增加一个flag防止nfsd4_callback工作队列并发</li>
+<li><a
+href="https://lore.kernel.org/all/171200183231.5439.7855646322906072619.stgit@klimt.1015granger.net/"><code>[PATCH 38f080f3cd19 NFSD: Move callback_wq into struct nfs4_client</code></a>:
+原本只有一个工作队列callback_wq，改成让每个nfs4_client结构体都有一个工作队列
 <ul>
-<li>可不合引入<code>__free_client()</code>的补丁: <code>59f8e91b75ec nfsd4: use reference count to free client</code></li>
-<li>可不合修改<code>nfs4_state_start()</code>的补丁: <a href="https://lore.kernel.org/all/1651526367-1522-4-git-send-email-dai.ngo@oracle.com/"><code>[PATCH RFC v25 3/7] d76cc46b37e1 NFSD: move create/destroy of laundry_wq to init_nfsd and exit_nfsd</code></a></li>
+<li>可不合引入<code>__free_client()</code>的补丁:
+<code>59f8e91b75ec nfsd4: use reference count to free client</code></li>
+<li>可不合修改<code>nfs4_state_start()</code>的补丁: <a
+href="https://lore.kernel.org/all/1651526367-1522-4-git-send-email-dai.ngo@oracle.com/"><code>[PATCH RFC v25 3/7] d76cc46b37e1 NFSD: move create/destroy of laundry_wq to init_nfsd and exit_nfsd</code></a></li>
 </ul></li>
-<li><a href="https://chenxiaosong.com/course/nfs/patch/NFSD-Make-it-possible-to-use-svc_set_num_threads_syn.html"><code>[PATCH 00/20 v3] SUNRPC: clean up server thread management</code></a></li>
+<li><a
+href="https://chenxiaosong.com/course/nfs/patch/NFSD-Make-it-possible-to-use-svc_set_num_threads_syn.html"><code>[PATCH 00/20 v3] SUNRPC: clean up server thread management</code></a></li>
 </ul>
 </body>
 </html>

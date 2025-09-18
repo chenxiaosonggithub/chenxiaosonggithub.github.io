@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,80 +94,95 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">shell和shell脚本</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#ps"><span class="toc-section-number">1</span> <code>ps</code></a>
+<li><a href="#ps" id="toc-ps"><span class="toc-section-number">1</span>
+<code>ps</code></a>
 <ul>
-<li><a href="#ps-auxww"><span class="toc-section-number">1.1</span> <code>ps auxww</code></a></li>
-<li><a href="#ps-eLf"><span class="toc-section-number">1.2</span> <code>ps eLf</code></a></li>
+<li><a href="#ps-auxww" id="toc-ps-auxww"><span
+class="toc-section-number">1.1</span> <code>ps auxww</code></a></li>
+<li><a href="#ps-eLf" id="toc-ps-eLf"><span
+class="toc-section-number">1.2</span> <code>ps eLf</code></a></li>
 </ul></li>
-<li><a href="#export"><span class="toc-section-number">2</span> <code>export</code></a></li>
+<li><a href="#export" id="toc-export"><span
+class="toc-section-number">2</span> <code>export</code></a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
-<h1 data-number="1" id="ps"><span class="header-section-number">1</span> <code>ps</code></h1>
-<h2 data-number="1.1" id="ps-auxww"><span class="header-section-number">1.1</span> <code>ps auxww</code></h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co"># a: 所有终端用户进程</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co"># u: 用户详细格式</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co"># x: 无终端进程</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="co"># ww: 两个w表示宽度不限制</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co"># 要用aux（没有-号），不要用-aux，不要用-aux</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="co"># 输出列: USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="co">#   USER    进程所有者（用户名）</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="co">#   PID 进程 ID（唯一标识）</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co">#   %CPU    CPU 使用率百分比（最近一次采样周期内）</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="co">#   %MEM    物理内存使用率百分比</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="co">#   VSZ 虚拟内存大小（Virtual Memory Size，单位 KB）</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="co">#   RSS 驻留集大小（Resident Set Size，实际占用的物理内存，单位 KB）</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="co">#   TTY 关联的终端设备：</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="co">#       ? = 无终端（守护进程）</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="co">#       pts/0 = 终端窗口</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="co">#   STAT    进程状态（关键字母组合）：</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="co">#       R = 运行中或可运行（在运行队列）</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="co">#       S = 可中断睡眠（等待事件）</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="co">#       D = 不可中断睡眠（通常等待 I/O）</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="co">#       Z = 僵尸进程（已终止但未回收）</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="co">#       T = 暂停状态（如 Ctrl+Z）</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="co">#       I = 空闲内核线程</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="co">#       s = 会话领导者</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a><span class="co">#       &lt; = 高优先级</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a><span class="co">#       N = 低优先级</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a><span class="co">#       + = 前台进程组</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a><span class="co">#   START   进程启动时间（24小时制）：</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a><span class="co">#       当天启动：HH:MM</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a><span class="co">#       跨天：月 日（如 Jul15）</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a><span class="co">#   TIME    累计占用 CPU 时间（格式 [分:]秒）</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a><span class="co">#   COMMAND 启动命令（完整路径或名称）：</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a><span class="co">#       [kthreadd] = 内核线程</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a><span class="co">#       带参数的命令会被截断（可用 ps auxww 查看完整命令）</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a><span class="fu">ps</span> auxww</span></code></pre></div>
-<h2 data-number="1.2" id="ps-eLf"><span class="header-section-number">1.2</span> <code>ps eLf</code></h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co"># -e: 显示 所有进程（等价于 -A）</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="co"># -L: 显示线程（Light Weight Process），新增两列：LWP（线程ID）和 NLWP（线程数量）</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co"># -f: 使用 完整格式（Full-format） 显示信息</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co"># 输出列:</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="co">#   UID 进程所有者的用户名</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co">#   PID 进程ID（主线程的PID与进程ID相同）</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co">#   PPID    父进程ID</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">#   LWP 线程ID（Light Weight Process ID），线程的唯一标识</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="co">#   C   CPU 利用率（百分比）</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="co">#   NLWP    进程中线程的数量（Number of Light Weight Processes）</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="co">#   STIME   进程启动时间</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="co">#   TTY 关联的终端（? 表示无终端，通常是守护进程）</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="co">#   TIME    累计占用CPU时间</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="co">#   CMD 启动进程的完整命令（参数可能被截断）</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="fu">ps</span> -eLf</span></code></pre></div>
-<h1 data-number="2" id="export"><span class="header-section-number">2</span> <code>export</code></h1>
+<p><a
+href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
+<h1 data-number="1" id="ps"><span class="header-section-number">1</span>
+<code>ps</code></h1>
+<h2 data-number="1.1" id="ps-auxww"><span
+class="header-section-number">1.1</span> <code>ps auxww</code></h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># a: 所有终端用户进程</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># u: 用户详细格式</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># x: 无终端进程</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ww: 两个w表示宽度不限制</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 要用aux（没有-号），不要用-aux，不要用-aux</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 输出列: USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   USER    进程所有者（用户名）</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   PID 进程 ID（唯一标识）</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   %CPU    CPU 使用率百分比（最近一次采样周期内）</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   %MEM    物理内存使用率百分比</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   VSZ 虚拟内存大小（Virtual Memory Size，单位 KB）</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   RSS 驻留集大小（Resident Set Size，实际占用的物理内存，单位 KB）</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   TTY 关联的终端设备：</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">#       ? = 无终端（守护进程）</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">#       pts/0 = 终端窗口</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   STAT    进程状态（关键字母组合）：</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">#       R = 运行中或可运行（在运行队列）</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">#       S = 可中断睡眠（等待事件）</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#       D = 不可中断睡眠（通常等待 I/O）</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">#       Z = 僵尸进程（已终止但未回收）</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">#       T = 暂停状态（如 Ctrl+Z）</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">#       I = 空闲内核线程</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co">#       s = 会话领导者</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co">#       &lt; = 高优先级</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co">#       N = 低优先级</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">#       + = 前台进程组</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co">#   START   进程启动时间（24小时制）：</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">#       当天启动：HH:MM</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co">#       跨天：月 日（如 Jul15）</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co">#   TIME    累计占用 CPU 时间（格式 [分:]秒）</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co">#   COMMAND 启动命令（完整路径或名称）：</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co">#       [kthreadd] = 内核线程</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co">#       带参数的命令会被截断（可用 ps auxww 查看完整命令）</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> auxww</span></code></pre></div>
+<h2 data-number="1.2" id="ps-eLf"><span
+class="header-section-number">1.2</span> <code>ps eLf</code></h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -e: 显示 所有进程（等价于 -A）</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -L: 显示线程（Light Weight Process），新增两列：LWP（线程ID）和 NLWP（线程数量）</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -f: 使用 完整格式（Full-format） 显示信息</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 输出列:</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   UID 进程所有者的用户名</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   PID 进程ID（主线程的PID与进程ID相同）</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   PPID    父进程ID</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   LWP 线程ID（Light Weight Process ID），线程的唯一标识</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   C   CPU 利用率（百分比）</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   NLWP    进程中线程的数量（Number of Light Weight Processes）</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   STIME   进程启动时间</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   TTY 关联的终端（? 表示无终端，通常是守护进程）</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   TIME    累计占用CPU时间</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   CMD 启动进程的完整命令（参数可能被截断）</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> <span class="at">-eLf</span></span></code></pre></div>
+<h1 data-number="2" id="export"><span
+class="header-section-number">2</span> <code>export</code></h1>
 <p>曾经遇到过一个坑，配置<code>http_proxy</code>和<code>https_proxy</code>时，前面没加<code>export</code>，proxy怎么都用不了。所以在这里记录一下<code>export</code>命令的笔记。</p>
 <p><code>http_proxy=http://10.42.20.221:7890</code>作用的是当前shell，子进程不可见，只是设置一个临时变量。</p>
 <p>而<code>export https_proxy=http://10.42.20.221:7890</code>作用范围是当前shell+子进程，一般影响外部工具的环境配置就要在前面加<code>export</code>。</p>

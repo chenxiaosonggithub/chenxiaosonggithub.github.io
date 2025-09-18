@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,59 +94,108 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">openEuler的nfs+</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#我的贡献"><span class="toc-section-number">1</span> 我的贡献</a></li>
-<li><a href="#issue"><span class="toc-section-number">2</span> 问题分析</a></li>
-<li><a href="#多个网卡环境"><span class="toc-section-number">3</span> 多个网卡环境</a></li>
-<li><a href="#openeuler-nfs的使用"><span class="toc-section-number">4</span> openeuler nfs+的使用</a></li>
+<li><a href="#我的贡献" id="toc-我的贡献"><span
+class="toc-section-number">1</span> 我的贡献</a></li>
+<li><a href="#issue" id="toc-issue"><span
+class="toc-section-number">2</span> 问题分析</a></li>
+<li><a href="#多个网卡环境" id="toc-多个网卡环境"><span
+class="toc-section-number">3</span> 多个网卡环境</a></li>
+<li><a href="#openeuler-nfs的使用" id="toc-openeuler-nfs的使用"><span
+class="toc-section-number">4</span> openeuler nfs+的使用</a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<h1 data-number="1" id="我的贡献"><span class="header-section-number">1</span> 我的贡献</h1>
-<p><a href="https://chenxiaosong.com/enfs-contribution.html">点击这里查看我的openEuler nfs+贡献</a>。</p>
-<h1 data-number="2" id="issue"><span class="header-section-number">2</span> 问题分析</h1>
+<p><a
+href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 data-number="1" id="我的贡献"><span
+class="header-section-number">1</span> 我的贡献</h1>
+<p><a
+href="https://chenxiaosong.com/enfs-contribution.html">点击这里查看我的openEuler
+nfs+贡献</a>。</p>
+<h1 data-number="2" id="issue"><span
+class="header-section-number">2</span> 问题分析</h1>
 <ul>
-<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/openeuler-enfs-null-ptr-deref-in-xprt_switch_get.html">openEuler的nfs+ xprt_switch_get()空指针解引用问题</a></li>
-<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/openeuler-enfs-double-free-of-multipath_client_info.html">openEuler的nfs+ multipath_client_info double free的问题</a></li>
-<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/openeuler-enfs-create-client-fail.html">openEuler的nfs+初始化enfs client失败的问题</a></li>
-<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/openeuler-enfs-server-not-responding.html">openEuler的nfs+报错not responding的问题</a></li>
-<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/openeuler-enfs-refactor.html">openEuler的nfs+代码重构</a></li>
+<li><a
+href="https://chenxiaosong.com/course/nfs/openeuler-enfs/openeuler-enfs-null-ptr-deref-in-xprt_switch_get.html">openEuler的nfs+
+xprt_switch_get()空指针解引用问题</a></li>
+<li><a
+href="https://chenxiaosong.com/course/nfs/openeuler-enfs/openeuler-enfs-double-free-of-multipath_client_info.html">openEuler的nfs+
+multipath_client_info double free的问题</a></li>
+<li><a
+href="https://chenxiaosong.com/course/nfs/openeuler-enfs/openeuler-enfs-create-client-fail.html">openEuler的nfs+初始化enfs
+client失败的问题</a></li>
+<li><a
+href="https://chenxiaosong.com/course/nfs/openeuler-enfs/openeuler-enfs-server-not-responding.html">openEuler的nfs+报错not
+responding的问题</a></li>
+<li><a
+href="https://chenxiaosong.com/course/nfs/openeuler-enfs/openeuler-enfs-refactor.html">openEuler的nfs+代码重构</a></li>
 </ul>
-<h1 data-number="3" id="多个网卡环境"><span class="header-section-number">3</span> 多个网卡环境</h1>
-<p>请查看<a href="https://chenxiaosong.com/course/kernel/environment.html#qemu-multi-nic">《内核开发环境》</a></p>
-<h1 data-number="4" id="openeuler-nfs的使用"><span class="header-section-number">4</span> openeuler nfs+的使用</h1>
+<h1 data-number="3" id="多个网卡环境"><span
+class="header-section-number">3</span> 多个网卡环境</h1>
+<p>请查看<a
+href="https://chenxiaosong.com/course/kernel/environment.html#qemu-multi-nic">《内核开发环境》</a></p>
+<h1 data-number="4" id="openeuler-nfs的使用"><span
+class="header-section-number">4</span> openeuler nfs+的使用</h1>
 <ul>
-<li><a href="https://docs.openeuler.org/zh/docs/20.03_LTS_SP4/docs/eNFS/enfs%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.html">eNFS 使用指南</a></li>
-<li><a href="https://docs.openeuler.org/zh/docs/23.03/docs/NfsMultipath/NFS%E5%A4%9A%E8%B7%AF%E5%BE%84.html">openeuler23.03 NFS多路径用户指南</a>（<a href="https://gitee.com/openeuler/docs/tree/stable2-23.03/docs/zh/docs/NfsMultipath">文档源码</a>），瞎搞的，这个版本根本没有多路径功能</li>
-<li><a href="https://gitee.com/src-openeuler/kernel/pulls?assignee_id=&amp;author_id=&amp;label_ids=&amp;label_text=&amp;milestone_id=&amp;priority=&amp;project_id=src-openeuler%2Fkernel&amp;project_type=&amp;scope=&amp;search=enfs&amp;single_label_id=&amp;single_label_text=&amp;sort=closed_at+desc&amp;status=merged&amp;target_project=&amp;tester_id=">src-openeuler仓库的pull request</a></li>
-<li><a href="https://gitee.com/openeuler/kernel/pulls?assignee_id=&amp;author_id=&amp;label_ids=&amp;label_text=&amp;milestone_id=&amp;priority=&amp;project_id=openeuler%2Fkernel&amp;project_type=&amp;scope=&amp;search=enfs&amp;single_label_id=&amp;single_label_text=&amp;sort=closed_at+desc&amp;status=merged&amp;target_project=&amp;tester_id=">openeuler仓库的pull request</a></li>
-<li><a href="https://gitee.com/src-openeuler/kernel/tree/openEuler-20.03-LTS-SP4">补丁文件</a></li>
-<li><a href="https://support.huawei.com/supportindex/index">support.huawei.com</a>选择“企业技术支持”</li>
+<li><a
+href="https://docs.openeuler.org/zh/docs/20.03_LTS_SP4/docs/eNFS/enfs%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.html">eNFS
+使用指南</a></li>
+<li><a
+href="https://docs.openeuler.org/zh/docs/23.03/docs/NfsMultipath/NFS%E5%A4%9A%E8%B7%AF%E5%BE%84.html">openeuler23.03
+NFS多路径用户指南</a>（<a
+href="https://gitee.com/openeuler/docs/tree/stable2-23.03/docs/zh/docs/NfsMultipath">文档源码</a>），瞎搞的，这个版本根本没有多路径功能</li>
+<li><a
+href="https://gitee.com/src-openeuler/kernel/pulls?assignee_id=&amp;author_id=&amp;label_ids=&amp;label_text=&amp;milestone_id=&amp;priority=&amp;project_id=src-openeuler%2Fkernel&amp;project_type=&amp;scope=&amp;search=enfs&amp;single_label_id=&amp;single_label_text=&amp;sort=closed_at+desc&amp;status=merged&amp;target_project=&amp;tester_id=">src-openeuler仓库的pull
+request</a></li>
+<li><a
+href="https://gitee.com/openeuler/kernel/pulls?assignee_id=&amp;author_id=&amp;label_ids=&amp;label_text=&amp;milestone_id=&amp;priority=&amp;project_id=openeuler%2Fkernel&amp;project_type=&amp;scope=&amp;search=enfs&amp;single_label_id=&amp;single_label_text=&amp;sort=closed_at+desc&amp;status=merged&amp;target_project=&amp;tester_id=">openeuler仓库的pull
+request</a></li>
+<li><a
+href="https://gitee.com/src-openeuler/kernel/tree/openEuler-20.03-LTS-SP4">补丁文件</a></li>
+<li><a
+href="https://support.huawei.com/supportindex/index">support.huawei.com</a>选择”企业技术支持”</li>
 </ul>
-<p>6.6内核可直接切换到<a href="https://gitee.com/openeuler/kernel/tree/OLK-6.6/"><code>OLK-6.6</code>分支</a>。</p>
-<p>4.19内核切换到<code>openEuler-1.0-LTS</code>分支，可以使用脚本<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/create-enfs-patchset.sh"><code>create-enfs-patchset.sh</code></a>生成完整的补丁文件， <a href="https://gitee.com/chenxiaosonggitee/tmp/tree/master/nfs/enfs-4.19-patch">再打上我修改的补丁</a>， 也可以直接用<a href="https://gitee.com/chenxiaosonggitee/kernel-enfs/tree/openEuler-1.0-LTS/">我的仓库kernel-enfs</a>。 编译前打开配置<code>CONFIG_ENFS</code>，可能还要关闭配置<code>CONFIG_NET_VENDOR_NETRONOME</code>。</p>
+<p>6.6内核可直接切换到<a
+href="https://gitee.com/openeuler/kernel/tree/OLK-6.6/"><code>OLK-6.6</code>分支</a>。</p>
+<p>4.19内核切换到<code>openEuler-1.0-LTS</code>分支，可以使用脚本<a
+href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/create-enfs-patchset.sh"><code>create-enfs-patchset.sh</code></a>生成完整的补丁文件，
+<a
+href="https://gitee.com/chenxiaosonggitee/tmp/tree/master/nfs/enfs-4.19-patch">再打上我修改的补丁</a>，
+也可以直接用<a
+href="https://gitee.com/chenxiaosonggitee/kernel-enfs/tree/openEuler-1.0-LTS/">我的仓库kernel-enfs</a>。
+编译前打开配置<code>CONFIG_ENFS</code>，可能还要关闭配置<code>CONFIG_NET_VENDOR_NETRONOME</code>。</p>
 <p>挂载:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">modprobe</span> enfs</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="fu">mount</span> -t nfs -o localaddrs=192.168.53.40~192.168.53.53,remoteaddrs=192.168.53.215~192.168.53.216 192.168.53.216:/s_test /mnt/</span></code></pre></div>
-<p>如果没有创建<code>/etc/enfs/config.ini</code>，会报错<code>failed to open file:/etc/enfs/config.ini err:-2</code>，配置文件请参考<a href="https://docs.openeuler.org/zh/docs/20.03_LTS_SP4/docs/eNFS/enfs%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.html">eNFS 使用指南</a>。只需要在nfs client端支持enfs就可以，<code>/etc/enfs/config.ini</code>默认配置如下:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="va">path_detect_interval=</span>10 # 路径连通探测周期，单位 ： 秒</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="va">path_detect_timeout=</span>10 # 路径连通探测消息越野时间，单位 ： 秒</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="va">multipath_timeout=</span>0 # 选择其他路径达到的文件操作的超时阈值，<span class="ex">0</span>表示使用 mount 命令指定的 timeo 参数，不使用 eNFS 模块的配置，单位 ： 秒。</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="va">multipath_disable=</span>0 # 启用 <span class="ex">eNFS</span> 特性</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">modprobe</span> enfs</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> localaddrs=192.168.53.40~192.168.53.53,remoteaddrs=192.168.53.215~192.168.53.216 192.168.53.216:/s_test /mnt/</span></code></pre></div>
+<p>如果没有创建<code>/etc/enfs/config.ini</code>，会报错<code>failed to open file:/etc/enfs/config.ini err:-2</code>，配置文件请参考<a
+href="https://docs.openeuler.org/zh/docs/20.03_LTS_SP4/docs/eNFS/enfs%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.html">eNFS
+使用指南</a>。只需要在nfs
+client端支持enfs就可以，<code>/etc/enfs/config.ini</code>默认配置如下:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">path_detect_interval</span><span class="op">=</span>10 <span class="co"># 路径连通探测周期，单位 ： 秒</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="va">path_detect_timeout</span><span class="op">=</span>10 <span class="co"># 路径连通探测消息越野时间，单位 ： 秒</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="va">multipath_timeout</span><span class="op">=</span>0 <span class="co"># 选择其他路径达到的文件操作的超时阈值，0表示使用 mount 命令指定的 timeo 参数，不使用 eNFS 模块的配置，单位 ： 秒。</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="va">multipath_disable</span><span class="op">=</span>0 <span class="co"># 启用 eNFS 特性</span></span></code></pre></div>
 <p>除了<code>mount</code>命令查看之外，还可以用以下方式:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="fu">cat</span> /proc/enfs/192.168.53.216_0/path</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="fu">cat</span> /proc/enfs/192.168.53.216_0/stat</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/enfs/192.168.53.216_0/path</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/enfs/192.168.53.216_0/stat</span></code></pre></div>
 </body>
 </html>
