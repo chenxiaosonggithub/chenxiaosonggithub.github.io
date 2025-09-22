@@ -165,29 +165,32 @@ class="header-section-number">2</span> 代码分析</h1>
 <span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>                                            get_uuid_from_task</span>
 <span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>                                              insert_and_update_shard</span>
 <span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>                                                query_and_update_shard</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                                                  dorado_query_lsId</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>            nfs_get_tree_common</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>              nfs_get_root</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>                nfs3_proc_get_root</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>                  do_proc_get_root <span class="co">// 这里会再发送fsinfo请求</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">// 遍历nfs_server</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>list_for_each_entry<span class="op">(</span>pos<span class="op">,</span> <span class="op">&amp;</span>nn<span class="op">-&gt;</span>nfs_volume_list<span class="op">,</span> master_link<span class="op">)</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                                                  dorado_query_fs_shard <span class="co">// 请求成功</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>                                                  dorado_query_lsId</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>                                                    <span class="co">// </span><span class="al">TODO</span><span class="co">: 这里为什么失败</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>                                                    dorado_extend_op <span class="co">// 返回错误 EINVAL</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>            nfs_get_tree_common</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>              nfs_get_root</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>                nfs3_proc_get_root</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>                  do_proc_get_root <span class="co">// 这里会再发送fsinfo请求</span></span>
 <span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>vfs_kern_mount</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  fs_context_for_mount</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    alloc_fs_context</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>      nfs_init_fs_context <span class="co">// fc-&gt;fs_type-&gt;init_fs_context</span></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        ctx<span class="op">-&gt;</span>mntfh <span class="op">=</span> nfs_alloc_fhandle<span class="op">();</span></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>        fc<span class="op">-&gt;</span>fs_private <span class="op">=</span> ctx</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>        fc<span class="op">-&gt;</span>ops <span class="op">=</span> <span class="op">&amp;</span>nfs_fs_context_ops</span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>  put_fs_context</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    nfs_fs_context_free <span class="co">// fc-&gt;ops-&gt;free(fc)</span></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>      nfs_free_fhandle<span class="op">(</span>ctx<span class="op">-&gt;</span>mntfh<span class="op">)</span></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>nfs3_xdr_enc_getattr3args</span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>nfs3_xdr_dec_fsinfo3res</span></code></pre></div>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="co">// 遍历nfs_server</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>list_for_each_entry<span class="op">(</span>pos<span class="op">,</span> <span class="op">&amp;</span>nn<span class="op">-&gt;</span>nfs_volume_list<span class="op">,</span> master_link<span class="op">)</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>vfs_kern_mount</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>  fs_context_for_mount</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    alloc_fs_context</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>      nfs_init_fs_context <span class="co">// fc-&gt;fs_type-&gt;init_fs_context</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>        ctx<span class="op">-&gt;</span>mntfh <span class="op">=</span> nfs_alloc_fhandle<span class="op">();</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        fc<span class="op">-&gt;</span>fs_private <span class="op">=</span> ctx</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>        fc<span class="op">-&gt;</span>ops <span class="op">=</span> <span class="op">&amp;</span>nfs_fs_context_ops</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>  put_fs_context</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    nfs_fs_context_free <span class="co">// fc-&gt;ops-&gt;free(fc)</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>      nfs_free_fhandle<span class="op">(</span>ctx<span class="op">-&gt;</span>mntfh<span class="op">)</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>nfs3_xdr_enc_getattr3args</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>nfs3_xdr_dec_fsinfo3res</span></code></pre></div>
 <h1 data-number="3" id="实现"><span
 class="header-section-number">3</span> 实现</h1>
 <p><a
