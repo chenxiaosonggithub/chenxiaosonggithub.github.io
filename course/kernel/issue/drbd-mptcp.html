@@ -118,6 +118,8 @@ class="toc-section-number">1</span> drbd环境</a></li>
 class="toc-section-number">2</span> 内核修改</a></li>
 <li><a href="#调试" id="toc-调试"><span
 class="toc-section-number">3</span> 调试</a></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">4</span> 代码分析</a></li>
 </ul>
 </nav>
 <p><a
@@ -245,5 +247,11 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 1003.627149] drbd r0: <span class="er">sock_recvmsg</span> <span class="ex">returned</span> <span class="at">-11</span></span></code></pre></div>
 <p><code>sock_recvmsg()</code>返回错误码<code>-EAGAIN</code>。</p>
 <p>还需要进一步定位。</p>
+<h1 data-number="4" id="代码分析"><span
+class="header-section-number">4</span> 代码分析</h1>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>drbd_recv</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  drbd_recv_short</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  drbd_err<span class="op">(</span>connection<span class="op">,</span> <span class="st">&quot;sock_recvmsg returned </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> rv<span class="op">)</span></span></code></pre></div>
 </body>
 </html>
