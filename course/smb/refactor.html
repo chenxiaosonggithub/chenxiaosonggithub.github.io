@@ -145,6 +145,26 @@ class="toc-section-number">6</span>
 <li><a href="#smb2_lock重构" id="toc-smb2_lock重构"><span
 class="toc-section-number">7</span>
 <code>smb2_lock()</code>重构</a></li>
+<li><a href="#年凑数补丁" id="toc-年凑数补丁"><span
+class="toc-section-number">8</span> 2025年凑数补丁</a>
+<ul>
+<li><a
+href="#ksmbd_decode_ntlmssp_auth_blob-arc4_setkey和arc4_crypt是否必须"
+id="toc-ksmbd_decode_ntlmssp_auth_blob-arc4_setkey和arc4_crypt是否必须"><span
+class="toc-section-number">8.1</span>
+<code>ksmbd_decode_ntlmssp_auth_blob()</code>:
+<code>arc4_setkey()</code>和<code>arc4_crypt()</code>是否必须？</a></li>
+<li><a href="#重复定义" id="toc-重复定义"><span
+class="toc-section-number">8.2</span> 重复定义</a>
+<ul>
+<li><a href="#cifspdu.h" id="toc-cifspdu.h"><span
+class="toc-section-number">8.2.1</span> cifspdu.h</a></li>
+<li><a href="#cifsglob.h" id="toc-cifsglob.h"><span
+class="toc-section-number">8.2.2</span> cifsglob.h</a></li>
+<li><a href="#smb2pdu.h" id="toc-smb2pdu.h"><span
+class="toc-section-number">8.2.3</span> smb2pdu.h</a></li>
+</ul></li>
+</ul></li>
 </ul>
 </nav>
 <p><a
@@ -351,5 +371,116 @@ class="header-section-number">6</span>
 <h1 data-number="7" id="smb2_lock重构"><span
 class="header-section-number">7</span> <code>smb2_lock()</code>重构</h1>
 <p>这个函数也挺长挺复杂，有353行（7535-7181）。</p>
+<h1 data-number="8" id="年凑数补丁"><span
+class="header-section-number">8</span> 2025年凑数补丁</h1>
+<h2 data-number="8.1"
+id="ksmbd_decode_ntlmssp_auth_blob-arc4_setkey和arc4_crypt是否必须"><span
+class="header-section-number">8.1</span>
+<code>ksmbd_decode_ntlmssp_auth_blob()</code>:
+<code>arc4_setkey()</code>和<code>arc4_crypt()</code>是否必须？</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>smb2_sess_setup</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  ntlm_authenticate</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    ksmbd_decode_ntlmssp_auth_blob</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    set_user_flag<span class="op">(</span>sess<span class="op">-&gt;</span>user<span class="op">,</span> KSMBD_USER_FLAG_BAD_PASSWORD<span class="op">)</span> <span class="co">// 发生错误时</span></span></code></pre></div>
+<h2 data-number="8.2" id="重复定义"><span
+class="header-section-number">8.2</span> 重复定义</h2>
+<p>发现gtags没法找到<code>ksmbd_conn_handler_loop()</code>的定义，是gtags的bug，有空去修一下。</p>
+<ul>
+<li>server文件: fs/smb/server/glob.h, fs/smb/server/smb2pdu.h,
+fs/smb/server/smb_common.h</li>
+<li>client文件: fs/smb/client/cifspdu.h, fs/smb/client/smb2pdu.h,
+fs/smb/client/cifsglob.h, fs/smb/client/smb2glob.h</li>
+</ul>
+<h3 data-number="8.2.1" id="cifspdu.h"><span
+class="header-section-number">8.2.1</span> cifspdu.h</h3>
+<ul>
+<li>SMB flag definitions: SMBFLG_CANONICAL_PATH_FORMAT 暂没找到</li>
+<li>SMB flag2 definitions: SMBFLG2_KNOWS_LONG_NAMES 暂没找到</li>
+<li>SMB command codes: SMB_COM_CREATE_DIRECTORY, 有些对不上: <a
+href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-cifs/5cd5747f-fe0b-40a6-89d0-d67f751f8232">MS-CIFS</a></li>
+<li>MAX_CIFS_SMALL_BUFFER_SIZE 暂没找到</li>
+<li>File Attribute flags: ATTR_READONLY, ATTR_WRITE_THROUGH, 找到一部分:
+<a
+href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb/65e0c225-5925-44b0-8104-6b91339c709f">MS-SMB</a></li>
+<li>smb_hdr: SecuritySignature, <a
+href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb/3c0848a6-efe9-47c2-b57a-f7e8217150b9">MS-SMB</a></li>
+<li>file access permission bits: FILE_READ_DATA, <a
+href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb/27f99d29-7784-4684-b6dd-264e9025b286">MS-SMB
+2.2.1.4.1</a></li>
+<li>SMB frame definitions: NEGOTIATE_REQ, NEGOTIATE_RSP,
+smb_negotiate_req, smb_negotiate_rsp</li>
+<li>FILE_SYSTEM_ATTRIBUTE_INFO, filesystem_attribute_info,
+FileSystemNameLen, FS-FSCC 2.5.1</li>
+<li>FILE_SYSTEM_DEVICE_INFO, filesystem_device_info, MS-CIFS
+2.2.8.2.5</li>
+<li>FILE_SYSTEM_INFO, filesystem_info, MS-CIFS 2.2.8.2.4</li>
+<li>FILE_DIRECTORY_INFO, file_directory_info, MS-CIFS 2.2.8.1.4</li>
+<li>FILE_FULL_DIRECTORY_INFO, file_full_directory_info, MS-CIFS
+2.2.8.1.5</li>
+<li>FILE_BOTH_DIRECTORY_INFO, file_both_directory_info, MS-CIFS
+2.2.8.1.7</li>
+<li>SEARCH_ID_FULL_DIR_INFO, file_id_full_dir_info, MS-SMB
+2.2.8.1.2</li>
+<li>FILE_SYSTEM_POSIX_INFO, filesystem_posix_info</li>
+</ul>
+<h3 data-number="8.2.2" id="cifsglob.h"><span
+class="header-section-number">8.2.2</span> cifsglob.h</h3>
+<ul>
+<li>done SMB1_VERSION_STRING, …, SMB311_VERSION_STRING</li>
+<li>done CIFS_DEFAULT_IOSIZE, 只有client用到</li>
+<li>done inc_rfc1001_len</li>
+<li>done smb_version_values</li>
+<li>done get_rfc1002_len, get_rfc1002_length</li>
+<li>done SMB1_PROTO_NUMBER</li>
+</ul>
+<h3 data-number="8.2.3" id="smb2pdu.h"><span
+class="header-section-number">8.2.3</span> smb2pdu.h</h3>
+<ul>
+<li>SMB2_DHANDLE_FLAG_PERSISTENT:
+<ul>
+<li><a
+href="https://learn.microsoft.com/zh-cn/openspecs/windows_protocols/ms-smb2/5e361a29-81a7-4774-861d-f290ea53a00e">MS-SMB2
+2.2.13.2.11</a></li>
+<li><a
+href="https://learn.microsoft.com/zh-cn/openspecs/windows_protocols/ms-smb2/a6d418a7-d2db-47c9-a1c7-5802222ad678">MS-SMB2
+2.2.13.2.12</a></li>
+<li><a
+href="https://learn.microsoft.com/zh-cn/openspecs/windows_protocols/ms-smb2/48c1049f-25a4-4f23-9a57-11ddd72ce985">MS-SMB2
+2.2.14.2.12</a></li>
+</ul></li>
+<li>todo srv_copychunk:
+<ul>
+<li><a
+href="https://learn.microsoft.com/zh-cn/openspecs/windows_protocols/ms-smb2/676ae4b4-6758-4930-9f73-f0853fcad081">MS-SMB2
+2.2.31.1.1</a></li>
+<li><a
+href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb/e4e20182-7c71-4755-b638-bb75ff1c06ca">MS-SMB
+2.2.7.2.1.1</a></li>
+</ul></li>
+<li>todo copychunk_ioctl_req: <a
+href="https://learn.microsoft.com/zh-cn/openspecs/windows_protocols/ms-smb2/1c91ae61-46ad-4953-805f-afc06ce4c70b">MS-SMB2
+2.2.31.1</a></li>
+<li>todo copychunk_ioctl_rsp: <a
+href="https://learn.microsoft.com/zh-cn/openspecs/windows_protocols/ms-smb2/80d85df3-a4dc-4418-ac7e-93dd67e423e9">MS-SMB2
+2.2.32.1</a></li>
+<li>RSS_CAPABLE, RDMA_CAPABLE: <a
+href="https://learn.microsoft.com/zh-cn/openspecs/windows_protocols/ms-smb2/fcd862d1-1b85-42df-92b1-e103199f531f">MS-SMB2
+2.2.32.5</a></li>
+<li>INTERNETWORK, INTERNETWORKV6: <a
+href="https://learn.microsoft.com/zh-cn/openspecs/windows_protocols/ms-smb2/4b77102f-769f-414d-b137-47cabfe8be8f">MS-SMB2
+2.2.32.5.1</a></li>
+<li>network_interface_info_ioctl_rsp: <a
+href="https://learn.microsoft.com/zh-cn/openspecs/windows_protocols/ms-smb2/fcd862d1-1b85-42df-92b1-e103199f531f">MS-SMB2
+2.2.32.5</a></li>
+<li>iface_info_ipv4, smb_sockaddr_in: <a
+href="https://learn.microsoft.com/zh-cn/openspecs/windows_protocols/ms-smb2/b5bf4d52-55ed-4e6a-94b8-b7b129aa98de">MS-SMB2
+2.2.32.5.1.1</a></li>
+<li>iface_info_ipv6, smb_sockaddr_in6: <a
+href="https://learn.microsoft.com/zh-cn/openspecs/windows_protocols/ms-smb2/98a4f647-7ed2-4417-b922-91cd29f35902">MS-SMB2
+2.2.32.5.1.2</a></li>
+<li>todo: smb2_file_network_open_info, smb2_file_ntwrk_info</li>
+<li>todo: create_posix_rsp</li>
+<li>todo: smb2_posix_info</li>
+</ul>
 </body>
 </html>
