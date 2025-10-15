@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -83,139 +94,161 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">drbd支持mptcp</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#drbd环境"><span class="toc-section-number">1</span> drbd环境</a></li>
-<li><a href="#内核修改"><span class="toc-section-number">2</span> 内核修改</a></li>
-<li><a href="#调试"><span class="toc-section-number">3</span> 调试</a></li>
-<li><a href="#代码分析"><span class="toc-section-number">4</span> 代码分析</a></li>
+<li><a href="#drbd环境" id="toc-drbd环境"><span
+class="toc-section-number">1</span> drbd环境</a></li>
+<li><a href="#内核修改" id="toc-内核修改"><span
+class="toc-section-number">2</span> 内核修改</a></li>
+<li><a href="#调试" id="toc-调试"><span
+class="toc-section-number">3</span> 调试</a></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">4</span> 代码分析</a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/mptcp/mptcp.html">点击跳转到MPTCP课程所有目录</a>。</p>
-<p>DRBD 类似磁盘阵列的RAID 1（镜像），只不过 RAID 1 是在同一台电脑内，而 DRBD 是透过网络。</p>
+<p><a
+href="https://chenxiaosong.com/course/mptcp/mptcp.html">点击跳转到MPTCP课程所有目录</a>。</p>
+<p>DRBD 类似磁盘阵列的RAID 1（镜像），只不过 RAID 1 是在同一台电脑内，而
+DRBD 是透过网络。</p>
 <p>准备试试让DRBD支持mptcp。</p>
-<h1 data-number="1" id="drbd环境"><span class="header-section-number">1</span> drbd环境</h1>
+<h1 data-number="1" id="drbd环境"><span
+class="header-section-number">1</span> drbd环境</h1>
 <ul>
 <li><a href="http://www.drbd.org">官方网站</a></li>
-<li><a href="https://documentation.ubuntu.com/server/how-to/high-availability/install-drbd/index.html">ubuntu文档</a></li>
+<li><a
+href="https://documentation.ubuntu.com/server/how-to/high-availability/install-drbd/index.html">ubuntu文档</a></li>
 </ul>
 <p>安装软件:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">dnf</span> install drbd-utils -y</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ex">apt</span> install drbd-utils -y</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> install drbd-utils <span class="at">-y</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">apt</span> install drbd-utils <span class="at">-y</span></span></code></pre></div>
 <p>两台机器上分别设置hostname:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">hostnamectl</span> set-hostname drbd01.chenxiaosong.com # 192.168.53.209</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">hostnamectl</span> set-hostname drbd02.chenxiaosong.com # 192.168.53.210</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">hostnamectl</span> set-hostname drbd01.chenxiaosong.com <span class="co"># 192.168.53.209</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">hostnamectl</span> set-hostname drbd02.chenxiaosong.com <span class="co"># 192.168.53.210</span></span></code></pre></div>
 <p>两台机器都在<code>/etc/hosts</code>中添加以下内容:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">192.168.53.209</span>     drbd01.chenxiaosong.com       drbd01</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">192.168.53.210</span>     drbd02.chenxiaosong.com       drbd02</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">192.168.53.209</span>     drbd01.chenxiaosong.com       drbd01</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">192.168.53.210</span>     drbd02.chenxiaosong.com       drbd02</span></code></pre></div>
 <p>两台机器的<code>/etc/drbd.conf</code>配置文件如下（参考<code>/usr/share/doc/drbd-utils/drbd.conf.example</code>）:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">global</span> { usage-count no<span class="kw">;</span> }</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">common</span> { syncer { rate 100M<span class="kw">;</span> } }</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="ex">resource</span> r0 {</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>        <span class="ex">protocol</span> C<span class="kw">;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>        <span class="ex">startup</span> {</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>                <span class="ex">wfc-timeout</span>  15<span class="kw">;</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>                <span class="ex">degr-wfc-timeout</span> 60<span class="kw">;</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>        }</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>        <span class="ex">net</span> {</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>                <span class="ex">cram-hmac-alg</span> sha1<span class="kw">;</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>                <span class="ex">shared-secret</span> <span class="st">&quot;secret&quot;</span><span class="kw">;</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>        }</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>        <span class="co"># 要写完整的域名，只写 drbd01 有问题</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>        <span class="ex">on</span> drbd01.chenxiaosong.com {</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>                <span class="ex">device</span> /dev/drbd0<span class="kw">;</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>                <span class="ex">disk</span> /dev/sda<span class="kw">;</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>                <span class="ex">address</span> 192.168.53.209:7788<span class="kw">;</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>                <span class="ex">meta-disk</span> internal<span class="kw">;</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>        }</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>        <span class="ex">on</span> drbd02.chenxiaosong.com {</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>                <span class="ex">device</span> /dev/drbd0<span class="kw">;</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a>                <span class="ex">disk</span> /dev/sda<span class="kw">;</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a>                <span class="ex">address</span> 192.168.53.210:7788<span class="kw">;</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>                <span class="ex">meta-disk</span> internal<span class="kw">;</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>        }</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">global</span> { usage-count no<span class="kw">;</span> <span class="er">}</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">common</span> { syncer { rate 100M<span class="kw">;</span> <span class="er">}</span> <span class="er">}</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">resource</span> r0 {</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">protocol</span> C<span class="kw">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">startup</span> {</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                <span class="ex">wfc-timeout</span>  15<span class="kw">;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                <span class="ex">degr-wfc-timeout</span> 60<span class="kw">;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="er">}</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="ex">net</span> {</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                <span class="ex">cram-hmac-alg</span> sha1<span class="kw">;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                <span class="ex">shared-secret</span> <span class="st">&quot;secret&quot;</span><span class="kw">;</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        <span class="er">}</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 要写完整的域名，只写 drbd01 有问题</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="ex">on</span> drbd01.chenxiaosong.com {</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                <span class="ex">device</span> /dev/drbd0<span class="kw">;</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>                <span class="ex">disk</span> /dev/sda<span class="kw">;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>                <span class="ex">address</span> 192.168.53.209:7788<span class="kw">;</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>                <span class="ex">meta-disk</span> internal<span class="kw">;</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        <span class="er">}</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        <span class="ex">on</span> drbd02.chenxiaosong.com {</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>                <span class="ex">device</span> /dev/drbd0<span class="kw">;</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>                <span class="ex">disk</span> /dev/sda<span class="kw">;</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>                <span class="ex">address</span> 192.168.53.210:7788<span class="kw">;</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>                <span class="ex">meta-disk</span> internal<span class="kw">;</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        <span class="er">}</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
 <p>两台机器上都执行以下命令:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">wipefs</span> -a /dev/sda</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">drbdadm</span> create-md r0</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">systemctl</span> start drbd.service</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">wipefs</span> <span class="at">-a</span> /dev/sda</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">drbdadm</span> create-md r0</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> start drbd.service</span></code></pre></div>
 <p><code>drbd01</code>上:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">drbdadm</span> -- --overwrite-data-of-peer primary all # primary host, 与secondary host（也就是 drbd02）同步</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="ex">drbdadm</span> status</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  <span class="co"># r0 role:Primary</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>  <span class="co">#   disk:UpToDate</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>  <span class="co">#   peer role:Secondary</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>  <span class="co">#     replication:Established peer-disk:UpToDate</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">drbdadm</span> <span class="at">--</span> <span class="at">--overwrite-data-of-peer</span> primary all <span class="co"># primary host, 与secondary host（也就是 drbd02）同步</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">drbdadm</span> status</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># r0 role:Primary</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   disk:UpToDate</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   peer role:Secondary</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#     replication:Established peer-disk:UpToDate</span></span></code></pre></div>
 <p><code>drbd02</code>上查看进度:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ex">watch</span> -n1 cat /proc/drbd # ctrl+c取消</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="ex">drbdadm</span> status</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>  <span class="co"># r0 role:Primary</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>  <span class="co">#   disk:UpToDate</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>  <span class="co">#   peer role:Secondary</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>  <span class="co">#     replication:Established peer-disk:UpToDate</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">watch</span> <span class="at">-n1</span> cat /proc/drbd <span class="co"># ctrl+c取消</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">drbdadm</span> status</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># r0 role:Primary</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   disk:UpToDate</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   peer role:Secondary</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#     replication:Established peer-disk:UpToDate</span></span></code></pre></div>
 <p><code>drbd01</code>上:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ex">mkfs.ext2</span> /dev/drbd0</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="fu">mount</span> /dev/drbd0 /mnt</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file <span class="co"># 写点东西</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="fu">umount</span> /mnt</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="ex">drbdadm</span> secondary r0 # drbd01 设置成 secondary</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext2</span> /dev/drbd0</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> /dev/drbd0 /mnt</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file <span class="co"># 写点东西</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">drbdadm</span> secondary r0 <span class="co"># drbd01 设置成 secondary</span></span></code></pre></div>
 <p><code>drbd02</code>提升为primary:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="ex">drbdadm</span> primary r0</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="fu">mount</span> /dev/drbd0 /mnt</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="fu">cat</span> /mnt/file</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">drbdadm</span> primary r0</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> /dev/drbd0 /mnt</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /mnt/file</span></code></pre></div>
 <p>我们看到在<code>drbd01</code>上写入的数据在<code>drbd02</code>上能看到，说明备份成功。</p>
-<h1 data-number="2" id="内核修改"><span class="header-section-number">2</span> 内核修改</h1>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="ex">---</span> a/drivers/block/drbd/drbd_receiver.c</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="ex">+++</span> b/drivers/block/drbd/drbd_receiver.c</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="ex">@@</span> -620,7 +620,7 @@ static struct socket *drbd_try_connect(struct drbd_connection *connection)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>        <span class="ex">what</span> = <span class="st">&quot;sock_create_kern&quot;</span><span class="kw">;</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>        <span class="ex">err</span> = sock_create_kern(<span class="kw">&amp;</span><span class="ex">init_net</span>, ((struct sockaddr *)<span class="kw">&amp;</span><span class="ex">src_in6</span>)<span class="ex">-</span><span class="op">&gt;</span>sa_family,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="ex">-</span>                              SOCK_STREAM, IPPROTO_TCP, <span class="kw">&amp;</span><span class="ex">sock</span>);</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a><span class="ex">+</span>                              SOCK_STREAM, IPPROTO_MPTCP, <span class="kw">&amp;</span><span class="ex">sock</span>);</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>        <span class="kw">if</span> <span class="kw">(</span><span class="ex">err</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>                <span class="ex">sock</span> = NULL<span class="kw">;</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>                <span class="ex">goto</span> out<span class="kw">;</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a><span class="ex">@@</span> -715,7 +715,7 @@ static int prepare_listen_socket(struct drbd_connection *connection, struct acce</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a>        <span class="ex">what</span> = <span class="st">&quot;sock_create_kern&quot;</span><span class="kw">;</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true"></a>        <span class="ex">err</span> = sock_create_kern(<span class="kw">&amp;</span><span class="ex">init_net</span>, ((struct sockaddr *)<span class="kw">&amp;</span><span class="ex">my_addr</span>)<span class="ex">-</span><span class="op">&gt;</span>sa_family,</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true"></a><span class="ex">-</span>                              SOCK_STREAM, IPPROTO_TCP, <span class="kw">&amp;</span><span class="ex">s_listen</span>);</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true"></a><span class="ex">+</span>                              SOCK_STREAM, IPPROTO_MPTCP, <span class="kw">&amp;</span><span class="ex">s_listen</span>);</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true"></a>        <span class="kw">if</span> <span class="kw">(</span><span class="ex">err</span><span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true"></a>                <span class="ex">s_listen</span> = NULL<span class="kw">;</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true"></a>                <span class="ex">goto</span> out<span class="kw">;</span></span></code></pre></div>
-<h1 data-number="3" id="调试"><span class="header-section-number">3</span> 调试</h1>
-<p>启动drbd服务后，报错的日志<a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/mptcp/drbd-mptcp-log.txt"><code>drbd-mptcp-log.txt</code></a>。</p>
+<h1 data-number="2" id="内核修改"><span
+class="header-section-number">2</span> 内核修改</h1>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">---</span> a/drivers/block/drbd/drbd_receiver.c</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">+++</span> b/drivers/block/drbd/drbd_receiver.c</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-620,7</span> +620,7 @@ static struct socket <span class="pp">*</span>drbd_try_connect<span class="er">(</span><span class="ex">struct</span> drbd_connection <span class="pp">*</span>connection<span class="kw">)</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">what</span> = <span class="st">&quot;sock_create_kern&quot;</span><span class="kw">;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">err</span> = sock_create_kern<span class="er">(</span><span class="kw">&amp;</span><span class="ex">init_net,</span> <span class="er">(</span><span class="kw">(</span><span class="ex">struct</span> sockaddr <span class="pp">*</span><span class="kw">)&amp;</span><span class="ex">src_in6</span><span class="kw">)</span><span class="ex">-</span><span class="op">&gt;</span>sa_family,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>                              SOCK_STREAM, IPPROTO_TCP, <span class="kw">&amp;</span><span class="ex">sock</span><span class="kw">);</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>                              SOCK_STREAM, IPPROTO_MPTCP, <span class="kw">&amp;</span><span class="ex">sock</span><span class="er">)</span><span class="kw">;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">(</span><span class="ex">err</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                <span class="ex">sock</span> = NULL<span class="kw">;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                <span class="ex">goto</span> out<span class="kw">;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="ex">@@</span> <span class="at">-715,7</span> +715,7 @@ static int prepare_listen_socket<span class="er">(</span><span class="ex">struct</span> drbd_connection <span class="pp">*</span>connection, struct acce</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>        <span class="ex">what</span> = <span class="st">&quot;sock_create_kern&quot;</span><span class="kw">;</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        <span class="ex">err</span> = sock_create_kern<span class="er">(</span><span class="kw">&amp;</span><span class="ex">init_net,</span> <span class="er">(</span><span class="kw">(</span><span class="ex">struct</span> sockaddr <span class="pp">*</span><span class="kw">)&amp;</span><span class="ex">my_addr</span><span class="kw">)</span><span class="ex">-</span><span class="op">&gt;</span>sa_family,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span>                              SOCK_STREAM, IPPROTO_TCP, <span class="kw">&amp;</span><span class="ex">s_listen</span><span class="kw">);</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="ex">+</span>                              SOCK_STREAM, IPPROTO_MPTCP, <span class="kw">&amp;</span><span class="ex">s_listen</span><span class="kw">);</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">(</span><span class="ex">err</span><span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>                <span class="ex">s_listen</span> = NULL<span class="kw">;</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>                <span class="ex">goto</span> out<span class="kw">;</span></span></code></pre></div>
+<h1 data-number="3" id="调试"><span
+class="header-section-number">3</span> 调试</h1>
+<p>启动drbd服务后，报错的日志<a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/mptcp/drbd-mptcp-log.txt"><code>drbd-mptcp-log.txt</code></a>。</p>
 <p>用<code>ss -ieMl</code>命令查看:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="ex">State</span>   Recv-Q  Send-Q   Local Address:Port  Peer Address:Port</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="ex">LISTEN</span>  3       5       192.168.53.209:7788       0.0.0.0:*</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">State</span>   Recv-Q  Send-Q   Local Address:Port  Peer Address:Port</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">LISTEN</span>  3       5       192.168.53.209:7788       0.0.0.0:<span class="pp">*</span></span></code></pre></div>
 <p>再用<code>ss -iaM</code>命令查看:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="ex">State</span>     Recv-Q   Send-Q    Local Address:Port      Peer Address:Port</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:33097   192.168.53.210:7788</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:54917   192.168.53.210:7788</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="ex">ESTAB</span>     960      0        192.168.53.209:7788     192.168.53.1:58511</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:39051   192.168.53.210:7788</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:38833   192.168.53.210:7788</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a><span class="ex">ESTAB</span>     0        0        192.168.53.209:51037   192.168.53.210:7788</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true"></a><span class="ex">LISTEN</span>    1        5        192.168.53.209:7788           0.0.0.0:*</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">State</span>     Recv-Q   Send-Q    Local Address:Port      Peer Address:Port</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:33097   192.168.53.210:7788</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:54917   192.168.53.210:7788</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">ESTAB</span>     960      0        192.168.53.209:7788     192.168.53.1:58511</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:39051   192.168.53.210:7788</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ex">FIN-WAIT</span>  0        0        192.168.53.209:38833   192.168.53.210:7788</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ex">ESTAB</span>     0        0        192.168.53.209:51037   192.168.53.210:7788</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">LISTEN</span>    1        5        192.168.53.209:7788           0.0.0.0:<span class="pp">*</span></span></code></pre></div>
 <p>可以看到，mptcp连接已经建立，但是<code>sock_recvmsg()</code>返回错误:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="bu">[</span> 1003.627149] drbd r0: sock_recvmsg returned -11</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 1003.627149] drbd r0: <span class="er">sock_recvmsg</span> <span class="ex">returned</span> <span class="at">-11</span></span></code></pre></div>
 <p><code>sock_recvmsg()</code>返回错误码<code>-EAGAIN</code>。</p>
 <p>还需要进一步定位。</p>
-<h1 data-number="4" id="代码分析"><span class="header-section-number">4</span> 代码分析</h1>
-<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a>drbd_recv</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a>  drbd_recv_short</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a>  drbd_err(connection, <span class="st">&quot;sock_recvmsg returned %d</span><span class="sc">\n</span><span class="st">&quot;</span>, rv)</span></code></pre></div>
+<h1 data-number="4" id="代码分析"><span
+class="header-section-number">4</span> 代码分析</h1>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>drbd_recv</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  drbd_recv_short</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  drbd_err<span class="op">(</span>connection<span class="op">,</span> <span class="st">&quot;sock_recvmsg returned </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> rv<span class="op">)</span></span></code></pre></div>
 </body>
 </html>
