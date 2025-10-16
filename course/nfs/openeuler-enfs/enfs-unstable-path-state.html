@@ -138,14 +138,14 @@ class="header-section-number">1</span> 需求</h1>
 <h1 data-number="2" id="代码分析"><span
 class="header-section-number">2</span> 代码分析</h1>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> rpc_xprt</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  connect_cookie</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  connect_cookie <span class="co">// 重连时这个值会变</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>pm_set_path_state</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>pm_set_path_state <span class="co">// 设置状态</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> enfs_xprt_context</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> enfs_xprt_context <span class="co">// 通过 xprt_get_reserve_context() 获取</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>enfs_alloc_xprt_ctx</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  ctx <span class="op">=</span> kzalloc <span class="co">// 初始化为0</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  ctx <span class="op">=</span> kzalloc <span class="co">// struct enfs_xprt_context 初始化为0</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>pm_ping_routine <span class="co">// kthread_run(pm_ping_routine,</span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  enfs_get_config_path_detect_interval <span class="co">// 获取间隔时长</span></span>
