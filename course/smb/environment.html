@@ -224,8 +224,26 @@ Build Samba from Source</a>。</p>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> install <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span>/usr/local/samba/bin/:/usr/local/samba/sbin/:<span class="va">$PATH</span></span></code></pre></div>
-<p>更新<code>smb.service</code>（具体位置可以用<code>systemctl status smb</code>查看）:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ./packaging/systemd/smb.service.in /usr/lib/systemd/system/smb.service</span></code></pre></div>
+<p>更新<code>/usr/lib/systemd/system/smb.service</code>，具体位置可以用<code>systemctl status smb</code>查看:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[Unit]</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="va">Description</span><span class="op">=</span>Samba <span class="ex">SMB</span> Daemon</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="va">Documentation</span><span class="op">=</span>man:smbd<span class="kw">(</span><span class="ex">8</span><span class="kw">)</span> <span class="ex">man:samba</span><span class="er">(</span><span class="ex">7</span><span class="kw">)</span> <span class="ex">man:smb.conf</span><span class="er">(</span><span class="ex">5</span><span class="kw">)</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="va">Wants</span><span class="op">=</span>network-online.target</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="va">After</span><span class="op">=</span>network.target <span class="ex">network-online.target</span> nmb.service winbind.service</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[Service]</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="va">Type</span><span class="op">=</span>notify</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="va">PIDFile</span><span class="op">=</span>/run/smbd.pid</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="va">LimitNOFILE</span><span class="op">=</span>16384</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="va">EnvironmentFile</span><span class="op">=</span>-/etc/sysconfig/samba</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStart</span><span class="op">=</span>/usr/local/samba/sbin/smbd <span class="ex">--foreground</span> <span class="at">--no-process-group</span> <span class="va">$SMBDOPTIONS</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="va">ExecReload</span><span class="op">=</span>/bin/kill <span class="ex">-HUP</span> <span class="va">$MAINPID</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="va">LimitCORE</span><span class="op">=</span>infinity</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="va">Environment</span><span class="op">=</span>KRB5CCNAME=FILE:/run/samba/krb5cc_samba</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[Install]</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="va">WantedBy</span><span class="op">=</span>multi-user.target</span></code></pre></div>
+<p>不能直接复制<code>./packaging/systemd/smb.service.in</code>，现在要设置环境变量的值了。</p>
 <p>创建配置文件:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> /etc/samba/smb.conf /usr/local/samba/etc/smb.conf</span></code></pre></div>
 <p>需要特别注意的是要重新创建用户:</p>

@@ -117,7 +117,7 @@ class="toc-section-number">1</span> 打印</a>
 <ul>
 <li><a href="#内核态server打印" id="toc-内核态server打印"><span
 class="toc-section-number">1.1</span> 内核态server打印</a></li>
-<li><a href="#用户态server打印" id="toc-用户态server打印"><span
+<li><a href="#samba-print" id="toc-samba-print"><span
 class="toc-section-number">1.2</span> 用户态server打印</a></li>
 <li><a href="#client打印" id="toc-client打印"><span
 class="toc-section-number">1.3</span> client打印</a>
@@ -186,15 +186,16 @@ class="header-section-number">1.1</span> 内核态server打印</h2>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">+int</span> ksmbd_debug_types = KSMBD_DEBUG_ALL<span class="kw">;</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a> </span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a> <span class="ex">struct</span> ksmbd_server_config server_conf<span class="kw">;</span></span></code></pre></div>
-<h2 data-number="1.2" id="用户态server打印"><span
+<h2 data-number="1.2" id="samba-print"><span
 class="header-section-number">1.2</span> 用户态server打印</h2>
 <p><a
 href="https://gitlab.com/samba-team/samba">用户态server仓库</a>。</p>
 <p>修改配置文件<code>/etc/samba/smb.conf</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[global]</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">log</span> level = 4</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 日志文件路径</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">log</span> file = /usr/local/samba/var/log.%m</span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 默认是0</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">log</span> level = 4</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 日志文件路径</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">log</span> file = /usr/local/samba/var/log.%m</span></code></pre></div>
 <p>常用的几个<code>log level</code>有以下几个:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define DEBUG_ERR     DBGLVL_ERR     </span><span class="co">// 0      /* error conditions */</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define DEBUG_WARNING DBGLVL_WARNING </span><span class="co">// 1      /* warning conditions */</span></span>
