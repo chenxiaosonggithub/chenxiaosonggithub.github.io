@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -94,152 +83,123 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">哈希表</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#uthash" id="toc-uthash"><span
-class="toc-section-number">1</span> uthash</a></li>
-<li><a href="#leetcode-1.-两数之和" id="toc-leetcode-1.-两数之和"><span
-class="toc-section-number">2</span> leetcode 1. 两数之和</a></li>
-<li><a href="#leetcode-496.-下一个更大元素-i"
-id="toc-leetcode-496.-下一个更大元素-i"><span
-class="toc-section-number">3</span> leetcode 496. 下一个更大元素
-I</a></li>
-<li><a href="#leetcode-217.-存在重复元素"
-id="toc-leetcode-217.-存在重复元素"><span
-class="toc-section-number">4</span> leetcode 217. 存在重复元素</a></li>
+<li><a href="#uthash"><span class="toc-section-number">1</span> uthash</a></li>
+<li><a href="#leetcode-1.-两数之和"><span class="toc-section-number">2</span> leetcode 1. 两数之和</a></li>
+<li><a href="#leetcode-496.-下一个更大元素-i"><span class="toc-section-number">3</span> leetcode 496. 下一个更大元素 I</a></li>
+<li><a href="#leetcode-217.-存在重复元素"><span class="toc-section-number">4</span> leetcode 217. 存在重复元素</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/course/algorithm/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/course/algorithm/algorithm.html">点击跳转到算法课程所有目录</a>。</p>
-<h1 data-number="1" id="uthash"><span
-class="header-section-number">1</span> uthash</h1>
+<p><a href="https://chenxiaosong.com/course/algorithm/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/algorithm/algorithm.html">点击跳转到算法课程所有目录</a>。</p>
+<h1 data-number="1" id="uthash"><span class="header-section-number">1</span> uthash</h1>
 <ul>
 <li><a href="https://troydhanson.github.io/uthash/">uthash主页</a></li>
-<li><a href="https://github.com/troydhanson/uthash">uthash
-github</a></li>
-<li>头文件<code>uthash.h</code>: <a
-href="https://github.com/troydhanson/uthash/blob/master/src/uthash.h">github</a></li>
-<li><a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/algorithm/src/hash-table/int-key-uthash.c">key为int类型时uthash的示例</a></li>
-<li><a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/algorithm/src/hash-table/char-ptr-key-uthash.c">key为char指针类型时uthash的示例</a></li>
-<li><a
-href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/algorithm/src/hash-table/char-array-key-uthash.c">key为char数组类型时uthash的示例</a></li>
+<li><a href="https://github.com/troydhanson/uthash">uthash github</a></li>
+<li>头文件<code>uthash.h</code>: <a href="https://github.com/troydhanson/uthash/blob/master/src/uthash.h">github</a></li>
+<li><a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/algorithm/src/hash-table/int-key-uthash.c">key为int类型时uthash的示例</a></li>
+<li><a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/algorithm/src/hash-table/char-ptr-key-uthash.c">key为char指针类型时uthash的示例</a></li>
+<li><a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/algorithm/src/hash-table/char-array-key-uthash.c">key为char数组类型时uthash的示例</a></li>
 </ul>
 <p>注意在leetcode中使用uthash，<code>head_table</code>在每个用例执行时都要初始化为<code>NULL</code>，因为全局变量和静态变量的初始化只会执行一次。</p>
-<h1 data-number="2" id="leetcode-1.-两数之和"><span
-class="header-section-number">2</span> leetcode 1. 两数之和</h1>
+<h1 data-number="2" id="leetcode-1.-两数之和"><span class="header-section-number">2</span> leetcode 1. 两数之和</h1>
 <ul>
-<li><a
-href="https://leetcode.cn/problems/two-sum/description/">点击这里查看题目</a></li>
+<li><a href="https://leetcode.cn/problems/two-sum/description/">点击这里查看题目</a></li>
 </ul>
 <p>c语言实现:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> hash_table <span class="op">{</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> key<span class="op">;</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> value<span class="op">;</span> <span class="co">// value</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    UT_hash_handle hh<span class="op">;</span> <span class="co">/* makes this structure hashable */</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">// 必须要初始化为NULL，考虑到leetcode c语言实现执行多个用例时全局变量和静态变量只会初始化一次，</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">// 所以我们这里就不在这里初始化值，而是放到main()中，</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">// 防止以后从这里copy代码到leetcode中时用例不通过</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">struct</span> hash_table <span class="op">*</span>head_table<span class="op">;</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> uthash_add<span class="op">(</span><span class="kw">struct</span> hash_table <span class="op">*</span>add<span class="op">)</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    HASH_ADD_INT<span class="op">(</span>head_table<span class="op">,</span> key<span class="op">,</span> add<span class="op">);</span> <span class="co">// 这里的key不是变量，而是结构体成员名</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="kw">struct</span> hash_table <span class="op">*</span>uthash_find<span class="op">(</span><span class="dt">int</span> key<span class="op">)</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> hash_table <span class="op">*</span>out<span class="op">;</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    HASH_FIND_INT<span class="op">(</span>head_table<span class="op">,</span> <span class="op">&amp;</span>key<span class="op">,</span> out<span class="op">);</span> <span class="co">// 这里的key是变量</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out<span class="op">;</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> uthash_delete<span class="op">(</span><span class="kw">struct</span> hash_table <span class="op">*</span>del<span class="op">)</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    HASH_DEL<span class="op">(</span>head_table<span class="op">,</span> del<span class="op">);</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"> * Note: The returned array must be malloced, assume caller calls free().</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span><span class="op">*</span> twoSum<span class="op">(</span><span class="dt">int</span><span class="op">*</span> nums<span class="op">,</span> <span class="dt">int</span> numsSize<span class="op">,</span> <span class="dt">int</span> target<span class="op">,</span> <span class="dt">int</span><span class="op">*</span> returnSize<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    head_table <span class="op">=</span> NULL<span class="op">;</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> hash_table <span class="op">*</span>tmp<span class="op">;</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> numsSize<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        tmp <span class="op">=</span> uthash_find<span class="op">(</span>target <span class="op">-</span> nums<span class="op">[</span>i<span class="op">]);</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>tmp<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            <span class="dt">int</span> <span class="op">*</span>ret <span class="op">=</span> malloc<span class="op">(</span><span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">)</span> <span class="op">*</span> <span class="dv">2</span><span class="op">);</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>            ret<span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> tmp<span class="op">-&gt;</span>value<span class="op">;</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>            ret<span class="op">[</span><span class="dv">1</span><span class="op">]</span> <span class="op">=</span> i<span class="op">;</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>            <span class="op">*</span>returnSize <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> ret<span class="op">;</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        tmp <span class="op">=</span> malloc<span class="op">(</span><span class="kw">sizeof</span><span class="op">(</span><span class="kw">struct</span> hash_table<span class="op">));</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>        tmp<span class="op">-&gt;</span>key <span class="op">=</span> nums<span class="op">[</span>i<span class="op">];</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>        tmp<span class="op">-&gt;</span>value <span class="op">=</span> i<span class="op">;</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>        uthash_add<span class="op">(</span>tmp<span class="op">);</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>returnSize <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> NULL<span class="op">;</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<h1 data-number="3" id="leetcode-496.-下一个更大元素-i"><span
-class="header-section-number">3</span> leetcode 496. 下一个更大元素
-I</h1>
-<p><a
-href="https://chenxiaosong.com/course/algorithm/monotonic-stack.html">点击这里查看“单调栈
-+ 哈希表”的解法</a></p>
-<h1 data-number="4" id="leetcode-217.-存在重复元素"><span
-class="header-section-number">4</span> leetcode 217. 存在重复元素</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">struct</span> hash_table {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>    <span class="dt">int</span> key;</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    <span class="dt">int</span> value; <span class="co">// value</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>    UT_hash_handle hh; <span class="co">/* makes this structure hashable */</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>};</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="co">// 必须要初始化为NULL，考虑到leetcode c语言实现执行多个用例时全局变量和静态变量只会初始化一次，</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="co">// 所以我们这里就不在这里初始化值，而是放到main()中，</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co">// 防止以后从这里copy代码到leetcode中时用例不通过</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="dt">static</span> <span class="kw">struct</span> hash_table *head_table;</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="dt">static</span> <span class="dt">void</span> uthash_add(<span class="kw">struct</span> hash_table *add)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>{</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>    HASH_ADD_INT(head_table, key, add); <span class="co">// 这里的key不是变量，而是结构体成员名</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>}</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="dt">static</span> <span class="kw">struct</span> hash_table *uthash_find(<span class="dt">int</span> key)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>{</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>    <span class="kw">struct</span> hash_table *out;</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>    HASH_FIND_INT(head_table, &amp;key, out); <span class="co">// 这里的key是变量</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>    <span class="cf">return</span> out;</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>}</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a><span class="dt">static</span> <span class="dt">void</span> uthash_delete(<span class="kw">struct</span> hash_table *del)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>{</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>    HASH_DEL(head_table, del);</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>}</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a><span class="co">/**</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a><span class="co"> * Note: The returned array must be malloced, assume caller calls free().</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a><span class="co"> */</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a><span class="dt">int</span>* twoSum(<span class="dt">int</span>* nums, <span class="dt">int</span> numsSize, <span class="dt">int</span> target, <span class="dt">int</span>* returnSize) {</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>    head_table = NULL;</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>    <span class="kw">struct</span> hash_table *tmp;</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>    <span class="cf">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; numsSize; i++) {</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>        tmp = uthash_find(target - nums[i]);</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>        <span class="cf">if</span> (tmp) {</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>            <span class="dt">int</span> *ret = malloc(<span class="kw">sizeof</span>(<span class="dt">int</span>) * <span class="dv">2</span>);</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a>            ret[<span class="dv">0</span>] = tmp-&gt;value;</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a>            ret[<span class="dv">1</span>] = i;</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a>            *returnSize = <span class="dv">2</span>;</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>            <span class="cf">return</span> ret;</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a>        }</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>        tmp = malloc(<span class="kw">sizeof</span>(<span class="kw">struct</span> hash_table));</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a>        tmp-&gt;key = nums[i];</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a>        tmp-&gt;value = i;</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a>        uthash_add(tmp);</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a>    }</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a>    *returnSize = <span class="dv">0</span>;</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true"></a>    <span class="cf">return</span> NULL;</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true"></a>}</span></code></pre></div>
+<h1 data-number="3" id="leetcode-496.-下一个更大元素-i"><span class="header-section-number">3</span> leetcode 496. 下一个更大元素 I</h1>
+<p><a href="https://chenxiaosong.com/course/algorithm/monotonic-stack.html">点击这里查看“单调栈 + 哈希表”的解法</a></p>
+<h1 data-number="4" id="leetcode-217.-存在重复元素"><span class="header-section-number">4</span> leetcode 217. 存在重复元素</h1>
 <ul>
-<li><a
-href="https://leetcode.cn/problems/contains-duplicate/description/">点击这里查看题目</a></li>
+<li><a href="https://leetcode.cn/problems/contains-duplicate/description/">点击这里查看题目</a></li>
 </ul>
 <p>c语言实现:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> hash_table <span class="op">{</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> key<span class="op">;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> value<span class="op">;</span>  <span class="co">// value用不到，可以去掉</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    UT_hash_handle hh<span class="op">;</span> <span class="co">/* makes this structure hashable */</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">// 只能放在函数里，放函数外用例失败</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">// struct hash_table *head_table = NULL;</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> containsDuplicate<span class="op">(</span><span class="dt">int</span><span class="op">*</span> nums<span class="op">,</span> <span class="dt">int</span> numsSize<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> hash_table <span class="op">*</span>head_table <span class="op">=</span> NULL<span class="op">;</span> <span class="co">// 只能放在函数里，放函数外用例失败</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> numsSize<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> hash_table <span class="op">*</span>tmp<span class="op">;</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        HASH_FIND_INT<span class="op">(</span>head_table<span class="op">,</span> <span class="op">&amp;</span>nums<span class="op">[</span>i<span class="op">],</span> tmp<span class="op">);</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(!</span>tmp<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>            tmp <span class="op">=</span> malloc<span class="op">(</span><span class="kw">sizeof</span><span class="op">(</span><span class="kw">struct</span> hash_table<span class="op">));</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>            tmp<span class="op">-&gt;</span>key <span class="op">=</span> nums<span class="op">[</span>i<span class="op">];</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>            HASH_ADD_INT<span class="op">(</span>head_table<span class="op">,</span> key<span class="op">,</span> tmp<span class="op">);</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">struct</span> hash_table {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>    <span class="dt">int</span> key;</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    <span class="dt">int</span> value;  <span class="co">// value用不到，可以去掉</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>    UT_hash_handle hh; <span class="co">/* makes this structure hashable */</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>};</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co">// 只能放在函数里，放函数外用例失败</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">// struct hash_table *head_table = NULL;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="dt">bool</span> containsDuplicate(<span class="dt">int</span>* nums, <span class="dt">int</span> numsSize) {</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>    <span class="kw">struct</span> hash_table *head_table = NULL; <span class="co">// 只能放在函数里，放函数外用例失败</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>    <span class="cf">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; numsSize; i++) {</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>        <span class="kw">struct</span> hash_table *tmp;</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>        HASH_FIND_INT(head_table, &amp;nums[i], tmp);</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>        <span class="cf">if</span> (!tmp) {</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>            tmp = malloc(<span class="kw">sizeof</span>(<span class="kw">struct</span> hash_table));</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>            tmp-&gt;key = nums[i];</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>            HASH_ADD_INT(head_table, key, tmp);</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>        } <span class="cf">else</span> {</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a>            <span class="cf">return</span> true;</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>        }</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a>    }</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a>    <span class="cf">return</span> false;</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>}</span></code></pre></div>
 </body>
 </html>

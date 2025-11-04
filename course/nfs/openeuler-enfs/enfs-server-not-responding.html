@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -94,148 +83,132 @@
 <ul>
 <li>作者: 陈孝松</li>
 <li><a href="https://chenxiaosong.com/">主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">openEuler的nfs+报错not responding的问题</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#问题描述" id="toc-问题描述"><span
-class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#代码分析" id="toc-代码分析"><span
-class="toc-section-number">2</span> 代码分析</a></li>
-<li><a href="#解决方案" id="toc-解决方案"><span
-class="toc-section-number">3</span> 解决方案</a></li>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">2</span> 代码分析</a></li>
+<li><a href="#解决方案"><span class="toc-section-number">3</span> 解决方案</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<h1 data-number="1" id="问题描述"><span
-class="header-section-number">1</span> 问题描述</h1>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
 <p>按以下步骤操作，报错<code>nfs: server 192.168.53.210 not responding, timed out</code>:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=3,localaddrs=192.168.53.209~192.168.53.46,remoteaddrs=192.168.53.210~192.168.53.47 192.168.53.210:/tmp/s_test /mnt/</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">modprobe</span> <span class="at">-r</span> enfs</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">modprobe</span> enfs</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># nfs: server 10.42.43.92 not responding, timed out</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ...</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.209} remoteip{10.42.43.93} path state change from {1} to {2}.</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.46} remoteip{10.42.43.92} path state change from {1} to {2}.</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.209} remoteip{10.42.43.92} path state change from {1} to {2}.</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.46} remoteip{10.42.43.93} path state change from {1} to {2}.</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">mount</span> -t nfs -o vers=3,localaddrs=192.168.53.209~192.168.53.46,remoteaddrs=192.168.53.210~192.168.53.47 192.168.53.210:/tmp/s_test /mnt/</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ex">modprobe</span> -r enfs</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ex">modprobe</span> enfs</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="co"># nfs: server 10.42.43.92 not responding, timed out</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co"># ...</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.209} remoteip{10.42.43.93} path state change from {1} to {2}.</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.46} remoteip{10.42.43.92} path state change from {1} to {2}.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.209} remoteip{10.42.43.92} path state change from {1} to {2}.</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.46} remoteip{10.42.43.93} path state change from {1} to {2}.</span></span></code></pre></div>
 <p>在<code>e96d124d2a24 (HEAD) !16573  Backport 6.6.64-6.6.72 LTS</code>（我的第一个提交之前）不只有以上错误，还会不断打印以下错误:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   33.459480] enfs:<span class="pp">[</span><span class="ss">query_and_update_shard</span><span class="pp">]</span>update lsId <span class="er">err:-22.</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   34.475287] nfs: server <span class="er">10.42.43.92</span> <span class="ex">not</span> responding, timed out</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   34.482117] ENFS: get <span class="er">fsInfo</span> <span class="ex">failed</span> <span class="at">-22.</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="bu">[</span>   33.459480] enfs:[query_and_update_shard]update lsId err:-22.</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>[   34.475287] nfs: server 10.42.43.92 not responding, timed out</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>[   34.482117] ENFS: get fsInfo failed -22.</span></code></pre></div>
 <p>创建配置文件<code>/etc/enfs/config.ini</code>设置<code>path_detect_timeout=10</code>后不报错。</p>
-<h1 data-number="2" id="代码分析"><span
-class="header-section-number">2</span> 代码分析</h1>
+<h1 data-number="2" id="代码分析"><span class="header-section-number">2</span> 代码分析</h1>
 <p>client端的null包的发送流程如下:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>enfs_multipath_init</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  pm_ping_init</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    pm_ping_start</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      pm_ping_routine <span class="co">// kthread_run(pm_ping_routine,</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        enfs_get_config_path_detect_interval <span class="co">// 获取间隔时长</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        pm_ping_loop_sunrpc_net</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>          pm_ping_loop_rpclnt</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>            rpc_clnt_iterate_for_each_xprt</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>              pm_ping_execute_xprt_test <span class="co">// fn</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                pm_ping_add_work</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                  pm_ping_execute_work <span class="co">// INIT_WORK(&amp;work_info-&gt;ping_work,</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                    rpc_clnt_test_xprt<span class="op">(...,</span> <span class="op">&amp;</span>pm_ping_set_status_ops<span class="op">,</span> <span class="op">...,</span> RPC_TASK_ASYNC<span class="op">...)</span> <span class="co">// 异步</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                      rpc_call_null_helper<span class="op">(...,</span> RPC_TASK_SOFT<span class="op">...)</span> <span class="co">// rpc请求不会一直尝试</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                        <span class="co">// 调试时可以判断task-&gt;tk_msg.rpc_proc-&gt;p_proc</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                        <span class="op">.</span>rpc_proc <span class="op">=</span> <span class="op">&amp;</span>rpcproc_null<span class="op">,</span> <span class="co">// rpcproc_null.p_proc不赋值默认为NFS3PROC_NULL</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>                        <span class="op">.</span>callback_ops <span class="op">=</span> <span class="op">&amp;</span>pm_ping_set_status_ops</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                        rpc_run_task</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>                          rpc_new_task</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>                            rpc_init_task</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>                              task<span class="op">-&gt;</span>tk_ops <span class="op">=</span> task_setup_data<span class="op">-&gt;</span>callback_ops <span class="op">=</span> pm_ping_set_status_ops</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>                              <span class="cf">if</span> <span class="op">(</span>task<span class="op">-&gt;</span>tk_ops<span class="op">-&gt;</span>rpc_call_prepare <span class="op">!=</span> NULL<span class="op">)</span> <span class="co">// 条件不满足</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>                              task<span class="op">-&gt;</span>tk_action <span class="op">==</span> NULL</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>                          rpc_call_start</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                            task<span class="op">-&gt;</span>tk_action <span class="op">=</span> call_start</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>xprt_create_transport</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  rpc_multipath_ops_create_xprt</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    enfs_create_xprt_ctx <span class="co">// create_xprt</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>      enfs_alloc_xprt_ctx</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        xprt_set_reserve_context</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>          buf<span class="op">-&gt;</span>reserve_context</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>mount</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  path_mount</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    do_new_mount</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>      vfs_get_tree</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        nfs_get_tree</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>          nfs_try_get_tree</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>            nfs_try_mount_request</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>              nfs3_create_server</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>                nfs_create_server</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>                  nfs_init_server</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>                    nfs_get_client</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>                      nfs_init_client</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>                        nfs_create_rpc_client</span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>                          rpc_create</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>                            rpc_create_xprt</span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>                              rpc_multipath_ops_create_clnt</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>                                enfs_create_multi_xprt</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>                                  enfs_multipath_create_thread</span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>                                    enfs_fill_empty_iplist</span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>                                    enfs_xprt_ippair_create</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>                                      enfs_combine_addr</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>                                        enfs_configure_xprt_to_clnt</span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>                                          print_enfs_multipath_addr</span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>                                          rpc_clnt_add_xprt</span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>                                            enfs_add_xprt_setup <span class="co">// setup</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>                                              xprt_get_reserve_context</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>enfs_multipath_init</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  pm_ping_init</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    pm_ping_start</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>      pm_ping_routine <span class="co">// kthread_run(pm_ping_routine,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>        enfs_get_config_path_detect_interval <span class="co">// 获取间隔时长</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>        pm_ping_loop_sunrpc_net</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>          pm_ping_loop_rpclnt</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>            rpc_clnt_iterate_for_each_xprt</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>              pm_ping_execute_xprt_test <span class="co">// fn</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>                pm_ping_add_work</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>                  pm_ping_execute_work <span class="co">// INIT_WORK(&amp;work_info-&gt;ping_work,</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>                    rpc_clnt_test_xprt(..., &amp;pm_ping_set_status_ops, ..., RPC_TASK_ASYNC...) <span class="co">// 异步</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>                      rpc_call_null_helper(..., RPC_TASK_SOFT...) <span class="co">// rpc请求不会一直尝试</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>                        <span class="co">// 调试时可以判断task-&gt;tk_msg.rpc_proc-&gt;p_proc</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>                        .rpc_proc = &amp;rpcproc_null, <span class="co">// rpcproc_null.p_proc不赋值默认为NFS3PROC_NULL</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>                        .callback_ops = &amp;pm_ping_set_status_ops</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>                        rpc_run_task</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>                          rpc_new_task</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>                            rpc_init_task</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>                              task-&gt;tk_ops = task_setup_data-&gt;callback_ops = pm_ping_set_status_ops</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>                              <span class="cf">if</span> (task-&gt;tk_ops-&gt;rpc_call_prepare != NULL) <span class="co">// 条件不满足</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a>                              task-&gt;tk_action == NULL</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a>                          rpc_call_start</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a>                            task-&gt;tk_action = call_start</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a>xprt_create_transport</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a>  rpc_multipath_ops_create_xprt</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>    enfs_create_xprt_ctx <span class="co">// create_xprt</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a>      enfs_alloc_xprt_ctx</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a>        xprt_set_reserve_context</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a>          buf-&gt;reserve_context</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a>mount</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a>  path_mount</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a>    do_new_mount</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true"></a>      vfs_get_tree</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true"></a>        nfs_get_tree</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true"></a>          nfs_try_get_tree</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true"></a>            nfs_try_mount_request</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true"></a>              nfs3_create_server</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true"></a>                nfs_create_server</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true"></a>                  nfs_init_server</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true"></a>                    nfs_get_client</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true"></a>                      nfs_init_client</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true"></a>                        nfs_create_rpc_client</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true"></a>                          rpc_create</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true"></a>                            rpc_create_xprt</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true"></a>                              rpc_multipath_ops_create_clnt</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true"></a>                                enfs_create_multi_xprt</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true"></a>                                  enfs_multipath_create_thread</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true"></a>                                    enfs_fill_empty_iplist</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true"></a>                                    enfs_xprt_ippair_create</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true"></a>                                      enfs_combine_addr</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true"></a>                                        enfs_configure_xprt_to_clnt</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true"></a>                                          print_enfs_multipath_addr</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true"></a>                                          rpc_clnt_add_xprt</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true"></a>                                            enfs_add_xprt_setup <span class="co">// setup</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true"></a>                                              xprt_get_reserve_context</span></code></pre></div>
 <p>在<code>call_status()</code>中超时打印:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>call_start</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>call_reserve</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>call_reserveresult</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>call_refresh</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>call_refreshresult</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>call_allocate</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>call_encode</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>call_transmit</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>call_transmit_status</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>call_status</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  status <span class="op">=</span> task<span class="op">-&gt;</span>tk_status <span class="op">==</span> <span class="op">-</span>ETIMEDOUT</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  rpc_check_timeout</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;</span><span class="sc">%s</span><span class="st">: server </span><span class="sc">%s</span><span class="st"> not responding, timed out</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span></span></code></pre></div>
-<p>在nfs
-server中打印xid，发现没有执行到<code>svc_process()</code>中。</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>nfsd</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  svc_recv</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 打印 rqstp-&gt;rq_xid</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    svc_process</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      rqstp<span class="op">-&gt;</span>rq_xid <span class="op">=</span> <span class="op">*</span>p<span class="op">++;</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      svc_process_common</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        nfsd_init_request <span class="co">// progp-&gt;pg_init_request</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>          svc_generic_init_request <span class="co">// 不确定，后面再调试看看</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            ret<span class="op">-&gt;</span>dispatch <span class="op">=</span> versp<span class="op">-&gt;</span>vs_dispatch</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        nfsd_dispatch <span class="co">// process.dispatch()</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>          nfssvc_decode_voidarg <span class="co">// proc-&gt;pc_decode</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>          nfsd3_proc_null <span class="co">// proc-&gt;pc_func</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>          nfssvc_encode_voidres <span class="co">// proc-&gt;pc_encode</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>      svc_send</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        svc_tcp_sendto <span class="co">// xprt-&gt;xpt_ops-&gt;xpo_sendto</span></span></code></pre></div>
-<h1 data-number="3" id="解决方案"><span
-class="header-section-number">3</span> 解决方案</h1>
-<p><a
-href="https://gitee.com/openeuler/kernel/pulls/17973/commits">请查看pr</a>。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>call_start</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>call_reserve</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>call_reserveresult</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>call_refresh</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>call_refreshresult</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>call_allocate</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>call_encode</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>call_transmit</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>call_transmit_status</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>call_status</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>  status = task-&gt;tk_status == -ETIMEDOUT</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>  rpc_check_timeout</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>    <span class="st">&quot;%s: server %s not responding, timed out</span><span class="sc">\n</span><span class="st">&quot;</span>,</span></code></pre></div>
+<p>在nfs server中打印xid，发现没有执行到<code>svc_process()</code>中。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>nfsd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>  svc_recv</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    <span class="co">// 打印 rqstp-&gt;rq_xid</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>    svc_process</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>      rqstp-&gt;rq_xid = *p++;</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>      svc_process_common</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>        nfsd_init_request <span class="co">// progp-&gt;pg_init_request</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>          svc_generic_init_request <span class="co">// 不确定，后面再调试看看</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>            ret-&gt;dispatch = versp-&gt;vs_dispatch</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>        nfsd_dispatch <span class="co">// process.dispatch()</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>          nfssvc_decode_voidarg <span class="co">// proc-&gt;pc_decode</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>          nfsd3_proc_null <span class="co">// proc-&gt;pc_func</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>          nfssvc_encode_voidres <span class="co">// proc-&gt;pc_encode</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a>      svc_send</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>        svc_tcp_sendto <span class="co">// xprt-&gt;xpt_ops-&gt;xpo_sendto</span></span></code></pre></div>
+<h1 data-number="3" id="解决方案"><span class="header-section-number">3</span> 解决方案</h1>
+<p><a href="https://gitee.com/openeuler/kernel/pulls/17973/commits">请查看pr</a>。</p>
 </body>
 </html>
