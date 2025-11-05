@@ -113,8 +113,14 @@ environment</a></li>
 id="toc-samba-development-environment"><span
 class="toc-section-number">3</span> samba development
 environment</a></li>
+<li><a href="#windows-environment" id="toc-windows-environment"><span
+class="toc-section-number">4</span> Windows environment</a></li>
+<li><a href="#samba-code-analysis" id="toc-samba-code-analysis"><span
+class="toc-section-number">5</span> samba code analysis</a></li>
 </ul>
 </nav>
+<p><a
+href="https://chenxiaosong.com/course/smb/issue/smb2-change-notify.html">中文分析过程请点击这里查看</a>。</p>
 <h1 data-number="1" id="requirements-description"><span
 class="header-section-number">1</span> Requirements description</h1>
 <p><a href="https://github.com/namjaejeon/ksmbd/issues/495">Please see
@@ -188,5 +194,45 @@ environment</h1>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">public</span> = yes</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">read</span> <span class="va">only</span> <span class="op">=</span> <span class="va">no</span></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">writeable</span> = yes</span></code></pre></div>
+<p>Create smb user:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We are testing in a virtual machine, so we just use the root user.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pdbedit</span> <span class="at">-a</span> <span class="at">-u</span> root</span></code></pre></div>
+<p>Start samba:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># stop the ksmbd service before starting samba</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> stop ksmbd.service</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /tmp/s_test</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> 777 /tmp/s_test <span class="co"># just for test</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart smbd.service <span class="co"># debian</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart smb.service <span class="co"># fedora</span></span></code></pre></div>
+<h1 data-number="4" id="windows-environment"><span
+class="header-section-number">4</span> Windows environment</h1>
+<p><code>10.42.20.210</code> is the IP address of the SMB server.</p>
+<p>Enter the following in “File Explorer”:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Windows is case-insensitive, so you can use either &quot;TEST&quot; or &quot;test&quot;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">\\10.42.20.210\test</span></span></code></pre></div>
+<p>When switching between samba and ksmbd, Windows may fail to mount. In
+that case, open PowerShell on Windows and run the following
+commands:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View existing connections</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Delete a specific connection</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use <span class="dt">\\</span>10.42.20.210<span class="dt">\I</span>PC$ /delete</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use <span class="dt">\\</span>10.42.20.210<span class="dt">\t</span>est /delete</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Delete all connections (not recommended)</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use <span class="pp">*</span> /delete</span></code></pre></div>
+<h1 data-number="5" id="samba-code-analysis"><span
+class="header-section-number">5</span> samba code analysis</h1>
+<p>You can use macros like <code>DBG_ERR()</code>, …,
+<code>DBG_DEBUG()</code>, etc., to print debug information.</p>
+<p>Use <code>log_stack_trace()</code> to print the function stack. If
+you get a compilation error indicating that
+<code>log_stack_trace()</code> cannot be found, you can refer to the
+changes in the patch <a
+href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/smb/src/0001-dump-stack-of-smbd_parent_loop.patch"><code>0001-dump-stack-of-smbd_parent_loop.patch</code></a>.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"></code></pre></div>
 </body>
 </html>
