@@ -8,30 +8,185 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
 <body>
 <header id="title-block-header">
 <ul>
-<li><a href="https://chenxiaosong.com/">Author: 陈孝松 (ChenXiaoSong)</a></li>
-<li><a href="https://chenxiaosong.com/">Homepage: chenxiaosong.com</a></li>
-<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/">Author: 陈孝松
+(ChenXiaoSong)</a></li>
+<li><a href="https://chenxiaosong.com/">Homepage:
+chenxiaosong.com</a></li>
+<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
 </ul>
 <h1 class="title">SMB2 CHANGE_NOTIFY feature</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#requirements-description"><span class="toc-section-number">1</span> Requirements description</a></li>
-<li><a href="#ksmbd-development-environment"><span class="toc-section-number">2</span> ksmbd development environment</a></li>
+<li><a href="#requirements-description"
+id="toc-requirements-description"><span
+class="toc-section-number">1</span> Requirements description</a></li>
+<li><a href="#ksmbd-development-environment"
+id="toc-ksmbd-development-environment"><span
+class="toc-section-number">2</span> ksmbd development
+environment</a></li>
+<li><a href="#samba-development-environment"
+id="toc-samba-development-environment"><span
+class="toc-section-number">3</span> samba development
+environment</a></li>
 </ul>
 </nav>
-<h1 data-number="1" id="requirements-description"><span class="header-section-number">1</span> Requirements description</h1>
-<p><a href="https://github.com/namjaejeon/ksmbd/issues/495">Please see GitHub issue</a>.</p>
-<h1 data-number="2" id="ksmbd-development-environment"><span class="header-section-number">2</span> ksmbd development environment</h1>
+<h1 data-number="1" id="requirements-description"><span
+class="header-section-number">1</span> Requirements description</h1>
+<p><a href="https://github.com/namjaejeon/ksmbd/issues/495">Please see
+GitHub issue</a>.</p>
+<h1 data-number="2" id="ksmbd-development-environment"><span
+class="header-section-number">2</span> ksmbd development
+environment</h1>
+<p>Install ksmbd-tools from source:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apt</span> install <span class="at">-y</span> git gcc pkgconf autoconf automake libtool make meson ninja-build gawk libnl-3-dev libnl-genl-3-dev libglib2.0-dev <span class="co"># debian</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> install <span class="at">-y</span> git gcc pkgconf autoconf automake libtool make meson ninja-build gawk libnl3-devel glib2-devel <span class="co"># fedora</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/cifsd-team/ksmbd-tools.git</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ksmbd-tools</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">./autogen.sh</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">./configure</span> <span class="at">--with-rundir</span><span class="op">=</span>/run <span class="co"># --prefix=/usr/local/sbin --sysconfdir=/usr/local/etc</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> make install</span></code></pre></div>
+<p>create smb user:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We are testing in a virtual machine, so we just use the root user.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ksmbd.adduser <span class="at">--add</span> root</span></code></pre></div>
+<p>Then create config file
+<code>/usr/local/etc/ksmbd/ksmbd.conf</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[global]</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>        <span class="ex">writeable</span> = yes</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="ex">public</span> = yes</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[TEST]</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">comment</span> = test dir</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">;</span> <span class="ex">Note:</span> there should not be a space after the path.</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="ex">path</span> = /tmp/s_test</span></code></pre></div>
+<p>Start ksmbd:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /tmp/s_test</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> stop smbd.service <span class="co"># stop samba on debian</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> stop smb.service <span class="co"># stop samba on fedora</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> 777 /tmp/s_test <span class="co"># just for test</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart ksmbd</span></code></pre></div>
+<h1 data-number="3" id="samba-development-environment"><span
+class="header-section-number">3</span> samba development
+environment</h1>
+<p>Install samba from source:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://gitlab.com/samba-team/devel/samba.git </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> samba/bootstrap/generated-dists/fedora41/ <span class="co"># You can replace fedora41 with your own distribution</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">./bootstrap.sh</span> <span class="co"># It may take some time to install the dependencies</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../../../</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">./configure</span> <span class="at">--with-systemd</span> <span class="at">--with-libunwind</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> install <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span>/usr/local/samba/bin/:/usr/local/samba/sbin/:<span class="va">$PATH</span></span></code></pre></div>
+<p>Create or update <code>usr/lib/systemd/system/smb.service</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[Unit]</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="va">Description</span><span class="op">=</span>Samba <span class="ex">SMB</span> Daemon</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="va">Documentation</span><span class="op">=</span>man:smbd<span class="kw">(</span><span class="ex">8</span><span class="kw">)</span> <span class="ex">man:samba</span><span class="er">(</span><span class="ex">7</span><span class="kw">)</span> <span class="ex">man:smb.conf</span><span class="er">(</span><span class="ex">5</span><span class="kw">)</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="va">Wants</span><span class="op">=</span>network-online.target</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="va">After</span><span class="op">=</span>network.target <span class="ex">network-online.target</span> nmb.service winbind.service</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[Service]</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="va">Type</span><span class="op">=</span>notify</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="va">PIDFile</span><span class="op">=</span>/run/smbd.pid</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="va">LimitNOFILE</span><span class="op">=</span>16384</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="va">EnvironmentFile</span><span class="op">=</span>-/etc/sysconfig/samba</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStart</span><span class="op">=</span>/usr/local/samba/sbin/smbd <span class="ex">--foreground</span> <span class="at">--no-process-group</span> <span class="va">$SMBDOPTIONS</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="va">ExecReload</span><span class="op">=</span>/bin/kill <span class="ex">-HUP</span> <span class="va">$MAINPID</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="va">LimitCORE</span><span class="op">=</span>infinity</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="va">Environment</span><span class="op">=</span>KRB5CCNAME=FILE:/run/samba/krb5cc_samba</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[Install]</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="va">WantedBy</span><span class="op">=</span>multi-user.target</span></code></pre></div>
+<p>Create config file <code>/usr/local/samba/etc/smb.conf</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[TEST]</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">comment</span> = test dir</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">path</span> = /tmp/s_test</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">public</span> = yes</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">read</span> <span class="va">only</span> <span class="op">=</span> <span class="va">no</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">writeable</span> = yes</span></code></pre></div>
 </body>
 </html>
