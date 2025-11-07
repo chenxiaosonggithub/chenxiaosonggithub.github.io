@@ -211,6 +211,9 @@ server切换时，windows可能会挂载不上，这时需要在windows上打开
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use <span class="dt">\\</span>10.42.20.210<span class="dt">\t</span>est /delete</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 删除所有连接，不建议用</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use <span class="pp">*</span> /delete</span></code></pre></div>
+<p>可能还需要删除凭据，打开”控制面板”（Win+R然后输入control），“用户账户”
+-&gt; “凭据管理器” -&gt; “管理Windows凭据”，点击条目展开，然后点击
+“删除” 。</p>
 <p>测试步骤如下:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /tmp/s_test是smb server导出的目录</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> /tmp/s_test/file <span class="co"># 在server端执行</span></span></code></pre></div>
@@ -353,13 +356,19 @@ FILE_NOTIFY_INFORMATION</h2>
 <span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_TUNNELLED_ID_COLLISION</span></code></pre></div>
 <h1 data-number="4" id="tcpdump抓包分析"><span
 class="header-section-number">4</span> tcpdump抓包分析</h1>
+<p>在虚拟机中使用以下命令抓包:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">--interface</span><span class="op">=</span>any <span class="at">-w</span> smb-server.pcap</span></code></pre></div>
+<p>在wireshark中打开，用<code>smb2.cmd == 15</code>过滤。</p>
+<p><a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/smb/change-notify/20251107-1016/tcpdump.md">抓包数据请查看<code>20251107-1016/tcpdump.md</code></a>。</p>
 <h1 data-number="5" id="samba代码分析"><span
 class="header-section-number">5</span> samba代码分析</h1>
 <p>samba的调试方法请查看<a
 href="https://chenxiaosong.com/course/smb/debug.html#samba-print">《smb调试方法》</a></p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_dispatch</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_process_notify</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_notify_send</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>      change_notify_reply</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_dispatch</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_process_notify</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_notify_send</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      change_notify_reply</span></code></pre></div>
 </body>
 </html>
