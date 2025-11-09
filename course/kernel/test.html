@@ -145,6 +145,8 @@ class="toc-section-number">2.3.2</span> ext4</a></li>
 <li><a href="#nfs" id="toc-nfs"><span
 class="toc-section-number">2.3.3</span> nfs</a></li>
 </ul></li>
+<li><a href="#调试脚本" id="toc-调试脚本"><span
+class="toc-section-number">2.4</span> 调试脚本</a></li>
 </ul></li>
 <li><a href="#ltp" id="toc-ltp"><span
 class="toc-section-number">3</span> ltp</a>
@@ -334,7 +336,7 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#
 <span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        xfsprogs-devel</span></code></pre></div>
 <p>源码编译安装:</p>
 <div class="sourceCode" id="cb18"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git</span>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> xfstests-dev</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> make install</span></code></pre></div>
@@ -425,13 +427,13 @@ external_file 参数是一个路径，指向一个包含要排除的测试列表
 class="header-section-number">2.3.2</span> ext4</h3>
 <p>创建<code>local.config</code>配置文件:</p>
 <div class="sourceCode" id="cb23"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="va">TEST_DEV</span><span class="op">=</span>/dev/sda</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="va">TEST_DIR</span><span class="op">=</span>/tmp/test</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="va">SCRATCH_DEV</span><span class="op">=</span>/dev/sdb</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="va">SCRATCH_MNT</span><span class="op">=</span>/tmp/scratch</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="va">FSTYP</span><span class="op">=</span>ext4</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="va">MKFS_OPTIONS</span><span class="op">=</span><span class="st">&quot;-b 4096&quot;</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="va">MOUNT_OPTIONS</span><span class="op">=</span><span class="st">&quot;-o acl,user_xattr&quot;</span></span></code></pre></div>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">TEST_DEV</span><span class="op">=</span>/dev/sda</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">TEST_DIR</span><span class="op">=</span>/tmp/test</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SCRATCH_DEV</span><span class="op">=</span>/dev/sdb</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SCRATCH_MNT</span><span class="op">=</span>/tmp/scratch</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">FSTYP</span><span class="op">=</span>ext4</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MKFS_OPTIONS</span><span class="op">=</span><span class="st">&quot;-b 4096&quot;</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MOUNT_OPTIONS</span><span class="op">=</span><span class="st">&quot;-o acl,user_xattr&quot;</span></span></code></pre></div>
 <p>测试命令:</p>
 <div class="sourceCode" id="cb24"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./check</span> generic/001</span>
@@ -444,17 +446,20 @@ href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/nfs-sv
 server。</p>
 <p>创建<code>local.config</code>配置文件:</p>
 <div class="sourceCode" id="cb25"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="va">TEST_DEV</span><span class="op">=</span>localhost:/s_test</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="va">TEST_DIR</span><span class="op">=</span>/tmp/test</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="va">SCRATCH_DEV</span><span class="op">=</span>localhost:/s_scratch</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="va">SCRATCH_MNT</span><span class="op">=</span>/tmp/scratch</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="va">FSTYP</span><span class="op">=</span>nfs</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="va">MOUNT_OPTIONS</span><span class="op">=</span><span class="st">&quot;-o vers=4.2&quot;</span></span></code></pre></div>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">TEST_DEV</span><span class="op">=</span>localhost:/s_test</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">TEST_DIR</span><span class="op">=</span>/tmp/test</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SCRATCH_DEV</span><span class="op">=</span>localhost:/s_scratch</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SCRATCH_MNT</span><span class="op">=</span>/tmp/scratch</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">FSTYP</span><span class="op">=</span>nfs</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MOUNT_OPTIONS</span><span class="op">=</span><span class="st">&quot;-o vers=4.2&quot;</span></span></code></pre></div>
 <p>测试命令:</p>
 <div class="sourceCode" id="cb26"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./check</span> generic/001</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./check</span> nfs/001</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="ex">./check</span> <span class="at">-g</span> generic/dir <span class="co"># 组查看tests/generic/group.list</span></span></code></pre></div>
+<h2 data-number="2.4" id="调试脚本"><span
+class="header-section-number">2.4</span> 调试脚本</h2>
+<p>在脚本前面加上”set -x”。</p>
 <h1 data-number="3" id="ltp"><span
 class="header-section-number">3</span> ltp</h1>
 <h2 data-number="3.1" id="环境"><span
