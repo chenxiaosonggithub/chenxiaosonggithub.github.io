@@ -196,6 +196,9 @@ repository:</p>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MOUNT_OPTIONS</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${smb_mount_options}</span><span class="st">&quot;</span></span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SCRATCH_DEV</span><span class="op">=</span>//<span class="va">${smb_server_ip}</span>/cifsd-test2</span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SCRATCH_MNT</span><span class="op">=</span>/mnt/2</span></code></pre></div>
+<p>We can use <a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/test/xfstests.sh"><code>xfstests.sh</code></a>
+to test.</p>
 <h1 data-number="3" id="smbtorture"><span
 class="header-section-number">3</span> smbtorture</h1>
 <p>Build <code>smbtorture</code> from source:</p>
@@ -205,5 +208,8 @@ class="header-section-number">3</span> smbtorture</h1>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../../../</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">./configure</span> <span class="at">--disable-cups</span> <span class="at">--disable-iprint</span> <span class="at">--without-ad-dc</span> <span class="at">--without-ads</span> <span class="at">--without-ldap</span> <span class="at">--without-pam</span> <span class="at">--with-shared-modules</span><span class="op">=</span><span class="st">&#39;!vfs_snapper&#39;</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="va">$((</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span><span class="op">+</span><span class="dv">1</span><span class="va">))</span> bin/smbtorture</span></code></pre></div>
+<p>We can use <a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/test/smbtorture.sh"><code>smbtorture.sh</code></a>
+to test.</p>
 </body>
 </html>
