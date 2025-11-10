@@ -163,7 +163,7 @@ href="https://github.com/namjaejeon/cifsd-test-result/blob/master/testsuites/smb
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="ex">vfs</span> objects = acl_xattr streams_xattr</span></code></pre></div>
 <p>Add KSMBD user and start ksmbd:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ksmbd.adduser</span> <span class="at">-P</span> ~/smb-test/ksmbdpwd.db <span class="at">-a</span> root <span class="at">-p</span> 1</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ksmbd.adduser --delete root # delete user</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ksmbd.adduser -P ~/smb-test/ksmbdpwd.db --delete root # delete user</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> modprobe ksmbd</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl stop smb</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl stop smbd</span>
