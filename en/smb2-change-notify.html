@@ -114,11 +114,14 @@ class="toc-section-number">3</span> Samba development
 environment</a></li>
 <li><a href="#windows-environment" id="toc-windows-environment"><span
 class="toc-section-number">4</span> Windows environment</a></li>
-<li><a href="#analysis-of-packets-captured-by-tcpdump"
-id="toc-analysis-of-packets-captured-by-tcpdump"><span
+<li><a href="#tcpdump" id="toc-tcpdump"><span
 class="toc-section-number">5</span> Analysis of packets captured by
-tcpdump</a></li>
-<li><a href="#samba-code-analysis" id="toc-samba-code-analysis"><span
+tcpdump</a>
+<ul>
+<li><a href="#samba-20251110-2016" id="toc-samba-20251110-2016"><span
+class="toc-section-number">5.1</span> samba 20251110-2016</a></li>
+</ul></li>
+<li><a href="#samba-code" id="toc-samba-code"><span
 class="toc-section-number">6</span> samba code analysis</a></li>
 </ul>
 </nav>
@@ -171,68 +174,93 @@ environment</h1>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> install <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span>/usr/local/samba/bin/:/usr/local/samba/sbin/:<span class="va">$PATH</span></span></code></pre></div>
+<p>When you only want to build and install <code>smbd</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span> bin/smbd <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /usr/local/samba/sbin/smbd<span class="kw">;</span> <span class="fu">cp</span> bin/smbd /usr/local/samba/sbin/smbd</span></code></pre></div>
 <p>Create or update
 <code>/usr/lib/systemd/system/smb.service</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[Unit]</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="va">Description</span><span class="op">=</span>Samba <span class="ex">SMB</span> Daemon</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="va">Documentation</span><span class="op">=</span>man:smbd<span class="kw">(</span><span class="ex">8</span><span class="kw">)</span> <span class="ex">man:samba</span><span class="er">(</span><span class="ex">7</span><span class="kw">)</span> <span class="ex">man:smb.conf</span><span class="er">(</span><span class="ex">5</span><span class="kw">)</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="va">Wants</span><span class="op">=</span>network-online.target</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="va">After</span><span class="op">=</span>network.target <span class="ex">network-online.target</span> nmb.service winbind.service</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[Service]</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="va">Type</span><span class="op">=</span>notify</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="va">PIDFile</span><span class="op">=</span>/run/smbd.pid</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="va">LimitNOFILE</span><span class="op">=</span>16384</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="va">EnvironmentFile</span><span class="op">=</span>-/etc/sysconfig/samba</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStart</span><span class="op">=</span>/usr/local/samba/sbin/smbd <span class="ex">--foreground</span> <span class="at">--no-process-group</span> <span class="va">$SMBDOPTIONS</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="va">ExecReload</span><span class="op">=</span>/bin/kill <span class="ex">-HUP</span> <span class="va">$MAINPID</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="va">LimitCORE</span><span class="op">=</span>infinity</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="va">Environment</span><span class="op">=</span>KRB5CCNAME=FILE:/run/samba/krb5cc_samba</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[Install]</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="va">WantedBy</span><span class="op">=</span>multi-user.target</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[Unit]</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="va">Description</span><span class="op">=</span>Samba <span class="ex">SMB</span> Daemon</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="va">Documentation</span><span class="op">=</span>man:smbd<span class="kw">(</span><span class="ex">8</span><span class="kw">)</span> <span class="ex">man:samba</span><span class="er">(</span><span class="ex">7</span><span class="kw">)</span> <span class="ex">man:smb.conf</span><span class="er">(</span><span class="ex">5</span><span class="kw">)</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="va">Wants</span><span class="op">=</span>network-online.target</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="va">After</span><span class="op">=</span>network.target <span class="ex">network-online.target</span> nmb.service winbind.service</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[Service]</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="va">Type</span><span class="op">=</span>notify</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="va">PIDFile</span><span class="op">=</span>/run/smbd.pid</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="va">LimitNOFILE</span><span class="op">=</span>16384</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="va">EnvironmentFile</span><span class="op">=</span>-/etc/sysconfig/samba</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="va">ExecStart</span><span class="op">=</span>/usr/local/samba/sbin/smbd <span class="ex">--foreground</span> <span class="at">--no-process-group</span> <span class="va">$SMBDOPTIONS</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="va">ExecReload</span><span class="op">=</span>/bin/kill <span class="ex">-HUP</span> <span class="va">$MAINPID</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="va">LimitCORE</span><span class="op">=</span>infinity</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="va">Environment</span><span class="op">=</span>KRB5CCNAME=FILE:/run/samba/krb5cc_samba</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[Install]</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="va">WantedBy</span><span class="op">=</span>multi-user.target</span></code></pre></div>
 <p>Create config file <code>/usr/local/samba/etc/smb.conf</code>:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[TEST]</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">comment</span> = test dir</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">path</span> = /tmp/s_test</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">public</span> = yes</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">read</span> <span class="va">only</span> <span class="op">=</span> <span class="va">no</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">writeable</span> = yes</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[TEST]</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">comment</span> = test dir</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">path</span> = /tmp/s_test</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">public</span> = yes</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">read</span> <span class="va">only</span> <span class="op">=</span> <span class="va">no</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">writeable</span> = yes</span></code></pre></div>
 <p>Create smb user:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We are testing in a virtual machine, so we just use the root user.</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pdbedit</span> <span class="at">-a</span> <span class="at">-u</span> root</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We are testing in a virtual machine, so we just use the root user.</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pdbedit</span> <span class="at">-a</span> <span class="at">-u</span> root</span></code></pre></div>
 <p>Start samba:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># stop the ksmbd service before starting samba</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> stop ksmbd.service</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /tmp/s_test</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> 777 /tmp/s_test <span class="co"># just for test</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart smbd.service <span class="co"># debian</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart smb.service <span class="co"># fedora</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># stop the ksmbd service before starting samba</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> stop ksmbd.service</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> /tmp/s_test</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> 777 /tmp/s_test <span class="co"># just for test</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart smbd.service <span class="co"># debian</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart smb.service <span class="co"># fedora</span></span></code></pre></div>
 <h1 data-number="4" id="windows-environment"><span
 class="header-section-number">4</span> Windows environment</h1>
 <p><code>10.42.20.210</code> is the IP address of the SMB server.</p>
 <p>Enter the following in “File Explorer”:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Windows is case-insensitive, so you can use either &quot;TEST&quot; or &quot;test&quot;</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">\\10.42.20.210\test</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Windows is case-insensitive, so you can use either &quot;TEST&quot; or &quot;test&quot;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">\\10.42.20.210\test</span></span></code></pre></div>
 <p>When switching between samba and ksmbd, Windows may fail to mount. In
 that case, open PowerShell on Windows and run the following
 commands:</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View existing connections</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Delete a specific connection</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use <span class="dt">\\</span>10.42.20.210<span class="dt">\I</span>PC$ /delete</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use <span class="dt">\\</span>10.42.20.210<span class="dt">\t</span>est /delete</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Delete all connections (not recommended)</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use <span class="pp">*</span> /delete</span></code></pre></div>
-<h1 data-number="5" id="analysis-of-packets-captured-by-tcpdump"><span
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View existing connections</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Delete a specific connection</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use <span class="dt">\\</span>10.42.20.210<span class="dt">\I</span>PC$ /delete</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use <span class="dt">\\</span>10.42.20.210<span class="dt">\t</span>est /delete</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Delete all connections (not recommended)</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ex">net</span> use <span class="pp">*</span> /delete</span></code></pre></div>
+<h1 data-number="5" id="tcpdump"><span
 class="header-section-number">5</span> Analysis of packets captured by
 tcpdump</h1>
-<h1 data-number="6" id="samba-code-analysis"><span
+<h2 data-number="5.1" id="samba-20251110-2016"><span
+class="header-section-number">5.1</span> samba 20251110-2016</h2>
+<p><a
+href="https://github.com/chenxiaosonggithub/tmp/blob/master/smb/change-notify/20251110-2016/samba.md">The
+full capture file can be found on GitHub</a> (<a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/smb/change-notify/20251110-2016/samba.md">or
+on gitee</a>).</p>
+<p>Windows client enter <code>dir/</code>:</p>
+<ul>
+<li>client request
+<code>20:17:29.666 Create Request;Notify Request No.239</code></li>
+<li>server respond
+<code>20:17:29.668 Notify Response, Error: STATUS_PENDING No.244 [Response to: 239]</code></li>
+</ul>
+<p>server executes <code>touch dir/file1</code>:</p>
+<ul>
+<li>server respond
+<code>20:17:54.095 Notify Response No.285 [Response to: 239]</code></li>
+</ul>
+<h1 data-number="6" id="samba-code"><span
 class="header-section-number">6</span> samba code analysis</h1>
+<p>Some code (e.g., the definition of <code>NT_STATUS_PENDING</code>) is
+generated during compilation. To see the full code, the project must be
+compiled first.</p>
 <p>You can use macros like <code>DBG_ERR()</code>, …,
 <code>DBG_DEBUG()</code>, etc., to print debug information.</p>
 <p>Use <code>log_stack_trace()</code> to print the function stack. If
@@ -242,6 +270,55 @@ changes in the patch <a
 href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/0001-dump-stack-of-smbd_parent_loop.patch"><code>0001-dump-stack-of-smbd_parent_loop.patch</code></a>.</p>
 <p>The logs can be found in
 <code>/usr/local/samba/var/log.smbd</code>.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"></code></pre></div>
+<p>When samba receive <code>Create Request</code>:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_dispatch</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_process_create</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_create_send</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>      smbd_smb2_create_finish</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        <span class="co">// save the fsp, and return immediately when file_fsp_smb2() is called later</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        smb2req<span class="op">-&gt;</span>compat_chain_fsp <span class="op">=</span> smb1req<span class="op">-&gt;</span>chain_fsp</span></code></pre></div>
+<p>When samba receive <code>Notify Request</code>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_dispatch</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_process_notify</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    file_fsp_smb2</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>      <span class="co">// when both persistent_id and volatile_id are -1, return fsp immediately</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> smb2req<span class="op">-&gt;</span>compat_chain_fsp</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_notify_send</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      change_notify_create</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>change_notify_fsp_has_changes<span class="op">(</span>fsp<span class="op">)</span> <span class="co">// have change information</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>      change_notify_reply <span class="co">// notify immediately</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        <span class="co">// reply NT_STATUS_OK</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>      change_notify_add_request <span class="co">// No changes for now, wait in the queue</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_request_pending_queue <span class="co">// nothing to notify, start the timer</span></span></code></pre></div>
+<p>Start the timer:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_pending_timer</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// reply NT_STATUS_PENDING</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// SMB2_HDR_OPCODE defines the offset of the Command field in struct smb2_hdr</span></span></code></pre></div>
+<p>When Windows exits the directory, samba receive
+<code>Cancel Request</code>:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_dispatch</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_process_cancel</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    _tevent_req_cancel</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>      smbd_smb2_notify_cancel</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>        smbd_notify_cancel_by_smbreq</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>          smbd_notify_cancel_by_map</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>            change_notify_reply</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>              <span class="co">// reply NT_STATUS_CANCELLED</span></span></code></pre></div>
+<p>Samba send <code>Notify Response</code> when change information is
+available:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>tevent_common_invoke_fd_handler</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  messaging_dgm_read_handler</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    messaging_dgm_recv</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>      msg_dgm_ref_recv</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        messaging_recv_cb</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>          messaging_dispatch_rec</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>            messaging_dispatch_classic</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>              notify_handler</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>                notify_callback</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>                  files_forall</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                    notify_fsp_cb</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>                      notify_fsp</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                        change_notify_reply</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                          <span class="co">// reply NT_STATUS_OK</span></span></code></pre></div>
 </body>
 </html>
