@@ -223,7 +223,10 @@ Build Samba from Source</a>。</p>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">./configure</span> <span class="at">--with-systemd</span> <span class="at">--with-libunwind</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> install <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span>/usr/local/samba/bin/:/usr/local/samba/sbin/:<span class="va">$PATH</span></span></code></pre></div>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span>/usr/local/samba/bin/:/usr/local/samba/sbin/:<span class="va">$PATH</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 只编译安装 smbd</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span> bin/smbd <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /usr/local/samba/sbin/smbd<span class="kw">;</span> <span class="fu">cp</span> bin/smbd /usr/local/samba/sbin/smbd</span></code></pre></div>
 <p>更新<code>/usr/lib/systemd/system/smb.service</code>，具体位置可以用<code>systemctl status smb</code>查看:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[Unit]</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="va">Description</span><span class="op">=</span>Samba <span class="ex">SMB</span> Daemon</span>
