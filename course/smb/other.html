@@ -121,6 +121,10 @@ class="toc-section-number">1</span> client流程</a></li>
 class="toc-section-number">2</span> lock</a></li>
 <li><a href="#ksmbd代码流程" id="toc-ksmbd代码流程"><span
 class="toc-section-number">3</span> ksmbd代码流程</a></li>
+<li><a href="#struct-smb3_fs_vol_info"
+id="toc-struct-smb3_fs_vol_info"><span
+class="toc-section-number">4</span>
+<code>struct smb3_fs_vol_info</code></a></li>
 </ul>
 </nav>
 <p><a
@@ -317,5 +321,26 @@ class="header-section-number">3</span> ksmbd代码流程</h1>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                  vfs_open</span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                    do_dentry_open</span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                      ext2_file_open</span></code></pre></div>
+<h1 data-number="4" id="struct-smb3_fs_vol_info"><span
+class="header-section-number">4</span>
+<code>struct smb3_fs_vol_info</code></h1>
+<ul>
+<li>MS-CIFS 2.2.8.2.3 SMB_QUERY_FS_VOLUME_INFO</li>
+<li>MS-FSCC 2.5.9 FileFsVolumeInformation</li>
+</ul>
+<p>client端结构体<code>smb3_fs_vol_info</code>，server端结构体<code>filesystem_vol_info</code>。</p>
+<p>client:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>SMB2_QFS_attr</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  max_len <span class="op">=</span> <span class="kw">sizeof</span><span class="op">(</span><span class="kw">struct</span> smb3_fs_vol_info<span class="op">)</span> <span class="op">+</span> MAX_VOL_LABEL_LEN</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  min_len <span class="op">=</span> <span class="kw">sizeof</span><span class="op">(</span><span class="kw">struct</span> smb3_fs_vol_info<span class="op">)</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  build_qfs_info_req<span class="op">(</span>outbuf_len <span class="op">=</span> max_len<span class="op">)</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    smb2_plain_req_init<span class="op">(</span>smb2_command <span class="op">=</span> SMB2_QUERY_INFO<span class="op">,</span> <span class="op">&amp;</span>total_len<span class="op">)</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>      __smb2_plain_req_init</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">*</span>request_buf <span class="op">=</span> cifs_buf_get<span class="op">()</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>          ret_buf <span class="op">=</span> mempool_alloc<span class="op">(</span>cifs_req_poolp<span class="op">,</span> <span class="op">...)</span> <span class="co">// 申请一块足够大的内存</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>cifs_init_request_bufs</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  cifs_req_cachep <span class="op">=</span> kmem_cache_create_usercopy<span class="op">(</span><span class="dv">4</span><span class="op">*</span><span class="dv">4096</span> <span class="op">+</span> <span class="dv">204</span><span class="op">)</span> <span class="co">// CIFSMaxBufSize = CIFS_MAX_MSGSIZE</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  cifs_req_poolp <span class="op">=</span> cifs_req_poolp <span class="op">=</span> mempool_create_slab_pool<span class="op">(</span><span class="dv">4</span><span class="op">,</span> cifs_req_cachep<span class="op">)</span> <span class="co">// cifs_min_rcv = CIFS_MIN_RCV_POOL</span></span></code></pre></div>
 </body>
 </html>
