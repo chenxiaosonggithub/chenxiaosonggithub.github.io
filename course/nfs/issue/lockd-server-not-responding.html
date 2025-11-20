@@ -145,6 +145,8 @@ class="toc-section-number">4.2</span> 6月22日</a></li>
 <li><a href="#tcpdump-0825" id="toc-tcpdump-0825"><span
 class="toc-section-number">4.3</span> 8月25日</a></li>
 </ul></li>
+<li><a href="#reconnect-mechanism" id="toc-reconnect-mechanism"><span
+class="toc-section-number">5</span> 重连机制</a></li>
 </ul>
 </nav>
 <p><a
@@ -453,5 +455,16 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#
 <span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="ex">9570</span>    2025-08-25 01:13:36.040042  11.8.68.71  11.73.24.85 NLM 290 V4 LOCK Call <span class="er">(</span><span class="ex">Reply</span> In 9572<span class="kw">)</span> <span class="ex">FH:0xe9cbe99b</span> svid:376683 pos:0-0</span>
 <span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="ex">9571</span>    2025-08-25 01:13:36.040292  11.73.24.85 11.8.68.71  TCP 66  2052 → 871 <span class="pp">[</span><span class="ss">ACK</span><span class="pp">]</span> Seq=1 Ack=225 Win=65024 Len=0 TSval=2610491592 TSecr=2377434721</span>
 <span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="ex">9572</span>    2025-08-25 01:13:36.043050  11.73.24.85 11.8.68.71  NLM 106 V4 LOCK Reply <span class="er">(</span><span class="ex">Call</span> In 9570<span class="kw">)</span></span></code></pre></div>
+<h1 data-number="5" id="reconnect-mechanism"><span
+class="header-section-number">5</span> 重连机制</h1>
+<ul>
+<li><a
+href="https://access.redhat.com/solutions/2979751">红帽知识库</a>（需要登录红帽账号）</li>
+<li><a
+href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e6237b6feb37582fbd6bd7a8336d1256a6b4b4f9">NFSv4.1:
+Don’t rebind to the same source port when reconnecting to the
+server</a></li>
+</ul>
+<p>经过修改代码的在本地环境的调试，nfsv3也可以修改成在重连时使用不同的端口，但是修改后风险未知，所有厂商的nfsv3也都没这样修改。</p>
 </body>
 </html>
