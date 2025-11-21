@@ -123,6 +123,8 @@ class="toc-section-number">2</span> 问题分析</a></li>
 class="toc-section-number">3</span> 多个网卡环境</a></li>
 <li><a href="#openeuler-nfs的使用" id="toc-openeuler-nfs的使用"><span
 class="toc-section-number">4</span> openeuler nfs+的使用</a></li>
+<li><a href="#测试" id="toc-测试"><span
+class="toc-section-number">5</span> 测试</a></li>
 </ul>
 </nav>
 <p><a
@@ -204,5 +206,21 @@ client端支持enfs就可以，<code>/etc/enfs/config.ini</code>默认配置如�
 <p>除了<code>mount</code>命令查看之外，还可以用以下方式:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/enfs/192.168.53.216_0/path</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/enfs/192.168.53.216_0/stat</span></code></pre></div>
+<h1 data-number="5" id="测试"><span
+class="header-section-number">5</span> 测试</h1>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> install <span class="at">-y</span> java-latest-openjdk</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># dnf install -y java-1.8.0-openjdk # jdk 8</span></span></code></pre></div>
+<p><a
+href="https://www.oracle.com/downloads/server-storage/vdbench-downloads.html">下载Vdbench</a>。</p>
+<p><code>vdbench_8k_io</code>配置文件:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="va">create_anchors</span><span class="op">=</span>yes</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 最新的jdk版本不支持这个参数</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># messsagescan=no</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="va">fsd</span><span class="op">=</span>fsd1,anchor=/mnt/,depth=2,width=2,files=20,size=1m</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="va">fwd</span><span class="op">=</span>fwd1,fsd=fsd<span class="pp">*</span>,fileio=random,fileselect=random,openflags=o_direct</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># rd=rd1,fwd=fwd*,fwdrate=max,xfersize=8k,format=yes,operation=(write,read,getattr),elapsed=120000,interval=1,threads=64</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="va">rd</span><span class="op">=</span>rd1,fwd=fwd<span class="pp">*</span>,fwdrate=max,xfersize=128k,format=restart,operation=<span class="kw">(</span><span class="fu">write</span><span class="kw">)</span><span class="ex">,elapsed=120000,interval=1,threads=64</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./vdbench</span> <span class="at">-f</span> vdbench_8k_io</span></code></pre></div>
 </body>
 </html>
