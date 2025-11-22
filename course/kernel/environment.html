@@ -459,7 +459,7 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> build/boot <span class="kw">&amp;&amp;</span> <span class="fu">make</span> O=build install INSTALL_PATH=boot <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># INSTALL_MOD_STRIP=1代表不含调试信息，不写INSTALL_MOD_STRIP=1代表含有调试信息</span></span>
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build modules_install INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=mod <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build INSTALL_MOD_STRIP=1 tar-pkg <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span> <span class="co"># 将boot/和ko打包成.tar</span></span></code></pre></div>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> O=build INSTALL_MOD_STRIP=1 tar-pkg <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span> <span class="co"># 编译并将boot/和ko打包成.tar</span></span></code></pre></div>
 <p>在<code>x86_64</code>下，如果是交叉编译其他架构，<code>ARCH</code>的值为<code>arch/</code>目录下相应的架构，编译命令是:</p>
 <div class="sourceCode" id="cb17"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> ARCH=i386 O=build bzImage <span class="co"># x86 32bit</span></span>
@@ -633,11 +633,13 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb26-1"><a href="#
 <span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ubuntu，麒麟desktop</span></span>
 <span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="ex">mkinitramfs</span> <span class="at">-o</span> /boot/initrd.img-xxx xxx <span class="co"># 生成`initrd.img`，其中`xxx`为内核版本</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="ex">update-grub</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 麒麟桌面系统要在把`grub.cfg`新生成的启动项里的`security=kysec`改成`security= `（注意后面有空格）</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span> /boot/grub/grub.cfg <span class="co"># x86</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span> /boot/efi/boot/grub/grub.cfg <span class="co"># arm64</span></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span></code></pre></div>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 麒麟桌面系统要在把`grub.cfg`新生成的启动项里的`security=kysec`改成`security= `（注意后面有空格）</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span> /boot/grub/grub.cfg <span class="co"># x86</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># GRUB_TIMEOUT_STYLE=menu</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># GRUB_TIMEOUT=30</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span> /boot/efi/boot/grub/grub.cfg <span class="co"># arm64</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="ex">update-grub</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span></code></pre></div>
 <p>麒麟server 4.19安装内核rpm包的步骤:</p>
 <div class="sourceCode" id="cb27"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 如果报错grub2-editenv: error: environment block too small.，就执行grub2-editenv create</span></span>
