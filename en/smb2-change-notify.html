@@ -124,6 +124,8 @@ class="toc-section-number">5.1</span> samba 20251110-2016</a></li>
 </ul></li>
 <li><a href="#samba-code" id="toc-samba-code"><span
 class="toc-section-number">6</span> samba code analysis</a></li>
+<li><a href="#fanotify" id="toc-fanotify"><span
+class="toc-section-number">7</span> fanotify</a></li>
 </ul>
 </nav>
 <p><a
@@ -326,5 +328,34 @@ available:</p>
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>          notify_fsp</span>
 <span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>            change_notify_reply</span>
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>              <span class="co">// reply NT_STATUS_OK</span></span></code></pre></div>
+<h1 data-number="7" id="fanotify"><span
+class="header-section-number">7</span> fanotify</h1>
+<p><a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/fs-monitor.c">Click
+here to view userspace fanotify usage examples
+<code>fs-monitor.c</code></a>:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">-o</span> fs-monitor fs-monitor.c</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./fs-monitor</span> /path/to/file</span></code></pre></div>
+<p>When reading a file:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>read</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  ksys_read</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    vfs_read</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>      fanotify_read</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>        add_wait_queue <span class="co">// wait here</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>        copy_event_to_user</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>vfs_read <span class="op">/</span> __kernel_read</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  fsnotify_access</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    fsnotify_file</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>      fsnotify_path</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        fsnotify_parent</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>          __fsnotify_parent</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>            fsnotify</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>              send_to_group</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>                fanotify_handle_event</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>                  fsnotify_insert_event</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// wake up the wait queue in fanotify_read()</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>                    wake_up<span class="op">(&amp;</span>group<span class="op">-&gt;</span>notification_waitq<span class="op">)</span></span></code></pre></div>
 </body>
 </html>
