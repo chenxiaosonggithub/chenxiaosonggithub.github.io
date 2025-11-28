@@ -315,7 +315,7 @@ class="header-section-number">2.2</span> 找到触发rpc任务的进程</h2>
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> ps <span class="at">-g</span> 227403</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="at">-g</span> 227403 <span class="co"># 打印出所有的栈</span></span></code></pre></div>
 <p><a
-href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/nfs-soft-lockup-in-__rpc_execute-crash-vmcore-bt-g-227403.txt">点击这里查看<code>bt -g 227403</code>的输出</a>。</p>
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/linux/nfs/nfs-soft-lockup-in-__rpc_execute-crash-vmcore-bt-g-227403.txt">点击这里查看<code>bt -g 227403</code>的输出</a>。</p>
 <h2 data-number="2.3" id="找到rpc请求的类型"><span
 class="header-section-number">2.3</span> 找到rpc请求的类型</h2>
 <p>解析rpc任务结构体:</p>
@@ -423,7 +423,7 @@ class="header-section-number">4</span> 代码分析</h1>
 <span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>                  wait_on_page_bit_killable <span class="co">// rpc读任务返回时通过unlock_page()唤醒</span></span>
 <span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>                    wait_on_page_bit_common</span></code></pre></div>
 <p><a
-href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/nfs-soft-lockup-in-__rpc_execute-crash-vmcore-bt-g-227403.txt">从vmcore的解析<code>bt -g 227403</code>的输出</a>可以看到进程组里没有一个进程在等待异步rpc读的回复。</p>
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/linux/nfs/nfs-soft-lockup-in-__rpc_execute-crash-vmcore-bt-g-227403.txt">从vmcore的解析<code>bt -g 227403</code>的输出</a>可以看到进程组里没有一个进程在等待异步rpc读的回复。</p>
 <h1 data-number="5" id="抓包数据分析-1"><span
 class="header-section-number">5</span> 抓包数据分析</h1>
 <p>nfs read请求包:</p>

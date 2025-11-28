@@ -210,7 +210,7 @@ href="https://chenxiaosong.com/course/nfs/debug.html#get-all_stack">《nfs调试
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">nfs_do_writepage+0x1bf/0x2d0:</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ex">nfs_do_writepage</span> at /usr/src/debug/kernel-4.19.90/linux-4.19.90-23.16.v2101.ky10.x86_64/fs/nfs/write.c:679</span></code></pre></div>
 <p><code>nfs_do_writepage</code>内联了太多函数，所以要<a
-href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/nfs/nfsv3-mount-hung-with-same-option-vmcore.md">查看反汇编</a>:</p>
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/linux/nfs/nfsv3-mount-hung-with-same-option-vmcore.md">查看反汇编</a>:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fs/nfs/write.c: 674 if (ret == -EAGAIN) {</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc08b2600</span> <span class="op">&lt;</span>nfs_do_writepage+0x1a0<span class="op">&gt;</span>:    cmp    <span class="va">$0</span>xfffffff5,%r14d</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffffffffc08b2604</span> <span class="op">&lt;</span>nfs_do_writepage+0x1a4<span class="op">&gt;</span>:    je     0xffffffffc08b2671 <span class="op">&lt;</span>nfs_do_writepage+0x211<span class="op">&gt;</span></span>
