@@ -126,7 +126,7 @@ class="toc-section-number">3</span> 构造</a></li>
 <h1 data-number="1" id="问题描述"><span
 class="header-section-number">1</span> 问题描述</h1>
 <p><code>dmesg</code>中报warning，请查看<a
-href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/xfs/xfs-shutdown-fs/dmesg-log.txt"><code>dmesg-log.txt</code></a>。其他报<code>Corruption of in-memory data detected.  Shutting down filesystem</code>的时刻分别为<code>8507581.813487, 9013282.995965, 142392.165592, 153722.596734</code>（复现一次，多次重新挂载触发）。</p>
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/xfs/xfs-shutdown-fs/dmesg-log.txt"><code>dmesg-log.txt</code></a>。其他报<code>Corruption of in-memory data detected.  Shutting down filesystem</code>的时刻分别为<code>8507581.813487, 9013282.995965, 142392.165592, 153722.596734</code>（复现一次，多次重新挂载触发）。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> sos_commands/scsi/lsscsi </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[0:0:15:0]</span>   enclosu SGA      E17202           0002  <span class="at">-</span>          <span class="at">-</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[0:2:0:0]</span>    disk    AVAGO    MR9361-8i        4.68  /dev/sda   3600605b00eb200802cf6f6d2bc2a72b7</span>
@@ -148,7 +148,7 @@ href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/xfs/xfs-shutdown-fs/dm
 <h1 data-number="2" id="分析镜像"><span
 class="header-section-number">2</span> 分析镜像</h1>
 <p>日志<a
-href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/xfs/xfs-shutdown-fs/xfs_repair-log.txt"><code>xfs_repair-log.txt</code></a>中:</p>
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/xfs/xfs-shutdown-fs/xfs_repair-log.txt"><code>xfs_repair-log.txt</code></a>中:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">agf_freeblks</span> 3997090, counted 4111777 in ag 0</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">agf_longest</span> 14556, counted 14846 in ag 0</span></code></pre></div>
 <p>代表AG0中空闲块数量不对。</p>
@@ -162,7 +162,7 @@ href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/xfs/xfs-shutdown-fs/xf
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">xfs_logprint</span> <span class="at">-n</span> dm.img <span class="op">&gt;</span> xfs_logprint-n-log.txt <span class="co"># 不尝试解释日志数据，只解释日志头信息。</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">xfs_logprint</span> dm.img <span class="op">&gt;</span> xfs_logprint-log.txt <span class="co"># 解释日志数据和日志头信息</span></span></code></pre></div>
 <p><a
-href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/xfs/xfs-shutdown-fs/xfs_logprint-log.txt">xfs_logprint-log.txt</a>中有如下日志:</p>
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/xfs/xfs-shutdown-fs/xfs_logprint-log.txt">xfs_logprint-log.txt</a>中有如下日志:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">cycle:</span> 230651   version: 2      lsn: 230651,154624  tail_lsn: 230651,147968</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">length</span> of Log Record: 258048    prev offset: 154112     num ops: 69</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uuid:</span> 561a8354-b4e6-4b60-a868-c7d633ec2d8b   format: little endian linux</span>
@@ -175,7 +175,7 @@ href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/xfs/xfs-shutdown-fs/xf
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">level</span> BNO: 2  CNT: 2</span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ex">1st:</span> 0  last: 5  cnt: 6  freeblks: 4111777  longest: 14846</span></code></pre></div>
 <p><a
-href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/xfs/xfs-shutdown-fs/xfs_logprint-n-log.txt">xfs_logprint-n-log.txt</a>中有如下日志:</p>
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/xfs/xfs-shutdown-fs/xfs_logprint-n-log.txt">xfs_logprint-n-log.txt</a>中有如下日志:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">cycle:</span> 230651   version: 2      lsn: 230651,154624  tail_lsn: 230651,147968</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">length</span> of Log Record: 258048    prev offset: 154112     num ops: 69</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uuid:</span> 561a8354-b4e6-4b60-a868-c7d633ec2d8b   format: little endian linux</span>
