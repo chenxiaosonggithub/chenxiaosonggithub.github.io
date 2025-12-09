@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -93,99 +82,71 @@
 <!-- sign begin -->
 <ul>
 <li>作者: 陈孝松</li>
-<li><a href="https://chenxiaosong.com/">中文主页:
-chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en">英文主页:
-chenxiaosong.com/en</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">QEMU/KVM环境搭建与使用</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#修改成不需要密码" id="toc-修改成不需要密码"><span
-class="toc-section-number">1</span> 修改成不需要密码</a></li>
-<li><a href="#arm32架构" id="toc-arm32架构"><span
-class="toc-section-number">2</span> arm32架构</a></li>
-<li><a href="#riscv-ubuntu2204镜像" id="toc-riscv-ubuntu2204镜像"><span
-class="toc-section-number">3</span> riscv ubuntu2204镜像</a></li>
-<li><a href="#openeuler" id="toc-openeuler"><span
-class="toc-section-number">4</span> openeuler</a></li>
+<li><a href="#修改成不需要密码"><span class="toc-section-number">1</span> 修改成不需要密码</a></li>
+<li><a href="#arm32架构"><span class="toc-section-number">2</span> arm32架构</a></li>
+<li><a href="#riscv-ubuntu2204镜像"><span class="toc-section-number">3</span> riscv ubuntu2204镜像</a></li>
+<li><a href="#openeuler"><span class="toc-section-number">4</span> openeuler</a></li>
 </ul>
 </nav>
-<h1 data-number="1" id="修改成不需要密码"><span
-class="header-section-number">1</span> 修改成不需要密码</h1>
+<h1 data-number="1" id="修改成不需要密码"><span class="header-section-number">1</span> 修改成不需要密码</h1>
 <p><code>/etc/passwd</code>修改成:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">root::0:0:Super</span> User:/root:/bin/bash</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">root</span>::0:0:Super User:/root:/bin/bash</span></code></pre></div>
 <p><code>/etc/shadow</code>可以不修改。</p>
-<h1 data-number="2" id="arm32架构"><span
-class="header-section-number">2</span> arm32架构</h1>
+<h1 data-number="2" id="arm32架构"><span class="header-section-number">2</span> arm32架构</h1>
 <p>在 linux 仓库中执行 <code>make dtbs</code> 生成 dtb 文件</p>
 <p>ubuntu2204宿主机中创建网络:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install bridge-utils <span class="at">-y</span> <span class="co"># brctl命令</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install uml-utilities <span class="at">-y</span> <span class="co"># tunctl 命令， centos９没有</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">qemu-system-arm</span> <span class="at">-net</span> nic,model=<span class="pp">?</span> <span class="at">-M</span> vexpress-a15 <span class="co"># 查看支持的虚拟网络</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> tunctl <span class="at">-b</span> <span class="co"># 按顺序创建 tap0 tap1，每输入一次命令创建一个</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> tunctl <span class="at">-t</span> tap0 <span class="at">-u</span> sonvhi <span class="co"># 指定名称创建</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> tunctl <span class="at">-t</span> tap1 <span class="at">-u</span> sonvhi</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ip link set tap0 up <span class="co"># 激活</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ip link set tap1 up <span class="co"># 激活</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> tunctl <span class="at">-d</span> tap1 <span class="co"># 删除 tap1</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> brctl show <span class="co"># 查看网桥</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> brctl addif virbr0 tap0 <span class="co"># tap0 加入网桥</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> brctl addif virbr0 tap1 <span class="co"># tap1 加入网桥</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> brctl delif virbr0 tap0 <span class="co"># tap0 移出网桥</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> brctl addbr br0 <span class="co"># 新建网桥 br0</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> brctl delbr br0 <span class="co"># 删除网桥 br0</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> brctl addif br0 enx381428b8c32c <span class="co"># 注意:无线网卡不行, 必须是以太网卡</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> brctl addif br0 tap0 <span class="co"># tap0 加入网桥</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="fu">sudo</span> apt install bridge-utils -y <span class="co"># brctl命令</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install uml-utilities -y <span class="co"># tunctl 命令， centos９没有</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ex">qemu-system-arm</span> -net nic,model=? -M vexpress-a15 # 查看支持的虚拟网络</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="fu">sudo</span> tunctl -b <span class="co"># 按顺序创建 tap0 tap1，每输入一次命令创建一个</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="fu">sudo</span> tunctl -t tap0 -u sonvhi <span class="co"># 指定名称创建</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="fu">sudo</span> tunctl -t tap1 -u sonvhi</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="fu">sudo</span> ip link set tap0 up <span class="co"># 激活</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="fu">sudo</span> ip link set tap1 up <span class="co"># 激活</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="fu">sudo</span> tunctl -d tap1 <span class="co"># 删除 tap1</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="fu">sudo</span> brctl show <span class="co"># 查看网桥</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="fu">sudo</span> brctl addif virbr0 tap0 <span class="co"># tap0 加入网桥</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="fu">sudo</span> brctl addif virbr0 tap1 <span class="co"># tap1 加入网桥</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="fu">sudo</span> brctl delif virbr0 tap0 <span class="co"># tap0 移出网桥</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="fu">sudo</span> brctl addbr br0 <span class="co"># 新建网桥 br0</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="fu">sudo</span> brctl delbr br0 <span class="co"># 删除网桥 br0</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a><span class="fu">sudo</span> brctl addif br0 enx381428b8c32c <span class="co"># 注意:无线网卡不行, 必须是以太网卡</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a><span class="fu">sudo</span> brctl addif br0 tap0 <span class="co"># tap0 加入网桥</span></span></code></pre></div>
 <p>centos9宿主机中没有 <code>tunctl</code>的解决办法:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ip tuntap add tap0 mode tap user sonvhi</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ip tuntap del tap0 mode tap</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ip tuntap list</span></code></pre></div>
-<p>bullseye aarch64 网络无法使用， <code>/etc/network/interfaces</code>
-需要把 <code>eth0</code> 改成
-<code>enp0s1</code>(通过<code>dmesg | grep -i eth</code>找到<code>enp0s1</code>)</p>
-<h1 data-number="3" id="riscv-ubuntu2204镜像"><span
-class="header-section-number">3</span> riscv ubuntu2204镜像</h1>
-<p>riscv64架构的镜像，可以直接下载<a
-href="https://ubuntu.com/download/risc-v">ubuntu2204</a>（选择[QEMU
-emulator]）。</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qemu-system-riscv64</span> <span class="at">-netdev</span> <span class="pp">?</span> <span class="co"># 宿主机中查看可用的netdev backend类型</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="fu">sudo</span> ip tuntap add tap0 mode tap user sonvhi</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="fu">sudo</span> ip tuntap del tap0 mode tap</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="fu">sudo</span> ip tuntap list</span></code></pre></div>
+<p>bullseye aarch64 网络无法使用， <code>/etc/network/interfaces</code> 需要把 <code>eth0</code> 改成 <code>enp0s1</code>(通过<code>dmesg | grep -i eth</code>找到<code>enp0s1</code>)</p>
+<h1 data-number="3" id="riscv-ubuntu2204镜像"><span class="header-section-number">3</span> riscv ubuntu2204镜像</h1>
+<p>riscv64架构的镜像，可以直接下载<a href="https://ubuntu.com/download/risc-v">ubuntu2204</a>（选择[QEMU emulator]）。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">qemu-system-riscv64</span> -netdev ? # 宿主机中查看可用的netdev backend类型</span></code></pre></div>
 <p>虚拟机中修改配置:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> status systemd-modules-load.service <span class="co"># 查看systemd-modules-load服务状态</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 删除systemd-modules-load服务，怕万一后续有用，只做重命名</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> /lib/systemd/system/systemd-modules-load.service /lib/systemd/system/systemd-modules-load.service.bak</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /etc/fstab /etc/fstab.bak <span class="co"># 备份</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span> /etc/fstab <span class="co"># 删除 LABEL=UEFI 一行</span></span></code></pre></div>
-<h1 data-number="4" id="openeuler"><span
-class="header-section-number">4</span> openeuler</h1>
-<p><a
-href="https://www.openeuler.org/en/download/?version=openEuler%2022.03%20LTS%20SP2">openEuler
-22.03 LTS SP2（或更新的版本）</a>，Scenario选择“cloud
-computing”，下载<code>qcow2.xz</code>，解压:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">xz</span> <span class="at">-d</span> openEuler-22.03-LTS-SP2-x86_64.qcow2.xz</span></code></pre></div>
-<p>qemu启动参数需要做一些小修改
-<code>-append "... root=/dev/vda2 ..."</code>。</p>
-<p>默认的登录账号是<code>root</code>，密码是
-<code>openEuler12#$</code>，具体参考<a
-href="https://docs.openeuler.org/zh/docs/22.03_LTS_SP3/docs/Releasenotes/%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85.html">系统安装</a>。</p>
-<p>注意需要打开<code>vfat</code>文件系统相关配置，具体查看<a
-href="https://chenxiaosong.com/src/filesystem/microsoft-fs.html">《微软文件系统》</a>中<code>vfat</code>相关的一节。否则会进入emergency
-mode，如果你实在不想打开<code>vfat</code>文件系统相关配置，可以编辑<code>/etc/fstab</code>文件删除<code>/boot</code>相关的一行，重启系统就可以正常启动了，但不建议哈。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">systemctl</span> status systemd-modules-load.service # 查看systemd-modules-load服务状态</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co"># 删除systemd-modules-load服务，怕万一后续有用，只做重命名</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="fu">mv</span> /lib/systemd/system/systemd-modules-load.service /lib/systemd/system/systemd-modules-load.service.bak</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="fu">cp</span> /etc/fstab /etc/fstab.bak <span class="co"># 备份</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="ex">vim</span> /etc/fstab # 删除 LABEL=UEFI 一行</span></code></pre></div>
+<h1 data-number="4" id="openeuler"><span class="header-section-number">4</span> openeuler</h1>
+<p><a href="https://www.openeuler.org/en/download/?version=openEuler%2022.03%20LTS%20SP2">openEuler 22.03 LTS SP2（或更新的版本）</a>，Scenario选择“cloud computing”，下载<code>qcow2.xz</code>，解压:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="fu">xz</span> -d openEuler-22.03-LTS-SP2-x86_64.qcow2.xz</span></code></pre></div>
+<p>qemu启动参数需要做一些小修改 <code>-append "... root=/dev/vda2 ..."</code>。</p>
+<p>默认的登录账号是<code>root</code>，密码是 <code>openEuler12#$</code>，具体参考<a href="https://docs.openeuler.org/zh/docs/22.03_LTS_SP3/docs/Releasenotes/%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85.html">系统安装</a>。</p>
+<p>注意需要打开<code>vfat</code>文件系统相关配置，具体查看<a href="https://chenxiaosong.com/src/filesystem/microsoft-fs.html">《微软文件系统》</a>中<code>vfat</code>相关的一节。否则会进入emergency mode，如果你实在不想打开<code>vfat</code>文件系统相关配置，可以编辑<code>/etc/fstab</code>文件删除<code>/boot</code>相关的一行，重启系统就可以正常启动了，但不建议哈。</p>
 </body>
 </html>

@@ -8,24 +8,13 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
+    ul.task-list{list-style: none;}
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -60,7 +49,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
+    code span.bu { } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -73,7 +62,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.im { } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -92,194 +81,160 @@
 <header id="title-block-header">
 <ul>
 <li>Author: 陈孝松 (ChenXiaoSong)</li>
-<li><a href="https://chenxiaosong.com/">Chinese Homepage:
-chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en/">English Homepage:
-chenxiaosong.com/en</a></li>
-<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/">Chinese Homepage: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en/">English Homepage: chenxiaosong.com/en</a></li>
+<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
 </ul>
 <h1 class="title">null-ptr-deref in nfsd4_probe_callback()</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#environment" id="toc-environment"><span
-class="toc-section-number">1</span> Environment</a></li>
-<li><a href="#issue" id="toc-issue"><span
-class="toc-section-number">2</span> Issue</a></li>
-<li><a href="#analysis-from-vmcore" id="toc-analysis-from-vmcore"><span
-class="toc-section-number">3</span> Analysis from vmcore</a>
+<li><a href="#environment"><span class="toc-section-number">1</span> Environment</a></li>
+<li><a href="#issue"><span class="toc-section-number">2</span> Issue</a></li>
+<li><a href="#analysis-from-vmcore"><span class="toc-section-number">3</span> Analysis from vmcore</a>
 <ul>
-<li><a href="#dmesg" id="toc-dmesg"><span
-class="toc-section-number">3.1</span> <code>dmesg</code></a></li>
-<li><a href="#bt" id="toc-bt"><span
-class="toc-section-number">3.2</span> <code>bt</code></a></li>
-<li><a href="#disassemble-__queue_work"
-id="toc-disassemble-__queue_work"><span
-class="toc-section-number">3.3</span> Disassemble
-<code>__queue_work()</code></a></li>
-<li><a href="#where-the-code-crashed"
-id="toc-where-the-code-crashed"><span
-class="toc-section-number">3.4</span> Where the code crashed</a></li>
-<li><a href="#callback_wq" id="toc-callback_wq"><span
-class="toc-section-number">3.5</span> <code>callback_wq</code></a></li>
+<li><a href="#dmesg"><span class="toc-section-number">3.1</span> <code>dmesg</code></a></li>
+<li><a href="#bt"><span class="toc-section-number">3.2</span> <code>bt</code></a></li>
+<li><a href="#disassemble-__queue_work"><span class="toc-section-number">3.3</span> Disassemble <code>__queue_work()</code></a></li>
+<li><a href="#where-the-code-crashed"><span class="toc-section-number">3.4</span> Where the code crashed</a></li>
+<li><a href="#callback_wq"><span class="toc-section-number">3.5</span> <code>callback_wq</code></a></li>
 </ul></li>
-<li><a href="#solution" id="toc-solution"><span
-class="toc-section-number">4</span> Solution</a></li>
+<li><a href="#solution"><span class="toc-section-number">4</span> Solution</a></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/course/nfs/issue/null-ptr-deref-in-nfsd4_probe_callback.html">中文分析过程请点击这里查看</a>。</p>
-<h1 data-number="1" id="environment"><span
-class="header-section-number">1</span> Environment</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> sys</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>      <span class="ex">KERNEL:</span> usr/lib/debug/lib/modules/4.19.90-52.39.v2207.ky10.aarch64/vmlinux</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">DUMPFILE:</span> vmcore  [PARTIAL DUMP]</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">CPUS:</span> 32</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">DATE:</span> Wed May 28 02:04:57 CST 2025</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      <span class="ex">UPTIME:</span> 06:43:45</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">LOAD</span> AVERAGE: 4.08, 4.00, 3.83</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>       <span class="ex">TASKS:</span> 4811</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">NODENAME:</span> k8s-node01</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>     <span class="ex">RELEASE:</span> 4.19.90-52.39.v2207.ky10.aarch64</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>     <span class="ex">VERSION:</span> <span class="co">#4 SMP Wed Jun 5 15:52:50 CST 2024</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>     <span class="ex">MACHINE:</span> aarch64  <span class="er">(</span><span class="ex">unknown</span> Mhz<span class="kw">)</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      <span class="ex">MEMORY:</span> 64 GB</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>       <span class="ex">PANIC:</span> <span class="st">&quot;Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000&quot;</span></span></code></pre></div>
-<h1 data-number="2" id="issue"><span
-class="header-section-number">2</span> Issue</h1>
+<p><a href="https://chenxiaosong.com/course/nfs/issue/null-ptr-deref-in-nfsd4_probe_callback.html">中文分析过程请点击这里查看</a>。</p>
+<h1 data-number="1" id="environment"><span class="header-section-number">1</span> Environment</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> sys</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>      <span class="ex">KERNEL</span>: usr/lib/debug/lib/modules/4.19.90-52.39.v2207.ky10.aarch64/vmlinux</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    <span class="ex">DUMPFILE</span>: vmcore  [PARTIAL DUMP]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>        <span class="ex">CPUS</span>: 32</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>        <span class="ex">DATE</span>: Wed May 28 02:04:57 CST 2025</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>      <span class="ex">UPTIME</span>: 06:43:45</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="ex">LOAD</span> AVERAGE: 4.08, 4.00, 3.83</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>       <span class="ex">TASKS</span>: 4811</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    <span class="ex">NODENAME</span>: k8s-node01</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>     <span class="ex">RELEASE</span>: 4.19.90-52.39.v2207.ky10.aarch64</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>     <span class="ex">VERSION</span>: #4 SMP Wed Jun 5 15:52:50 CST 2024</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>     <span class="ex">MACHINE</span>: aarch64  (unknown Mhz)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>      <span class="ex">MEMORY</span>: 64 GB</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>       <span class="ex">PANIC</span>: <span class="st">&quot;Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000&quot;</span></span></code></pre></div>
+<h1 data-number="2" id="issue"><span class="header-section-number">2</span> Issue</h1>
 <p>We had a null-ptr-deref in <code>nfsd4_probe_callback()</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dmesg</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.575708]</span> nfsd: last server has exited, flushing export cache</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.580242]</span> NFSD: starting 90-second grace period <span class="er">(</span><span class="ex">net</span> f0000030<span class="kw">)</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.738349]</span> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.803480]</span> Call trace:</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.804639]</span>  __queue_work+0xb4/0x558</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.805949]</span>  queue_work_on+0x88/0x90</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.807306]</span>  nfsd4_probe_callback+0x4c/0x58 <span class="pp">[</span><span class="ss">nfsd</span><span class="pp">]</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.807458]</span> NFSD: starting 90-second grace period <span class="er">(</span><span class="ex">net</span> f0000030<span class="kw">)</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.808896]</span>  nfsd4_probe_callback_sync+0x20/0x38 <span class="pp">[</span><span class="ss">nfsd</span><span class="pp">]</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.808909]</span>  nfsd4_init_conn.isra.57+0x8c/0xa8 <span class="pp">[</span><span class="ss">nfsd</span><span class="pp">]</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.815204]</span>  nfsd4_create_session+0x5b8/0x718 <span class="pp">[</span><span class="ss">nfsd</span><span class="pp">]</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.817711]</span>  nfsd4_proc_compound+0x4c0/0x710 <span class="pp">[</span><span class="ss">nfsd</span><span class="pp">]</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.819329]</span>  nfsd_dispatch+0x104/0x248 <span class="pp">[</span><span class="ss">nfsd</span><span class="pp">]</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.820742]</span>  svc_process_common+0x348/0x808 <span class="pp">[</span><span class="ss">sunrpc</span><span class="pp">]</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.822294]</span>  svc_process+0xb0/0xc8 <span class="pp">[</span><span class="ss">sunrpc</span><span class="pp">]</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.823760]</span>  nfsd+0xf0/0x160 <span class="pp">[</span><span class="ss">nfsd</span><span class="pp">]</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.825006]</span>  kthread+0x134/0x138</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.826336]</span>  ret_from_fork+0x10/0x18</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.827722]</span> Code: aa1c03e0 97ffffba aa0003e2 b5000780 <span class="er">(</span><span class="ex">f9400262</span><span class="kw">)</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.829444]</span> SMP: stopping secondary CPUs</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.838583]</span> Starting crashdump kernel...</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.842579]</span> Bye!</span></code></pre></div>
-<h1 data-number="3" id="analysis-from-vmcore"><span
-class="header-section-number">3</span> Analysis from vmcore</h1>
-<p><a
-href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/nfs/null-ptr-deref-in-nfsd4_probe_callback-vmcore.md">Click
-here to view the complete vmcore information</a>.</p>
-<h2 data-number="3.1" id="dmesg"><span
-class="header-section-number">3.1</span> <code>dmesg</code></h2>
-<p><code>"NFSD: starting 90-second grace period"</code> was printed
-twice in a very short period.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dmesg</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.575708]</span> nfsd: last server has exited, flushing export cache</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.580242]</span> NFSD: starting 90-second grace period <span class="er">(</span><span class="ex">net</span> f0000030<span class="kw">)</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.738349]</span> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.807458]</span> NFSD: starting 90-second grace period <span class="er">(</span><span class="ex">net</span> f0000030<span class="kw">)</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.838583]</span> Starting crashdump kernel...</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[24225.842579]</span> Bye!</span></code></pre></div>
-<h2 data-number="3.2" id="bt"><span
-class="header-section-number">3.2</span> <code>bt</code></h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 2772769  TASK: ffff8004296f7d00  CPU: 24  COMMAND: <span class="st">&quot;nfsd&quot;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a> <span class="co">#0 [ffff80043786f5b0] machine_kexec at ffff0000480a2e8c</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a> <span class="co">#1 [ffff80043786f610] __crash_kexec at ffff0000481ba948</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a> <span class="co">#2 [ffff80043786f780] crash_kexec at ffff0000481baa58</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a> <span class="co">#3 [ffff80043786f7b0] die at ffff00004808f65c</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a> <span class="co">#4 [ffff80043786f7f0] die_kernel_fault at ffff0000480b1ef0</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a> <span class="co">#5 [ffff80043786f820] __do_kernel_fault at ffff0000480b1bc4</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a> <span class="co">#6 [ffff80043786f850] do_page_fault at ffff000048c7a650</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a> <span class="co">#7 [ffff80043786f930] do_translation_fault at ffff000048c7ab44</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a> <span class="co">#8 [ffff80043786f960] do_mem_abort at ffff0000480812c4</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a> <span class="co">#9 [ffff80043786fb40] el1_ia at ffff000048082f0c</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>     <span class="ex">PC:</span> ffff000048111014  <span class="pp">[</span><span class="ss">__queue_work+180</span><span class="pp">]</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>     <span class="ex">LR:</span> ffff00004811100c  <span class="pp">[</span><span class="ss">__queue_work+172</span><span class="pp">]</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>     <span class="ex">SP:</span> ffff80043786fb50  PSTATE: 60c00085</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X29:</span> ffff80043786fb50  X28: ffff80042b644ef8  X27: ffff000049f44aa8</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X26:</span> ffff0000498b3000  X25: 0000000000000400  X24: ffff80042c343400</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X23:</span> 0000000000000018  X22: ffff000049f44a88  X21: ffff000049480018</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X20:</span> 0000000000000017  X19: 0000000000000000  X18: 0000000000000001</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X17:</span> 0000fffd9fe76608  X16: ffff000048368b48  X15: 0000ffffd5c4cfa8</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X14:</span> 0000000000000000  X13: 0000000032306564  X12: 6f6e2d73386b0a00</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X11:</span> 00000a101cde0100  X10: 0000000000000004   X9: 0000000000000000</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X8:</span> ffff80042e54b000   X7: 951ff3846835fec9   X6: 0000000000000002</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X5:</span> 0000000000000000   X4: ffff8001d5fdd298   X3: 0000000000000000</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X2:</span> 0000000000000000   X1: 000000007fffffff   X0: 0000000000000000</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">#10 [ffff80043786fb50] __queue_work at ffff000048111010</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co">#11 [ffff80043786fbc0] queue_work_on at ffff00004811153c</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="co">#12 [ffff80043786fbf0] nfsd4_probe_callback at ffff000042a231e8 [nfsd]</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co">#13 [ffff80043786fc10] nfsd4_probe_callback_sync at ffff000042a23214 [nfsd]</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co">#14 [ffff80043786fc30] nfsd4_init_conn at ffff000042a16178 [nfsd]</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co">#15 [ffff80043786fc60] nfsd4_create_session at ffff000042a18aa4 [nfsd]</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co">#16 [ffff80043786fcd0] nfsd4_proc_compound at ffff000042a07504 [nfsd]</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="co">#17 [ffff80043786fd40] nfsd_dispatch at ffff0000429f1ed0 [nfsd]</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="co">#18 [ffff80043786fd80] svc_process_common at ffff000042588d34 [sunrpc]</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co">#19 [ffff80043786fe00] svc_process at ffff0000425892a4 [sunrpc]</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co">#20 [ffff80043786fe20] nfsd at ffff0000429f1884 [nfsd]</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="co">#21 [ffff80043786fe70] kthread at ffff00004811a870</span></span></code></pre></div>
-<h2 data-number="3.3" id="disassemble-__queue_work"><span
-class="header-section-number">3.3</span> Disassemble
-<code>__queue_work()</code></h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> __queue_work</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel/workqueue.c:</span> 577</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># unbound_pwq_by_node() -&gt; rcu_dereference_raw()</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110ff8</span> <span class="op">&lt;</span>__queue_work+152<span class="op">&gt;</span>:  sxtw    x0, w0</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110ffc</span> <span class="op">&lt;</span>__queue_work+156<span class="op">&gt;</span>:  add x0, x0, <span class="co">#0x22</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/./include/linux/compiler.h:</span> 310</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># rcu_dereference_raw() -&gt; READ_ONCE() -&gt; __READ_ONCE() -&gt; __read_once_size()</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111000</span> <span class="op">&lt;</span>__queue_work+160<span class="op">&gt;</span>:  ldr x19, [x24,x0,lsl <span class="co">#3] # ==&gt; pwq == X19: 0000000000000000</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel/workqueue.c:</span> 1400</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111010</span> <span class="op">&lt;</span>__queue_work+176<span class="op">&gt;</span>:  cbnz    x0, 0xffff000048111100 <span class="op">&lt;</span>__queue_work+416<span class="op">&gt;</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048111014</span> <span class="op">&lt;</span>__queue_work+180<span class="op">&gt;</span>:  ldr x2, <span class="pp">[</span><span class="ss">x19</span><span class="pp">]</span> <span class="co"># ==&gt; dereference pwq-&gt;pool</span></span></code></pre></div>
-<h2 data-number="3.4" id="where-the-code-crashed"><span
-class="header-section-number">3.4</span> Where the code crashed</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dmesg</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>[<span class="ex">24225.575708</span>] nfsd: last server has exited, flushing export cache</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>[<span class="ex">24225.580242</span>] NFSD: starting 90-second grace period (net f0000030)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>[<span class="ex">24225.738349</span>] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>[<span class="ex">24225.803480</span>] Call trace:</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>[<span class="ex">24225.804639</span>]  __queue_work+0xb4/0x558</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>[<span class="ex">24225.805949</span>]  queue_work_on+0x88/0x90</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>[<span class="ex">24225.807306</span>]  nfsd4_probe_callback+0x4c/0x58 [nfsd]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>[<span class="ex">24225.807458</span>] NFSD: starting 90-second grace period (net f0000030)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>[<span class="ex">24225.808896</span>]  nfsd4_probe_callback_sync+0x20/0x38 [nfsd]</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>[<span class="ex">24225.808909</span>]  nfsd4_init_conn.isra.57+0x8c/0xa8 [nfsd]</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>[<span class="ex">24225.815204</span>]  nfsd4_create_session+0x5b8/0x718 [nfsd]</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>[<span class="ex">24225.817711</span>]  nfsd4_proc_compound+0x4c0/0x710 [nfsd]</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>[<span class="ex">24225.819329</span>]  nfsd_dispatch+0x104/0x248 [nfsd]</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>[<span class="ex">24225.820742</span>]  svc_process_common+0x348/0x808 [sunrpc]</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>[<span class="ex">24225.822294</span>]  svc_process+0xb0/0xc8 [sunrpc]</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>[<span class="ex">24225.823760</span>]  nfsd+0xf0/0x160 [nfsd]</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>[<span class="ex">24225.825006</span>]  kthread+0x134/0x138</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a>[<span class="ex">24225.826336</span>]  ret_from_fork+0x10/0x18</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>[<span class="ex">24225.827722</span>] Code: aa1c03e0 97ffffba aa0003e2 b5000780 (f9400262)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a>[<span class="ex">24225.829444</span>] SMP: stopping secondary CPUs</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a>[<span class="ex">24225.838583</span>] Starting crashdump kernel...</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>[<span class="ex">24225.842579</span>] Bye!</span></code></pre></div>
+<h1 data-number="3" id="analysis-from-vmcore"><span class="header-section-number">3</span> Analysis from vmcore</h1>
+<p><a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/nfs/null-ptr-deref-in-nfsd4_probe_callback-vmcore.md">Click here to view the complete vmcore information</a>.</p>
+<h2 data-number="3.1" id="dmesg"><span class="header-section-number">3.1</span> <code>dmesg</code></h2>
+<p><code>"NFSD: starting 90-second grace period"</code> was printed twice in a very short period.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dmesg</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>[<span class="ex">24225.575708</span>] nfsd: last server has exited, flushing export cache</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>[<span class="ex">24225.580242</span>] NFSD: starting 90-second grace period (net f0000030)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>[<span class="ex">24225.738349</span>] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>[<span class="ex">24225.807458</span>] NFSD: starting 90-second grace period (net f0000030)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>[<span class="ex">24225.838583</span>] Starting crashdump kernel...</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>[<span class="ex">24225.842579</span>] Bye!</span></code></pre></div>
+<h2 data-number="3.2" id="bt"><span class="header-section-number">3.2</span> <code>bt</code></h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">PID</span>: 2772769  TASK: ffff8004296f7d00  CPU: 24  COMMAND: <span class="st">&quot;nfsd&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a> <span class="co">#0 [ffff80043786f5b0] machine_kexec at ffff0000480a2e8c</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a> <span class="co">#1 [ffff80043786f610] __crash_kexec at ffff0000481ba948</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a> <span class="co">#2 [ffff80043786f780] crash_kexec at ffff0000481baa58</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a> <span class="co">#3 [ffff80043786f7b0] die at ffff00004808f65c</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a> <span class="co">#4 [ffff80043786f7f0] die_kernel_fault at ffff0000480b1ef0</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a> <span class="co">#5 [ffff80043786f820] __do_kernel_fault at ffff0000480b1bc4</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a> <span class="co">#6 [ffff80043786f850] do_page_fault at ffff000048c7a650</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a> <span class="co">#7 [ffff80043786f930] do_translation_fault at ffff000048c7ab44</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a> <span class="co">#8 [ffff80043786f960] do_mem_abort at ffff0000480812c4</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a> <span class="co">#9 [ffff80043786fb40] el1_ia at ffff000048082f0c</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>     <span class="ex">PC</span>: ffff000048111014  [__queue_work+180]</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>     <span class="ex">LR</span>: ffff00004811100c  [__queue_work+172]</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>     <span class="ex">SP</span>: ffff80043786fb50  PSTATE: 60c00085</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>    <span class="ex">X29</span>: ffff80043786fb50  X28: ffff80042b644ef8  X27: ffff000049f44aa8</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>    <span class="ex">X26</span>: ffff0000498b3000  X25: 0000000000000400  X24: ffff80042c343400</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>    <span class="ex">X23</span>: 0000000000000018  X22: ffff000049f44a88  X21: ffff000049480018</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>    <span class="ex">X20</span>: 0000000000000017  X19: 0000000000000000  X18: 0000000000000001</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>    <span class="ex">X17</span>: 0000fffd9fe76608  X16: ffff000048368b48  X15: 0000ffffd5c4cfa8</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>    <span class="ex">X14</span>: 0000000000000000  X13: 0000000032306564  X12: 6f6e2d73386b0a00</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a>    <span class="ex">X11</span>: 00000a101cde0100  X10: 0000000000000004   X9: 0000000000000000</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a>     <span class="ex">X8</span>: ffff80042e54b000   X7: 951ff3846835fec9   X6: 0000000000000002</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>     <span class="ex">X5</span>: 0000000000000000   X4: ffff8001d5fdd298   X3: 0000000000000000</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>     <span class="ex">X2</span>: 0000000000000000   X1: 000000007fffffff   X0: 0000000000000000</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a><span class="co">#10 [ffff80043786fb50] __queue_work at ffff000048111010</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a><span class="co">#11 [ffff80043786fbc0] queue_work_on at ffff00004811153c</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a><span class="co">#12 [ffff80043786fbf0] nfsd4_probe_callback at ffff000042a231e8 [nfsd]</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a><span class="co">#13 [ffff80043786fc10] nfsd4_probe_callback_sync at ffff000042a23214 [nfsd]</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a><span class="co">#14 [ffff80043786fc30] nfsd4_init_conn at ffff000042a16178 [nfsd]</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a><span class="co">#15 [ffff80043786fc60] nfsd4_create_session at ffff000042a18aa4 [nfsd]</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a><span class="co">#16 [ffff80043786fcd0] nfsd4_proc_compound at ffff000042a07504 [nfsd]</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a><span class="co">#17 [ffff80043786fd40] nfsd_dispatch at ffff0000429f1ed0 [nfsd]</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true"></a><span class="co">#18 [ffff80043786fd80] svc_process_common at ffff000042588d34 [sunrpc]</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true"></a><span class="co">#19 [ffff80043786fe00] svc_process at ffff0000425892a4 [sunrpc]</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true"></a><span class="co">#20 [ffff80043786fe20] nfsd at ffff0000429f1884 [nfsd]</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true"></a><span class="co">#21 [ffff80043786fe70] kthread at ffff00004811a870</span></span></code></pre></div>
+<h2 data-number="3.3" id="disassemble-__queue_work"><span class="header-section-number">3.3</span> Disassemble <code>__queue_work()</code></h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dis -l __queue_work</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel</span>/workqueue.c: <span class="ex">577</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co"># unbound_pwq_by_node() -&gt; rcu_dereference_raw()</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="ex">0xffff000048110ff8</span> <span class="op">&lt;</span>__queue_work+<span class="op">152&gt;</span>:  sxtw    x0, w0</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="ex">0xffff000048110ffc</span> <span class="op">&lt;</span>__queue_work+<span class="op">156&gt;</span>:  add x0, x0, #0x22</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/./include/linux</span>/compiler.h: <span class="ex">310</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="co"># rcu_dereference_raw() -&gt; READ_ONCE() -&gt; __READ_ONCE() -&gt; __read_once_size()</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="ex">0xffff000048111000</span> <span class="op">&lt;</span>__queue_work+<span class="op">160&gt;</span>:  ldr x19, [x24,x0,lsl #3] # ==<span class="op">&gt;</span> pwq == X19: 0000000000000000</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-52.39.v2207.ky10.aarch64/kernel</span>/workqueue.c: <span class="ex">1400</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a><span class="ex">0xffff000048111010</span> <span class="op">&lt;</span>__queue_work+<span class="op">176&gt;</span>:  cbnz    x0, 0xffff000048111100 <span class="op">&lt;</span>__queue_work+<span class="op">416&gt;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a><span class="ex">0xffff000048111014</span> <span class="op">&lt;</span>__queue_work+<span class="op">180&gt;</span>:  ldr x2, [x19] # ==<span class="op">&gt;</span> dereference pwq-<span class="op">&gt;</span>pool</span></code></pre></div>
+<h2 data-number="3.4" id="where-the-code-crashed"><span class="header-section-number">3.4</span> Where the code crashed</h2>
 <p>Crashed in <code>__queue_work()</code>, <code>pwq == NULL</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1360</span> <span class="dt">static</span> <span class="dt">void</span> __queue_work<span class="op">(</span><span class="dt">int</span> cpu<span class="op">,</span> <span class="kw">struct</span> workqueue_struct <span class="op">*</span>wq<span class="op">,</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1361</span>                          <span class="kw">struct</span> work_struct <span class="op">*</span>work<span class="op">)</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1399</span>         last_pool <span class="op">=</span> get_work_pool<span class="op">(</span>work<span class="op">);</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> <span class="dv">1400</span>         <span class="cf">if</span> <span class="op">(</span>last_pool <span class="op">&amp;&amp;</span> last_pool <span class="op">!=</span> pwq<span class="op">-&gt;</span>pool<span class="op">)</span> <span class="op">{</span> <span class="op">==&gt;</span> pwq <span class="op">==</span> NULL</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1401</span>                 <span class="kw">struct</span> worker <span class="op">*</span>worker<span class="op">;</span></span></code></pre></div>
-<h2 data-number="3.5" id="callback_wq"><span
-class="header-section-number">3.5</span> <code>callback_wq</code></h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-l</span> __queue_work</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff000048110f74</span> <span class="op">&lt;</span>__queue_work+20<span class="op">&gt;</span>:   mov x24, x1 <span class="co"># x1 == second arg `wq`</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
-<p><code>x24</code> hasn’t been overwritten, so the value of
-<code>wq</code>(second arg of <code>__queue_work()</code>) is
-<code>X24: ffff80042c343400</code>, it is value of
-<code>callback_wq</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct workqueue_struct ffff80042c343400</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> workqueue_struct {</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">dfl_pwq</span> = 0x0, <span class="co"># has already been freed</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
-<p>But the current value of <code>callback_wq</code> is different from
-<code>X24</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> rd callback_wq</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff000042a55a70:</span>  ffff80010eb50600</span></code></pre></div>
-<h1 data-number="4" id="solution"><span
-class="header-section-number">4</span> Solution</h1>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>  <span class="dv">1360</span> <span class="dt">static</span> <span class="dt">void</span> __queue_work(<span class="dt">int</span> cpu, <span class="kw">struct</span> workqueue_struct *wq,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>  <span class="dv">1361</span>                          <span class="kw">struct</span> work_struct *work)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  ...</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>  <span class="dv">1399</span>         last_pool = get_work_pool(work);</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>&gt; <span class="dv">1400</span>         <span class="cf">if</span> (last_pool &amp;&amp; last_pool != pwq-&gt;pool) { ==&gt; pwq == NULL</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>  <span class="dv">1401</span>                 <span class="kw">struct</span> worker *worker;</span></code></pre></div>
+<h2 data-number="3.5" id="callback_wq"><span class="header-section-number">3.5</span> <code>callback_wq</code></h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dis -l __queue_work</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="ex">0xffff000048110f74</span> <span class="op">&lt;</span>__queue_work+<span class="op">20&gt;</span>:   mov x24, x1 # x1 == second arg <span class="kw">`</span><span class="ex">wq</span><span class="kw">`</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="ex">...</span></span></code></pre></div>
+<p><code>x24</code> hasn’t been overwritten, so the value of <code>wq</code>(second arg of <code>__queue_work()</code>) is <code>X24: ffff80042c343400</code>, it is value of <code>callback_wq</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct workqueue_struct ffff80042c343400</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="ex">struct</span> workqueue_struct {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>  <span class="ex">dfl_pwq</span> = 0x0, # has already been freed</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="ex">...</span></span></code></pre></div>
+<p>But the current value of <code>callback_wq</code> is different from <code>X24</code>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> rd callback_wq</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="ex">ffff000042a55a70</span>:  ffff80010eb50600</span></code></pre></div>
+<h1 data-number="4" id="solution"><span class="header-section-number">4</span> Solution</h1>
 <p>Merge the following patches:</p>
 <ul>
-<li><a
-href="https://lore.kernel.org/all/163816148557.32298.11233238491435215789.stgit@noble.brown/"><code>[PATCH 08/20] 3409e4f1e8f2 NFSD: Make it possible to use svc_set_num_threads_sync</code></a></li>
+<li><a href="https://lore.kernel.org/all/163816148557.32298.11233238491435215789.stgit@noble.brown/"><code>[PATCH 08/20] 3409e4f1e8f2 NFSD: Make it possible to use svc_set_num_threads_sync</code></a></li>
 </ul>
 </body>
 </html>
