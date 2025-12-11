@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -82,109 +93,140 @@
 <!-- sign begin -->
 <ul>
 <li>作者: 陈孝松</li>
-<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/">中文主页:
+chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页:
+chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">nfsv3缓存占用太多的问题</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#vmcore解析"><span class="toc-section-number">2</span> vmcore解析</a></li>
-<li><a href="#vm-debug"><span class="toc-section-number">3</span> 虚拟机中调试</a></li>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#vmcore解析" id="toc-vmcore解析"><span
+class="toc-section-number">2</span> vmcore解析</a></li>
+<li><a href="#vm-debug" id="toc-vm-debug"><span
+class="toc-section-number">3</span> 虚拟机中调试</a>
+<ul>
+<li><a href="#vmcore解析-1" id="toc-vmcore解析-1"><span
+class="toc-section-number">3.1</span> vmcore解析</a></li>
+<li><a href="#section" id="toc-section"><span
+class="toc-section-number">3.2</span> </a></li>
+</ul></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p><a
+href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
 <p>nfsv3占用缓存太多。</p>
-<h1 data-number="2" id="vmcore解析"><span class="header-section-number">2</span> vmcore解析</h1>
+<h1 data-number="2" id="vmcore解析"><span
+class="header-section-number">2</span> vmcore解析</h1>
 <ul>
-<li><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfs-cannot-drop-cache-vmcore-1.md"><code>nfs-cannot-drop-cache-vmcore-1.md</code></a></li>
-<li><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfs-cannot-drop-cache-vmcore-2.md"><code>nfs-cannot-drop-cache-vmcore-2.md</code></a></li>
+<li><a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-cannot-drop-cache-vmcore-1.md"><code>nfs-cannot-drop-cache-vmcore-1.md</code></a></li>
+<li><a
+href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-cannot-drop-cache-vmcore-2.md"><code>nfs-cannot-drop-cache-vmcore-2.md</code></a></li>
 </ul>
-<h1 data-number="3" id="vm-debug"><span class="header-section-number">3</span> 虚拟机中调试</h1>
+<h1 data-number="3" id="vm-debug"><span
+class="header-section-number">3</span> 虚拟机中调试</h1>
 <p>挂载:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">mount</span> -t nfs -o vers=3 192.168.53.209:/tmp/s_test /mnt</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=3 192.168.53.209:/tmp/s_test /mnt</span></code></pre></div>
 <p>用户态程序<code>test.c</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;string.h&gt;</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="dt">int</span> main() {</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>    <span class="dt">const</span> <span class="dt">char</span> *filename = <span class="st">&quot;/mnt/file&quot;</span>;</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>    <span class="dt">char</span> buffer[<span class="dv">4096</span>];</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>    <span class="dt">ssize_t</span> bytes_read;</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>    </span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>    <span class="co">// 打开文件</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>    <span class="dt">int</span> fd = open(filename, O_RDONLY, <span class="bn">0644</span>);</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>    <span class="cf">if</span> (fd == -<span class="dv">1</span>) {</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>        perror(<span class="st">&quot;无法打开文件&quot;</span>);</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>        <span class="cf">return</span> <span class="dv">1</span>;</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>    }</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>    printf(<span class="st">&quot;文件已打开 (fd=%d)</span><span class="sc">\n</span><span class="st">&quot;</span>, fd);</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>    </span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a>    <span class="co">// 读取并显示文件前4096字节</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>    lseek(fd, <span class="dv">0</span>, SEEK_SET);</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a>    bytes_read = read(fd, buffer, <span class="kw">sizeof</span>(buffer) - <span class="dv">1</span>);</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a>    <span class="cf">if</span> (bytes_read &gt; <span class="dv">0</span>) {</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>        buffer[bytes_read] = <span class="ch">&#39;\0&#39;</span>;</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a>        printf(<span class="st">&quot;文件前 %zd 字节:</span><span class="sc">\n</span><span class="st">%s</span><span class="sc">\n</span><span class="st">&quot;</span>, bytes_read, buffer);</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a>    }</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a>    <span class="co">// 无限循环等待</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a>    <span class="cf">while</span> (<span class="dv">1</span>) {</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a>        sleep(<span class="dv">1</span>);</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a>    }</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a>    </span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true"></a>    <span class="co">// 这行代码永远不会执行</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true"></a>    close(fd);</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true"></a>    <span class="cf">return</span> <span class="dv">0</span>;</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;string.h&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>filename <span class="op">=</span> <span class="st">&quot;/mnt/file&quot;</span><span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> buf_size <span class="op">=</span> <span class="dv">100</span> <span class="op">*</span> <span class="dv">1024</span> <span class="op">*</span> <span class="dv">1024</span><span class="op">;</span> <span class="co">// 读100M</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> <span class="op">*</span>buffer <span class="op">=</span> malloc<span class="op">(</span>buf_size<span class="op">);</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">ssize_t</span> bytes_read<span class="op">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 打开文件</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> fd <span class="op">=</span> open<span class="op">(</span>filename<span class="op">,</span> O_RDONLY<span class="op">,</span> <span class="bn">0644</span><span class="op">);</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>fd <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        perror<span class="op">(</span><span class="st">&quot;无法打开文件&quot;</span><span class="op">);</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;文件已打开 (fd=</span><span class="sc">%d</span><span class="st">)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> fd<span class="op">);</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 读取并显示文件前4096字节</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    lseek<span class="op">(</span>fd<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> SEEK_SET<span class="op">);</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    bytes_read <span class="op">=</span> read<span class="op">(</span>fd<span class="op">,</span> buffer<span class="op">,</span> buf_size <span class="op">-</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>bytes_read <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        buffer<span class="op">[</span>bytes_read<span class="op">]</span> <span class="op">=</span> <span class="ch">&#39;</span><span class="sc">\0</span><span class="ch">&#39;</span><span class="op">;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;读了 </span><span class="sc">%zd</span><span class="st"> 字节:</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> bytes_read<span class="op">);</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 无限循环等待</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        sleep<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 这行代码永远不会执行</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    close<span class="op">(</span>fd<span class="op">);</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>编译运行:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="fu">gcc</span> test.c</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">./a.out</span> <span class="kw">&amp;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="bu">cd</span> /mnt <span class="co"># 进入挂载点</span></span></code></pre></div>
-<p>参考<a href="https://chenxiaosong.com/course/kernel/debug.html#kdump-crash">《内核调试方法》</a>在虚拟机中导出vmcore。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/dev/random of=/mnt/file bs=1M count=1024</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> test.c</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">./a.out</span> <span class="kw">&amp;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /mnt <span class="co"># 进入挂载点</span></span></code></pre></div>
+<h2 data-number="3.1" id="vmcore解析-1"><span
+class="header-section-number">3.1</span> vmcore解析</h2>
+<p>参考<a
+href="https://chenxiaosong.com/course/kernel/debug.html#kdump-crash">《内核调试方法》</a>在虚拟机中导出vmcore。</p>
 <p>vmcore解析如下:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> ps <span class="kw">|</span> <span class="fu">grep</span> a.out</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>     <span class="ex">1027</span>     710   7  ffff888110e119c0  IN   0.0     2548     1508  a.out</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> files 1027</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="ex">PID</span>: 1027     TASK: ffff888110e119c0  CPU: 7    COMMAND: <span class="st">&quot;a.out&quot;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="ex">ROOT</span>: /    CWD: /root</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a> <span class="ex">FD</span>       FILE            DENTRY           INODE       TYPE PATH</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>  <span class="ex">...</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>  <span class="ex">3</span> ffff88810a8f8c00 ffff8881004840c0 ffff888104e06048 REG  /mnt/file</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct inode.i_mapping ffff888104e06048</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>  <span class="ex">i_mapping</span> = 0xffff888104e061b8,</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct address_space.nrpages 0xffff888104e061b8</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>  <span class="ex">nrpages</span> = 4, # 有预读，4个page</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct address_space.i_mmap 0xffff888104e061b8</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>  <span class="ex">i_mmap</span> = {</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>    <span class="ex">rb_root</span> = {</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>      <span class="ex">rb_node</span> = 0x0</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>    },</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>    <span class="ex">rb_leftmost</span> = 0x0</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a>  },</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> foreach files -R mnt</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a><span class="ex">PID</span>: 710      TASK: ffff888110e13380  CPU: 1    COMMAND: <span class="st">&quot;bash&quot;</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a><span class="ex">ROOT</span>: /    CWD: /mnt </span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a><span class="ex">PID</span>: 1027     TASK: ffff888110e119c0  CPU: 9    COMMAND: <span class="st">&quot;a.out&quot;</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a><span class="ex">ROOT</span>: /    CWD: /root </span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a> <span class="ex">FD</span>       FILE            DENTRY           INODE       TYPE PATH</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a>  <span class="ex">3</span> ffff88810a8f8c00 ffff8881004840c0 ffff888104e06048 REG  /mnt/file</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> ps <span class="kw">|</span> <span class="fu">grep</span> a.out</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>      <span class="ex">966</span>     703   7  ffff888011fe4d40  IN   2.0   104952   104032  a.out</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> files 966</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 966      TASK: ffff888011fe4d40  CPU: 7    COMMAND: <span class="st">&quot;a.out&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">ROOT:</span> /    CWD: /root</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a> <span class="ex">FD</span>       FILE            DENTRY           INODE       TYPE PATH</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">3</span> ffff888006b21740 ffff88810430e600 ffff888112352ec8 REG  /mnt/file</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct inode.i_mapping ffff888112352ec8</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="ex">i_mapping</span> = 0xffff888112353038,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct address_space.nrpages 0xffff888112353038</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nrpages</span> = 25728, <span class="co"># 执行完 echo 3 &gt; /proc/sys/vm/drop_caches 后为 0</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct address_space.i_mmap 0xffff888112353038</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="ex">i_mmap</span> = {</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rb_root</span> = {</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>      <span class="ex">rb_node</span> = 0x0</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span><span class="ex">,</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rb_leftmost</span> = 0x0</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> foreach files <span class="at">-R</span> mnt</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 966      TASK: ffff888011fe4d40  CPU: 7    COMMAND: <span class="st">&quot;a.out&quot;</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="ex">ROOT:</span> /    CWD: /root </span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a> <span class="ex">FD</span>       FILE            DENTRY           INODE       TYPE PATH</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="ex">3</span> ffff888006b21740 ffff88810430e600 ffff888112352ec8 REG  /mnt/file</span></code></pre></div>
+<h2 data-number="3.2" id="section"><span
+class="header-section-number">3.2</span> </h2>
 </body>
 </html>

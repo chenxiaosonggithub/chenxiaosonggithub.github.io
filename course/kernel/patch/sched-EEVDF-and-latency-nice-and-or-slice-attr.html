@@ -8,10 +8,19 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -20,44 +29,106 @@
 <!-- sign begin -->
 <ul>
 <li>作者: 陈孝松</li>
-<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/">中文主页:
+chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页:
+chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">sched: EEVDF and latency-nice and/or slice-attr</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#前几版补丁集"><span class="toc-section-number">1</span> 前几版补丁集</a>
+<li><a href="#前几版补丁集" id="toc-前几版补丁集"><span
+class="toc-section-number">1</span> 前几版补丁集</a>
 <ul>
-<li><a href="#patch-0010-sched-eevdf-using-latency-nice"><span class="toc-section-number">1.1</span> <span><code>2023.03.06 [PATCH 00/10] sched: EEVDF using latency-nice</code></span></a></li>
-<li><a href="#patch-0017-sched-eevdf-using-latency-nice"><span class="toc-section-number">1.2</span> <span><code>2023.03.28 [PATCH 00/17] sched: EEVDF using latency-nice</code></span></a></li>
+<li><a href="#patch-0010-sched-eevdf-using-latency-nice"
+id="toc-patch-0010-sched-eevdf-using-latency-nice"><span
+class="toc-section-number">1.1</span>
+<code>2023.03.06 [PATCH 00/10] sched: EEVDF using latency-nice</code></a></li>
+<li><a href="#patch-0017-sched-eevdf-using-latency-nice"
+id="toc-patch-0017-sched-eevdf-using-latency-nice"><span
+class="toc-section-number">1.2</span>
+<code>2023.03.28 [PATCH 00/17] sched: EEVDF using latency-nice</code></a></li>
 </ul></li>
-<li><a href="#合入的补丁集2023.05.31-patch-0015-sched-eevdf-and-latency-nice-andor-slice-attr"><span class="toc-section-number">2</span> 合入的补丁集<span><code>2023.05.31 [PATCH 00/15] sched: EEVDF and latency-nice and/or slice-attr</code></span></a>
+<li><a
+href="#合入的补丁集2023.05.31-patch-0015-sched-eevdf-and-latency-nice-andor-slice-attr"
+id="toc-合入的补丁集2023.05.31-patch-0015-sched-eevdf-and-latency-nice-andor-slice-attr"><span
+class="toc-section-number">2</span>
+合入的补丁集<code>2023.05.31 [PATCH 00/15] sched: EEVDF and latency-nice and/or slice-attr</code></a>
 <ul>
-<li><a href="#patch-0115-af4cf40470c2-schedfair-add-cfs_rqavg_vruntime"><span class="toc-section-number">2.1</span> <span><code>[PATCH 01/15] af4cf40470c2 sched/fair: Add cfs_rq::avg_vruntime</code></span></a></li>
-<li><a href="#patch-0215-e0c2ff903c32-schedfair-remove-sched_featstart_debit"><span class="toc-section-number">2.2</span> <span><code>[PATCH 02/15] e0c2ff903c32 sched/fair: Remove sched_feat(START_DEBIT)</code></span></a></li>
-<li><a href="#patch-0315-86bfbb7ce4f6-schedfair-add-lag-based-placement"><span class="toc-section-number">2.3</span> <span><code>[PATCH 03/15] 86bfbb7ce4f6 sched/fair: Add lag based placement</code></span></a></li>
-<li><a href="#patch-0415-99d4d26551b5-rbtree-add-rb_add_augmented_cached-helper"><span class="toc-section-number">2.4</span> <span><code>[PATCH 04/15] 99d4d26551b5 rbtree: Add rb_add_augmented_cached() helper</code></span></a></li>
-<li><a href="#patch-0515-147f3efaa241-schedfair-implement-an-eevdf-like-scheduling-policy"><span class="toc-section-number">2.5</span> <span><code>[PATCH 05/15] 147f3efaa241 sched/fair: Implement an EEVDF-like scheduling policy</code></span></a></li>
-<li><a href="#patch-0615-76cae9dbe185-schedfair-commit-to-lag-based-placement"><span class="toc-section-number">2.6</span> <span><code>[PATCH 06/15] 76cae9dbe185 sched/fair: Commit to lag based placement</code></span></a></li>
-<li><a href="#patch-0715-e8f331bcc270-schedsmp-use-lag-to-simplify-cross-runqueue-placement"><span class="toc-section-number">2.7</span> <span><code>[PATCH 07/15] e8f331bcc270 sched/smp: Use lag to simplify cross-runqueue placement</code></span></a></li>
-<li><a href="#patch-0815-5e963f2bd465-schedfair-commit-to-eevdf"><span class="toc-section-number">2.8</span> <span><code>[PATCH 08/15] 5e963f2bd465 sched/fair: Commit to EEVDF</code></span></a></li>
-<li><a href="#patch-0915-e4ec3318a17f-scheddebug-rename-sysctl_sched_min_granularity-to-sysctl_sched_base_slice"><span class="toc-section-number">2.9</span> <span><code>[PATCH 09/15] e4ec3318a17f sched/debug: Rename sysctl_sched_min_granularity to sysctl_sched_base_slice</code></span></a></li>
-<li><a href="#patch-1015-d07f09a1f99c-schedfair-propagate-enqueue-flags-into-place_entity"><span class="toc-section-number">2.10</span> <span><code>[PATCH 10/15] d07f09a1f99c sched/fair: Propagate enqueue flags into place_entity()</code></span></a></li>
+<li><a href="#patch-0115-af4cf40470c2-schedfair-add-cfs_rqavg_vruntime"
+id="toc-patch-0115-af4cf40470c2-schedfair-add-cfs_rqavg_vruntime"><span
+class="toc-section-number">2.1</span>
+<code>[PATCH 01/15] af4cf40470c2 sched/fair: Add cfs_rq::avg_vruntime</code></a></li>
+<li><a
+href="#patch-0215-e0c2ff903c32-schedfair-remove-sched_featstart_debit"
+id="toc-patch-0215-e0c2ff903c32-schedfair-remove-sched_featstart_debit"><span
+class="toc-section-number">2.2</span>
+<code>[PATCH 02/15] e0c2ff903c32 sched/fair: Remove sched_feat(START_DEBIT)</code></a></li>
+<li><a href="#patch-0315-86bfbb7ce4f6-schedfair-add-lag-based-placement"
+id="toc-patch-0315-86bfbb7ce4f6-schedfair-add-lag-based-placement"><span
+class="toc-section-number">2.3</span>
+<code>[PATCH 03/15] 86bfbb7ce4f6 sched/fair: Add lag based placement</code></a></li>
+<li><a
+href="#patch-0415-99d4d26551b5-rbtree-add-rb_add_augmented_cached-helper"
+id="toc-patch-0415-99d4d26551b5-rbtree-add-rb_add_augmented_cached-helper"><span
+class="toc-section-number">2.4</span>
+<code>[PATCH 04/15] 99d4d26551b5 rbtree: Add rb_add_augmented_cached() helper</code></a></li>
+<li><a
+href="#patch-0515-147f3efaa241-schedfair-implement-an-eevdf-like-scheduling-policy"
+id="toc-patch-0515-147f3efaa241-schedfair-implement-an-eevdf-like-scheduling-policy"><span
+class="toc-section-number">2.5</span>
+<code>[PATCH 05/15] 147f3efaa241 sched/fair: Implement an EEVDF-like scheduling policy</code></a></li>
+<li><a
+href="#patch-0615-76cae9dbe185-schedfair-commit-to-lag-based-placement"
+id="toc-patch-0615-76cae9dbe185-schedfair-commit-to-lag-based-placement"><span
+class="toc-section-number">2.6</span>
+<code>[PATCH 06/15] 76cae9dbe185 sched/fair: Commit to lag based placement</code></a></li>
+<li><a
+href="#patch-0715-e8f331bcc270-schedsmp-use-lag-to-simplify-cross-runqueue-placement"
+id="toc-patch-0715-e8f331bcc270-schedsmp-use-lag-to-simplify-cross-runqueue-placement"><span
+class="toc-section-number">2.7</span>
+<code>[PATCH 07/15] e8f331bcc270 sched/smp: Use lag to simplify cross-runqueue placement</code></a></li>
+<li><a href="#patch-0815-5e963f2bd465-schedfair-commit-to-eevdf"
+id="toc-patch-0815-5e963f2bd465-schedfair-commit-to-eevdf"><span
+class="toc-section-number">2.8</span>
+<code>[PATCH 08/15] 5e963f2bd465 sched/fair: Commit to EEVDF</code></a></li>
+<li><a
+href="#patch-0915-e4ec3318a17f-scheddebug-rename-sysctl_sched_min_granularity-to-sysctl_sched_base_slice"
+id="toc-patch-0915-e4ec3318a17f-scheddebug-rename-sysctl_sched_min_granularity-to-sysctl_sched_base_slice"><span
+class="toc-section-number">2.9</span>
+<code>[PATCH 09/15] e4ec3318a17f sched/debug: Rename sysctl_sched_min_granularity to sysctl_sched_base_slice</code></a></li>
+<li><a
+href="#patch-1015-d07f09a1f99c-schedfair-propagate-enqueue-flags-into-place_entity"
+id="toc-patch-1015-d07f09a1f99c-schedfair-propagate-enqueue-flags-into-place_entity"><span
+class="toc-section-number">2.10</span>
+<code>[PATCH 10/15] d07f09a1f99c sched/fair: Propagate enqueue flags into place_entity()</code></a></li>
 </ul></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
-<p><a href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
-<h1 data-number="1" id="前几版补丁集"><span class="header-section-number">1</span> 前几版补丁集</h1>
-<h2 data-number="1.1" id="patch-0010-sched-eevdf-using-latency-nice"><span class="header-section-number">1.1</span> <a href="https://lore.kernel.org/all/20230306132521.968182689@infradead.org/"><code>2023.03.06 [PATCH 00/10] sched: EEVDF using latency-nice</code></a></h2>
+<p><a
+href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<h1 data-number="1" id="前几版补丁集"><span
+class="header-section-number">1</span> 前几版补丁集</h1>
+<h2 data-number="1.1"
+id="patch-0010-sched-eevdf-using-latency-nice"><span
+class="header-section-number">1.1</span> <a
+href="https://lore.kernel.org/all/20230306132521.968182689@infradead.org/"><code>2023.03.06 [PATCH 00/10] sched: EEVDF using latency-nice</code></a></h2>
 <pre><code>你好！
 
 自从看到 latency-nice 补丁后，我一直在想，是否使用 EEVDF 会更有意义，我确实向 Vincent 提到过我之前的一些旧补丁（他的增强版 rbtree 也来自于此）。
@@ -91,7 +162,10 @@ hackbench 负载 + cyclictest --policy 其他结果:
 虽然 -19 的结果不如 Vincent 的漂亮，但最后我因为盯着树形打印看得眼花缭乱，实在弄不清楚问题出在哪里。
 
 肯定还有更多的基准测试/调整要做（0-day 已经报告了 stress-ng 的失败），但如果我们能实现这一点，我们可以删除大量让人讨厌的启发式代码。EEVDF 比我们目前使用的策略要定义得更好。</code></pre>
-<h2 data-number="1.2" id="patch-0017-sched-eevdf-using-latency-nice"><span class="header-section-number">1.2</span> <a href="https://lore.kernel.org/all/20230328092622.062917921@infradead.org/"><code>2023.03.28 [PATCH 00/17] sched: EEVDF using latency-nice</code></a></h2>
+<h2 data-number="1.2"
+id="patch-0017-sched-eevdf-using-latency-nice"><span
+class="header-section-number">1.2</span> <a
+href="https://lore.kernel.org/all/20230328092622.062917921@infradead.org/"><code>2023.03.28 [PATCH 00/17] sched: EEVDF using latency-nice</code></a></h2>
 <pre><code>你好！
 
 这是 EEVDF 补丁的最新版本 [1]。
@@ -109,7 +183,10 @@ PLACE_BONUS 补丁严重搞乱了像 hackbench 和 latency-nice 之类的东西�
 但总体而言，该补丁似乎相当可用，可以进行更广泛的测试。
 
 [1] https://citeseerx.ist.psu.edu/document?repid=rep1&amp;type=pdf&amp;doi=805acf7726282721504c8f00575d91ebfd750564</code></pre>
-<h1 data-number="2" id="合入的补丁集2023.05.31-patch-0015-sched-eevdf-and-latency-nice-andor-slice-attr"><span class="header-section-number">2</span> 合入的补丁集<a href="https://lore.kernel.org/all/20230531115839.089944915@infradead.org/"><code>2023.05.31 [PATCH 00/15] sched: EEVDF and latency-nice and/or slice-attr</code></a></h1>
+<h1 data-number="2"
+id="合入的补丁集2023.05.31-patch-0015-sched-eevdf-and-latency-nice-andor-slice-attr"><span
+class="header-section-number">2</span> 合入的补丁集<a
+href="https://lore.kernel.org/all/20230531115839.089944915@infradead.org/"><code>2023.05.31 [PATCH 00/15] sched: EEVDF and latency-nice and/or slice-attr</code></a></h1>
 <p>邮件中的<code>11~15</code>补丁未合入。</p>
 <pre><code>你好！
 
@@ -141,7 +218,10 @@ PLACE_BONUS 补丁严重搞乱了像 hackbench 和 latency-nice 之类的东西�
 [1] https://citeseerx.ist.psu.edu/document?repid=rep1&amp;type=pdf&amp;doi=805acf7726282721504c8f00575d91ebfd750564
 
 [2] https://lkml.kernel.org/r/20230420150537.GC4253%40hirez.programming.kicks-ass.net</code></pre>
-<h2 data-number="2.1" id="patch-0115-af4cf40470c2-schedfair-add-cfs_rqavg_vruntime"><span class="header-section-number">2.1</span> <a href="https://lore.kernel.org/all/20230531124603.654144274@infradead.org/"><code>[PATCH 01/15] af4cf40470c2 sched/fair: Add cfs_rq::avg_vruntime</code></a></h2>
+<h2 data-number="2.1"
+id="patch-0115-af4cf40470c2-schedfair-add-cfs_rqavg_vruntime"><span
+class="header-section-number">2.1</span> <a
+href="https://lore.kernel.org/all/20230531124603.654144274@infradead.org/"><code>[PATCH 01/15] af4cf40470c2 sched/fair: Add cfs_rq::avg_vruntime</code></a></h2>
 <pre><code>sched/fair: 添加 cfs_rq::avg_vruntime
 
 为了转向基于资格的调度策略，我们需要对理想调度器进行更好的近似。
@@ -151,21 +231,33 @@ PLACE_BONUS 补丁严重搞乱了像 hackbench 和 latency-nice 之类的东西�
 因此，计算加权平均值来近似理想调度器——注意，这种近似体现在单个任务的行为上，这并不严格遵循理想调度器的规范。
 
 特别是考虑添加一个虚拟运行时间在中心左侧的任务，在这种情况下，平均值将会向后移动——这是理想调度器当然永远不会做的事情。</code></pre>
-<h2 data-number="2.2" id="patch-0215-e0c2ff903c32-schedfair-remove-sched_featstart_debit"><span class="header-section-number">2.2</span> <a href="https://lore.kernel.org/all/20230531124603.722361178@infradead.org/"><code>[PATCH 02/15] e0c2ff903c32 sched/fair: Remove sched_feat(START_DEBIT)</code></a></h2>
+<h2 data-number="2.2"
+id="patch-0215-e0c2ff903c32-schedfair-remove-sched_featstart_debit"><span
+class="header-section-number">2.2</span> <a
+href="https://lore.kernel.org/all/20230531124603.722361178@infradead.org/"><code>[PATCH 02/15] e0c2ff903c32 sched/fair: Remove sched_feat(START_DEBIT)</code></a></h2>
 <pre><code>sched/fair: 移除 sched_feat(START_DEBIT)
 
 随着 avg_vruntime() 的引入，不再需要使用较差的近似方法。将 0 延迟点作为插入新任务的起点。</code></pre>
-<h2 data-number="2.3" id="patch-0315-86bfbb7ce4f6-schedfair-add-lag-based-placement"><span class="header-section-number">2.3</span> <a href="https://lore.kernel.org/all/20230531124603.794929315@infradead.org/"><code>[PATCH 03/15] 86bfbb7ce4f6 sched/fair: Add lag based placement</code></a></h2>
+<h2 data-number="2.3"
+id="patch-0315-86bfbb7ce4f6-schedfair-add-lag-based-placement"><span
+class="header-section-number">2.3</span> <a
+href="https://lore.kernel.org/all/20230531124603.794929315@infradead.org/"><code>[PATCH 03/15] 86bfbb7ce4f6 sched/fair: Add lag based placement</code></a></h2>
 <pre><code>sched/fair: 添加基于延迟的放置
 
 随着 avg_vruntime 的引入，现在可以近似计算延迟（事实上，这就是引入它的全部目的）。利用这一点，在睡眠+唤醒时进行基于延迟的放置。
 
 具体来说，FAIR_SLEEPERS 机制将任务放置得太靠左，破坏了 EEVDF 的截止时间特性。</code></pre>
-<h2 data-number="2.4" id="patch-0415-99d4d26551b5-rbtree-add-rb_add_augmented_cached-helper"><span class="header-section-number">2.4</span> <a href="https://lore.kernel.org/all/20230531124603.862983648@infradead.org/"><code>[PATCH 04/15] 99d4d26551b5 rbtree: Add rb_add_augmented_cached() helper</code></a></h2>
+<h2 data-number="2.4"
+id="patch-0415-99d4d26551b5-rbtree-add-rb_add_augmented_cached-helper"><span
+class="header-section-number">2.4</span> <a
+href="https://lore.kernel.org/all/20230531124603.862983648@infradead.org/"><code>[PATCH 04/15] 99d4d26551b5 rbtree: Add rb_add_augmented_cached() helper</code></a></h2>
 <pre><code>rbtree: 添加 rb_add_augmented_cached() 辅助函数
 
 虽然略显次优，但在查找过程中向下遍历树时更新增强数据会更快——可惜当前的增强接口不支持这种操作，因此提供一个通用的辅助函数，用于将节点添加到增强缓存树中。</code></pre>
-<h2 data-number="2.5" id="patch-0515-147f3efaa241-schedfair-implement-an-eevdf-like-scheduling-policy"><span class="header-section-number">2.5</span> <a href="https://lore.kernel.org/all/20230531124603.931005524@infradead.org/"><code>[PATCH 05/15] 147f3efaa241 sched/fair: Implement an EEVDF-like scheduling policy</code></a></h2>
+<h2 data-number="2.5"
+id="patch-0515-147f3efaa241-schedfair-implement-an-eevdf-like-scheduling-policy"><span
+class="header-section-number">2.5</span> <a
+href="https://lore.kernel.org/all/20230531124603.931005524@infradead.org/"><code>[PATCH 05/15] 147f3efaa241 sched/fair: Implement an EEVDF-like scheduling policy</code></a></h2>
 <pre><code>sched/fair: 实现类似 EEVDF 的调度策略
 
 目前 CFS 是基于加权公平队列（WFQ）的调度器，只有一个调节参数——权重。通过添加第二个面向延迟的参数，可以更好地实现类似 WF2Q 或 EEVDF 的调度策略。
@@ -183,7 +275,10 @@ EEVDF 有两个参数:
 Tick 驱动的抢占由请求/时间片的完成驱动，而唤醒抢占则由截止时间驱动。
 
 由于现在的树实际上是一个区间树，并且选择不再是“最左侧”，过度调度的问题也得到了缓解。</code></pre>
-<h2 data-number="2.6" id="patch-0615-76cae9dbe185-schedfair-commit-to-lag-based-placement"><span class="header-section-number">2.6</span> <a href="https://lore.kernel.org/all/20230531124604.000198861@infradead.org/"><code>[PATCH 06/15] 76cae9dbe185 sched/fair: Commit to lag based placement</code></a></h2>
+<h2 data-number="2.6"
+id="patch-0615-76cae9dbe185-schedfair-commit-to-lag-based-placement"><span
+class="header-section-number">2.6</span> <a
+href="https://lore.kernel.org/all/20230531124604.000198861@infradead.org/"><code>[PATCH 06/15] 76cae9dbe185 sched/fair: Commit to lag based placement</code></a></h2>
 <pre><code>sched/fair: 确认基于延迟的放置
 
 移除了 FAIR_SLEEPERS 代码，取而代之的是新的基于延迟的放置。
@@ -191,21 +286,33 @@ Tick 驱动的抢占由请求/时间片的完成驱动，而唤醒抢占则由�
 具体来说，FAIR_SLEEPERS 机制是一个非常粗糙的近似方法，用于弥补缺乏基于延迟的放置，特别是“服务欠缺”部分。这对于像 starve 和 hackbench 这样的场景非常重要。
 
 FAIR_SLEEPER 的一个副作用是导致了“小”的不公平，具体来说，通过总是忽略最长为 thresh 的睡眠时间，它对于一个 50% 的睡眠者和一个 100% 的运行者会有 50%/50% 的时间分配，而严格来说，这应该（当然）导致 33%/67% 的分配（如果睡眠期超过了 thresh，CFS 也会如此处理）。</code></pre>
-<h2 data-number="2.7" id="patch-0715-e8f331bcc270-schedsmp-use-lag-to-simplify-cross-runqueue-placement"><span class="header-section-number">2.7</span> <a href="https://lore.kernel.org/all/20230531124604.068911180@infradead.org/"><code>[PATCH 07/15] e8f331bcc270 sched/smp: Use lag to simplify cross-runqueue placement</code></a></h2>
+<h2 data-number="2.7"
+id="patch-0715-e8f331bcc270-schedsmp-use-lag-to-simplify-cross-runqueue-placement"><span
+class="header-section-number">2.7</span> <a
+href="https://lore.kernel.org/all/20230531124604.068911180@infradead.org/"><code>[PATCH 07/15] e8f331bcc270 sched/smp: Use lag to simplify cross-runqueue placement</code></a></h2>
 <pre><code>sched/smp: 使用延迟简化跨运行队列的放置
 
 在跨运行队列移动时，使用延迟既更准确又更简单。
 
 值得注意的是，min_vruntime() 被发明为 avg_vruntime() 的一种廉价近似，用于此目的（SMP 迁移）。既然我们现在有了真实的 avg_vruntime()，就应当使用它。</code></pre>
-<h2 data-number="2.8" id="patch-0815-5e963f2bd465-schedfair-commit-to-eevdf"><span class="header-section-number">2.8</span> <a href="https://lore.kernel.org/all/20230531124604.137187212@infradead.org/"><code>[PATCH 08/15] 5e963f2bd465 sched/fair: Commit to EEVDF</code></a></h2>
+<h2 data-number="2.8"
+id="patch-0815-5e963f2bd465-schedfair-commit-to-eevdf"><span
+class="header-section-number">2.8</span> <a
+href="https://lore.kernel.org/all/20230531124604.137187212@infradead.org/"><code>[PATCH 08/15] 5e963f2bd465 sched/fair: Commit to EEVDF</code></a></h2>
 <pre><code>sched/fair: 确认使用 EEVDF
 
 EEVDF 是一个定义更明确的调度策略，因此它具有更少的启发式方法和调节参数。没有强有力的理由继续保留 CFS。</code></pre>
-<h2 data-number="2.9" id="patch-0915-e4ec3318a17f-scheddebug-rename-sysctl_sched_min_granularity-to-sysctl_sched_base_slice"><span class="header-section-number">2.9</span> <a href="https://lore.kernel.org/all/20230531124604.205287511@infradead.org/"><code>[PATCH 09/15] e4ec3318a17f sched/debug: Rename sysctl_sched_min_granularity to sysctl_sched_base_slice</code></a></h2>
+<h2 data-number="2.9"
+id="patch-0915-e4ec3318a17f-scheddebug-rename-sysctl_sched_min_granularity-to-sysctl_sched_base_slice"><span
+class="header-section-number">2.9</span> <a
+href="https://lore.kernel.org/all/20230531124604.205287511@infradead.org/"><code>[PATCH 09/15] e4ec3318a17f sched/debug: Rename sysctl_sched_min_granularity to sysctl_sched_base_slice</code></a></h2>
 <pre><code>sched/debug: 将 sysctl_sched_min_granularity 重命名为 sysctl_sched_base_slice
 
 EEVDF 使用这个调节参数作为基本的请求/时间片——确保名称能够反映这一点。</code></pre>
-<h2 data-number="2.10" id="patch-1015-d07f09a1f99c-schedfair-propagate-enqueue-flags-into-place_entity"><span class="header-section-number">2.10</span> <a href="https://lore.kernel.org/all/20230531124604.274010996@infradead.org/"><code>[PATCH 10/15] d07f09a1f99c sched/fair: Propagate enqueue flags into place_entity()</code></a></h2>
+<h2 data-number="2.10"
+id="patch-1015-d07f09a1f99c-schedfair-propagate-enqueue-flags-into-place_entity"><span
+class="header-section-number">2.10</span> <a
+href="https://lore.kernel.org/all/20230531124604.274010996@infradead.org/"><code>[PATCH 10/15] d07f09a1f99c sched/fair: Propagate enqueue flags into place_entity()</code></a></h2>
 <pre><code>sched/fair: 将入队标志传播到 place_entity() 中
 
 这允许 place_entity() 考虑 ENQUEUE_WAKEUP 和 ENQUEUE_MIGRATED 标志。</code></pre>

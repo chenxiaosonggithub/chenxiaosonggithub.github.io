@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -82,221 +93,274 @@
 <!-- sign begin -->
 <ul>
 <li>作者: 陈孝松</li>
-<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/">中文主页:
+chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页:
+chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
-<h1 class="title">patchset: Fix nfsv4.1 deadlock between nfs4_evict_inode() and nfs4_opendata_get_inode()</h1>
+<h1 class="title">patchset: Fix nfsv4.1 deadlock between
+nfs4_evict_inode() and nfs4_opendata_get_inode()</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#dfe1fe75e00e-nfsv4-fix-deadlock-between-nfs4_evict_inode-and-nfs4_opendata_get_inode"><span class="toc-section-number">1</span> <span><code>dfe1fe75e00e NFSv4: Fix deadlock between nfs4_evict_inode() and nfs4_opendata_get_inode()</code></span></a>
+<li><a
+href="#dfe1fe75e00e-nfsv4-fix-deadlock-between-nfs4_evict_inode-and-nfs4_opendata_get_inode"
+id="toc-dfe1fe75e00e-nfsv4-fix-deadlock-between-nfs4_evict_inode-and-nfs4_opendata_get_inode"><span
+class="toc-section-number">1</span>
+<code>dfe1fe75e00e NFSv4: Fix deadlock between nfs4_evict_inode() and nfs4_opendata_get_inode()</code></a>
 <ul>
-<li><a href="#问题描述"><span class="toc-section-number">1.1</span> 问题描述</a></li>
-<li><a href="#代码分析"><span class="toc-section-number">1.2</span> 代码分析</a></li>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1.1</span> 问题描述</a></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">1.2</span> 代码分析</a></li>
 </ul></li>
-<li><a href="#c3aba897c6e6-nfsv4-fix-second-deadlock-in-nfs4_evict_inode"><span class="toc-section-number">2</span> <span><code>c3aba897c6e6 NFSv4: Fix second deadlock in nfs4_evict_inode()</code></span></a></li>
-<li><a href="#b904bf33-sunrpc-should-wake-up-the-privileged-task-firstly."><span class="toc-section-number">3</span> <span><code>5483b904bf33 SUNRPC: Should wake up the privileged task firstly.</code></span></a></li>
-<li><a href="#fcb170a9d825-sunrpc-fix-the-batch-tasks-count-wraparound."><span class="toc-section-number">4</span> <span><code>fcb170a9d825 SUNRPC: Fix the batch tasks count wraparound.</code></span></a></li>
+<li><a
+href="#c3aba897c6e6-nfsv4-fix-second-deadlock-in-nfs4_evict_inode"
+id="toc-c3aba897c6e6-nfsv4-fix-second-deadlock-in-nfs4_evict_inode"><span
+class="toc-section-number">2</span>
+<code>c3aba897c6e6 NFSv4: Fix second deadlock in nfs4_evict_inode()</code></a></li>
+<li><a
+href="#b904bf33-sunrpc-should-wake-up-the-privileged-task-firstly."
+id="toc-b904bf33-sunrpc-should-wake-up-the-privileged-task-firstly."><span
+class="toc-section-number">3</span>
+<code>5483b904bf33 SUNRPC: Should wake up the privileged task firstly.</code></a></li>
+<li><a href="#fcb170a9d825-sunrpc-fix-the-batch-tasks-count-wraparound."
+id="toc-fcb170a9d825-sunrpc-fix-the-batch-tasks-count-wraparound."><span
+class="toc-section-number">4</span>
+<code>fcb170a9d825 SUNRPC: Fix the batch tasks count wraparound.</code></a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<p>分析过程参考<a href="https://gitee.com/openeuler/kernel/issues/I4DD74">openeuler issue</a>。</p>
-<h1 data-number="1" id="dfe1fe75e00e-nfsv4-fix-deadlock-between-nfs4_evict_inode-and-nfs4_opendata_get_inode"><span class="header-section-number">1</span> <a href="https://patchwork.kernel.org/project/linux-nfs/patch/20210601173634.243152-1-trondmy@kernel.org/"><code>dfe1fe75e00e NFSv4: Fix deadlock between nfs4_evict_inode() and nfs4_opendata_get_inode()</code></a></h1>
-<h2 data-number="1.1" id="问题描述"><span class="header-section-number">1.1</span> 问题描述</h2>
+<p><a
+href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p>分析过程参考<a
+href="https://gitee.com/openeuler/kernel/issues/I4DD74">openeuler
+issue</a>。</p>
+<h1 data-number="1"
+id="dfe1fe75e00e-nfsv4-fix-deadlock-between-nfs4_evict_inode-and-nfs4_opendata_get_inode"><span
+class="header-section-number">1</span> <a
+href="https://patchwork.kernel.org/project/linux-nfs/patch/20210601173634.243152-1-trondmy@kernel.org/"><code>dfe1fe75e00e NFSv4: Fix deadlock between nfs4_evict_inode() and nfs4_opendata_get_inode()</code></a></h1>
+<h2 data-number="1.1" id="问题描述"><span
+class="header-section-number">1.1</span> 问题描述</h2>
 <p>在使用 fsstress 压测时，注入网络故障：如断网/丢包，触发进程卡死。</p>
-<p>打开文件生成 inode 时，等待相同的 inode 被释放掉。此时 slot 未释放:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>[<span class="ex">root@localhost</span> crash]# cat /proc/4241/stack </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">__wait_on_freeing_inode+0xe2/0x130</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">find_inode+0xcc/0x160</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">ilookup5_nowait+0x7a/0xc0</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">ilookup5+0x3b/0xe0</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">iget5_locked+0x2e/0xc0</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_fhget+0x10b/0x7f0</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">_nfs4_opendata_to_nfs4_state+0x4de/0x500</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs4_do_open.constprop.37+0x630/0xe60</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs4_atomic_open+0x12/0x30</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_atomic_open+0x24c/0x8c0</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">path_openat+0xad4/0x1de0</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">do_filp_open+0xab/0x150</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">do_sys_open+0x252/0x340</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">__x64_sys_open+0x25/0x30</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">do_syscall_64+0xa1/0x440</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">entry_SYSCALL_64_after_hwframe+0x44/0xa9</span></span></code></pre></div>
+<p>打开文件生成 inode 时，等待相同的 inode 被释放掉。此时 slot
+未释放:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[root@localhost</span> crash]# cat /proc/4241/stack </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] __wait_on_freeing_inode+0xe2/0x130</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] find_inode+0xcc/0x160</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] ilookup5_nowait+0x7a/0xc0</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] ilookup5+0x3b/0xe0</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] iget5_locked+0x2e/0xc0</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs_fhget+0x10b/0x7f0</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] _nfs4_opendata_to_nfs4_state+0x4de/0x500</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_do_open.constprop.37+0x630/0xe60</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_atomic_open+0x12/0x30</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs_atomic_open+0x24c/0x8c0</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] path_openat+0xad4/0x1de0</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_filp_open+0xab/0x150</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_sys_open+0x252/0x340</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] __x64_sys_open+0x25/0x30</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_syscall_64+0xa1/0x440</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] entry_SYSCALL_64_after_hwframe+0x44/0xa9</span></code></pre></div>
 <p>释放 inode 的进程正在等待 delegation 返回完成:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>[<span class="ex">root@localhost</span> crash]# cat /proc/56/stack </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">rpc_wait_bit_killable+0x26/0x100</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">__rpc_wait_for_completion_task+0x37/0x40</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">_nfs4_proc_delegreturn+0x373/0x490</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs4_proc_delegreturn+0x8e/0x1d0</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_do_return_delegation+0x36/0x60</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_inode_return_delegation_noreclaim+0x3b/0x50</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs4_evict_inode+0x3d/0xc0</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">evict+0x114/0x300</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">dispose_list+0x68/0xa0</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">prune_icache_sb+0x62/0x90</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">super_cache_scan+0x169/0x210</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">do_shrink_slab+0x166/0x400</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">shrink_slab+0xfa/0x470</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">shrink_node+0x154/0x690</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">kswapd+0x37f/0xad0</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">kthread+0x169/0x1a0</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">ret_from_fork+0x1f/0x30</span></span></code></pre></div>
-<p>nfs 状态异常，等待 slot的任务完成后被清空，即等待 4241 号进程完成:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>[<span class="ex">root@localhost</span> crash]# cat /proc/6624/stack </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs4_drain_slot_tbl+0x8e/0xa0</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs4_begin_drain_session.isra.4+0x61/0x70</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs4_run_state_manager+0x48f/0xdf0</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">kthread+0x169/0x1a0</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>[<span class="op">&lt;0&gt;</span>] <span class="ex">ret_from_fork+0x1f/0x30</span></span></code></pre></div>
-<h2 data-number="1.2" id="代码分析"><span class="header-section-number">1.2</span> 代码分析</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[root@localhost</span> crash]# cat /proc/56/stack </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] rpc_wait_bit_killable+0x26/0x100</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] __rpc_wait_for_completion_task+0x37/0x40</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] _nfs4_proc_delegreturn+0x373/0x490</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_proc_delegreturn+0x8e/0x1d0</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs_do_return_delegation+0x36/0x60</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs_inode_return_delegation_noreclaim+0x3b/0x50</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_evict_inode+0x3d/0xc0</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] evict+0x114/0x300</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] dispose_list+0x68/0xa0</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] prune_icache_sb+0x62/0x90</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] super_cache_scan+0x169/0x210</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] do_shrink_slab+0x166/0x400</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] shrink_slab+0xfa/0x470</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] shrink_node+0x154/0x690</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] kswapd+0x37f/0xad0</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] kthread+0x169/0x1a0</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] ret_from_fork+0x1f/0x30</span></code></pre></div>
+<p>nfs 状态异常，等待 slot的任务完成后被清空，即等待 4241
+号进程完成:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[root@localhost</span> crash]# cat /proc/6624/stack </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_drain_slot_tbl+0x8e/0xa0</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_begin_drain_session.isra.4+0x61/0x70</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] nfs4_run_state_manager+0x48f/0xdf0</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] kthread+0x169/0x1a0</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[</span><span class="op">&lt;</span>0<span class="op">&gt;</span>] ret_from_fork+0x1f/0x30</span></code></pre></div>
+<h2 data-number="1.2" id="代码分析"><span
+class="header-section-number">1.2</span> 代码分析</h2>
 <p>回收inode时，在<code>evict()</code>中等待delegreturn请示异步执行完成:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>evict</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>  nfs4_evict_inode</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>    clear_inode</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>      <span class="co">// 标记 inode 正在被释放，导致open时在find_inode()中等待</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>      inode-&gt;i_state = I_FREEING | I_CLEAR;</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>    nfs_inode_return_delegation_noreclaim</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>      nfs_do_return_delegation</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>        nfs4_proc_delegreturn</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>          _nfs4_proc_delegreturn</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>            .flags = RPC_TASK_ASYNC, <span class="co">// 异步</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>            rpc_run_task</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>              rpc_new_task</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>                rpc_alloc_task</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>                rpc_init_task</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>                  task-&gt;tk_action = rpc_prepare_task</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>              rpc_execute <span class="co">// 在内核线程异步执行</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>            __rpc_wait_for_completion_task</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>              rpc_wait_bit_killable <span class="co">// 在这里等异步执行完成，后面的代码未执行</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>        nfs_free_delegation</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>  remove_inode_hash</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>    __remove_inode_hash</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a>      spin_lock(&amp;inode_hash_lock);</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a>      hlist_del_init_rcu(&amp;inode-&gt;i_hash);</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>      spin_unlock(&amp;inode_hash_lock);</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>  wake_up_bit(&amp;inode-&gt;i_state, __I_NEW); <span class="co">// 唤醒open时find_inode()中的等待</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a>  destroy_inode</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a>    __destroy_inode</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a>    nfs_destroy_inode <span class="co">// inode-&gt;i_sb-&gt;s_op-&gt;destroy_inode</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a>      nfs_i_callback</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a><span class="co">// 内核线程发送rpc请求</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a>__rpc_execute</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a>  rpc_prepare_task</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true"></a>    nfs4_delegreturn_prepare <span class="co">// .rpc_call_prepare</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true"></a>      nfs4_setup_sequence</span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true"></a>        nfs4_slot_tbl_draining</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true"></a>          test_bit(NFS4_SLOT_TBL_DRAINING</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true"></a>        <span class="co">// 睡着了，所以evict()在__rpc_wait_for_completion_task()中等</span></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true"></a>        rpc_sleep_on</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>evict</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  nfs4_evict_inode</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    clear_inode</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>      <span class="co">// 标记 inode 正在被释放，导致open时在find_inode()中等待</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      inode<span class="op">-&gt;</span>i_state <span class="op">=</span> I_FREEING <span class="op">|</span> I_CLEAR<span class="op">;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    nfs_inode_return_delegation_noreclaim</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      nfs_do_return_delegation</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        nfs4_proc_delegreturn</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>          _nfs4_proc_delegreturn</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>            <span class="op">.</span>flags <span class="op">=</span> RPC_TASK_ASYNC<span class="op">,</span> <span class="co">// 异步</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>            rpc_run_task</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>              rpc_new_task</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                rpc_alloc_task</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>                rpc_init_task</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                  task<span class="op">-&gt;</span>tk_action <span class="op">=</span> rpc_prepare_task</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>              rpc_execute <span class="co">// 在内核线程异步执行</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>            __rpc_wait_for_completion_task</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>              rpc_wait_bit_killable <span class="co">// 在这里等异步执行完成，后面的代码未执行</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        nfs_free_delegation</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  remove_inode_hash</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    __remove_inode_hash</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      spin_lock<span class="op">(&amp;</span>inode_hash_lock<span class="op">);</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      hlist_del_init_rcu<span class="op">(&amp;</span>inode<span class="op">-&gt;</span>i_hash<span class="op">);</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>      spin_unlock<span class="op">(&amp;</span>inode_hash_lock<span class="op">);</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  wake_up_bit<span class="op">(&amp;</span>inode<span class="op">-&gt;</span>i_state<span class="op">,</span> __I_NEW<span class="op">);</span> <span class="co">// 唤醒open时find_inode()中的等待</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  destroy_inode</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    __destroy_inode</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    nfs_destroy_inode <span class="co">// inode-&gt;i_sb-&gt;s_op-&gt;destroy_inode</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>      nfs_i_callback</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co">// 内核线程发送rpc请求</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>__rpc_execute</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  rpc_prepare_task</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    nfs4_delegreturn_prepare <span class="co">// .rpc_call_prepare</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>      nfs4_setup_sequence</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>        nfs4_slot_tbl_draining</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>          test_bit<span class="op">(</span>NFS4_SLOT_TBL_DRAINING</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>        <span class="co">// 睡着了，所以evict()在__rpc_wait_for_completion_task()中等</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        rpc_sleep_on</span></code></pre></div>
 <p>打开文件时生成inode，等待<code>evict()</code>中唤醒<code>__I_NEW</code>标记:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>nfs4_atomic_open</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>  nfs4_do_open</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    _nfs4_do_open</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>      nfs4_opendata_alloc</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>      _nfs4_open_and_get_state</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>        _nfs4_proc_open</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>        _nfs4_opendata_to_nfs4_state</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>          nfs4_opendata_find_nfs4_state</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>            nfs4_opendata_get_inode</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>              nfs_fhget</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>                iget5_locked</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>                  ilookup5</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>                    ilookup5_nowait</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a>                      spin_lock(&amp;inode_hash_lock);  <span class="co">// 加锁</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>                      find_inode</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a>                        nfs_find_actor <span class="co">// test(inode, data)</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a>                        <span class="co">// 在evict()中被标记</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a>                        <span class="cf">if</span> (inode-&gt;i_state &amp; (I_FREEING|I_WILL_FREE)) <span class="co">// 条件满足</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a>                        __wait_on_freeing_inode  <span class="co">// 如果找到匹配的 inode，等待可以新建该inode</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a>                          bit_waitqueue(&amp;inode-&gt;i_state, __I_NEW); <span class="co">// 在evict()中唤醒</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a>      <span class="co">// 后面的代码未执行</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a>      nfs4_opendata_put <span class="co">// 由于等待 inode 被释放，因此如下的流程未执行，即有 slot 正在被使用</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a>        nfs4_opendata_free</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a>          nfs4_sequence_free_slot</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a>            nfs41_sequence_free_slot</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a>              nfs41_release_slot</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true"></a>                slot-&gt;seq_done</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true"></a>                nfs4_free_slot</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true"></a>                  __clear_bit(slotid, tbl-&gt;used_slots);</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true"></a>                  nfs4_slot_tbl_drain_complete <span class="co">// 唤醒nfs4_drain_slot_tbl()的的等待</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>nfs4_atomic_open</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  nfs4_do_open</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    _nfs4_do_open</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      nfs4_opendata_alloc</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      _nfs4_open_and_get_state</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        _nfs4_proc_open</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        _nfs4_opendata_to_nfs4_state</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>          nfs4_opendata_find_nfs4_state</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            nfs4_opendata_get_inode</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>              nfs_fhget</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                iget5_locked</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                  ilookup5</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                    ilookup5_nowait</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                      spin_lock<span class="op">(&amp;</span>inode_hash_lock<span class="op">);</span>  <span class="co">// 加锁</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                      find_inode</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                        nfs_find_actor <span class="co">// test(inode, data)</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                        <span class="co">// 在evict()中被标记</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">if</span> <span class="op">(</span>inode<span class="op">-&gt;</span>i_state <span class="op">&amp;</span> <span class="op">(</span>I_FREEING<span class="op">|</span>I_WILL_FREE<span class="op">))</span> <span class="co">// 条件满足</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                        __wait_on_freeing_inode  <span class="co">// 如果找到匹配的 inode，等待可以新建该inode</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>                          bit_waitqueue<span class="op">(&amp;</span>inode<span class="op">-&gt;</span>i_state<span class="op">,</span> __I_NEW<span class="op">);</span> <span class="co">// 在evict()中唤醒</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>      <span class="co">// 后面的代码未执行</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>      nfs4_opendata_put <span class="co">// 由于等待 inode 被释放，因此如下的流程未执行，即有 slot 正在被使用</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        nfs4_opendata_free</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>          nfs4_sequence_free_slot</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>            nfs41_sequence_free_slot</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>              nfs41_release_slot</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>                slot<span class="op">-&gt;</span>seq_done</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>                nfs4_free_slot</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>                  __clear_bit<span class="op">(</span>slotid<span class="op">,</span> tbl<span class="op">-&gt;</span>used_slots<span class="op">);</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>                  nfs4_slot_tbl_drain_complete <span class="co">// 唤醒nfs4_drain_slot_tbl()的的等待</span></span></code></pre></div>
 <p>内核线程设置slot标记，等待open请求完成清空slot:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>nfs4_run_state_manager</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>  nfs4_state_manager</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    nfs4_bind_conn_to_session</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>      nfs4_begin_drain_session</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>        nfs4_drain_slot_tbl</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>          set_bit(NFS4_SLOT_TBL_DRAINING,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>          reinit_completion</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>          <span class="co">// 等待slot清空，下面的代码未执行</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>          wait_for_completion_interruptible <span class="co">// 在nfs4_slot_tbl_drain_complete()中唤醒</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>    nfs4_end_drain_session</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>      nfs4_end_drain_slot_table</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>        test_and_clear_bit(NFS4_SLOT_TBL_DRAINING,</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>nfs4_run_state_manager</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  nfs4_state_manager</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    nfs4_bind_conn_to_session</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      nfs4_begin_drain_session</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        nfs4_drain_slot_tbl</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>          set_bit<span class="op">(</span>NFS4_SLOT_TBL_DRAINING<span class="op">,</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>          reinit_completion</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>          <span class="co">// 等待slot清空，下面的代码未执行</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>          wait_for_completion_interruptible <span class="co">// 在nfs4_slot_tbl_drain_complete()中唤醒</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    nfs4_end_drain_session</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      nfs4_end_drain_slot_table</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        test_and_clear_bit<span class="op">(</span>NFS4_SLOT_TBL_DRAINING<span class="op">,</span></span></code></pre></div>
 <p><code>evict()</code>、<code>open()</code>、<code>nfs4_run_state_manager()</code>互相等待唤醒，造成了死锁。</p>
-<h1 data-number="2" id="c3aba897c6e6-nfsv4-fix-second-deadlock-in-nfs4_evict_inode"><span class="header-section-number">2</span> <a href="https://patchwork.kernel.org/project/linux-nfs/patch/20210601173634.243152-2-trondmy@kernel.org/"><code>c3aba897c6e6 NFSv4: Fix second deadlock in nfs4_evict_inode()</code></a></h1>
+<h1 data-number="2"
+id="c3aba897c6e6-nfsv4-fix-second-deadlock-in-nfs4_evict_inode"><span
+class="header-section-number">2</span> <a
+href="https://patchwork.kernel.org/project/linux-nfs/patch/20210601173634.243152-2-trondmy@kernel.org/"><code>c3aba897c6e6 NFSv4: Fix second deadlock in nfs4_evict_inode()</code></a></h1>
 <p>请看上一个补丁的分析。</p>
-<h1 data-number="3" id="b904bf33-sunrpc-should-wake-up-the-privileged-task-firstly."><span class="header-section-number">3</span> <a href="https://patchwork.kernel.org/project/linux-nfs/patch/20210626075042.805548-3-zhangxiaoxu5@huawei.com/"><code>5483b904bf33 SUNRPC: Should wake up the privileged task firstly.</code></a></h1>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>nfs41_sequence_free_slot</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>  nfs41_release_slot</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>    nfs41_wake_and_assign_slot</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>      __nfs41_wake_and_assign_slot</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>        rpc_wake_up_first</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>          rpc_wake_up_first_on_wq(nfs41_assign_slot)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>            __rpc_find_next_queued</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>              __rpc_find_next_queued_priority</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>                <span class="co">// 优先当前优先级的 task，且为避免资源消耗，当前优先级最多处理 nr 个后，开始处理下一个优先级</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a>                queue-&gt;tasks[queue-&gt;priority];</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a>                <span class="co">// 处理下一个队列的任务</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a>                q = q - <span class="dv">1</span>;</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a>                <span class="co">// 反转到最高优先级的队列进行处理</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a>                q = &amp;queue-&gt;tasks[queue-&gt;maxpriority];</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a>                <span class="co">// 没有任务要处理，重置当前正在处理的优先级及nr</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true"></a>                rpc_reset_waitqueue_priority</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true"></a>                <span class="co">// 检查优先级，如果当前优先级发生了切换，重置优先级及nr</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true"></a>                rpc_set_waitqueue_priority</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true"></a>            nfs41_assign_slot <span class="co">// func(task, data)</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true"></a>              <span class="co">// 正在清空slot时，只有特权task才会返回true</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true"></a>              <span class="cf">if</span> (nfs4_slot_tbl_draining(tbl) &amp;&amp; !args-&gt;sa_privileged)</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true"></a>            rpc_wake_up_task_on_wq_queue_action_locked</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true"></a>              __rpc_do_wake_up_task_on_wq</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true"></a>                rpc_make_runnable</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true"></a>                  queue_work(wq, &amp;task-&gt;u.tk_work); <span class="co">// 异步任务投入运行</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true"></a>                  wake_up_bit(&amp;task-&gt;tk_runstate, RPC_TASK_QUEUED);     <span class="co">// 同步任务唤醒__rpc_execute()中的等待</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>nfs4_setup_sequence</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>  tbl  = client-&gt;cl_slot_tbl == NULL <span class="co">// cl_slot_tbl只有4.0才会在nfs40_init_client()初始化</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>  tbl = &amp;session-&gt;fc_slot_table</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>  nfs4_alloc_slot <span class="co">// 找不到空闲的slot</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>  rpc_sleep_on_priority</span></code></pre></div>
+<h1 data-number="3"
+id="b904bf33-sunrpc-should-wake-up-the-privileged-task-firstly."><span
+class="header-section-number">3</span> <a
+href="https://patchwork.kernel.org/project/linux-nfs/patch/20210626075042.805548-3-zhangxiaoxu5@huawei.com/"><code>5483b904bf33 SUNRPC: Should wake up the privileged task firstly.</code></a></h1>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>nfs41_sequence_free_slot</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  nfs41_release_slot</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    nfs41_wake_and_assign_slot</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      __nfs41_wake_and_assign_slot</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        rpc_wake_up_first</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>          rpc_wake_up_first_on_wq<span class="op">(</span>nfs41_assign_slot<span class="op">)</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            __rpc_find_next_queued</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>              __rpc_find_next_queued_priority</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 优先当前优先级的 task，且为避免资源消耗，当前优先级最多处理 nr 个后，开始处理下一个优先级</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                queue<span class="op">-&gt;</span>tasks<span class="op">[</span>queue<span class="op">-&gt;</span>priority<span class="op">];</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 处理下一个队列的任务</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                q <span class="op">=</span> q <span class="op">-</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 反转到最高优先级的队列进行处理</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                q <span class="op">=</span> <span class="op">&amp;</span>queue<span class="op">-&gt;</span>tasks<span class="op">[</span>queue<span class="op">-&gt;</span>maxpriority<span class="op">];</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 没有任务要处理，重置当前正在处理的优先级及nr</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                rpc_reset_waitqueue_priority</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 检查优先级，如果当前优先级发生了切换，重置优先级及nr</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>                rpc_set_waitqueue_priority</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>            nfs41_assign_slot <span class="co">// func(task, data)</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>              <span class="co">// 正在清空slot时，只有特权task才会返回true</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>              <span class="cf">if</span> <span class="op">(</span>nfs4_slot_tbl_draining<span class="op">(</span>tbl<span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="op">!</span>args<span class="op">-&gt;</span>sa_privileged<span class="op">)</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>            rpc_wake_up_task_on_wq_queue_action_locked</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>              __rpc_do_wake_up_task_on_wq</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>                rpc_make_runnable</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>                  queue_work<span class="op">(</span>wq<span class="op">,</span> <span class="op">&amp;</span>task<span class="op">-&gt;</span>u<span class="op">.</span>tk_work<span class="op">);</span> <span class="co">// 异步任务投入运行</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>                  wake_up_bit<span class="op">(&amp;</span>task<span class="op">-&gt;</span>tk_runstate<span class="op">,</span> RPC_TASK_QUEUED<span class="op">);</span>     <span class="co">// 同步任务唤醒__rpc_execute()中的等待</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>nfs4_setup_sequence</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  tbl  <span class="op">=</span> client<span class="op">-&gt;</span>cl_slot_tbl <span class="op">==</span> NULL <span class="co">// cl_slot_tbl只有4.0才会在nfs40_init_client()初始化</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  tbl <span class="op">=</span> <span class="op">&amp;</span>session<span class="op">-&gt;</span>fc_slot_table</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  nfs4_alloc_slot <span class="co">// 找不到空闲的slot</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  rpc_sleep_on_priority</span></code></pre></div>
 <p>如下情况下可能会导致同样的死锁问题：</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>nfs4_session.fc_slot_table.slot_tbl_waitq.priority = <span class="dv">1</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>nfs4_session.fc_slot_table.slot_tbl_waitq.tasks[<span class="dv">0</span>] = {}</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>nfs4_session.fc_slot_table.slot_tbl_waitq.tasks[<span class="dv">1</span>] = {GETATTR, OPEN ...}</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>nfs4_session.fc_slot_table.slot_tbl_waitq.tasks[<span class="dv">2</span>] = {}</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>nfs4_session.fc_slot_table.slot_tbl_waitq.tasks[<span class="dv">3</span>] = {DELEGRETURN}</span></code></pre></div>
-<p>由于 <code>tasks[1]</code> 中为非特权的 task，因此在 <code>nfs41_assign_slot()</code> 检查时返回false，进一步导致所有的任务都无法分配slot，就更谈不上释放 slot。进而可能导致无法唤醒 <code>tasks[3]</code> 中的任务。</p>
-<h1 data-number="4" id="fcb170a9d825-sunrpc-fix-the-batch-tasks-count-wraparound."><span class="header-section-number">4</span> <a href="https://patchwork.kernel.org/project/linux-nfs/patch/20210626075042.805548-2-zhangxiaoxu5@huawei.com/"><code>fcb170a9d825 SUNRPC: Fix the batch tasks count wraparound.</code></a></h1>
-<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>__rpc_find_next_queued_priority</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>  <span class="co">// 第一次进入， queue-&gt;nr = 1</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>  <span class="cf">if</span> (!list_empty(q) &amp;&amp; --queue-&gt;nr)  <span class="co">// 执行完后 queue-&gt;nr == 1</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>  <span class="cf">goto</span> new_queue; <span class="co">// 只有当前优先级队列上有任务,优先级不变</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>  rpc_set_waitqueue_priority</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>    queue-&gt;priority != priority <span class="co">// 优先级未发生变化，未更新 queue-&gt;nr</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>__rpc_find_next_queued_priority</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>  <span class="co">// 第二次进入，queue-&gt;nr = 0</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>  <span class="cf">if</span> (!list_empty(q) &amp;&amp; --queue-&gt;nr) <span class="co">// 此处溢出，queue-&gt;nr == 255</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>    <span class="cf">goto</span> out;</span></code></pre></div>
-<p>在 session draining 的时候，由于无法对非特权优先级的任务分配 slot，slot 释放后，普通优先级的任务无法再分配slot，更无法再次释放 slot。 该场景下，如果 slot 的个数小于 255，则所有的 slot 释放后， nr 都不可能减为0，从而导致高优先级的任务无法唤醒。</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>nfs4_session<span class="op">.</span>fc_slot_table<span class="op">.</span>slot_tbl_waitq<span class="op">.</span>priority <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>nfs4_session<span class="op">.</span>fc_slot_table<span class="op">.</span>slot_tbl_waitq<span class="op">.</span>tasks<span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> <span class="op">{}</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>nfs4_session<span class="op">.</span>fc_slot_table<span class="op">.</span>slot_tbl_waitq<span class="op">.</span>tasks<span class="op">[</span><span class="dv">1</span><span class="op">]</span> <span class="op">=</span> <span class="op">{</span>GETATTR<span class="op">,</span> OPEN <span class="op">...}</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>nfs4_session<span class="op">.</span>fc_slot_table<span class="op">.</span>slot_tbl_waitq<span class="op">.</span>tasks<span class="op">[</span><span class="dv">2</span><span class="op">]</span> <span class="op">=</span> <span class="op">{}</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>nfs4_session<span class="op">.</span>fc_slot_table<span class="op">.</span>slot_tbl_waitq<span class="op">.</span>tasks<span class="op">[</span><span class="dv">3</span><span class="op">]</span> <span class="op">=</span> <span class="op">{</span>DELEGRETURN<span class="op">}</span></span></code></pre></div>
+<p>由于 <code>tasks[1]</code> 中为非特权的 task，因此在
+<code>nfs41_assign_slot()</code>
+检查时返回false，进一步导致所有的任务都无法分配slot，就更谈不上释放
+slot。进而可能导致无法唤醒 <code>tasks[3]</code> 中的任务。</p>
+<h1 data-number="4"
+id="fcb170a9d825-sunrpc-fix-the-batch-tasks-count-wraparound."><span
+class="header-section-number">4</span> <a
+href="https://patchwork.kernel.org/project/linux-nfs/patch/20210626075042.805548-2-zhangxiaoxu5@huawei.com/"><code>fcb170a9d825 SUNRPC: Fix the batch tasks count wraparound.</code></a></h1>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>__rpc_find_next_queued_priority</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 第一次进入， queue-&gt;nr = 1</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>list_empty<span class="op">(</span>q<span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="op">--</span>queue<span class="op">-&gt;</span>nr<span class="op">)</span>  <span class="co">// 执行完后 queue-&gt;nr == 1</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">goto</span> new_queue<span class="op">;</span> <span class="co">// 只有当前优先级队列上有任务,优先级不变</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  rpc_set_waitqueue_priority</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    queue<span class="op">-&gt;</span>priority <span class="op">!=</span> priority <span class="co">// 优先级未发生变化，未更新 queue-&gt;nr</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>__rpc_find_next_queued_priority</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 第二次进入，queue-&gt;nr = 0</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>list_empty<span class="op">(</span>q<span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="op">--</span>queue<span class="op">-&gt;</span>nr<span class="op">)</span> <span class="co">// 此处溢出，queue-&gt;nr == 255</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">goto</span> out<span class="op">;</span></span></code></pre></div>
+<p>在 session draining 的时候，由于无法对非特权优先级的任务分配
+slot，slot 释放后，普通优先级的任务无法再分配slot，更无法再次释放 slot。
+该场景下，如果 slot 的个数小于 255，则所有的 slot 释放后， nr
+都不可能减为0，从而导致高优先级的任务无法唤醒。</p>
 <p>进一步导致该问题。</p>
-<p>另外，如果 slot 的个数小于当前优先级的批处理任务的个数，则同样会导致上述问题。</p>
+<p>另外，如果 slot
+的个数小于当前优先级的批处理任务的个数，则同样会导致上述问题。</p>
 </body>
 </html>
