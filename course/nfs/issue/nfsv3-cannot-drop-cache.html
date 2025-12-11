@@ -124,8 +124,8 @@ class="toc-section-number">3</span> 虚拟机中调试</a>
 <ul>
 <li><a href="#vmcore解析-1" id="toc-vmcore解析-1"><span
 class="toc-section-number">3.1</span> vmcore解析</a></li>
-<li><a href="#section" id="toc-section"><span
-class="toc-section-number">3.2</span> </a></li>
+<li><a href="#查看文件缓存" id="toc-查看文件缓存"><span
+class="toc-section-number">3.2</span> 查看文件缓存</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -226,7 +226,19 @@ href="https://chenxiaosong.com/course/kernel/debug.html#kdump-crash">《内核�
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="ex">ROOT:</span> /    CWD: /root </span>
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a> <span class="ex">FD</span>       FILE            DENTRY           INODE       TYPE PATH</span>
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="ex">3</span> ffff888006b21740 ffff88810430e600 ffff888112352ec8 REG  /mnt/file</span></code></pre></div>
-<h2 data-number="3.2" id="section"><span
-class="header-section-number">3.2</span> </h2>
+<h2 data-number="3.2" id="查看文件缓存"><span
+class="header-section-number">3.2</span> 查看文件缓存</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">size_threshold_mb</span><span class="op">=</span>100</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> /mnt <span class="at">-type</span> f <span class="at">-print0</span> <span class="kw">|</span> <span class="fu">xargs</span> <span class="at">-0</span> <span class="at">-n1</span> <span class="at">-P16</span> sh <span class="at">-c</span> <span class="st">&#39;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="st">    for file do</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">        out=$(vmtouch -v &quot;$file&quot;)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">        pages=$(echo &quot;$out&quot; | awk &quot;/Resident Pages:/ {print \$3}&quot; | cut -d/ -f1)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="st">        mb=$((pages*4096/1024/1024))</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="st">        if [ &quot;$mb&quot; -gt ${size_threshold_mb} ]; then</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="st">            echo &quot;$file Cached_MB=${mb}&quot;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="st">        fi</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="st">    done</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="st">  &#39;</span> sh</span></code></pre></div>
 </body>
 </html>
