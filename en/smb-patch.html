@@ -8,10 +8,19 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -19,92 +28,89 @@
 <header id="title-block-header">
 <ul>
 <li>Author: 陈孝松 (ChenXiaoSong)</li>
-<li><a href="https://chenxiaosong.com/">Chinese Homepage: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en/">English Homepage: chenxiaosong.com/en</a></li>
-<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/">Chinese Homepage:
+chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en/">English Homepage:
+chenxiaosong.com/en</a></li>
+<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
 </ul>
 <h1 class="title">SMB Patches to Be Reviewed</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#patches-to-be-reviewed"><span class="toc-section-number">1</span> Patches to Be Reviewed</a></li>
-<li><a href="#merged-patches"><span class="toc-section-number">2</span> Merged Patches</a></li>
+<li><a href="#safest-patches-for-6.19-rc1"
+id="toc-safest-patches-for-6.19-rc1"><span
+class="toc-section-number">1</span> “Safest” Patches for
+6.19-rc1</a></li>
+<li><a href="#other-patches-to-be-reviewed"
+id="toc-other-patches-to-be-reviewed"><span
+class="toc-section-number">2</span> Other Patches to Be
+Reviewed</a></li>
+<li><a href="#merged-patches" id="toc-merged-patches"><span
+class="toc-section-number">3</span> Merged Patches</a></li>
 </ul>
 </nav>
-<h1 data-number="1" id="patches-to-be-reviewed"><span class="header-section-number">1</span> Patches to Be Reviewed</h1>
+<h1 data-number="1" id="safest-patches-for-6.19-rc1"><span
+class="header-section-number">1</span> “Safest” Patches for
+6.19-rc1</h1>
 <ul>
-<li><a href="https://lore.kernel.org/linux-cifs/20251211143228.172470-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v2 0/7] smb: move duplicate definitions into common header file, part 2</a>
-<ul>
-<li>[PATCH v2 3/7] smb: move some SMB1 definitions into common/smb1pdu.h</li>
-<li>[PATCH v2 4/7] smb: move smb3_fs_vol_info into common/fscc.h</li>
-<li>[PATCH v2 5/7] smb: move some definitions from common/smb2pdu.h into</li>
-<li>[PATCH v2 6/7] smb: introduce struct create_posix_ctxt_rsp</li>
-<li>[PATCH v2 7/7] smb: introduce struct file_posix_info</li>
-</ul></li>
-<li><a href="https://lore.kernel.org/linux-cifs/20251206151826.2932970-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v4 00/10] smb: improve search speed of SMB2 maperror</a>
-<ul>
-<li>[PATCH v4 05/10] smb/client: sort smb2_error_map_table array</li>
-<li>[PATCH v4 06/10] smb/client: use bsearch() to find target status code</li>
-<li>[PATCH v4 07/10] smb/client: introduce smb2_get_err_map()</li>
-<li>[PATCH v4 08/10] smb/client: introduce smb2maperror KUnit tests</li>
-</ul></li>
-<li><a href="https://lore.kernel.org/linux-cifs/20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH 00/30] smb: improve search speed of SMB1 maperror</a>
-<ul>
-<li>[PATCH 07/30] smb/client: introduce DEFINE_CMP_FUNC()</li>
-<li>[PATCH 08/30] smb/client: sort ntstatus_to_dos_map array</li>
-<li>[PATCH 09/30] smb/client: create netmisc_test.c and introduce</li>
-<li>[PATCH 10/30] smb/client: introduce KUnit test to check sort result</li>
-<li>[PATCH 11/30] smb/client: introduce DEFINE_SEARCH_FUNC()</li>
-<li>[PATCH 12/30] smb/client: use bsearch() to find target in</li>
-<li>[PATCH 13/30] smb/client: remove useless elements from</li>
-<li>[PATCH 14/30] smb/client: introduce DEFINE_CHECK_SEARCH_FUNC()</li>
-<li>[PATCH 15/30] smb/client: introduce KUnit test to check search result</li>
-<li>[PATCH 16/30] smb/client: sort nt_errs array</li>
-<li>[PATCH 17/30] smb/client: introduce KUnit test to check sort result</li>
-<li>[PATCH 18/30] smb/client: use bsearch() to find target in nt_errs</li>
-<li>[PATCH 19/30] smb/client: remove useless elements from nt_errs array</li>
-<li>[PATCH 20/30] smb/client: introduce KUnit test to check search result</li>
-<li>[PATCH 21/30] smb/client: sort mapping_table_ERRDOS array</li>
-<li>[PATCH 22/30] smb/client: introduce KUnit test to check sort result</li>
-<li>[PATCH 23/30] smb/client: use bsearch() to find target in</li>
-<li>[PATCH 24/30] smb/client: remove useless elements from</li>
-<li>[PATCH 25/30] smb/client: introduce KUnit test to check search result</li>
-<li>[PATCH 26/30] smb/client: sort mapping_table_ERRSRV array</li>
-<li>[PATCH 27/30] smb/client: introduce KUnit test to check sort result</li>
-<li>[PATCH 28/30] smb/client: use bsearch() to find target in</li>
-<li>[PATCH 29/30] smb/client: remove useless elements from</li>
-<li>[PATCH 30/30] smb/client: introduce KUnit test to check search result</li>
-</ul></li>
+<li><a
+href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/patch/remove-duplicate-definitions/0001-smb-move-some-SMB1-definitions-into-common-smb1pdu.h.patch">smb:
+move some SMB1 definitions into common/smb1pdu.h</a></li>
+<li><a
+href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/patch/remove-duplicate-definitions/0002-smb-move-smb3_fs_vol_info-into-common-fscc.h.patch">smb:
+move smb3_fs_vol_info into common/fscc.h</a></li>
+<li><a
+href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/patch/remove-duplicate-definitions/0003-smb-move-some-definitions-from-common-smb2pdu.h-into.patch">smb:
+move some definitions from common/smb2pdu.h into common/fscc.h</a></li>
 </ul>
-<h1 data-number="2" id="merged-patches"><span class="header-section-number">2</span> Merged Patches</h1>
-<p>The following patches have been merged into <a href="https://git.samba.org/sfrench/?p=sfrench/cifs-2.6.git;a=shortlog;h=refs/heads/for-next">cifs-2.6.git for-next</a>:</p>
+<h1 data-number="2" id="other-patches-to-be-reviewed"><span
+class="header-section-number">2</span> Other Patches to Be Reviewed</h1>
 <ul>
-<li>ab0347e67dac smb/client: remove DeviceType Flags and Device Characteristics definitions</li>
-<li>2b6abb893e71 smb: move File Attributes definitions into common/fscc.h</li>
+<li><a
+href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/patch/remove-duplicate-definitions/0004-smb-introduce-struct-create_posix_ctxt_rsp.patch">smb:
+introduce struct create_posix_ctxt_rsp</a></li>
+<li><a
+href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/patch/remove-duplicate-definitions/0005-smb-introduce-struct-file_posix_info.patch">smb:
+introduce struct file_posix_info</a></li>
+</ul>
+<h1 data-number="3" id="merged-patches"><span
+class="header-section-number">3</span> Merged Patches</h1>
+<p>The following patches have been merged into <a
+href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log">mainline</a>:</p>
+<ul>
+<li>ab0347e67dac smb/client: remove DeviceType Flags and Device
+Characteristics definitions</li>
+<li>2b6abb893e71 smb: move File Attributes definitions into
+common/fscc.h</li>
 <li>c97503321ed3 smb: update struct duplicate_extents_to_file_ex</li>
 <li>08c2a7d2bae9 smb: move file_notify_information to common/fscc.h</li>
-<li>6539e18517b6 smb: move SMB2 Notify Action Flags into common/smb2pdu.h</li>
-<li>9ec7629b430a smb: move notify completion filter flags into common/smb2pdu.h</li>
-<li>a71a4aab4834 smb/client: add parentheses to NT error code definitions containing bitwise OR operator</li>
-<li>bcdd6cfaf2ec smb: add documentation references for smb2 change notify definitions</li>
+<li>6539e18517b6 smb: move SMB2 Notify Action Flags into
+common/smb2pdu.h</li>
+<li>9ec7629b430a smb: move notify completion filter flags into
+common/smb2pdu.h</li>
+<li>a71a4aab4834 smb/client: add parentheses to NT error code
+definitions containing bitwise OR operator</li>
+<li>bcdd6cfaf2ec smb: add documentation references for smb2 change
+notify definitions</li>
 <li>a9adafd40165 smb/client: add 4 NT error code definitions</li>
 <li>9f99caa8950a smb/client: fix NT_STATUS_UNABLE_TO_FREE_VM value</li>
 <li>b2b50fca34da smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value</li>
 <li>a1237c203f17 smb/client: fix NT_STATUS_NO_DATA_DETECTED value</li>
-</ul>
-<p>The following patches have been merged into <a href="https://git.samba.org/?p=ksmbd.git;a=shortlog;h=refs/heads/ksmbd-for-next">ksmbd.git ksmbd-for-next</a>:</p>
-<ul>
-<li>2e0d224d8988 smb/server: add comment to FileSystemName of FileFsAttributeInformation</li>
+<li>2e0d224d8988 smb/server: add comment to FileSystemName of
+FileFsAttributeInformation</li>
 <li>98def4eb0244 smb/server: remove unused nterr.h</li>
 <li>01ab0d1640e3 smb/server: rename include guard in smb_common.h</li>
-</ul>
-<p>The following patches have been merged into <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log">mainline</a>:</p>
-<ul>
 <li>d8f52650b24d smb/client: update some SMB2 status strings</li>
-<li>d159702c9492 smb/client: add two elements to smb2_error_map_table array</li>
-<li>523ecd976632 smb: rename to STATUS_SMB_NO_PREAUTH_INTEGRITY_HASH_OVERLAP</li>
-<li>bf80d1517dc8 smb/client: remove unused elements from smb2_error_map_table array</li>
-<li>6c1eb31ecb97 smb/client: reduce loop count in map_smb2_to_linux_error() by half</li>
+<li>d159702c9492 smb/client: add two elements to smb2_error_map_table
+array</li>
+<li>523ecd976632 smb: rename to
+STATUS_SMB_NO_PREAUTH_INTEGRITY_HASH_OVERLAP</li>
+<li>bf80d1517dc8 smb/client: remove unused elements from
+smb2_error_map_table array</li>
+<li>6c1eb31ecb97 smb/client: reduce loop count in
+map_smb2_to_linux_error() by half</li>
 </ul>
 </body>
 </html>
