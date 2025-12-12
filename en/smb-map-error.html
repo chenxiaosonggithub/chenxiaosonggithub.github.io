@@ -119,18 +119,6 @@ SMB2 error mapping table</a></li>
 class="toc-section-number">2</span> Patches to Be Tested</a></li>
 <li><a href="#kunit-test-results" id="toc-kunit-test-results"><span
 class="toc-section-number">3</span> KUnit Test Results</a></li>
-<li><a href="#minor-suggestions-1" id="toc-minor-suggestions-1"><span
-class="toc-section-number">4</span> Minor Suggestions</a>
-<ul>
-<li><a href="#patch-12-cifs-label-smb2-statuses-with-errors-1"
-id="toc-patch-12-cifs-label-smb2-statuses-with-errors-1"><span
-class="toc-section-number">4.1</span> [PATCH 1/2] cifs: Label SMB2
-statuses with errors</a></li>
-<li><a href="#patch-22-cifs-autogenerate-smb2-error-mapping-table-1"
-id="toc-patch-22-cifs-autogenerate-smb2-error-mapping-table-1"><span
-class="toc-section-number">4.2</span> [PATCH 2/2] cifs: Autogenerate
-SMB2 error mapping table</a></li>
-</ul></li>
 </ul>
 </nav>
 <h1 data-number="1" id="minor-suggestions"><span
@@ -210,38 +198,5 @@ follows:</p>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   18.940408] # Totals: <span class="er">pass:2</span> <span class="ex">fail:0</span> skip:0 total:2</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   18.941897] ok 1 <span class="er">smb2_maperror</span></span></code></pre></div>
 <p>All KUnit test cases passed!</p>
-<h1 data-number="4" id="minor-suggestions-1"><span
-class="header-section-number">4</span> Minor Suggestions</h1>
-<h2 data-number="4.1"
-id="patch-12-cifs-label-smb2-statuses-with-errors-1"><span
-class="header-section-number">4.1</span> <a
-href="https://lore.kernel.org/linux-cifs/782536.1765465397@warthog.procyon.org.uk/">[PATCH
-1/2] cifs: Label SMB2 statuses with errors</a></h2>
-<p>Hi David,</p>
-<p>Did you use a script to update these macros? If so, could you put it
-in the commit message? I’m concerned that manual edits might introduce
-typos.</p>
-<p>Just like the shell commands I used in this patch:
-https://lore.kernel.org/linux-cifs/20251208062100.3268777-7-chenxiaosong.chenxiaosong@linux.dev/</p>
-<p>Of course, your changes would require a more complex script.</p>
-<h2 data-number="4.2"
-id="patch-22-cifs-autogenerate-smb2-error-mapping-table-1"><span
-class="header-section-number">4.2</span> <a
-href="https://lore.kernel.org/linux-cifs/782578.1765465450@warthog.procyon.org.uk/">[PATCH
-2/2] cifs: Autogenerate SMB2 error mapping table</a></h2>
-<p>Hi David,</p>
-<p><code>STATUS_SUCCESS</code> and <code>STATUS_WAIT_0</code> are both
-zero, and since zero indicates success, they are not needed.</p>
-<p>The following status codes have duplicate values. We should update
-the status strings to make the log messages more explicit, as done in my
-patch: <a
-href="https://lore.kernel.org/linux-cifs/20251206151826.2932970-10-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v4 09/10] smb/client: update some SMB2 status strings</a>.</p>
-<ul>
-<li><code>STATUS_ABANDONED_WAIT_0</code>,
-<code>STATUS_ABANDONED</code></li>
-<li><code>STATUS_FWP_TOO_MANY_CALLOUTS</code>,
-<code>STATUS_FWP_TOO_MANY_BOOTTIME_FILTERS</code></li>
-</ul>
 </body>
 </html>
