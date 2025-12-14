@@ -104,8 +104,9 @@
 <li><a href="#vmcore解析"><span class="toc-section-number">4.1</span> vmcore解析</a></li>
 </ul></li>
 <li><a href="#找出缓存大于特定值的文件"><span class="toc-section-number">5</span> 找出缓存大于特定值的文件</a></li>
-<li><a href="#code-analysis"><span class="toc-section-number">6</span> 代码分析</a></li>
-<li><a href="#补丁"><span class="toc-section-number">7</span> 补丁</a></li>
+<li><a href="#尝试构造"><span class="toc-section-number">6</span> 尝试构造</a></li>
+<li><a href="#code-analysis"><span class="toc-section-number">7</span> 代码分析</a></li>
+<li><a href="#补丁"><span class="toc-section-number">8</span> 补丁</a></li>
 </ul>
 </nav>
 <p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
@@ -171,21 +172,68 @@
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a><span class="st">        fi</span></span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a><span class="st">    done</span></span>
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a><span class="st">  &#39;</span> sh</span></code></pre></div>
-<h1 data-number="6" id="code-analysis"><span class="header-section-number">6</span> 代码分析</h1>
+<h1 data-number="6" id="尝试构造"><span class="header-section-number">6</span> 尝试构造</h1>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="fu">mount</span> -t nfs -o vers=3 192.168.53.211:/tmp/s_test /mnt</span></code></pre></div>
+<p>测试步骤:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="bu">echo</span> something <span class="op">&gt;</span> something</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="bu">echo</span> something_else <span class="op">&gt;</span> something_else</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="bu">echo</span> something_else_again <span class="op">&gt;</span> something_else_again</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="co"># 为什么不直接用 echo something &gt; /mnt/file 呢，因为用ps无法查看到echo进程</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a><span class="fu">cat</span> something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a><span class="fu">cat</span> something_else <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a><span class="fu">cat</span> something_else_again <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span></code></pre></div>
+<h1 data-number="7" id="code-analysis"><span class="header-section-number">7</span> 代码分析</h1>
 <p>page设置private的地方:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>nfs_inode_add_request</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>  SetPagePrivate(req-&gt;wb_page);</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a>nfs_inode_add_request</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a>  SetPagePrivate(req-&gt;wb_page);</span></code></pre></div>
 <p>page清除private的地方:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>nfs_inode_remove_request</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a>  ClearPagePrivate(head-&gt;wb_page);</span></code></pre></div>
-<h1 data-number="7" id="补丁"><span class="header-section-number">7</span> 补丁</h1>
-<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="fu">git</span> log --grep=nfs_inode_remove_request --oneline --date=short --format=<span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="co"># 2025-08-19 76d2e3890fb1 NFS: Fix a race when updating an existing write Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="co"># 2024-07-08 b571cfcb9dca nfs: don&#39;t reuse partially completed requests in nfs_lock_and_join_requests Christoph Hellwig &lt;hch@lst.de&gt;</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a><span class="co"># 2023-10-11 6a6d4644ce93 NFS: Fix potential oops in nfs_inode_remove_request() Scott Mayhew &lt;smayhew@redhat.com&gt;</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a><span class="co"># 2023-09-28 dd1b2026323a nfs: decrement nrequests counter before releasing the req Jeff Layton &lt;jlayton@kernel.org&gt;</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a><span class="co"># 2020-01-15 b8946d7bfb94 NFS: Revalidate the file mapping on all fatal writeback errors Trond Myklebust &lt;trondmy@gmail.com&gt;</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true"></a><span class="co"># 2019-10-02 33ea5aaa87cd nfs: Fix nfsi-&gt;nrequests count error on nfs_inode_remove_request ZhangXiaoxu &lt;zhangxiaoxu5@huawei.com&gt;</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true"></a><span class="co"># 2019-08-19 06c9fdf3b9f1 NFS: On fatal writeback errors, we need to call nfs_inode_remove_request() Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a>nfs_write_error_remove_page</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a>  <span class="co">// 在这里打印出inode地址</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a>  req-&gt;wb_context-&gt;dentry-&gt;d_inode</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a>  <span class="co">// 出问题的代码合入补丁 22876f540bdf NFS: Don&#39;t call generic_error_remove_page() while holding locks</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a>  <span class="co">// 以下函数不会调用</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true"></a>  generic_error_remove_page</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true"></a>    truncate_inode_page</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true"></a>      truncate_cleanup_page</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true"></a>        do_invalidatepage</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true"></a>          nfs_invalidate_page</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true"></a>            nfs_wb_page_cancel</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true"></a>              nfs_inode_remove_request</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true"></a>                <span class="co">// 由于没调用generic_error_remove_page，所以不会执行到这里，也不会清除private标记</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true"></a>                ClearPagePrivate(head-&gt;wb_page);</span></code></pre></div>
+<p>调用<code>nfs_write_error_remove_page()</code>的地方:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="co">// done</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>nfs_async_write_error</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a><span class="co">// todo</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a>nfs_page_async_flush <span class="co">// 这个在软锁问题那里分析过，也有可能有些流程会不触发软锁</span></span></code></pre></div>
+<p>调用<code>nfs_async_write_error()</code>的地方:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="co">// done</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a>nfs_async_write_reschedule_io</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="co">// done</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a>.error_cleanup</span></code></pre></div>
+<p>调用<code>nfs_async_write_reschedule_io()</code>的地方:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="co">// done，pnfs不涉及</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>ff_layout_reset_write</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>  .reschedule_io</span></code></pre></div>
+<p>调用<code>.error_cleanup</code>的地方:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="co">// todo</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a>nfs_pageio_cleanup_request</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a><span class="co">// todo</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a>nfs_pageio_error_cleanup</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true"></a><span class="co">// todo</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true"></a>nfs_pageio_resend</span></code></pre></div>
+<h1 data-number="8" id="补丁"><span class="header-section-number">8</span> 补丁</h1>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="fu">git</span> log --grep=nfs_inode_remove_request --oneline --date=short --format=<span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a><span class="co"># 2025-08-19 76d2e3890fb1 NFS: Fix a race when updating an existing write Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a><span class="co"># 2024-07-08 b571cfcb9dca nfs: don&#39;t reuse partially completed requests in nfs_lock_and_join_requests Christoph Hellwig &lt;hch@lst.de&gt;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true"></a><span class="co"># 2023-10-11 6a6d4644ce93 NFS: Fix potential oops in nfs_inode_remove_request() Scott Mayhew &lt;smayhew@redhat.com&gt;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true"></a><span class="co"># 2023-09-28 dd1b2026323a nfs: decrement nrequests counter before releasing the req Jeff Layton &lt;jlayton@kernel.org&gt;</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true"></a><span class="co"># 2020-01-15 b8946d7bfb94 NFS: Revalidate the file mapping on all fatal writeback errors Trond Myklebust &lt;trondmy@gmail.com&gt;</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true"></a><span class="co"># 2019-10-02 33ea5aaa87cd nfs: Fix nfsi-&gt;nrequests count error on nfs_inode_remove_request ZhangXiaoxu &lt;zhangxiaoxu5@huawei.com&gt;</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true"></a><span class="co"># 2019-08-19 06c9fdf3b9f1 NFS: On fatal writeback errors, we need to call nfs_inode_remove_request() Trond Myklebust &lt;trond.myklebust@hammerspace.com&gt;</span></span></code></pre></div>
 </body>
 </html>
