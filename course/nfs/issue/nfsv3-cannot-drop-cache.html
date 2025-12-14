@@ -204,8 +204,9 @@
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true"></a>          nfs_invalidate_page</span>
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true"></a>            nfs_wb_page_cancel</span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true"></a>              nfs_inode_remove_request</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true"></a>                <span class="co">// 由于没调用generic_error_remove_page，所以不会执行到这里，也不会清除private标记</span></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true"></a>                ClearPagePrivate(head-&gt;wb_page);</span></code></pre></div>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true"></a>                <span class="co">// 由于没调用generic_error_remove_page()</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true"></a>                <span class="co">// 所以不会执行到这里，也不会清除private标记</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true"></a>                ClearPagePrivate(head-&gt;wb_page);</span></code></pre></div>
 <p>调用<code>nfs_write_error_remove_page()</code>的地方:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="co">// done</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>nfs_async_write_error</span>
