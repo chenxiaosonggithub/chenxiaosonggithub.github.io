@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -82,127 +93,148 @@
 <!-- sign begin -->
 <ul>
 <li>作者: 陈孝松</li>
-<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/">中文主页:
+chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页:
+chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">4.19 btrfs文件系统变成只读的问题</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#代码分析"><span class="toc-section-number">2</span> 代码分析</a></li>
-<li><a href="#社区邮件列表提问"><span class="toc-section-number">3</span> 社区邮件列表提问</a></li>
-<li><a href="#下次复现时的操作"><span class="toc-section-number">4</span> 下次复现时的操作</a></li>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">2</span> 代码分析</a></li>
+<li><a href="#社区邮件列表提问" id="toc-社区邮件列表提问"><span
+class="toc-section-number">3</span> 社区邮件列表提问</a></li>
+<li><a href="#下次复现时的操作" id="toc-下次复现时的操作"><span
+class="toc-section-number">4</span> 下次复现时的操作</a></li>
 </ul>
 </nav>
-<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
 <p>文件系统变成只读，系统重启后恢复。</p>
 <p>环境信息:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">mount</span> <span class="kw">|</span> <span class="fu">grep</span> btrfs</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ex">/dev/mapper/datavg-dockerlv</span> on /var/lib/docker type btrfs (rw,relatime,noacl,space_cache,subvolid=5,subvol=/)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ex">/dev/mapper/datavg-dockerlv</span> on /var/lib/docker/btrfs type btrfs (rw,relatime,noacl,space_cache,subvolid=5,subvol=/btrfs)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="fu">uname</span> -a</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="ex">Linux</span> pjdhcpaasnap8pn 4.19.90-17.ky10.x86_64 #1 SMP Sun Jun 28 15:41:49 CST 2020 x86_64 x86_64 x86_64 GNU/Linux</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="kw">|</span> <span class="fu">grep</span> btrfs</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/dev/mapper/datavg-dockerlv</span> on /var/lib/docker type btrfs <span class="er">(</span><span class="ex">rw,relatime,noacl,space_cache,subvolid=5,subvol=/</span><span class="kw">)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/dev/mapper/datavg-dockerlv</span> on /var/lib/docker/btrfs type btrfs <span class="er">(</span><span class="ex">rw,relatime,noacl,space_cache,subvolid=5,subvol=/btrfs</span><span class="kw">)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">uname</span> <span class="at">-a</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Linux</span> pjdhcpaasnap8pn 4.19.90-17.ky10.x86_64 <span class="co">#1 SMP Sun Jun 28 15:41:49 CST 2020 x86_64 x86_64 x86_64 GNU/Linux</span></span></code></pre></div>
 <p>内核日志:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328533] ------------[ cut here ]------------</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328594] WARNING: CPU: 42 PID: 460094 at fs/btrfs/extent-tree.c:6805 __btrfs_free_extent.isra.71+0x65c/0xbd0 [btrfs]</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328647] CPU: 42 PID: 460094 Comm: httpWorkerThrea Kdump: loaded Tainted: G        W         4.19.90-17.ky10.x86_64 #1</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328648] Hardware name: Sugon H620-G30/65N32-US, BIOS 0SSSX245 06/07/2020</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328656] RIP: 0010:__btrfs_free_extent.isra.71+0x65c/0xbd0 [btrfs]</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328659] Code: 44 89 e9 ba c8 1a 00 00 48 c7 c6 a0 aa 06 c1 e8 fc ba 09 00 e9 fe fa ff ff 0f 0b 44 89 ee 48 c7 c7 68 7c 07 c1 e8 14 e9 2d e5 <span class="op">&lt;</span>0f<span class="op">&gt;</span> 0b e9 ce fa ff ff 41 83 f8 29 0f 86 d6 01 00 00 48 8b 7c 24 08</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328660] RSP: 0018:ffffae7f9f6e78c8 EFLAGS: 00010286</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328661] RAX: 0000000000000000 RBX: 000000000000a0c9 RCX: 0000000000000006</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328662] RDX: 0000000000000007 RSI: 0000000000000092 RDI: ffff90a4ffa96850</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328663] RBP: 00000470931db000 R08: 000000000210773e R09: 0000000000000004</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328664] R10: 00000000ffffffe4 R11: 0000000000000001 R12: ffff909b302e2a80</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328664] R13: 00000000ffffffe4 R14: 0000000000000000 R15: 000000000003fc62</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328666] FS:  00007f4aedae2700(0000) <span class="ex">GS</span>:ffff90a4ffa80000(0000) <span class="ex">knlGS</span>:0000000000000000</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328667] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328667] CR2: 00007efce4073ff0 CR3: 0000006413d3c000 CR4: 00000000003406e0</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328668] Call Trace:</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328682]  __btrfs_run_delayed_refs+0x4f8/0x1150 [btrfs]</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328707]  btrfs_run_delayed_refs+0xe7/0x1b0 [btrfs]</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328717]  btrfs_truncate_inode_items+0xa56/0xeb0 [btrfs]</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328728]  btrfs_evict_inode+0x496/0x4f0 [btrfs]</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328733]  evict+0xd2/0x1a0</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328736]  __dentry_kill+0xdd/0x180</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328738]  dentry_kill+0x4d/0x260</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328740]  dput+0x183/0x200</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328743]  __fput+0x118/0x1f0</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328747]  task_work_run+0x8a/0xb0</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328750]  do_exit+0x2ec/0xbf0</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328753]  do_group_exit+0x3a/0xa0</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328755]  get_signal+0x13f/0x7a0</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328758]  do_signal+0x36/0x610</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328768]  exit_to_usermode_loop+0x71/0xe0</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328770]  do_syscall_64+0x1a3/0x1d0</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328773]  entry_SYSCALL_64_after_hwframe+0x44/0xa9</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328779] RIP: 0033:0x7f4b12fae10c</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328785] Code: Bad RIP value.</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328785] RSP: 002b:00007f4aedae1550 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328786] RAX: fffffffffffffe00 RBX: 00007f4b0d1914e0 RCX: 00007f4b12fae10c</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328787] RDX: 0000000000000000 RSI: 0000000000000080 RDI: 00007f4b0d19150c</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328787] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000794039ff8</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328788] R10: 0000000000000000 R11: 0000000000000246 R12: 00007f4b0d1914b8</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328789] R13: 0000000000008223 R14: 0000000000000000 R15: 00007f4b0d19150c</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328790] ---[ end trace 74a7f2461a0f9473 ]---</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.328961] BTRFS: error (device dm-9) <span class="kw">in</span> <span class="ex">__btrfs_free_extent</span>:6805: errno=-28 No space left</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.439057] BTRFS info (device dm-9)<span class="bu">:</span> forced readonly</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: [13439425.439067] BTRFS: error (device dm-9) <span class="kw">in</span> <span class="ex">btrfs_run_delayed_refs</span>:2935: errno=-28 No space left</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:28 pjdhcpaasnap8pn kernel: [13439435.962898] BTRFS warning (device dm-9)<span class="bu">:</span> Skipping commit of aborted transaction.</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true"></a><span class="ex">Dec</span>  8 15:25:28 pjdhcpaasnap8pn kernel: [13439435.962902] BTRFS: error (device dm-9) <span class="kw">in</span> <span class="ex">cleanup_transaction</span>:1860: errno=-28 No space left</span></code></pre></div>
-<p><code>git log fs/btrfs/</code>中有一个补丁日志有点像，<a href="https://lore.kernel.org/all/20210820175040.586806-1-desmondcheongzx@gmail.com/">0d977e0eba23 btrfs: reset replace target device to allocation state on close</a>。</p>
-<h1 data-number="2" id="代码分析"><span class="header-section-number">2</span> 代码分析</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328533</span><span class="pp">]</span> <span class="at">------------[</span> cut here ]------------</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328594</span><span class="pp">]</span> WARNING: CPU: 42 PID: 460094 at fs/btrfs/extent-tree.c:6805 __btrfs_free_extent.isra.71+0x65c/0xbd0 <span class="pp">[</span><span class="ss">btrfs</span><span class="pp">]</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328647</span><span class="pp">]</span> CPU: 42 PID: 460094 Comm: httpWorkerThrea Kdump: loaded Tainted: G        W         4.19.90-17.ky10.x86_64 <span class="co">#1</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328648</span><span class="pp">]</span> Hardware name: Sugon H620-G30/65N32-US, BIOS 0SSSX245 06/07/2020</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328656</span><span class="pp">]</span> RIP: 0010:__btrfs_free_extent.isra.71+0x65c/0xbd0 <span class="pp">[</span><span class="ss">btrfs</span><span class="pp">]</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328659</span><span class="pp">]</span> Code: 44 89 e9 ba c8 1a 00 00 48 c7 c6 a0 aa 06 c1 e8 fc ba 09 00 e9 fe fa ff ff 0f 0b 44 89 ee 48 c7 c7 68 7c 07 c1 e8 14 e9 2d e5 <span class="op">&lt;</span>0f<span class="op">&gt;</span> 0b e9 ce fa ff ff 41 83 f8 29 0f 86 d6 01 00 00 48 8b 7c 24 08</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328660</span><span class="pp">]</span> RSP: 0018:ffffae7f9f6e78c8 EFLAGS: 00010286</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328661</span><span class="pp">]</span> RAX: 0000000000000000 RBX: 000000000000a0c9 RCX: 0000000000000006</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328662</span><span class="pp">]</span> RDX: 0000000000000007 RSI: 0000000000000092 RDI: ffff90a4ffa96850</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328663</span><span class="pp">]</span> RBP: 00000470931db000 R08: 000000000210773e R09: 0000000000000004</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328664</span><span class="pp">]</span> R10: 00000000ffffffe4 R11: 0000000000000001 R12: ffff909b302e2a80</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328664</span><span class="pp">]</span> R13: 00000000ffffffe4 R14: 0000000000000000 R15: 000000000003fc62</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328666</span><span class="pp">]</span> FS:  00007f4aedae2700<span class="er">(</span><span class="ex">0000</span><span class="kw">)</span> <span class="ex">GS:ffff90a4ffa80000</span><span class="er">(</span><span class="ex">0000</span><span class="kw">)</span> <span class="ex">knlGS:0000000000000000</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328667</span><span class="pp">]</span> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328667</span><span class="pp">]</span> CR2: 00007efce4073ff0 CR3: 0000006413d3c000 CR4: 00000000003406e0</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328668</span><span class="pp">]</span> Call Trace:</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328682</span><span class="pp">]</span>  __btrfs_run_delayed_refs+0x4f8/0x1150 <span class="pp">[</span><span class="ss">btrfs</span><span class="pp">]</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328707</span><span class="pp">]</span>  btrfs_run_delayed_refs+0xe7/0x1b0 <span class="pp">[</span><span class="ss">btrfs</span><span class="pp">]</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328717</span><span class="pp">]</span>  btrfs_truncate_inode_items+0xa56/0xeb0 <span class="pp">[</span><span class="ss">btrfs</span><span class="pp">]</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328728</span><span class="pp">]</span>  btrfs_evict_inode+0x496/0x4f0 <span class="pp">[</span><span class="ss">btrfs</span><span class="pp">]</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328733</span><span class="pp">]</span>  evict+0xd2/0x1a0</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328736</span><span class="pp">]</span>  __dentry_kill+0xdd/0x180</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328738</span><span class="pp">]</span>  dentry_kill+0x4d/0x260</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328740</span><span class="pp">]</span>  dput+0x183/0x200</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328743</span><span class="pp">]</span>  __fput+0x118/0x1f0</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328747</span><span class="pp">]</span>  task_work_run+0x8a/0xb0</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328750</span><span class="pp">]</span>  do_exit+0x2ec/0xbf0</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328753</span><span class="pp">]</span>  do_group_exit+0x3a/0xa0</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328755</span><span class="pp">]</span>  get_signal+0x13f/0x7a0</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328758</span><span class="pp">]</span>  do_signal+0x36/0x610</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328768</span><span class="pp">]</span>  exit_to_usermode_loop+0x71/0xe0</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328770</span><span class="pp">]</span>  do_syscall_64+0x1a3/0x1d0</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328773</span><span class="pp">]</span>  entry_SYSCALL_64_after_hwframe+0x44/0xa9</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328779</span><span class="pp">]</span> RIP: 0033:0x7f4b12fae10c</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328785</span><span class="pp">]</span> Code: Bad RIP value.</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328785</span><span class="pp">]</span> RSP: 002b:00007f4aedae1550 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328786</span><span class="pp">]</span> RAX: fffffffffffffe00 RBX: 00007f4b0d1914e0 RCX: 00007f4b12fae10c</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328787</span><span class="pp">]</span> RDX: 0000000000000000 RSI: 0000000000000080 RDI: 00007f4b0d19150c</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328787</span><span class="pp">]</span> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000794039ff8</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328788</span><span class="pp">]</span> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f4b0d1914b8</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328789</span><span class="pp">]</span> R13: 0000000000008223 R14: 0000000000000000 R15: 00007f4b0d19150c</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328790</span><span class="pp">]</span> <span class="at">---[</span> end trace 74a7f2461a0f9473 ]---</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.328961</span><span class="pp">]</span> BTRFS: error <span class="er">(</span><span class="ex">device</span> dm-9<span class="kw">)</span> <span class="er">in</span> <span class="ex">__btrfs_free_extent:6805:</span> errno=-28 No space left</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.439057</span><span class="pp">]</span> BTRFS info <span class="er">(</span><span class="ex">device</span> dm-9<span class="kw">)</span><span class="bu">:</span> forced readonly</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:17 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439425.439067</span><span class="pp">]</span> BTRFS: error <span class="er">(</span><span class="ex">device</span> dm-9<span class="kw">)</span> <span class="er">in</span> <span class="ex">btrfs_run_delayed_refs:2935:</span> errno=-28 No space left</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:28 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439435.962898</span><span class="pp">]</span> BTRFS warning <span class="er">(</span><span class="ex">device</span> dm-9<span class="kw">)</span><span class="bu">:</span> Skipping commit of aborted transaction.</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="ex">Dec</span>  8 15:25:28 pjdhcpaasnap8pn kernel: <span class="pp">[</span><span class="ss">13439435.962902</span><span class="pp">]</span> BTRFS: error <span class="er">(</span><span class="ex">device</span> dm-9<span class="kw">)</span> <span class="er">in</span> <span class="ex">cleanup_transaction:1860:</span> errno=-28 No space left</span></code></pre></div>
+<p><code>git log fs/btrfs/</code>中有一个补丁日志有点像，<a
+href="https://lore.kernel.org/all/20210820175040.586806-1-desmondcheongzx@gmail.com/">0d977e0eba23
+btrfs: reset replace target device to allocation state on
+close</a>。</p>
+<h1 data-number="2" id="代码分析"><span
+class="header-section-number">2</span> 代码分析</h1>
 <p><code>lookup_extent_backref</code>函数中可能返回<code>-ENOSPC</code>错误的地方非常多，不太可能把每一种可能性都分析出来。</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>exit_to_usermode_loop</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  do_signal</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    get_signal</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>      do_group_exit</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>        do_exit</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>          task_work_run</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>            __fput</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>__fput</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>  dput</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>    dentry_kill</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>      __dentry_kill</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>        evict</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>          btrfs_evict_inode</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>            btrfs_truncate_inode_items</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>              btrfs_run_delayed_refs</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>                __btrfs_run_delayed_refs</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>                  run_one_delayed_ref</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>                    run_delayed_tree_ref <span class="co">// 暂时不确定是走到这里还是走到 run_delayed_data_ref</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>                      __btrfs_free_extent</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>                        ret = lookup_extent_backref = -ENOSPC = -<span class="dv">28</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a>                        btrfs_abort_transaction</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a>                    run_delayed_data_ref</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a>                      __btrfs_free_extent</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a>                        btrfs_abort_transaction</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a>                btrfs_abort_transaction</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>btrfs_abort_transaction</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a>  __btrfs_abort_transaction</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a>    __btrfs_handle_fs_error</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a>      pr_crit(<span class="st">&quot;BTRFS: error (device %s) in %s:%d: errno=%d %s (%pV)</span><span class="sc">\n</span><span class="st">&quot;</span></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a>      <span class="cf">if</span> (sb_rdonly(sb)) <span class="co">// 条件不满足(不是只读)才会向下执行</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a>      sb-&gt;s_flags |= SB_RDONLY <span class="co">// 设置为只读</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a>      btrfs_info(fs_info, <span class="st">&quot;forced readonly&quot;</span>);</span></code></pre></div>
-<h1 data-number="3" id="社区邮件列表提问"><span class="header-section-number">3</span> 社区邮件列表提问</h1>
-<p><a href="https://lore.kernel.org/all/tencent_0C621A54ED78C4A1ED4ECA25F87A9619CE09@qq.com/">Question about btrfs no space left error and forced readonly</a></p>
-<h1 data-number="4" id="下次复现时的操作"><span class="header-section-number">4</span> 下次复现时的操作</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>exit_to_usermode_loop</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  do_signal</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    get_signal</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      do_group_exit</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        do_exit</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>          task_work_run</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            __fput</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>__fput</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  dput</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    dentry_kill</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>      __dentry_kill</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        evict</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>          btrfs_evict_inode</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>            btrfs_truncate_inode_items</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>              btrfs_run_delayed_refs</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                __btrfs_run_delayed_refs</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>                  run_one_delayed_ref</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>                    run_delayed_tree_ref <span class="co">// 暂时不确定是走到这里还是走到 run_delayed_data_ref</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>                      __btrfs_free_extent</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>                        ret <span class="op">=</span> lookup_extent_backref <span class="op">=</span> <span class="op">-</span>ENOSPC <span class="op">=</span> <span class="op">-</span><span class="dv">28</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>                        btrfs_abort_transaction</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>                    run_delayed_data_ref</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                      __btrfs_free_extent</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>                        btrfs_abort_transaction</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                btrfs_abort_transaction</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>btrfs_abort_transaction</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  __btrfs_abort_transaction</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    __btrfs_handle_fs_error</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>      pr_crit<span class="op">(</span><span class="st">&quot;BTRFS: error (device </span><span class="sc">%s</span><span class="st">) in </span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">: errno=</span><span class="sc">%d</span><span class="st"> </span><span class="sc">%s</span><span class="st"> (</span><span class="sc">%p</span><span class="st">V)</span><span class="sc">\n</span><span class="st">&quot;</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>sb_rdonly<span class="op">(</span>sb<span class="op">))</span> <span class="co">// 条件不满足(不是只读)才会向下执行</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>      sb<span class="op">-&gt;</span>s_flags <span class="op">|=</span> SB_RDONLY <span class="co">// 设置为只读</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>      btrfs_info<span class="op">(</span>fs_info<span class="op">,</span> <span class="st">&quot;forced readonly&quot;</span><span class="op">);</span></span></code></pre></div>
+<h1 data-number="3" id="社区邮件列表提问"><span
+class="header-section-number">3</span> 社区邮件列表提问</h1>
+<p><a
+href="https://lore.kernel.org/all/tencent_0C621A54ED78C4A1ED4ECA25F87A9619CE09@qq.com/">Question
+about btrfs no space left error and forced readonly</a></p>
+<h1 data-number="4" id="下次复现时的操作"><span
+class="header-section-number">4</span> 下次复现时的操作</h1>
 <p>在生产环境下，如果必须要快速恢复环境，且这个环境是可以接受重启系统，就可以尝试手动导出vmcore，vmcore中的信息有时对分析问题很有帮助:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /proc/sys/kernel/sysrq</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="bu">echo</span> c <span class="op">&gt;</span> /proc/sysrq-trigger</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /proc/sys/kernel/sysrq</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> c <span class="op">&gt;</span> /proc/sysrq-trigger</span></code></pre></div>
 </body>
 </html>

@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -82,211 +93,228 @@
 <!-- sign begin -->
 <ul>
 <li>作者: 陈孝松</li>
-<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/">中文主页:
+chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页:
+chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">4.19 __nfs3_proc_setacls()空指针解引用问题</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
-<li><a href="#vmcore分析"><span class="toc-section-number">2</span> vmcore分析</a></li>
-<li><a href="#修复补丁"><span class="toc-section-number">3</span> 修复补丁</a></li>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#vmcore分析" id="toc-vmcore分析"><span
+class="toc-section-number">2</span> vmcore分析</a></li>
+<li><a href="#修复补丁" id="toc-修复补丁"><span
+class="toc-section-number">3</span> 修复补丁</a></li>
 </ul>
 </nav>
-<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<h1 data-number="1" id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p><a
+href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
 <p><code>dmesg</code>日志如下:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>[<span class="ex">172602.460977</span>] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000028</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>[<span class="ex">172602.470254</span>] Mem abort info:</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>[<span class="ex">172602.473553</span>]   ESR = 0x96000007</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>[<span class="ex">172602.477113</span>]   Exception class = DABT (current EL), <span class="ex">IL</span> = 32 bits</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>[<span class="ex">172602.483544</span>]   SET = 0, FnV = 0</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>[<span class="ex">172602.487110</span>]   EA = 0, S1PTW = 0</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>[<span class="ex">172602.490769</span>] Data abort info:</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>[<span class="ex">172602.494158</span>]   ISV = 0, ISS = 0x00000007</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>[<span class="ex">172602.498495</span>]   CM = 0, WnR = 0</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>[<span class="ex">172602.501986</span>] user pgtable: 64k pages, 48-bit VAs, pgdp = 00000000eb57799a</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>[<span class="ex">172602.509178</span>] [0000000000000028] pgd=0000203f3f0b0003, pud=0000203f3f0b0003, pmd=0000203fd64e0003, pte=0000000000000000</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>[<span class="ex">172602.520275</span>] Internal error: Oops: 96000007 [#1] SMP</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>[<span class="ex">172602.627698</span>] Process mkdir (pid: 102562, stack limit = 0x00000000336a1556)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>[<span class="ex">172602.634974</span>] CPU: 64 PID: 102562 Comm: mkdir Kdump: loaded Tainted: G        W  OE     4.19.xxx #1</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>[<span class="ex">172602.648038</span>] Hardware name: PowerLeader PR210K/BC82AMDYC, BIOS KL4.41.102.BD.240118.R 01/18/2024</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>[<span class="ex">172602.657214</span>] pstate: 60400009 (nZCv daif +PAN -UAO)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>[<span class="ex">172602.662509</span>] pc : __nfs3_proc_setacls+0x4c/0x328 [nfsv3]</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>[<span class="ex">172602.668231</span>] lr : nfs3_proc_setacls+0x34/0x50 [nfsv3]</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>[<span class="ex">172602.673689</span>] sp : fffff64fae247c00</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>[<span class="ex">172602.677508</span>] x29: fffff64fae247c00 x28: fffff6301ac90340 </span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>[<span class="ex">172602.683315</span>] x27: 0000000000000000 x26: 0000000000000000 </span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>[<span class="ex">172602.689121</span>] x25: 0000000056000000 x24: fffff62fe622b130 </span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>[<span class="ex">172602.694926</span>] x23: 0000000000000000 x22: fffff62fe6620f18 </span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>[<span class="ex">172602.700732</span>] x21: 0000000000000000 x20: 0000000000000000 </span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>[<span class="ex">172602.706538</span>] x19: 0000000000000000 x18: 0000000000000000 </span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>[<span class="ex">172602.712343</span>] x17: 0000000000000000 x16: ffff4a6e97ea9d50 </span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>[<span class="ex">172602.718149</span>] x15: 0000000000000000 x14: 32312d30302d3731 </span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a>[<span class="ex">172602.723955</span>] x13: ffff000000000000 x12: ffffffffffffffff </span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>[<span class="ex">172602.729761</span>] x11: 0000000000000030 x10: 0000000000000005 </span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>[<span class="ex">172602.735567</span>] x9 : 000000000000ffff x8 : fffffffffffffff0 </span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>[<span class="ex">172602.741373</span>] x7 : ffffffffffffffff x6 : fffff62fe598a324 </span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>[<span class="ex">172602.747179</span>] x5 : fffff64fae247c94 x4 : 0000000000000001 </span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>[<span class="ex">172602.752985</span>] x3 : fffff64fae247c50 x2 : fffff64fae247c78 </span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>[<span class="ex">172602.758791</span>] x1 : fffff64fae247c48 x0 : fffff64fae247c84 </span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>[<span class="ex">172602.764598</span>] Call trace:</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>[<span class="ex">172602.767555</span>]  __nfs3_proc_setacls+0x4c/0x328 [nfsv3]</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>[<span class="ex">172602.772930</span>]  nfs3_proc_setacls+0x34/0x50 [nfsv3]</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>[<span class="ex">172602.778046</span>]  nfs3_proc_mkdir+0x134/0x1c8 [nfsv3]</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a>[<span class="ex">172602.783190</span>]  nfs_mkdir+0x68/0x190 [nfs]</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a>[<span class="ex">172602.787534</span>]  vfs_mkdir+0x130/0x1d8</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a>[<span class="ex">172602.791439</span>]  do_mkdirat+0xf4/0x110</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>[<span class="ex">172602.795344</span>]  __arm64_sys_mkdirat+0x28/0x38</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a>[<span class="ex">172602.799944</span>]  el0_svc_common+0x78/0x130</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>[<span class="ex">172602.804195</span>]  el0_svc_handler+0x38/0x78</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a>[<span class="ex">172602.808445</span>]  el0_svc+0x8/0x1b0</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a>[<span class="ex">172602.812006</span>] Code: 910143a3 9101e3a2 a9007c1f 910123a1 (f94016a0) </span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a>[<span class="ex">172602.818696</span>] SMP: stopping secondary CPUs</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a>[<span class="ex">172602.827904</span>] Starting crashdump kernel...</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a>[<span class="ex">172602.832332</span>] Bye!</span></code></pre></div>
-<h1 data-number="2" id="vmcore分析"><span class="header-section-number">2</span> vmcore分析</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">faddr2line</span> usr/lib/debug/lib/modules/4.19.90-25.17.v2101.osc.ky10.aarch64/kernel/fs/nfs/nfsv3.ko.debug __nfs3_proc_setacls+0x4c/0x328</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">__nfs3_proc_setacls+0x4c</span>/0x328:</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ex">NFS_SB</span> 于 /usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/./include/linux/nfs_fs.h:253</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="kw">(</span>已内连入<span class="kw">)</span><span class="ex">NFS_SERVER</span> 于 /usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/./include/linux/nfs_fs.h:263</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="kw">(</span>已内连入<span class="kw">)</span><span class="ex">__nfs3_proc_setacls</span> 于 /usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:161</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.460977]</span> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000028</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.470254]</span> Mem abort info:</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.473553]</span>   ESR = 0x96000007</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.477113]</span>   Exception class = DABT <span class="er">(</span><span class="ex">current</span> EL<span class="kw">)</span><span class="ex">,</span> IL = 32 bits</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.483544]</span>   SET = 0, FnV = 0</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.487110]</span>   EA = 0, S1PTW = 0</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.490769]</span> Data abort info:</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.494158]</span>   ISV = 0, ISS = 0x00000007</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.498495]</span>   CM = 0, WnR = 0</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.501986]</span> user pgtable: 64k pages, 48-bit VAs, pgdp = 00000000eb57799a</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.509178]</span> <span class="pp">[</span><span class="ss">0000000000000028</span><span class="pp">]</span> pgd=0000203f3f0b0003, pud=0000203f3f0b0003, pmd=0000203fd64e0003, pte=0000000000000000</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.520275]</span> Internal error: Oops: 96000007 <span class="pp">[</span><span class="ss">#1</span><span class="pp">]</span> SMP</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.627698]</span> Process mkdir <span class="er">(</span><span class="ex">pid:</span> 102562, stack limit = 0x00000000336a1556<span class="kw">)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.634974]</span> CPU: 64 PID: 102562 Comm: mkdir Kdump: loaded Tainted: G        W  OE     4.19.xxx <span class="co">#1</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.648038]</span> Hardware name: PowerLeader PR210K/BC82AMDYC, BIOS KL4.41.102.BD.240118.R 01/18/2024</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.657214]</span> pstate: 60400009 <span class="er">(</span><span class="ex">nZCv</span> daif +PAN <span class="at">-UAO</span><span class="kw">)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.662509]</span> pc : __nfs3_proc_setacls+0x4c/0x328 <span class="pp">[</span><span class="ss">nfsv3</span><span class="pp">]</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.668231]</span> lr : nfs3_proc_setacls+0x34/0x50 <span class="pp">[</span><span class="ss">nfsv3</span><span class="pp">]</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.673689]</span> sp : fffff64fae247c00</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.677508]</span> x29: fffff64fae247c00 x28: fffff6301ac90340 </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.683315]</span> x27: 0000000000000000 x26: 0000000000000000 </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.689121]</span> x25: 0000000056000000 x24: fffff62fe622b130 </span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.694926]</span> x23: 0000000000000000 x22: fffff62fe6620f18 </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.700732]</span> x21: 0000000000000000 x20: 0000000000000000 </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.706538]</span> x19: 0000000000000000 x18: 0000000000000000 </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.712343]</span> x17: 0000000000000000 x16: ffff4a6e97ea9d50 </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.718149]</span> x15: 0000000000000000 x14: 32312d30302d3731 </span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.723955]</span> x13: ffff000000000000 x12: ffffffffffffffff </span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.729761]</span> x11: 0000000000000030 x10: 0000000000000005 </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.735567]</span> x9 : 000000000000ffff x8 : fffffffffffffff0 </span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.741373]</span> x7 : ffffffffffffffff x6 : fffff62fe598a324 </span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.747179]</span> x5 : fffff64fae247c94 x4 : 0000000000000001 </span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.752985]</span> x3 : fffff64fae247c50 x2 : fffff64fae247c78 </span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.758791]</span> x1 : fffff64fae247c48 x0 : fffff64fae247c84 </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.764598]</span> Call trace:</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.767555]</span>  __nfs3_proc_setacls+0x4c/0x328 <span class="pp">[</span><span class="ss">nfsv3</span><span class="pp">]</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.772930]</span>  nfs3_proc_setacls+0x34/0x50 <span class="pp">[</span><span class="ss">nfsv3</span><span class="pp">]</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.778046]</span>  nfs3_proc_mkdir+0x134/0x1c8 <span class="pp">[</span><span class="ss">nfsv3</span><span class="pp">]</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.783190]</span>  nfs_mkdir+0x68/0x190 <span class="pp">[</span><span class="ss">nfs</span><span class="pp">]</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.787534]</span>  vfs_mkdir+0x130/0x1d8</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.791439]</span>  do_mkdirat+0xf4/0x110</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.795344]</span>  __arm64_sys_mkdirat+0x28/0x38</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.799944]</span>  el0_svc_common+0x78/0x130</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.804195]</span>  el0_svc_handler+0x38/0x78</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.808445]</span>  el0_svc+0x8/0x1b0</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.812006]</span> Code: 910143a3 9101e3a2 a9007c1f 910123a1 <span class="er">(</span><span class="ex">f94016a0</span><span class="kw">)</span> </span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.818696]</span> SMP: stopping secondary CPUs</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.827904]</span> Starting crashdump kernel...</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ex">[172602.832332]</span> Bye!</span></code></pre></div>
+<h1 data-number="2" id="vmcore分析"><span
+class="header-section-number">2</span> vmcore分析</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">faddr2line</span> usr/lib/debug/lib/modules/4.19.90-25.17.v2101.osc.ky10.aarch64/kernel/fs/nfs/nfsv3.ko.debug __nfs3_proc_setacls+0x4c/0x328</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">__nfs3_proc_setacls+0x4c/0x328:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">NFS_SB</span> 于 /usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/./include/linux/nfs_fs.h:253</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">已内连入</span><span class="kw">)</span><span class="ex">NFS_SERVER</span> 于 /usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/./include/linux/nfs_fs.h:263</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">已内连入</span><span class="kw">)</span><span class="ex">__nfs3_proc_setacls</span> 于 /usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:161</span></code></pre></div>
 <p>crash发生在<code>__nfs3_proc_setacls() -&gt; NFS_SERVER() -&gt; NFS_SB(inode-&gt;i_sb)</code>。</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> struct inode -ox</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">struct</span> inode {</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>   <span class="ex">...</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>   [<span class="ex">0x28</span>] struct super_block *i_sb<span class="kw">;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>   <span class="ex">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct inode <span class="at">-ox</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> inode {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>   <span class="ex">...</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>   <span class="ex">[0x28]</span> struct super_block <span class="pp">*</span>i_sb<span class="kw">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>   <span class="ex">...</span></span></code></pre></div>
 <p><code>i_sb</code>的偏移量是<code>0x28</code>，和<code>dmesg</code>日志中的<code>virtual address 0000000000000028</code>对应，所以空指针的对象是<code>struct inode</code>。</p>
 <p>再看一下栈信息:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">PID</span>: 102562  TASK: fffff6301ac90340  CPU: 64  COMMAND: <span class="st">&quot;mkdir&quot;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a> <span class="co">#0 [fffff64fae247650] machine_kexec at ffff4a6e97c02ecc</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a> <span class="co">#1 [fffff64fae2476b0] __crash_kexec at ffff4a6e97d0fdc8</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a> <span class="co">#2 [fffff64fae247820] crash_kexec at ffff4a6e97d0fed0</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a> <span class="co">#3 [fffff64fae247850] die at ffff4a6e97bef514</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a> <span class="co">#4 [fffff64fae247890] die_kernel_fault at ffff4a6e97c0a9c4</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a> <span class="co">#5 [fffff64fae2478c0] __do_kernel_fault at ffff4a6e97c0a694</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a> <span class="co">#6 [fffff64fae2478f0] do_page_fault at ffff4a6e98734814</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a> <span class="co">#7 [fffff64fae2479e0] do_translation_fault at ffff4a6e98734d0c</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a> <span class="co">#8 [fffff64fae247a10] do_mem_abort at ffff4a6e97be1284</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a> <span class="co">#9 [fffff64fae247bf0] el1_ia at ffff4a6e97be310c</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>     <span class="ex">PC</span>: ffff4a6e7e7e49a4  [__nfs3_proc_setacls+76]</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>     <span class="ex">LR</span>: ffff4a6e7e7e520c  [nfs3_proc_setacls+52]</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>     <span class="ex">SP</span>: fffff64fae247c00  PSTATE: 60400009</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>    <span class="ex">X29</span>: fffff64fae247c00  X28: fffff6301ac90340  X27: 0000000000000000</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>    <span class="ex">X26</span>: 0000000000000000  X25: 0000000056000000  X24: fffff62fe622b130</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>    <span class="ex">X23</span>: 0000000000000000  X22: fffff62fe6620f18  X21: 0000000000000000</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>    <span class="ex">X20</span>: 0000000000000000  X19: 0000000000000000  X18: 0000000000000000</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>    <span class="ex">X17</span>: 0000000000000000  X16: ffff4a6e97ea9d50  X15: 0000000000000000</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>    <span class="ex">X14</span>: 32312d30302d3731  X13: ffff000000000000  X12: ffffffffffffffff</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a>    <span class="ex">X11</span>: 0000000000000030  X10: 0000000000000005   X9: 000000000000ffff</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a>     <span class="ex">X8</span>: fffffffffffffff0   X7: ffffffffffffffff   X6: fffff62fe598a324</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>     <span class="ex">X5</span>: fffff64fae247c94   X4: 0000000000000001   X3: fffff64fae247c50</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>     <span class="ex">X2</span>: fffff64fae247c78   X1: fffff64fae247c48   X0: fffff64fae247c84</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a><span class="co">#10 [fffff64fae247c00] __nfs3_proc_setacls at ffff4a6e7e7e49a0 [nfsv3]</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a><span class="co">#11 [fffff64fae247cb0] nfs3_proc_setacls at ffff4a6e7e7e5208 [nfsv3]</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a><span class="co">#12 [fffff64fae247ce0] nfs3_proc_mkdir at ffff4a6e7e7e16d8 [nfsv3]</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a>    <span class="co"># 用bt -FF命令还能看到[fffff62fe622b130:dentry]</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a>    <span class="ex">fffff64fae247cf0</span>: [fffff62fe6620f18:nfs_inode_cache] [fffff62fe622b130:dentry]</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a><span class="co">#13 [fffff64fae247d30] nfs_mkdir at ffff4a6e7ee53904 [nfs]</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a><span class="co">#14 [fffff64fae247db0] vfs_mkdir at ffff4a6e97e9a404</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a><span class="co">#15 [fffff64fae247df0] do_mkdirat at ffff4a6e97e9fe20</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true"></a><span class="co">#16 [fffff64fae247e40] __arm64_sys_mkdirat at ffff4a6e97e9fe64</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true"></a><span class="co">#17 [fffff64fae247e60] el0_svc_common at ffff4a6e97bf81dc</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true"></a><span class="co">#18 [fffff64fae247ea0] el0_svc_handler at ffff4a6e97bf82cc</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true"></a><span class="co">#19 [fffff64fae247ff0] el0_svc at ffff4a6e97be4084</span></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true"></a>     <span class="ex">PC</span>: 0000ffff151a9b74   LR: 00000000004026c4   SP: 0000ffffc1e4d900</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true"></a>    <span class="ex">X29</span>: 0000ffffc1e4d900  X28: 0000000000000000  X27: 0000000000000001</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true"></a>    <span class="ex">X26</span>: 00000000000001ed  X25: 0000000000000000  X24: 00000000ffffffff</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true"></a>    <span class="ex">X23</span>: 0000ffffc1e4dae0  X22: 0000000000402100  X21: 00000000000001ed</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true"></a>    <span class="ex">X20</span>: 0000ffffc1e4fbee  X19: 0000ffffc1e4da88  X18: 0000000000000a03</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true"></a>    <span class="ex">X17</span>: 0000ffff151a9b60  X16: 00000000004191e0  X15: 0000ffff1531ccc0</span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true"></a>    <span class="ex">X14</span>: 0000000000000000  X13: 0000000000000000  X12: 00000000000003f3</span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true"></a>    <span class="ex">X11</span>: 0000000000000004  X10: 0101010101010101   X9: 00000000003fffff</span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true"></a>     <span class="ex">X8</span>: 0000000000000022   X7: 00000000ffffffff   X6: 0000000000000000</span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true"></a>     <span class="ex">X5</span>: 00000000004020b8   X4: 00000000000001ed   X3: 0000000000000001</span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true"></a>     <span class="ex">X2</span>: 00000000000001ed   X1: 0000ffffc1e4fc23   X0: ffffffffffffff9c</span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true"></a>    <span class="ex">ORIG_X0</span>: ffffffffffffff9c  SYSCALLNO: 22  PSTATE: 00001000</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 102562  TASK: fffff6301ac90340  CPU: 64  COMMAND: <span class="st">&quot;mkdir&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a> <span class="co">#0 [fffff64fae247650] machine_kexec at ffff4a6e97c02ecc</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a> <span class="co">#1 [fffff64fae2476b0] __crash_kexec at ffff4a6e97d0fdc8</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a> <span class="co">#2 [fffff64fae247820] crash_kexec at ffff4a6e97d0fed0</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a> <span class="co">#3 [fffff64fae247850] die at ffff4a6e97bef514</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a> <span class="co">#4 [fffff64fae247890] die_kernel_fault at ffff4a6e97c0a9c4</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a> <span class="co">#5 [fffff64fae2478c0] __do_kernel_fault at ffff4a6e97c0a694</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a> <span class="co">#6 [fffff64fae2478f0] do_page_fault at ffff4a6e98734814</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a> <span class="co">#7 [fffff64fae2479e0] do_translation_fault at ffff4a6e98734d0c</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a> <span class="co">#8 [fffff64fae247a10] do_mem_abort at ffff4a6e97be1284</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a> <span class="co">#9 [fffff64fae247bf0] el1_ia at ffff4a6e97be310c</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>     <span class="ex">PC:</span> ffff4a6e7e7e49a4  <span class="pp">[</span><span class="ss">__nfs3_proc_setacls+76</span><span class="pp">]</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>     <span class="ex">LR:</span> ffff4a6e7e7e520c  <span class="pp">[</span><span class="ss">nfs3_proc_setacls+52</span><span class="pp">]</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>     <span class="ex">SP:</span> fffff64fae247c00  PSTATE: 60400009</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X29:</span> fffff64fae247c00  X28: fffff6301ac90340  X27: 0000000000000000</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X26:</span> 0000000000000000  X25: 0000000056000000  X24: fffff62fe622b130</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X23:</span> 0000000000000000  X22: fffff62fe6620f18  X21: 0000000000000000</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X20:</span> 0000000000000000  X19: 0000000000000000  X18: 0000000000000000</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X17:</span> 0000000000000000  X16: ffff4a6e97ea9d50  X15: 0000000000000000</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X14:</span> 32312d30302d3731  X13: ffff000000000000  X12: ffffffffffffffff</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X11:</span> 0000000000000030  X10: 0000000000000005   X9: 000000000000ffff</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X8:</span> fffffffffffffff0   X7: ffffffffffffffff   X6: fffff62fe598a324</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X5:</span> fffff64fae247c94   X4: 0000000000000001   X3: fffff64fae247c50</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X2:</span> fffff64fae247c78   X1: fffff64fae247c48   X0: fffff64fae247c84</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">#10 [fffff64fae247c00] __nfs3_proc_setacls at ffff4a6e7e7e49a0 [nfsv3]</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co">#11 [fffff64fae247cb0] nfs3_proc_setacls at ffff4a6e7e7e5208 [nfsv3]</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="co">#12 [fffff64fae247ce0] nfs3_proc_mkdir at ffff4a6e7e7e16d8 [nfsv3]</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 用bt -FF命令还能看到[fffff62fe622b130:dentry]</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="ex">fffff64fae247cf0:</span> <span class="pp">[</span><span class="ss">fffff62fe6620f18:nfs_inode_cache</span><span class="pp">]</span> <span class="pp">[</span><span class="ss">fffff62fe622b130:dentry</span><span class="pp">]</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co">#13 [fffff64fae247d30] nfs_mkdir at ffff4a6e7ee53904 [nfs]</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co">#14 [fffff64fae247db0] vfs_mkdir at ffff4a6e97e9a404</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="co">#15 [fffff64fae247df0] do_mkdirat at ffff4a6e97e9fe20</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="co">#16 [fffff64fae247e40] __arm64_sys_mkdirat at ffff4a6e97e9fe64</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co">#17 [fffff64fae247e60] el0_svc_common at ffff4a6e97bf81dc</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co">#18 [fffff64fae247ea0] el0_svc_handler at ffff4a6e97bf82cc</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="co">#19 [fffff64fae247ff0] el0_svc at ffff4a6e97be4084</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>     <span class="ex">PC:</span> 0000ffff151a9b74   LR: 00000000004026c4   SP: 0000ffffc1e4d900</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X29:</span> 0000ffffc1e4d900  X28: 0000000000000000  X27: 0000000000000001</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X26:</span> 00000000000001ed  X25: 0000000000000000  X24: 00000000ffffffff</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X23:</span> 0000ffffc1e4dae0  X22: 0000000000402100  X21: 00000000000001ed</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X20:</span> 0000ffffc1e4fbee  X19: 0000ffffc1e4da88  X18: 0000000000000a03</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X17:</span> 0000ffff151a9b60  X16: 00000000004191e0  X15: 0000ffff1531ccc0</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X14:</span> 0000000000000000  X13: 0000000000000000  X12: 00000000000003f3</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>    <span class="ex">X11:</span> 0000000000000004  X10: 0101010101010101   X9: 00000000003fffff</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X8:</span> 0000000000000022   X7: 00000000ffffffff   X6: 0000000000000000</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X5:</span> 00000000004020b8   X4: 00000000000001ed   X3: 0000000000000001</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>     <span class="ex">X2:</span> 00000000000001ed   X1: 0000ffffc1e4fc23   X0: ffffffffffffff9c</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ORIG_X0:</span> ffffffffffffff9c  SYSCALLNO: 22  PSTATE: 00001000</span></code></pre></div>
 <p>反汇编<code>nfs3_proc_mkdir</code>函数:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dis -lx nfs3_proc_mkdir</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3proc.c: <span class="ex">560</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e16d0</span> <span class="op">&lt;</span>nfs3_proc_mkdir+0x128<span class="op">&gt;</span>:     ldr     x0, [x24,#48]</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e16d4</span> <span class="op">&lt;</span>nfs3_proc_mkdir+0x12c<span class="op">&gt;</span>:     ldp     x2, x1, [x29,#64]</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e16d8</span> <span class="op">&lt;</span>nfs3_proc_mkdir+0x130<span class="op">&gt;</span>:     bl      0xffff4a6e7e7e51d8 <span class="op">&lt;</span>nfs3_proc_setacls<span class="op">&gt;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e16dc</span> <span class="op">&lt;</span>nfs3_proc_mkdir+0x134<span class="op">&gt;</span>:     mov     w20, w0</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-lx</span> nfs3_proc_mkdir</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3proc.c:</span> 560</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e16d0</span> <span class="op">&lt;</span>nfs3_proc_mkdir+0x128<span class="op">&gt;</span>:     ldr     x0, <span class="pp">[</span><span class="ss">x24,#48</span><span class="pp">]</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e16d4</span> <span class="op">&lt;</span>nfs3_proc_mkdir+0x12c<span class="op">&gt;</span>:     ldp     x2, x1, <span class="pp">[</span><span class="ss">x29,#64</span><span class="pp">]</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e16d8</span> <span class="op">&lt;</span>nfs3_proc_mkdir+0x130<span class="op">&gt;</span>:     bl      0xffff4a6e7e7e51d8 <span class="op">&lt;</span>nfs3_proc_setacls<span class="op">&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e16dc</span> <span class="op">&lt;</span>nfs3_proc_mkdir+0x134<span class="op">&gt;</span>:     mov     w20, w0</span></code></pre></div>
 <p>由于<code>d_inode</code>在<code>struct dentry</code>中的偏移量为48，所以可以确定<code>x24</code>寄存器这时存的是<code>struct dentry</code>的值，但后面<code>x24</code>寄存器的值有可能被改变，所以再看后面的函数反汇率:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dis -lx nfs3_proc_setacls</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3acl.c: <span class="ex">247</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e51d8</span> <span class="op">&lt;</span>nfs3_proc_setacls<span class="op">&gt;</span>: stp     x29, x30, [sp,#-48]!</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e51dc</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x4<span class="op">&gt;</span>:     mov     x29, sp</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e51e0</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x8<span class="op">&gt;</span>:     stp     x19, x20, [sp,#16]</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e51e4</span> <span class="op">&lt;</span>nfs3_proc_setacls+0xc<span class="op">&gt;</span>:     str     x21, [sp,#32]</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e51e8</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x10<span class="op">&gt;</span>:    mov     x19, x0</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e51ec</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x14<span class="op">&gt;</span>:    mov     x20, x1</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e51f0</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x18<span class="op">&gt;</span>:    mov     x0, x30</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e51f4</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x1c<span class="op">&gt;</span>:    mov     x21, x2</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e51f8</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x20<span class="op">&gt;</span>:    nop</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3acl.c: <span class="ex">249</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e51fc</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x24<span class="op">&gt;</span>:    mov     x2, x21</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e5200</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x28<span class="op">&gt;</span>:    mov     x1, x20</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e5204</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x2c<span class="op">&gt;</span>:    mov     x0, x19</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e5208</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x30<span class="op">&gt;</span>:    bl      0xffff4a6e7e7e4958 <span class="op">&lt;</span>__nfs3_proc_setacls<span class="op">&gt;</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3acl.c: <span class="ex">250</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e520c</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x34<span class="op">&gt;</span>:    cmn     w0, #0x5f</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true"></a><span class="ex">crash</span><span class="op">&gt;</span> dis -lx __nfs3_proc_setacls # 或 dis -rl __nfs3_proc_setacls+0x4c</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3acl.c: <span class="ex">160</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4958</span> <span class="op">&lt;</span>__nfs3_proc_setacls<span class="op">&gt;</span>:       stp     x29, x30, [sp,#-176]!</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e495c</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x4<span class="op">&gt;</span>:   mov     x29, sp</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4960</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x8<span class="op">&gt;</span>:   stp     x19, x20, [sp,#16]</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4964</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0xc<span class="op">&gt;</span>:   stp     x21, x22, [sp,#32]</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4968</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x10<span class="op">&gt;</span>:  str     x23, [sp,#48]</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e496c</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x14<span class="op">&gt;</span>:  mov     x21, x0</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4970</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x18<span class="op">&gt;</span>:  mov     x19, x1</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4974</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x1c<span class="op">&gt;</span>:  mov     x23, x2</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4978</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x20<span class="op">&gt;</span>:  mov     x0, x30</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e497c</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x24<span class="op">&gt;</span>:  nop</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3acl.c: <span class="ex">170</span></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4980</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x28<span class="op">&gt;</span>:  stp     xzr, xzr, [x29,#88]</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3acl.c: <span class="ex">164</span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4984</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x2c<span class="op">&gt;</span>:  add     x0, x29, #0x84</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4988</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x30<span class="op">&gt;</span>:  add     x5, x29, #0x94</span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3acl.c: <span class="ex">170</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e498c</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x34<span class="op">&gt;</span>:  stp     xzr, xzr, [x29,#104]</span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3acl.c: <span class="ex">164</span></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4990</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x38<span class="op">&gt;</span>:  mov     w4, #0x1                        // #1</span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4994</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x3c<span class="op">&gt;</span>:  add     x3, x29, #0x50</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3acl.c: <span class="ex">170</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e4998</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x40<span class="op">&gt;</span>:  add     x2, x29, #0x78</span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3acl.c: <span class="ex">164</span></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e499c</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x44<span class="op">&gt;</span>:  stp     xzr, xzr, [x0]</span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs</span>/nfs3acl.c: <span class="ex">170</span></span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e49a0</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x48<span class="op">&gt;</span>:  add     x1, x29, #0x48</span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/./include/linux</span>/nfs_fs.h: <span class="ex">253</span></span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true"></a><span class="ex">0xffff4a6e7e7e49a4</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x4c<span class="op">&gt;</span>:  ldr     x0, [x21,#40]</span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true"></a><span class="ex">...</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-lx</span> nfs3_proc_setacls</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:</span> 247</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e51d8</span> <span class="op">&lt;</span>nfs3_proc_setacls<span class="op">&gt;</span>: stp     x29, x30, <span class="pp">[</span><span class="ss">sp,#</span><span class="pp">-</span><span class="ss">48</span><span class="pp">]</span>!</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e51dc</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x4<span class="op">&gt;</span>:     mov     x29, sp</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e51e0</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x8<span class="op">&gt;</span>:     stp     x19, x20, <span class="pp">[</span><span class="ss">sp,#16</span><span class="pp">]</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e51e4</span> <span class="op">&lt;</span>nfs3_proc_setacls+0xc<span class="op">&gt;</span>:     str     x21, <span class="pp">[</span><span class="ss">sp,#32</span><span class="pp">]</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e51e8</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x10<span class="op">&gt;</span>:    mov     x19, x0</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e51ec</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x14<span class="op">&gt;</span>:    mov     x20, x1</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e51f0</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x18<span class="op">&gt;</span>:    mov     x0, x30</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e51f4</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x1c<span class="op">&gt;</span>:    mov     x21, x2</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e51f8</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x20<span class="op">&gt;</span>:    nop</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:</span> 249</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e51fc</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x24<span class="op">&gt;</span>:    mov     x2, x21</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e5200</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x28<span class="op">&gt;</span>:    mov     x1, x20</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e5204</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x2c<span class="op">&gt;</span>:    mov     x0, x19</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e5208</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x30<span class="op">&gt;</span>:    bl      0xffff4a6e7e7e4958 <span class="op">&lt;</span>__nfs3_proc_setacls<span class="op">&gt;</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:</span> 250</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e520c</span> <span class="op">&lt;</span>nfs3_proc_setacls+0x34<span class="op">&gt;</span>:    cmn     w0, <span class="co">#0x5f</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> dis <span class="at">-lx</span> __nfs3_proc_setacls <span class="co"># 或 dis -rl __nfs3_proc_setacls+0x4c</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:</span> 160</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4958</span> <span class="op">&lt;</span>__nfs3_proc_setacls<span class="op">&gt;</span>:       stp     x29, x30, <span class="pp">[</span><span class="ss">sp,#</span><span class="pp">-</span><span class="ss">176</span><span class="pp">]</span>!</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e495c</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x4<span class="op">&gt;</span>:   mov     x29, sp</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4960</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x8<span class="op">&gt;</span>:   stp     x19, x20, <span class="pp">[</span><span class="ss">sp,#16</span><span class="pp">]</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4964</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0xc<span class="op">&gt;</span>:   stp     x21, x22, <span class="pp">[</span><span class="ss">sp,#32</span><span class="pp">]</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4968</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x10<span class="op">&gt;</span>:  str     x23, <span class="pp">[</span><span class="ss">sp,#48</span><span class="pp">]</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e496c</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x14<span class="op">&gt;</span>:  mov     x21, x0</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4970</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x18<span class="op">&gt;</span>:  mov     x19, x1</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4974</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x1c<span class="op">&gt;</span>:  mov     x23, x2</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4978</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x20<span class="op">&gt;</span>:  mov     x0, x30</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e497c</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x24<span class="op">&gt;</span>:  nop</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:</span> 170</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4980</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x28<span class="op">&gt;</span>:  stp     xzr, xzr, <span class="pp">[</span><span class="ss">x29,#88</span><span class="pp">]</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:</span> 164</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4984</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x2c<span class="op">&gt;</span>:  add     x0, x29, <span class="co">#0x84</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4988</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x30<span class="op">&gt;</span>:  add     x5, x29, <span class="co">#0x94</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:</span> 170</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e498c</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x34<span class="op">&gt;</span>:  stp     xzr, xzr, <span class="pp">[</span><span class="ss">x29,#104</span><span class="pp">]</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:</span> 164</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4990</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x38<span class="op">&gt;</span>:  mov     w4, <span class="co">#0x1                        // #1</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4994</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x3c<span class="op">&gt;</span>:  add     x3, x29, <span class="co">#0x50</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:</span> 170</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e4998</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x40<span class="op">&gt;</span>:  add     x2, x29, <span class="co">#0x78</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:</span> 164</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e499c</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x44<span class="op">&gt;</span>:  stp     xzr, xzr, <span class="pp">[</span><span class="ss">x0</span><span class="pp">]</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/fs/nfs/nfs3acl.c:</span> 170</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e49a0</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x48<span class="op">&gt;</span>:  add     x1, x29, <span class="co">#0x48</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-25.17.v2101.osc.ky10.aarch64/./include/linux/nfs_fs.h:</span> 253</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff4a6e7e7e49a4</span> <span class="op">&lt;</span>__nfs3_proc_setacls+0x4c<span class="op">&gt;</span>:  ldr     x0, <span class="pp">[</span><span class="ss">x21,#40</span><span class="pp">]</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
 <p><code>x24</code>没有被改变，所以崩溃时<code>x24</code>寄存器中存的就是<code>struct dentry</code>对象的值:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ex">struct</span> dentry fffff62fe622b130 # x24寄存器的值</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="ex">struct</span> dentry {</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>  <span class="ex">...</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>  <span class="ex">d_inode</span> = 0x0,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>  <span class="ex">...</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> dentry fffff62fe622b130 <span class="co"># x24寄存器的值</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">struct</span> dentry {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">d_inode</span> = 0x0,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">...</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
 <p>这也从另一个角度证明了<code>nfs3_proc_setacls()</code>和<code>__nfs3_proc_setacls()</code>函数中传入的<code>struct inode</code>为空指针。</p>
-<h1 data-number="3" id="修复补丁"><span class="header-section-number">3</span> 修复补丁</h1>
-<p><a href="https://chenxiaosong.com/course/nfs/patch/patchset-nfs_instantiate-might-succeed-leaving-dentry-negative-unhashed.html"><code>patchset: nfs_instantiate() might succeed leaving dentry negative unhashed</code></a></p>
+<h1 data-number="3" id="修复补丁"><span
+class="header-section-number">3</span> 修复补丁</h1>
+<p><a
+href="https://chenxiaosong.com/course/nfs/patch/patchset-nfs_instantiate-might-succeed-leaving-dentry-negative-unhashed.html"><code>patchset: nfs_instantiate() might succeed leaving dentry negative unhashed</code></a></p>
 </body>
 </html>
