@@ -183,6 +183,11 @@
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a><span class="fu">cat</span> something_else <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a><span class="fu">cat</span> something_else_again <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span></code></pre></div>
 <h1 data-number="7" id="code-analysis"><span class="header-section-number">7</span> 代码分析</h1>
+<p>其他相关的分析请查看以两个链接:</p>
+<ul>
+<li><a href="https://chenxiaosong.com/course/nfs/issue/4.19-null-ptr-deref-in-nfs_updatepage.html">4.19 nfs_updatepage()空指针解引用问题</a></li>
+<li><a href="https://chenxiaosong.com/course/nfs/issue/4.19-nfs-soft-lockup-in-nfs_wb_page.html">4.19 nfs_wb_page() soft lockup的问题</a></li>
+</ul>
 <p>page设置private的地方:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a>nfs_inode_add_request</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a>  SetPagePrivate(req-&gt;wb_page);</span></code></pre></div>
