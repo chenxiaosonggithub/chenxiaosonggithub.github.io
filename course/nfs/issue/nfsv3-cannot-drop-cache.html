@@ -163,56 +163,64 @@ href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-ca
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem ffffc7b0a71abc40</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex"> </span>     PAGE         PHYSICAL      MAPPING       INDEX CNT FLAGS</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffc7b0a71abc40</span> 19c6af1000 ffff8db67005d210     3773  2 17ffffc000102a error,uptodate,lru,private</span></code></pre></div>
+<p>文件的大小为<code>613G</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct inode.i_size 0xffff8dc8f6cb4380</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">i_size</span> = 658510457197,</span></code></pre></div>
 <h1 data-number="3" id="vmcore分析-1"><span
 class="header-section-number">3</span> 20251202 vmcore分析</h1>
 <p><a
 href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-cannot-drop-cache/nfsv3-cannot-drop-cache-vmcore-20251202.md">详细的crash输出请点击这里查看</a>。</p>
 <p>占用缓存最多的inode地址为<code>0xffff9d9eeca42da0</code>，找出超级块地址:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct inode.i_sb 0xffff9d9eeca42da0</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">i_sb</span> = 0xffff9dae81c1d000,</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct inode.i_sb 0xffff9d9eeca42da0</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">i_sb</span> = 0xffff9dae81c1d000,</span></code></pre></div>
 <p>在挂载信息中找不到这个超级块地址:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mount <span class="kw">|</span> <span class="fu">grep</span> ffff9dae81c1d000</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mount <span class="kw">|</span> <span class="fu">grep</span> ffff9dae81c1d000</span></code></pre></div>
 <p>根据以下在虚拟机中验证可知，在导出vmcore之前，环境已经执行过<code>umount -l</code>。</p>
 <p>查看第一个page，可以看到private标记没有清除:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem fffffae836418f40</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>      <span class="ex">PAGE</span>         PHYSICAL      MAPPING       INDEX CNT FLAGS</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">fffffae836418f40</span> ad9063d000 ffff9d9eeca42f10  54e470e  2 197ffffc000102a error,uptodate,lru,private</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem fffffae836418f40</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>      <span class="ex">PAGE</span>         PHYSICAL      MAPPING       INDEX CNT FLAGS</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">fffffae836418f40</span> ad9063d000 ffff9d9eeca42f10  54e470e  2 197ffffc000102a error,uptodate,lru,private</span></code></pre></div>
+<p>文件的大小为<code>613G</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct inode.i_size 0xffff9d9eeca42da0</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">i_size</span> = 658367030190,</span></code></pre></div>
 <h1 data-number="4" id="reproduce"><span
 class="header-section-number">4</span> 构造复现</h1>
 <p>合入补丁<a
 href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/0001-reproduce-4.19-nfsv3-cannot-drop-cache.patch">0001-reproduce-4.19-nfsv3-cannot-drop-cache.patch</a>。</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=3 192.168.53.211:/tmp/s_test /mnt</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=3 192.168.53.211:/tmp/s_test /mnt</span></code></pre></div>
 <p>测试步骤:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> something</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something_else <span class="op">&gt;</span> something_else</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something_else_again <span class="op">&gt;</span> something_else_again</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 为什么不直接用 echo something &gt; /mnt/file 呢，因为用ps无法查看到echo进程</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> something_else <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> something_else_again <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something <span class="op">&gt;</span> something</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something_else <span class="op">&gt;</span> something_else</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> something_else_again <span class="op">&gt;</span> something_else_again</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 为什么不直接用 echo something &gt; /mnt/file 呢，因为用ps无法查看到echo进程</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> something_else <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> something_else_again <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></span></code></pre></div>
 <h2 data-number="4.1" id="vmcore解析"><span
 class="header-section-number">4.1</span> vmcore解析</h2>
 <p><a
 href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-cannot-drop-cache/nfsv3-cannot-drop-cache-vmcore-reproduce.md">详细的crash命令输出请点击这里查看</a>。</p>
 <p>我们看到page的flags中的private没有清除:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem ffffea000434e4c0</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>      <span class="ex">PAGE</span>       PHYSICAL      MAPPING       INDEX CNT FLAGS</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffea000434e4c0</span> 10d393000 ffff8881037967f0        0  3 17ffffc000102b locked,error,uptodate,lru,private</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem ffffea000434e4c0</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>      <span class="ex">PAGE</span>       PHYSICAL      MAPPING       INDEX CNT FLAGS</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">ffffea000434e4c0</span> 10d393000 ffff8881037967f0        0  3 17ffffc000102b locked,error,uptodate,lru,private</span></code></pre></div>
 <p>执行完<code>echo 3 &gt; /proc/sys/vm/drop_caches</code>后，还是一样。</p>
 <h1 data-number="5" id="normal-debug"><span
 class="header-section-number">5</span> 正常情况调试</h1>
 <p>挂载:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=3 192.168.53.209:/tmp/s_test /mnt</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=3 192.168.53.209:/tmp/s_test /mnt</span></code></pre></div>
 <p><a
 href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-cannot-drop-cache/test.c">用户态程序<code>test.c</code>请点击这里查看</a>。</p>
 <p>编译运行:</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/dev/random of=/mnt/file bs=1M count=1024 <span class="co"># 文件大小1G</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> test.c</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="ex">./a.out</span> <span class="kw">&amp;</span> <span class="co"># 读100M数据</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /mnt <span class="co"># 进入挂载点</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/dev/random of=/mnt/file bs=1M count=1024 <span class="co"># 文件大小1G</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> test.c</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ex">./a.out</span> <span class="kw">&amp;</span> <span class="co"># 读100M数据</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /mnt <span class="co"># 进入挂载点</span></span></code></pre></div>
 <h2 data-number="5.1" id="vmcore解析-1"><span
 class="header-section-number">5.1</span> vmcore解析</h2>
 <p>参考<a
@@ -220,44 +228,44 @@ href="https://chenxiaosong.com/course/kernel/debug.html#kdump-crash">《内核�
 <p><a
 href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-cannot-drop-cache/nfsv3-cannot-drop-cache-vmcore-debug.md">详细的crash命令输出请点击这里查看</a>。</p>
 <p>查看地址空间中有<code>25728</code>个page，每个page有4K大小，总共<code>100M</code>:</p>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct address_space.nrpages 0xffff88810437dd38</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nrpages</span> = 25728, <span class="co"># 执行完 echo 3 &gt; /proc/sys/vm/drop_caches 后 nrpages 为 0</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct address_space.nrpages 0xffff88810437dd38</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nrpages</span> = 25728, <span class="co"># 执行完 echo 3 &gt; /proc/sys/vm/drop_caches 后 nrpages 为 0</span></span></code></pre></div>
 <p>执行<code>umount -l</code>后重新再<code>mount</code>（挂载参数一样，路径可以不同），<code>mount</code>命令输出中包含inode所在的super
 block，<code>files</code>命令也可以找到打开这个文件的进程:</p>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mount <span class="kw">|</span> <span class="fu">grep</span> ffff88812ae61800</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff8881002ce880</span> ffff88812ae61800 nfs    192.168.53.209:/tmp/s_test /mnt</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> foreach files <span class="at">-R</span> mnt</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 923      TASK: ffff8881045bcd40  CPU: 14   COMMAND: <span class="st">&quot;a.out&quot;</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="ex">ROOT:</span> /    CWD: /root </span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a> <span class="ex">FD</span>       FILE            DENTRY           INODE       TYPE PATH</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">3</span> ffff88800ee72a80 ffff888004e1c000 ffff88810437dbc8 REG  /mnt/file</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mount <span class="kw">|</span> <span class="fu">grep</span> ffff88812ae61800</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ffff8881002ce880</span> ffff88812ae61800 nfs    192.168.53.209:/tmp/s_test /mnt</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> foreach files <span class="at">-R</span> mnt</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ex">PID:</span> 923      TASK: ffff8881045bcd40  CPU: 14   COMMAND: <span class="st">&quot;a.out&quot;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="ex">ROOT:</span> /    CWD: /root </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a> <span class="ex">FD</span>       FILE            DENTRY           INODE       TYPE PATH</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">3</span> ffff88800ee72a80 ffff888004e1c000 ffff88810437dbc8 REG  /mnt/file</span></code></pre></div>
 <p>执行<code>umount -l</code>后重新再<code>mount</code>（挂载参数不同），<code>mount</code>命令输出中不包含inode所在的super
 block，<code>files</code>命令也找不到打开文件的进程:</p>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mount <span class="kw">|</span> <span class="fu">grep</span> ffff88812ae61800 <span class="co"># 找不到</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> foreach files <span class="at">-R</span> mnt <span class="co"># 没有找到</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mount <span class="kw">|</span> <span class="fu">grep</span> ffff88812ae61800 <span class="co"># 找不到</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> foreach files <span class="at">-R</span> mnt <span class="co"># 没有找到</span></span></code></pre></div>
 <h1 data-number="6" id="找出缓存大于特定值的文件"><span
 class="header-section-number">6</span> 找出缓存大于特定值的文件</h1>
 <p>麒麟服务器v10没有vmtouch，可以<a
 href="https://mirrors.tuna.tsinghua.edu.cn/epel/8/Everything/x86_64/Packages/v/vmtouch-1.3.1-1.el8.x86_64.rpm">在这里下载vmtouch
 rpm包</a>。</p>
-<div class="sourceCode" id="cb15"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="va">mount_point</span><span class="op">=</span>/mnt</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">size_threshold_mb</span><span class="op">=</span>100</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> <span class="va">${mount_point}</span> <span class="at">-type</span> f <span class="at">-print0</span> <span class="kw">|</span> <span class="fu">xargs</span> <span class="at">-0</span> <span class="at">-n1</span> <span class="at">-P16</span> sh <span class="at">-c</span> <span class="st">&#39;</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="st">    for file do</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="st">        out=$(vmtouch -v &quot;$file&quot;)</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="st">        pages=$(echo &quot;$out&quot; | awk &quot;/Resident Pages:/ {print \$3}&quot; | cut -d/ -f1)</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="st">        mb=$((pages*4096/1024/1024))</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="st">        if [ &quot;$mb&quot; -gt ${size_threshold_mb} ]; then</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="st">            echo &quot;$file Cached_MB=${mb}&quot;</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="st">        fi</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="st">    done</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="st">  &#39;</span> sh</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="va">mount_point</span><span class="op">=</span>/mnt</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">size_threshold_mb</span><span class="op">=</span>100</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> <span class="va">${mount_point}</span> <span class="at">-type</span> f <span class="at">-print0</span> <span class="kw">|</span> <span class="fu">xargs</span> <span class="at">-0</span> <span class="at">-n1</span> <span class="at">-P16</span> sh <span class="at">-c</span> <span class="st">&#39;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="st">    for file do</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="st">        out=$(vmtouch -v &quot;$file&quot;)</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="st">        pages=$(echo &quot;$out&quot; | awk &quot;/Resident Pages:/ {print \$3}&quot; | cut -d/ -f1)</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="st">        mb=$((pages*4096/1024/1024))</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="st">        if [ &quot;$mb&quot; -gt ${size_threshold_mb} ]; then</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="st">            echo &quot;$file Cached_MB=${mb}&quot;</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="st">        fi</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="st">    done</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="st">  &#39;</span> sh</span></code></pre></div>
 <h1 data-number="7" id="code-analysis"><span
 class="header-section-number">7</span> 代码分析</h1>
 <p>其他相关的分析请查看以两个链接:</p>
@@ -270,49 +278,49 @@ href="https://chenxiaosong.com/course/nfs/issue/4.19-nfs-soft-lockup-in-nfs_wb_p
 nfs_wb_page() soft lockup的问题</a></li>
 </ul>
 <p>page设置private的地方:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>nfs_inode_add_request</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  SetPagePrivate<span class="op">(</span>req<span class="op">-&gt;</span>wb_page<span class="op">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>nfs_inode_add_request</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  SetPagePrivate<span class="op">(</span>req<span class="op">-&gt;</span>wb_page<span class="op">);</span></span></code></pre></div>
 <p>page清除private的地方:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>nfs_write_error_remove_page</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 在这里打印出inode地址</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  req<span class="op">-&gt;</span>wb_context<span class="op">-&gt;</span>dentry<span class="op">-&gt;</span>d_inode</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 出问题的代码合入补丁 22876f540bdf NFS: Don&#39;t call generic_error_remove_page() while holding locks</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 以下函数不会调用</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  generic_error_remove_page</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    truncate_inode_page</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>      truncate_cleanup_page</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>        do_invalidatepage</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>          nfs_invalidate_page</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>            nfs_wb_page_cancel</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>              nfs_inode_remove_request</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 由于没调用generic_error_remove_page()</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 所以不会执行到这里，也不会清除private标记</span></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>                ClearPagePrivate<span class="op">(</span>head<span class="op">-&gt;</span>wb_page<span class="op">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>nfs_write_error_remove_page</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 在这里打印出inode地址</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  req<span class="op">-&gt;</span>wb_context<span class="op">-&gt;</span>dentry<span class="op">-&gt;</span>d_inode</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 出问题的代码合入补丁 22876f540bdf NFS: Don&#39;t call generic_error_remove_page() while holding locks</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 以下函数不会调用</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  generic_error_remove_page</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    truncate_inode_page</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      truncate_cleanup_page</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>        do_invalidatepage</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>          nfs_invalidate_page</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>            nfs_wb_page_cancel</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>              nfs_inode_remove_request</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 由于没调用generic_error_remove_page()</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>                <span class="co">// 所以不会执行到这里，也不会清除private标记</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>                ClearPagePrivate<span class="op">(</span>head<span class="op">-&gt;</span>wb_page<span class="op">);</span></span></code></pre></div>
 <p>调用<code>nfs_write_error_remove_page()</code>的地方:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">// done</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>nfs_async_write_error</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">// todo</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>nfs_page_async_flush <span class="co">// 这个在软锁问题那里分析过，也有可能有些流程会不触发软锁</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">// done</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>nfs_async_write_error</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">// todo</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>nfs_page_async_flush <span class="co">// 这个在软锁问题那里分析过，也有可能有些流程会不触发软锁</span></span></code></pre></div>
 <p>调用<code>nfs_async_write_error()</code>的地方:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">// done</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>nfs_async_write_reschedule_io</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">// done</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>error_cleanup</span></code></pre></div>
-<p>调用<code>nfs_async_write_reschedule_io()</code>的地方:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">// done，pnfs不涉及</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>ff_layout_reset_write</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span>reschedule_io</span></code></pre></div>
-<p>调用<code>.error_cleanup</code>的地方:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">// todo</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>nfs_pageio_cleanup_request</span>
+<div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">// done</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>nfs_async_write_reschedule_io</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">// todo</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>nfs_pageio_error_cleanup</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co">// todo</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>nfs_pageio_resend</span></code></pre></div>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">// done</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="op">.</span>error_cleanup</span></code></pre></div>
+<p>调用<code>nfs_async_write_reschedule_io()</code>的地方:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">// done，pnfs不涉及</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>ff_layout_reset_write</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span>reschedule_io</span></code></pre></div>
+<p>调用<code>.error_cleanup</code>的地方:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">// todo</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>nfs_pageio_cleanup_request</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">// todo</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>nfs_pageio_error_cleanup</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">// todo</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>nfs_pageio_resend</span></code></pre></div>
 <h1 data-number="8" id="解决方案"><span
 class="header-section-number">8</span> 解决方案</h1>
 <p>回退补丁<a
