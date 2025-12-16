@@ -8,13 +8,24 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -82,80 +93,102 @@
 <!-- sign begin -->
 <ul>
 <li>作者: 陈孝松</li>
-<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/">中文主页:
+chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页:
+chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">4.19 nfs lazy umount 后无法挂载的问题</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#环境信息"><span class="toc-section-number">1</span> 环境信息</a></li>
-<li><a href="#问题描述"><span class="toc-section-number">2</span> 问题描述</a></li>
-<li><a href="#代码分析"><span class="toc-section-number">3</span> 代码分析</a></li>
+<li><a href="#环境信息" id="toc-环境信息"><span
+class="toc-section-number">1</span> 环境信息</a></li>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">2</span> 问题描述</a></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">3</span> 代码分析</a></li>
 </ul>
 </nav>
-<h1 data-number="1" id="环境信息"><span class="header-section-number">1</span> 环境信息</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">uname</span> </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ex">Linux</span> localhost.localdomain 4.19.90-24.4.v2101.ky10.x86_64 #1 SMP Mon May 24 12:14:55 CST 2021 x86_64 x86_64 x86_64 GNU/Linux</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="fu">mount</span> <span class="kw">|</span> <span class="fu">grep</span> nfs</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ex">200.22.252.66</span>:/data0/media on /data0/media type nfs4 (rw,relatime,sync,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,clientaddr=200.22.252.67,local_lock=none,addr=200.22.252.66)</span></code></pre></div>
-<h1 data-number="2" id="问题描述"><span class="header-section-number">2</span> 问题描述</h1>
+<h1 data-number="1" id="环境信息"><span
+class="header-section-number">1</span> 环境信息</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">uname</span> </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Linux</span> localhost.localdomain 4.19.90-24.4.v2101.ky10.x86_64 <span class="co">#1 SMP Mon May 24 12:14:55 CST 2021 x86_64 x86_64 x86_64 GNU/Linux</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="kw">|</span> <span class="fu">grep</span> nfs</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">200.22.252.66:/data0/media</span> on /data0/media type nfs4 <span class="er">(</span><span class="ex">rw,relatime,sync,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,clientaddr=200.22.252.67,local_lock=none,addr=200.22.252.66</span><span class="kw">)</span></span></code></pre></div>
+<h1 data-number="2" id="问题描述"><span
+class="header-section-number">2</span> 问题描述</h1>
 <p>client端<code>df -h</code>卡住，读写不可用。<code>umount -l &lt;挂载点&gt;</code>后，无法重新挂载，重启client的操作系统后，恢复。</p>
 <p>client端报错:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">Nov</span> 14 13:21:32 localhost kernel: [2762097.294397] nfs: server 200.22.252.66 not responding, still trying</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Nov</span> 14 13:21:32 localhost kernel: <span class="pp">[</span><span class="ss">2762097.294397</span><span class="pp">]</span> nfs: server 200.22.252.66 not responding, still trying</span></code></pre></div>
 <p>server端报错（暂不确定是否相关）:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">Nov</span> 14 13:02:17 localhost kernel: [2761217.103877] nfsd4_validate_stateid: 26 callbacks suppressed</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="ex">Nov</span> 14 13:02:17 localhost kernel: [2761217.104230] NFSD: client 200.22.252.69 testing state ID with incorrect client ID</span></code></pre></div>
-<h1 data-number="3" id="代码分析"><span class="header-section-number">3</span> 代码分析</h1>
-<p>社区<a href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git">stable仓库的linux.4.19.y分支</a>执行命令<code>git log -L:nfsd4_validate_stateid:fs/nfsd/nfs4state.c</code>可以看到<code>nfsd4_validate_stateid</code>函数还经过以下修改:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Nov</span> 14 13:02:17 localhost kernel: <span class="pp">[</span><span class="ss">2761217.103877</span><span class="pp">]</span> nfsd4_validate_stateid: 26 callbacks suppressed</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Nov</span> 14 13:02:17 localhost kernel: <span class="pp">[</span><span class="ss">2761217.104230</span><span class="pp">]</span> NFSD: client 200.22.252.69 testing state ID with incorrect client ID</span></code></pre></div>
+<h1 data-number="3" id="代码分析"><span
+class="header-section-number">3</span> 代码分析</h1>
+<p>社区<a
+href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git">stable仓库的linux.4.19.y分支</a>执行命令<code>git log -L:nfsd4_validate_stateid:fs/nfsd/nfs4state.c</code>可以看到<code>nfsd4_validate_stateid</code>函数还经过以下修改:</p>
 <ul>
-<li><a href="https://chenxiaosong.com/course/nfs/patch/nfsd-Remove-incorrect-check-in-nfsd4_validate_statei.html"><code>600df3856f0b nfsd: Remove incorrect check in nfsd4_validate_stateid</code></a></li>
-<li><a href="https://lore.kernel.org/all/20200319141849.GB1546@fieldses.org/"><code>c6ac11906599 nfsd4: kill warnings on testing stateids with mismatched clientids</code></a></li>
+<li><a
+href="https://chenxiaosong.com/course/nfs/patch/nfsd-Remove-incorrect-check-in-nfsd4_validate_statei.html"><code>600df3856f0b nfsd: Remove incorrect check in nfsd4_validate_stateid</code></a></li>
+<li><a
+href="https://lore.kernel.org/all/20200319141849.GB1546@fieldses.org/"><code>c6ac11906599 nfsd4: kill warnings on testing stateids with mismatched clientids</code></a></li>
 </ul>
-<p>在这两个补丁未合入时，test stateid操作时，server端检测到stateid不匹配，server返回给client端错误<code>NFS4ERR_BAD_STATEID</code>，client端不会调用 free stateid 操作，函数<code>nfs41_test_and_free_expired_stateid</code>返回错误值<code>-NFS4ERR_BAD_STATEID</code>，但client端的后续处理流程和执行free stateid操作返回<code>-NFS4ERR_EXPIRED</code>错误的处理流程没什么区别，为什么会导致client端不断发起test stateid，还没搞明白。</p>
+<p>在这两个补丁未合入时，test
+stateid操作时，server端检测到stateid不匹配，server返回给client端错误<code>NFS4ERR_BAD_STATEID</code>，client端不会调用
+free stateid
+操作，函数<code>nfs41_test_and_free_expired_stateid</code>返回错误值<code>-NFS4ERR_BAD_STATEID</code>，但client端的后续处理流程和执行free
+stateid操作返回<code>-NFS4ERR_EXPIRED</code>错误的处理流程没什么区别，为什么会导致client端不断发起test
+stateid，还没搞明白。</p>
 <p>server端代码:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>nfsd4_test_stateid</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>  nfsd4_validate_stateid</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>    <span class="cf">if</span> (!same_clid(&amp;stateid-&gt;si_opaque.so_clid, &amp;cl-&gt;cl_clientid))</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    pr_warn_ratelimited(<span class="st">&quot;NFSD: client %s testing state ID with incorrect client ID</span><span class="sc">\n</span><span class="st">&quot;</span>, addr_str);</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>      printk_ratelimited</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>        __ratelimit</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>          ___ratelimit</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>            printk_deferred(KERN_WARNING <span class="st">&quot;%s: %d callbacks suppressed</span><span class="sc">\n</span><span class="st">&quot;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>    <span class="cf">return</span> nfserr_bad_stateid</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>nfsd4_test_stateid</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  nfsd4_validate_stateid</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(!</span>same_clid<span class="op">(&amp;</span>stateid<span class="op">-&gt;</span>si_opaque<span class="op">.</span>so_clid<span class="op">,</span> <span class="op">&amp;</span>cl<span class="op">-&gt;</span>cl_clientid<span class="op">))</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    pr_warn_ratelimited<span class="op">(</span><span class="st">&quot;NFSD: client </span><span class="sc">%s</span><span class="st"> testing state ID with incorrect client ID</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> addr_str<span class="op">);</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      printk_ratelimited</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        __ratelimit</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>          ___ratelimit</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>            printk_deferred<span class="op">(</span>KERN_WARNING <span class="st">&quot;</span><span class="sc">%s</span><span class="st">: </span><span class="sc">%d</span><span class="st"> callbacks suppressed</span><span class="sc">\n</span><span class="st">&quot;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nfserr_bad_stateid</span></code></pre></div>
 <p>client端代码:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>nfs41_test_and_free_expired_stateid</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>  nfs41_test_stateid <span class="co">// return -NFS4ERR_BAD_STATEID</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    _nfs41_test_stateid</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>      .rpc_proc = &amp;nfs4_procedures[NFSPROC4_CLNT_TEST_STATEID]</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>      status = nfs4_call_sync_sequence != NFS_OK</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>      <span class="cf">return</span> -NFS4ERR_BAD_STATEID <span class="co">// -res.status, 10025</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>  <span class="co">// 只有 -NFS4ERR_EXPIRED, -NFS4ERR_ADMIN_REVOKED, -NFS4ERR_DELEG_REVOKED 三种错误，才会调用 free stateid</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>  <span class="co">// 在问题场景下，永远不会调用 free stateid</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>  nfs41_free_stateid</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>    .rpc_proc = &amp;nfs4_procedures[NFSPROC4_CLNT_FREE_STATEID]</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>  <span class="cf">return</span> -NFS4ERR_EXPIRED</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>nfs41_test_and_free_expired_stateid</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  nfs41_test_stateid <span class="co">// return -NFS4ERR_BAD_STATEID</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    _nfs41_test_stateid</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span>rpc_proc <span class="op">=</span> <span class="op">&amp;</span>nfs4_procedures<span class="op">[</span>NFSPROC4_CLNT_TEST_STATEID<span class="op">]</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      status <span class="op">=</span> nfs4_call_sync_sequence <span class="op">!=</span> NFS_OK</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="op">-</span>NFS4ERR_BAD_STATEID <span class="co">// -res.status, 10025</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 只有 -NFS4ERR_EXPIRED, -NFS4ERR_ADMIN_REVOKED, -NFS4ERR_DELEG_REVOKED 三种错误，才会调用 free stateid</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 在问题场景下，永远不会调用 free stateid</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  nfs41_free_stateid</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span>rpc_proc <span class="op">=</span> <span class="op">&amp;</span>nfs4_procedures<span class="op">[</span>NFSPROC4_CLNT_FREE_STATEID<span class="op">]</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="op">-</span>NFS4ERR_EXPIRED</span></code></pre></div>
 <p>client端的open stateid相关代码流程:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>nfs4_state_manager</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>  nfs4_do_reclaim</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    nfs4_reclaim_open_state</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>      .recover_open   = nfs41_open_expired,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>        nfs41_open_expired</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>          nfs41_check_open_stateid</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>            nfs41_test_and_free_expired_stateid</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>update_open_stateid</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>  nfs4_test_and_free_stateid</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>    .test_and_free_expired = nfs41_test_and_free_expired_stateid, <span class="co">// nfs_v4_1_minor_ops</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>      nfs41_test_and_free_expired_stateid</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>nfs4_state_manager</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  nfs4_do_reclaim</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    nfs4_reclaim_open_state</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span>recover_open   <span class="op">=</span> nfs41_open_expired<span class="op">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        nfs41_open_expired</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>          nfs41_check_open_stateid</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            nfs41_test_and_free_expired_stateid</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>update_open_stateid</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  nfs4_test_and_free_stateid</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span>test_and_free_expired <span class="op">=</span> nfs41_test_and_free_expired_stateid<span class="op">,</span> <span class="co">// nfs_v4_1_minor_ops</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>      nfs41_test_and_free_expired_stateid</span></code></pre></div>
 </body>
 </html>
