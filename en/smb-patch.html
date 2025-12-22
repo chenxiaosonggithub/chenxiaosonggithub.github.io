@@ -8,19 +8,10 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    ul.task-list{list-style: none;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -28,85 +19,51 @@
 <header id="title-block-header">
 <ul>
 <li>Author: 陈孝松 (ChenXiaoSong)</li>
-<li><a href="https://chenxiaosong.com/">Chinese Homepage:
-chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en/">English Homepage:
-chenxiaosong.com/en</a></li>
-<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/">Chinese Homepage: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en/">English Homepage: chenxiaosong.com/en</a></li>
+<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
 </ul>
 <h1 class="title">SMB Patches to Be Reviewed</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#patches-to-be-reviewed"
-id="toc-patches-to-be-reviewed"><span
-class="toc-section-number">1</span> Patches to Be Reviewed</a></li>
-<li><a href="#merged-patches" id="toc-merged-patches"><span
-class="toc-section-number">2</span> Merged Patches</a></li>
+<li><a href="#patches-to-be-reviewed"><span class="toc-section-number">1</span> Patches to Be Reviewed</a></li>
+<li><a href="#merged-patches"><span class="toc-section-number">2</span> Merged Patches</a></li>
 </ul>
 </nav>
-<h1 data-number="1" id="patches-to-be-reviewed"><span
-class="header-section-number">1</span> Patches to Be Reviewed</h1>
-<p><a
-href="https://lore.kernel.org/linux-cifs/20251211143228.172470-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v2 0/7] smb: move duplicate definitions into common header file, part
-2</a></p>
+<h1 data-number="1" id="patches-to-be-reviewed"><span class="header-section-number">1</span> Patches to Be Reviewed</h1>
+<p><a href="https://lore.kernel.org/linux-cifs/20251211143228.172470-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v2 0/7] smb: move duplicate definitions into common header file, part 2</a></p>
 <ul>
-<li><a
-href="https://lore.kernel.org/linux-cifs/20251211143228.172470-5-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v2 4/7] smb: move smb3_fs_vol_info into common/fscc.h</a></li>
-<li><a
-href="https://lore.kernel.org/linux-cifs/20251211143228.172470-6-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v2 5/7] smb: move some definitions from common/smb2pdu.h into
-common/fscc.h</a></li>
-<li><a
-href="https://lore.kernel.org/linux-cifs/20251211143228.172470-7-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v2 6/7] smb: introduce struct create_posix_ctxt_rsp</a></li>
-<li><a
-href="https://lore.kernel.org/linux-cifs/20251211143228.172470-8-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v2 7/7] smb: introduce struct file_posix_info</a></li>
+<li><a href="https://lore.kernel.org/linux-cifs/20251211143228.172470-5-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v2 4/7] smb: move smb3_fs_vol_info into common/fscc.h</a></li>
+<li><a href="https://lore.kernel.org/linux-cifs/20251211143228.172470-6-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v2 5/7] smb: move some definitions from common/smb2pdu.h into common/fscc.h</a></li>
+<li><a href="https://lore.kernel.org/linux-cifs/20251211143228.172470-7-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v2 6/7] smb: introduce struct create_posix_ctxt_rsp</a></li>
+<li><a href="https://lore.kernel.org/linux-cifs/20251211143228.172470-8-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v2 7/7] smb: introduce struct file_posix_info</a></li>
 </ul>
-<h1 data-number="2" id="merged-patches"><span
-class="header-section-number">2</span> Merged Patches</h1>
-<p>The following patches have been merged into <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log">mainline</a>:</p>
+<h1 data-number="2" id="merged-patches"><span class="header-section-number">2</span> Merged Patches</h1>
+<p>The following patches have been merged into <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log">mainline</a>:</p>
 <ul>
-<li>ab0347e67dac smb/client: remove DeviceType Flags and Device
-Characteristics definitions</li>
-<li>2b6abb893e71 smb: move File Attributes definitions into
-common/fscc.h</li>
+<li>ab0347e67dac smb/client: remove DeviceType Flags and Device Characteristics definitions</li>
+<li>2b6abb893e71 smb: move File Attributes definitions into common/fscc.h</li>
 <li>c97503321ed3 smb: update struct duplicate_extents_to_file_ex</li>
 <li>08c2a7d2bae9 smb: move file_notify_information to common/fscc.h</li>
-<li>6539e18517b6 smb: move SMB2 Notify Action Flags into
-common/smb2pdu.h</li>
-<li>9ec7629b430a smb: move notify completion filter flags into
-common/smb2pdu.h</li>
-<li>a71a4aab4834 smb/client: add parentheses to NT error code
-definitions containing bitwise OR operator</li>
-<li>bcdd6cfaf2ec smb: add documentation references for smb2 change
-notify definitions</li>
+<li>6539e18517b6 smb: move SMB2 Notify Action Flags into common/smb2pdu.h</li>
+<li>9ec7629b430a smb: move notify completion filter flags into common/smb2pdu.h</li>
+<li>a71a4aab4834 smb/client: add parentheses to NT error code definitions containing bitwise OR operator</li>
+<li>bcdd6cfaf2ec smb: add documentation references for smb2 change notify definitions</li>
 <li>a9adafd40165 smb/client: add 4 NT error code definitions</li>
 <li>9f99caa8950a smb/client: fix NT_STATUS_UNABLE_TO_FREE_VM value</li>
 <li>b2b50fca34da smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value</li>
 <li>a1237c203f17 smb/client: fix NT_STATUS_NO_DATA_DETECTED value</li>
-<li>2e0d224d8988 smb/server: add comment to FileSystemName of
-FileFsAttributeInformation</li>
+<li>2e0d224d8988 smb/server: add comment to FileSystemName of FileFsAttributeInformation</li>
 <li>98def4eb0244 smb/server: remove unused nterr.h</li>
 <li>01ab0d1640e3 smb/server: rename include guard in smb_common.h</li>
 <li>d8f52650b24d smb/client: update some SMB2 status strings</li>
-<li>d159702c9492 smb/client: add two elements to smb2_error_map_table
-array</li>
-<li>523ecd976632 smb: rename to
-STATUS_SMB_NO_PREAUTH_INTEGRITY_HASH_OVERLAP</li>
-<li>bf80d1517dc8 smb/client: remove unused elements from
-smb2_error_map_table array</li>
-<li>6c1eb31ecb97 smb/client: reduce loop count in
-map_smb2_to_linux_error() by half</li>
+<li>d159702c9492 smb/client: add two elements to smb2_error_map_table array</li>
+<li>523ecd976632 smb: rename to STATUS_SMB_NO_PREAUTH_INTEGRITY_HASH_OVERLAP</li>
+<li>bf80d1517dc8 smb/client: remove unused elements from smb2_error_map_table array</li>
+<li>6c1eb31ecb97 smb/client: reduce loop count in map_smb2_to_linux_error() by half</li>
 </ul>
-<p>The following patches have been merged into <a
-href="https://git.samba.org/sfrench/?p=sfrench/cifs-2.6.git;a=shortlog;h=refs/heads/for-next">cifs-2.6.git
-for-next</a>:</p>
+<p>The following patches have been merged into <a href="https://git.samba.org/sfrench/?p=sfrench/cifs-2.6.git;a=shortlog;h=refs/heads/for-next">cifs-2.6.git for-next</a>:</p>
 <ul>
 <li>smb: move some SMB1 definitions into common/smb1pdu.h</li>
 </ul>
