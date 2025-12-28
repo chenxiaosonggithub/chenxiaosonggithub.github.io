@@ -120,20 +120,19 @@
 </ul></li>
 <li><a href="#qemuvnc安装系统"><span class="toc-section-number">5.2</span> QEMU+VNC安装系统</a></li>
 </ul></li>
-<li><a href="#ubuntu-cmd-wifi"><span class="toc-section-number">6</span> ubuntu通过命令行操作wifi</a></li>
-<li><a href="#我的常用软件"><span class="toc-section-number">7</span> 我的常用软件</a>
+<li><a href="#ubuntu-cmd-wifi"><span class="toc-section-number">6</span> ubuntu通过命令行操作wifi</a>
 <ul>
-<li><a href="#ubuntu-1"><span class="toc-section-number">7.1</span> ubuntu</a></li>
-<li><a href="#fedora"><span class="toc-section-number">7.2</span> fedora</a></li>
+<li><a href="#ubuntu常用软件"><span class="toc-section-number">6.1</span> ubuntu常用软件</a></li>
 </ul></li>
-<li><a href="#其他系统的一些笔记"><span class="toc-section-number">8</span> 其他系统的一些笔记</a>
+<li><a href="#其他系统的一些笔记"><span class="toc-section-number">7</span> 其他系统的一些笔记</a>
 <ul>
-<li><a href="#centos"><span class="toc-section-number">8.1</span> centos</a></li>
-<li><a href="#centos7"><span class="toc-section-number">8.2</span> centos7</a></li>
-<li><a href="#树莓派"><span class="toc-section-number">8.3</span> 树莓派</a></li>
-<li><a href="#麒麟系统"><span class="toc-section-number">8.4</span> 麒麟系统</a></li>
-<li><a href="#arcolinux"><span class="toc-section-number">8.5</span> arcolinux</a></li>
-<li><a href="#suse"><span class="toc-section-number">8.6</span> suse</a></li>
+<li><a href="#fedora"><span class="toc-section-number">7.1</span> fedora</a></li>
+<li><a href="#centos"><span class="toc-section-number">7.2</span> centos</a></li>
+<li><a href="#centos7"><span class="toc-section-number">7.3</span> centos7</a></li>
+<li><a href="#树莓派"><span class="toc-section-number">7.4</span> 树莓派</a></li>
+<li><a href="#麒麟系统"><span class="toc-section-number">7.5</span> 麒麟系统</a></li>
+<li><a href="#arcolinux"><span class="toc-section-number">7.6</span> arcolinux</a></li>
+<li><a href="#suse"><span class="toc-section-number">7.7</span> suse</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -308,9 +307,8 @@
 <span id="cb22-9"><a href="#cb22-9" aria-hidden="true"></a><span class="fu">sudo</span> nmcli dev connect wlo2    # 连接</span>
 <span id="cb22-10"><a href="#cb22-10" aria-hidden="true"></a><span class="ex">nmcli</span> dev wifi connect <span class="st">&quot;HUAWEI-NET&quot;</span> ifname wlo2 # 连接开放网络（无密码）</span>
 <span id="cb22-11"><a href="#cb22-11" aria-hidden="true"></a><span class="ex">nmcli</span> dev wifi connect <span class="st">&quot;HUAWEI-NET&quot;</span> password <span class="st">&quot;your_password&quot;</span> ifname wlo2 # 连接加密网络（WPA/WPA2）</span></code></pre></div>
-<h1 data-number="7" id="我的常用软件"><span class="header-section-number">7</span> 我的常用软件</h1>
+<h2 data-number="6.1" id="ubuntu常用软件"><span class="header-section-number">6.1</span> ubuntu常用软件</h2>
 <p>这是我的开发环境上的一些配置，方便自己的查阅</p>
-<h2 data-number="7.1" id="ubuntu-1"><span class="header-section-number">7.1</span> ubuntu</h2>
 <p>我平时工作用的是ubuntu桌面系统。</p>
 <p>常用的软件安装:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a><span class="fu">strings</span> /lib/x86_64-linux-gnu/libc.so.6 <span class="kw">|</span> <span class="fu">grep</span> GLIBC_ <span class="co"># 查看支持的glibc版本</span></span>
@@ -333,33 +331,31 @@
 <p>通过<code>sudo apt install ./xxxx.deb -y</code>安装的软件，卸载用以下命令:</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true"></a><span class="fu">sudo</span> apt list --installed <span class="kw">|</span> <span class="fu">grep</span> wkhtmltox</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true"></a><span class="fu">sudo</span> apt purge wkhtmltox -y</span></code></pre></div>
-<h2 data-number="7.2" id="fedora"><span class="header-section-number">7.2</span> fedora</h2>
+<h1 data-number="7" id="其他系统的一些笔记"><span class="header-section-number">7</span> 其他系统的一些笔记</h1>
+<h2 data-number="7.1" id="fedora"><span class="header-section-number">7.1</span> fedora</h2>
 <p>安装软件:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a><span class="fu">sudo</span> dnf group install development-tools -y <span class="co"># fedora41不能用groupinstall，必须要两个单词group install</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true"></a><span class="fu">strings</span> /lib64/libc.so.6 <span class="kw">|</span> <span class="fu">grep</span> ^GLIBC_ <span class="co"># 查看支持的glibc版本</span></span></code></pre></div>
-<h1 data-number="8" id="其他系统的一些笔记"><span class="header-section-number">8</span> 其他系统的一些笔记</h1>
-<h2 data-number="8.1" id="centos"><span class="header-section-number">8.1</span> centos</h2>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a><span class="fu">strings</span> /lib64/libc.so.6 <span class="kw">|</span> <span class="fu">grep</span> ^GLIBC_ <span class="co"># 查看支持的glibc版本</span></span></code></pre></div>
+<h2 data-number="7.2" id="centos"><span class="header-section-number">7.2</span> centos</h2>
 <p>centos的开发软件生态比ubuntu还是稍微差一些，尤其是桌面系统。</p>
 <p>常用软件安装:</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true"></a><span class="fu">sudo</span> dnf groupinstall <span class="st">&quot;development tools&quot;</span> -y <span class="co"># 编译常用软件</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true"></a><span class="fu">sudo</span> dnf install qemu-kvm virt-manager libvirt -y <span class="co"># 虚拟机相关软件</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true"></a><span class="fu">sudo</span> systemctl restart libvirtd <span class="co"># 需要重启libvirtd，否则虚拟机有些功能无法使用</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true"></a><span class="fu">sudo</span> dnf install ncurses-devel -y <span class="co"># 内核编译所需</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true"></a></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true"></a><span class="co"># centos9需要通过源码安装bridge-utils，https://wiki.linuxfoundation.org/networking/bridge</span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true"></a><span class="fu">git</span> clone -b main git://git.kernel.org/pub/scm/network/bridge/bridge-utils.git</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true"></a><span class="bu">cd</span> bridge-utils</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true"></a><span class="fu">autoconf</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true"></a><span class="ex">./configure</span></span></code></pre></div>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true"></a><span class="co"># centos9需要通过源码安装bridge-utils，https://wiki.linuxfoundation.org/networking/bridge</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true"></a><span class="fu">git</span> clone -b main git://git.kernel.org/pub/scm/network/bridge/bridge-utils.git</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true"></a><span class="bu">cd</span> bridge-utils</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true"></a><span class="fu">autoconf</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true"></a><span class="ex">./configure</span></span></code></pre></div>
 <p>默认centos9是打开selinux的，但个人用户没有那么高的安全需求时，可以关闭selinux:</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true"></a><span class="fu">sudo</span> vim /etc/selinux/config <span class="co"># centos9 改成 SELINUX=disabled</span></span></code></pre></div>
-<h2 data-number="8.2" id="centos7"><span class="header-section-number">8.2</span> centos7</h2>
+<h2 data-number="7.3" id="centos7"><span class="header-section-number">7.3</span> centos7</h2>
 <div class="sourceCode" id="cb28"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true"></a><span class="fu">mv</span> /etc/yum.repos.d/ /etc/yum.repos.d.bak</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true"></a><span class="fu">mkdir</span> -p /etc/yum.repos.d/</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true"></a><span class="ex">curl</span> -o /etc/yum.repos.d/Centos7-aliyun.repo https://mirrors.wlnmp.com/centos/Centos7-aliyun-x86_64.repo</span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true"></a><span class="ex">yum</span> clean all</span>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true"></a><span class="ex">yum</span> makecache</span></code></pre></div>
-<h2 data-number="8.3" id="树莓派"><span class="header-section-number">8.3</span> 树莓派</h2>
+<h2 data-number="7.4" id="树莓派"><span class="header-section-number">7.4</span> 树莓派</h2>
 <p>从<a href="https://www.raspberrypi.com/software/operating-systems/#raspberry-pi-os-64-bit">Operating system images</a>下载“Raspberry Pi OS with desktop and recommended software”。</p>
 <p>向SD卡烧录系统:</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a><span class="fu">sudo</span> dd bs=4M if=解压之后的img of=/dev/sdb</span></code></pre></div>
@@ -382,7 +378,7 @@
 <span id="cb30-16"><a href="#cb30-16" aria-hidden="true"></a><span class="fu">sudo</span> apt install vim-gtk3 -y</span></code></pre></div>
 <p>含代理服务器选项，chrome浏览器启动命令:</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true"></a><span class="ex">chromium-browser</span> --proxy-server=<span class="st">&quot;https=127.0.0.1:1080;http=127.0.0.1:1080;ftp=127.0.0.1:1080&quot;</span></span></code></pre></div>
-<h2 data-number="8.4" id="麒麟系统"><span class="header-section-number">8.4</span> 麒麟系统</h2>
+<h2 data-number="7.5" id="麒麟系统"><span class="header-section-number">7.5</span> 麒麟系统</h2>
 <p>填写<a href="https://www.kylinos.cn/support/trial.html">产品试用申请</a>后就可以下载iso文件。</p>
 <p>注意桌面麒麟系统在arm芯片的macos上无法用vmware fusion安装，可以用<a href="https://github.com/utmapp/UTM">UTM</a>安装。</p>
 <p>基于openeuler的服务器麒麟系统用<code>qemu</code>命令行启动时，编辑网络用命令<code>nmtui</code>，网络接口名改成和<code>ifconfig</code>中一样的名，再<code>启用连接 -&gt; 激活</code>。 arm64版本无法用<a href="https://gitee.com/src-openeuler/kernel/issues/I7LDS2">VMware以及UTM等虚拟机安装</a>， 可以尝试用<a href="https://gitee.com/openeuler/eulerlauncher/tree/master/docs">EulerLauncher</a>安装 （还可以参考<a href="https://gitee.com/openeuler/docs/tree/master/docs/zh/docs/EulerLauncher">openeuler文档中的EulerLauncher</a>）。</p>
@@ -391,9 +387,9 @@
 <p>麒麟server v10安装软件:</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true"></a><span class="fu">sudo</span> dnf remove docker-runc -y</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true"></a><span class="fu">sudo</span> dnf install docker-engine -y</span></code></pre></div>
-<h2 data-number="8.5" id="arcolinux"><span class="header-section-number">8.5</span> arcolinux</h2>
+<h2 data-number="7.6" id="arcolinux"><span class="header-section-number">7.6</span> arcolinux</h2>
 <p><a href="https://arcolinux.com/">ArcoLinux</a>是<a href="https://archlinux.org/">Arch Linux</a>的衍生发行版。</p>
-<h2 data-number="8.6" id="suse"><span class="header-section-number">8.6</span> suse</h2>
+<h2 data-number="7.7" id="suse"><span class="header-section-number">7.7</span> suse</h2>
 <div class="sourceCode" id="cb33"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true"></a><span class="ex">systemctl</span> stop SuSEfirewall2 # 关闭防火墙</span></code></pre></div>
 </body>
 </html>
