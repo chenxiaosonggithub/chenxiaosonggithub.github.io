@@ -117,10 +117,8 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 <ul>
 <li><a href="#社区" id="toc-社区"><span
 class="toc-section-number">1</span> 社区</a></li>
-<li><a href="#smb-server补丁统计" id="toc-smb-server补丁统计"><span
-class="toc-section-number">2</span> smb server补丁统计</a></li>
-<li><a href="#社区其他人的补丁" id="toc-社区其他人的补丁"><span
-class="toc-section-number">3</span> 社区其他人的补丁</a></li>
+<li><a href="#smb补丁统计" id="toc-smb补丁统计"><span
+class="toc-section-number">2</span> smb补丁统计</a></li>
 </ul>
 </nav>
 <p><a
@@ -132,9 +130,9 @@ client是我相对比较熟悉的模块，但nfs client maintainer很不友好�
 server maintainer友好但我对nfs server不是太熟悉。smb
 server近两年贡献的人数不是很多，又是近几年才进内核的模块，所以是相对比较适合我投入社区的。</p>
 <ul>
-<li><a href="https://lore.kernel.org/linux-cifs/">邮件列表</a></li>
-<li><a
-href="https://patchwork.kernel.org/project/cifs-client/list/">patchwork</a></li>
+<li><a href="https://lore.kernel.org/linux-cifs/">SMB 邮件列表</a></li>
+<li><a href="https://patchwork.kernel.org/project/cifs-client/list/">SMB
+patchwork</a></li>
 </ul>
 <h1 data-number="1" id="社区"><span
 class="header-section-number">1</span> 社区</h1>
@@ -143,13 +141,13 @@ class="header-section-number">1</span> 社区</h1>
 href="mailto:sfrench@samba.org"
 class="email">sfrench@samba.org</a>，友好
 <ul>
-<li>所在时区比中国时间晚10小时，中国早上9点时他晚上7点</li>
+<li>所在时区UTC-6，中国早上9点时他晚上7点</li>
 </ul></li>
 <li>smb server maintainer: Namjae Jeon <a
 href="mailto:linkinjeon@kernel.org"
 class="email">linkinjeon@kernel.org</a>，友好
 <ul>
-<li>在韩国，所在时区比中国时间早1小时，中国早上9点时他早上10点</li>
+<li>在韩国，所在时区UTC+9，中国早上9点时他早上10点</li>
 </ul></li>
 <li><a
 href="https://git.samba.org/sfrench/?p=sfrench/cifs-2.6.git;a=summary">smb
@@ -184,7 +182,7 @@ href="https://git.samba.org/?p=ksmbd.git;a=log;h=refs/heads/ksmbd-for-next">ksmb
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># KEYS/KEYRINGS: security/keys/</span></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># LINUX KERNEL MEMORY CONSISTENCY MODEL (LKMM): tools/memory-model/</span></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># RXRPC SOCKETS (AF_RXRPC): net/rxrpc/</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ex">David</span> Howells <span class="op">&lt;</span>dhowells@redhat.com<span class="op">&gt;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ex">David</span> Howells <span class="op">&lt;</span>dhowells@redhat.com<span class="op">&gt;</span> # 时区UTC0</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ex">linux-cifs@vger.kernel.org</span></span></code></pre></div>
 <p>发送补丁:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> send-email <span class="at">--to</span><span class="op">=</span><span class="dt">\</span></span>
@@ -195,81 +193,38 @@ href="https://git.samba.org/?p=ksmbd.git;a=log;h=refs/heads/ksmbd-for-next">ksmb
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>--cc=<span class="dt">\</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>linux-cifs@vger.kernel.org <span class="dt">\</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>00<span class="pp">*</span></span></code></pre></div>
-<h1 data-number="2" id="smb-server补丁统计"><span
-class="header-section-number">2</span> smb server补丁统计</h1>
-<p>smb
-client很早进入内核，就不统计了。这里统计一下2021.03.16进入内核的smb
-server的补丁贡献者，列出贡献超过一个补丁的贡献者。</p>
-<p>现在（2025.11.03）的目录<code>fs/smb/server</code>统计:</p>
+<h1 data-number="2" id="smb补丁统计"><span
+class="header-section-number">2</span> smb补丁统计</h1>
+<p>现在（2025.12.30）的目录<code>fs/smb/</code>统计:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 还要显示邮件可以用 --format=&#39;%aN &lt;%aE&gt;&#39;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># --follow 对目录其实没啥卵用，但还是习惯的写了</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">--follow</span> <span class="at">--format</span><span class="op">=</span><span class="st">&#39;%aN &lt;%aE&gt;&#39;</span> fs/smb/server/ <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="at">-nr</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">173</span> Namjae Jeon <span class="op">&lt;</span>linkinjeon@kernel.org<span class="op">&gt;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>     <span class="ex">90</span> Stefan Metzmacher <span class="op">&lt;</span>metze@samba.org<span class="op">&gt;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>     <span class="ex">10</span> NeilBrown <span class="op">&lt;</span>neil@brown.name<span class="op">&gt;</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="ex">9</span> Thorsten Blum <span class="op">&lt;</span>thorsten.blum@linux.dev<span class="op">&gt;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="ex">8</span> Marios Makassikis <span class="op">&lt;</span>mmakassikis@freebox.fr<span class="op">&gt;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      <span class="ex">7</span> ChenXiaoSong <span class="op">&lt;</span>chenxiaosong@kylinos.cn<span class="op">&gt;</span>   # 这是我</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>      <span class="ex">7</span> Al Viro <span class="op">&lt;</span>viro@zeniv.linux.org.uk<span class="op">&gt;</span>  </span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>      <span class="ex">6</span> Jeff Layton <span class="op">&lt;</span>jlayton@kernel.org<span class="op">&gt;</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>      <span class="ex">5</span> Norbert Szetei <span class="op">&lt;</span>norbert@doyensec.com<span class="op">&gt;</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>      <span class="ex">5</span> Christian Brauner <span class="op">&lt;</span>brauner@kernel.org<span class="op">&gt;</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      <span class="ex">4</span> Steve French <span class="op">&lt;</span>stfrench@microsoft.com<span class="op">&gt;</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>      <span class="ex">4</span> Sean Heelan <span class="op">&lt;</span>seanheelan@gmail.com<span class="op">&gt;</span>     </span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>      <span class="ex">3</span> ZhangGuoDong <span class="op">&lt;</span>zhangguodong@kylinos.cn<span class="op">&gt;</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>      <span class="ex">3</span> Yang Li <span class="op">&lt;</span>yang.lee@linux.alibaba.com<span class="op">&gt;</span>   </span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>      <span class="ex">3</span> Hobin Woo <span class="op">&lt;</span>hobin.woo@samsung.com<span class="op">&gt;</span>      </span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>      <span class="ex">3</span> Gustavo A. R. Silva <span class="op">&lt;</span>gustavoars@kernel.org<span class="op">&gt;</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>      <span class="ex">3</span> Dr. David Alan Gilbert <span class="op">&lt;</span>linux@treblig.org<span class="op">&gt;</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Randy Dunlap <span class="op">&lt;</span>rdunlap@infradead.org<span class="op">&gt;</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Lu Hongfei <span class="op">&lt;</span>luhongfei@vivo.com<span class="op">&gt;</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Kuan-Ting Chen <span class="op">&lt;</span>h3xrabbit@gmail.com<span class="op">&gt;</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Jordy Zomer <span class="op">&lt;</span>jordyzomer@google.com<span class="op">&gt;</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Fedor Pchelkin <span class="op">&lt;</span>pchelkin@ispras.ru<span class="op">&gt;</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Eric Biggers <span class="op">&lt;</span>ebiggers@google.com<span class="op">&gt;</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Dan Carpenter <span class="op">&lt;</span>dan.carpenter@linaro.org<span class="op">&gt;</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Christophe JAILLET <span class="op">&lt;</span>christophe.jaillet@wanadoo.fr<span class="op">&gt;</span></span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">--follow</span> <span class="at">--format</span><span class="op">=</span><span class="st">&#39;%aN &lt;%aE&gt;&#39;</span> fs/smb/ <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="at">-nr</span> <span class="kw">|</span> <span class="fu">less</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">244</span> Stefan Metzmacher <span class="op">&lt;</span>metze@samba.org<span class="op">&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">183</span> Namjae Jeon <span class="op">&lt;</span>linkinjeon@kernel.org<span class="op">&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">182</span> Paulo Alcantara <span class="op">&lt;</span>pc@manguebit.org<span class="op">&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">106</span> David Howells <span class="op">&lt;</span>dhowells@redhat.com<span class="op">&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">104</span> Steve French <span class="op">&lt;</span>stfrench@microsoft.com<span class="op">&gt;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>     <span class="ex">90</span> Pali Rohár <span class="op">&lt;</span>pali@kernel.org<span class="op">&gt;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>     <span class="ex">69</span> Shyam Prasad N <span class="op">&lt;</span>sprasad@microsoft.com<span class="op">&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>     <span class="ex">53</span> ChenXiaoSong <span class="op">&lt;</span>chenxiaosong@kylinos.cn<span class="op">&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>     <span class="ex">26</span> Bharath SM <span class="op">&lt;</span>bharathsm@microsoft.com<span class="op">&gt;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>     <span class="ex">19</span> Henrique Carvalho <span class="op">&lt;</span>henrique.carvalho@suse.com<span class="op">&gt;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>     <span class="ex">17</span> NeilBrown <span class="op">&lt;</span>neil@brown.name<span class="op">&gt;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>     <span class="ex">16</span> Jeff Layton <span class="op">&lt;</span>jlayton@kernel.org<span class="op">&gt;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>     <span class="ex">16</span> Enzo Matsumiya <span class="op">&lt;</span>ematsumiya@suse.de<span class="op">&gt;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>     <span class="ex">15</span> Al Viro <span class="op">&lt;</span>viro@zeniv.linux.org.uk<span class="op">&gt;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>     <span class="ex">13</span> ZhangGuoDong <span class="op">&lt;</span>zhangguodong@kylinos.cn<span class="op">&gt;</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>     <span class="ex">12</span> Thorsten Blum <span class="op">&lt;</span>thorsten.blum@linux.dev<span class="op">&gt;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>     <span class="ex">12</span> Eric Biggers <span class="op">&lt;</span>ebiggers@kernel.org<span class="op">&gt;</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>     <span class="ex">11</span> Markus Elfring <span class="op">&lt;</span>elfring@users.sourceforge.net<span class="op">&gt;</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>     <span class="ex">10</span> Wang Zhaolong <span class="op">&lt;</span>wangzhaolong@huaweicloud.com<span class="op">&gt;</span></span></code></pre></div>
 <p><code>checkout</code>到<code>38c8a9a52082 smb: move client and server files to common directory fs/smb</code>（2023.05.21）之前的记录:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout cb8b02fd6343228966324528adf920bfb8b8e681</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">--follow</span> <span class="at">--format</span><span class="op">=</span><span class="st">&#39;%aN &lt;%aE&gt;&#39;</span> fs/ksmbd/ <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="at">-nr</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">107</span> Namjae Jeon <span class="op">&lt;</span>linkinjeon@kernel.org<span class="op">&gt;</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>     <span class="ex">46</span> Hyunchul Lee <span class="op">&lt;</span>hyc.lee@gmail.com<span class="op">&gt;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>     <span class="ex">42</span> Namjae Jeon <span class="op">&lt;</span>namjae.jeon@samsung.com<span class="op">&gt;</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>     <span class="ex">24</span> Christian Brauner <span class="op">&lt;</span>brauner@kernel.org<span class="op">&gt;</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>     <span class="ex">13</span> Marios Makassikis <span class="op">&lt;</span>mmakassikis@freebox.fr<span class="op">&gt;</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>     <span class="ex">10</span> Steve French <span class="op">&lt;</span>stfrench@microsoft.com<span class="op">&gt;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      <span class="ex">6</span> Dan Carpenter <span class="op">&lt;</span>error27@gmail.com<span class="op">&gt;</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>      <span class="ex">5</span> Yang Li <span class="op">&lt;</span>yang.lee@linux.alibaba.com<span class="op">&gt;</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>      <span class="ex">5</span> Ronnie Sahlberg <span class="op">&lt;</span>lsahlber@redhat.com<span class="op">&gt;</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>      <span class="ex">4</span> Ralph Boehme <span class="op">&lt;</span>slow@samba.org<span class="op">&gt;</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>      <span class="ex">4</span> Dawei Li <span class="op">&lt;</span>set_pte_at@outlook.com<span class="op">&gt;</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>      <span class="ex">4</span> David Disseldorp <span class="op">&lt;</span>ddiss@suse.de<span class="op">&gt;</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>      <span class="ex">4</span> Christophe JAILLET <span class="op">&lt;</span>christophe.jaillet@wanadoo.fr<span class="op">&gt;</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>      <span class="ex">4</span> Atte Heikkilä <span class="op">&lt;</span>atteh.mailbox@gmail.com<span class="op">&gt;</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      <span class="ex">4</span> Al Viro <span class="op">&lt;</span>viro@zeniv.linux.org.uk<span class="op">&gt;</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>      <span class="ex">3</span> Jeff Layton <span class="op">&lt;</span>jlayton@kernel.org<span class="op">&gt;</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>      <span class="ex">3</span> Gustavo A. R. Silva <span class="op">&lt;</span>gustavoars@kernel.org<span class="op">&gt;</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>      <span class="ex">3</span> Colin Ian King <span class="op">&lt;</span>colin.i.king@gmail.com<span class="op">&gt;</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>      <span class="ex">3</span> Chih-Yen Chang <span class="op">&lt;</span>cc85nod@gmail.com<span class="op">&gt;</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Tom Talpey <span class="op">&lt;</span>tom@talpey.com<span class="op">&gt;</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Kees Cook <span class="op">&lt;</span>keescook@chromium.org<span class="op">&gt;</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Greg Kroah-Hartman <span class="op">&lt;</span>gregkh@linuxfoundation.org<span class="op">&gt;</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Amir Goldstein <span class="op">&lt;</span>amir73il@gmail.com<span class="op">&gt;</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>      <span class="ex">1</span> ChenXiaoSong <span class="op">&lt;</span>chenxiaosong2@huawei.com<span class="op">&gt;</span> # 这是我</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout cb8b02fd6343228966324528adf920bfb8b8e681 <span class="co"># fs/ksmbd/</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> fs/ksmbd/</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2021-06-28 1a93084b9a89 ksmbd: move fs/cifsd to fs/ksmbd Namjae Jeon &lt;namjae.jeon@samsung.com&gt;</span></span></code></pre></div>
 <p>再<code>checkout</code>到<code>1a93084b9a89 ksmbd: move fs/cifsd to fs/ksmbd</code>（2021.06.24）之前的记录:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout 131bac1ece2e16201674b2f29b64d2044c826b56</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">--follow</span> <span class="at">--format</span><span class="op">=</span><span class="st">&#39;%aN &lt;%aE&gt;&#39;</span> fs/cifsd/ <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="at">-nr</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>     <span class="ex">91</span> Namjae Jeon <span class="op">&lt;</span>namjae.jeon@samsung.com<span class="op">&gt;</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>     <span class="ex">13</span> Hyunchul Lee <span class="op">&lt;</span>hyc.lee@gmail.com<span class="op">&gt;</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      <span class="ex">9</span> Marios Makassikis <span class="op">&lt;</span>mmakassikis@freebox.fr<span class="op">&gt;</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="ex">5</span> Dan Carpenter <span class="op">&lt;</span>dan.carpenter@oracle.com<span class="op">&gt;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      <span class="ex">3</span> Yang Yingliang <span class="op">&lt;</span>yangyingliang@huawei.com<span class="op">&gt;</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="ex">3</span> Colin Ian King <span class="op">&lt;</span>colin.king@canonical.com<span class="op">&gt;</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> Muhammad Usama Anjum <span class="op">&lt;</span>musamaanjum@gmail.com<span class="op">&gt;</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      <span class="ex">2</span> kernel test robot <span class="op">&lt;</span>lkp@intel.com<span class="op">&gt;</span></span></code></pre></div>
-<h1 data-number="3" id="社区其他人的补丁"><span
-class="header-section-number">3</span> 社区其他人的补丁</h1>
-<p>请查看<a
-href="https://chenxiaosong.com/course/smb/patch/other-patch.html">社区补丁</a></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout 131bac1ece2e16201674b2f29b64d2044c826b56 <span class="co"># fs/cifsd/</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">--date</span><span class="op">=</span>short <span class="at">--format</span><span class="op">=</span><span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span>  fs/cifsd/</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2021-05-10 0626e6641f6b cifsd: add server handler for central processing and tranport layers Namjae Jeon &lt;namjae.jeon@samsung.com&gt;</span></span></code></pre></div>
 </body>
 </html>
