@@ -430,6 +430,31 @@ href="https://chenxiaosong.com/en/smb2-change-notify.html#samba-code">《SMB2
 CHANGE_NOTIFY feature》</a>。</p>
 <h1 data-number="8" id="ksmbd代码分析"><span
 class="header-section-number">8</span> ksmbd代码分析</h1>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>smb2_lock</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  setup_async_work<span class="op">(...,</span> smb2_remove_blocked_lock<span class="op">,</span> <span class="op">...)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    work<span class="op">-&gt;</span>cancel_fn <span class="op">=</span> fn</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  smb2_send_interim_resp<span class="op">(</span>work<span class="op">,</span> STATUS_PENDING<span class="op">);</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  ksmbd_vfs_posix_lock_wait</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>smb2_cancel</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  iter<span class="op">-&gt;</span>state <span class="op">=</span> KSMBD_WORK_CANCELLED</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  smb2_remove_blocked_lock <span class="co">// iter-&gt;cancel_fn</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    locks_delete_block</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>      __locks_delete_block</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        __locks_wake_up_blocks</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>          locks_wake_up_waiter</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>            wake_up<span class="op">(&amp;</span>flc<span class="op">-&gt;</span>flc_wait<span class="op">)</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>ksmbd_conn_handler_loop <span class="co">// default_conn_ops.process_fn</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  ksmbd_server_process_request</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    queue_ksmbd_work</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>      ksmbd_alloc_work_struct</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>        ksmbd_queue_work</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>          handle_ksmbd_work <span class="co">// queue_work(ksmbd_wq,</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>            __handle_ksmbd_work</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>              __process_request</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>              ksmbd_conn_try_dequeue_request</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>                list_del_init<span class="op">(&amp;</span>work<span class="op">-&gt;</span>request_entry<span class="op">)</span> <span class="co">// 从async_requests链表中删除</span></span></code></pre></div>
 <h1 data-number="9" id="fanotify"><span
 class="header-section-number">9</span> fanotify</h1>
 <p>详细的分析过程请查看英文网页<a
