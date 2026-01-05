@@ -478,12 +478,17 @@ class="header-section-number">9</span> smb client内核代码分析</h1>
 <div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ioctl</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  cifs_ioctl</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    smb3_notify</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>      SMB2_change_notify</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>      SMB2_close</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        __SMB2_close</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>          smb2_handle_cancelled_close</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>            __smb2_handle_cancelled_cmd</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>              smb2_cancelled_close_fid <span class="co">// INIT_WORK(&amp;cancelled-&gt;work,</span></span></code></pre></div>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>      SMB2_open</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        SMB2_open_init</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>          smb2_plain_req_init<span class="op">(</span>SMB2_CREATE<span class="op">,</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>      SMB2_change_notify</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        SMB2_notify_init</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>          smb2_plain_req_init<span class="op">(</span>SMB2_CHANGE_NOTIFY<span class="op">,</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>      SMB2_close</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        __SMB2_close</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>          smb2_handle_cancelled_close</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>            __smb2_handle_cancelled_cmd</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>              smb2_cancelled_close_fid <span class="co">// INIT_WORK(&amp;cancelled-&gt;work,</span></span></code></pre></div>
 <h1 data-number="10" id="fanotify"><span
 class="header-section-number">10</span> fanotify</h1>
 <p>详细的分析过程请查看英文网页<a
