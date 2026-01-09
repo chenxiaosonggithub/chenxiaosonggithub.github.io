@@ -121,45 +121,19 @@ class="toc-section-number">1</span> 需求描述</a></li>
 <li><a href="#复现步骤" id="toc-复现步骤"><span
 class="toc-section-number">2</span> 复现步骤</a></li>
 <li><a href="#smb协议分析" id="toc-smb协议分析"><span
-class="toc-section-number">3</span> smb协议分析</a>
-<ul>
-<li><a href="#ms-smb2-2.2.35-smb2-change_notify-request"
-id="toc-ms-smb2-2.2.35-smb2-change_notify-request"><span
-class="toc-section-number">3.1</span> MS-SMB2 2.2.35 SMB2 CHANGE_NOTIFY
-Request</a></li>
-<li><a href="#ms-smb2-2.2.14.1-smb2_fileid"
-id="toc-ms-smb2-2.2.14.1-smb2_fileid"><span
-class="toc-section-number">3.2</span> MS-SMB2 2.2.14.1
-SMB2_FILEID</a></li>
-<li><a href="#ms-smb2-2.2.36-smb2-change_notify-response"
-id="toc-ms-smb2-2.2.36-smb2-change_notify-response"><span
-class="toc-section-number">3.3</span> MS-SMB2 2.2.36 SMB2 CHANGE_NOTIFY
-Response</a></li>
-<li><a href="#ms-fscc-2.7.1-file_notify_information"
-id="toc-ms-fscc-2.7.1-file_notify_information"><span
-class="toc-section-number">3.4</span> MS-FSCC 2.7.1
-FILE_NOTIFY_INFORMATION</a></li>
-</ul></li>
-<li><a href="#ms-smb2-2.2.13-smb2-create-request"
-id="toc-ms-smb2-2.2.13-smb2-create-request"><span
-class="toc-section-number">4</span> MS-SMB2 2.2.13 SMB2 CREATE
-Request</a></li>
-<li><a href="#ms-smb2-2.2.1-smb2-packet-header"
-id="toc-ms-smb2-2.2.1-smb2-packet-header"><span
-class="toc-section-number">5</span> MS-SMB2 2.2.1 SMB2 Packet
-Header</a></li>
+class="toc-section-number">3</span> smb协议分析</a></li>
 <li><a href="#tcpdump抓包分析" id="toc-tcpdump抓包分析"><span
-class="toc-section-number">6</span> tcpdump抓包分析</a></li>
+class="toc-section-number">4</span> tcpdump抓包分析</a></li>
 <li><a href="#samba代码分析" id="toc-samba代码分析"><span
-class="toc-section-number">7</span> samba代码分析</a></li>
+class="toc-section-number">5</span> samba代码分析</a></li>
 <li><a href="#smb-server内核代码分析"
 id="toc-smb-server内核代码分析"><span
-class="toc-section-number">8</span> smb server内核代码分析</a></li>
+class="toc-section-number">6</span> smb server内核代码分析</a></li>
 <li><a href="#smb-client内核代码分析"
 id="toc-smb-client内核代码分析"><span
-class="toc-section-number">9</span> smb client内核代码分析</a></li>
+class="toc-section-number">7</span> smb client内核代码分析</a></li>
 <li><a href="#fanotify" id="toc-fanotify"><span
-class="toc-section-number">10</span> fanotify</a></li>
+class="toc-section-number">8</span> fanotify</a></li>
 </ul>
 </nav>
 <p><a
@@ -239,258 +213,109 @@ href="https://chenxiaosong.com/course/gnu-linux/ssh-reverse.html">内网穿透</
 <p>当server使用samba时，创建的新文件在windows上能立刻显示；当server使用ksmbd时，创建的新文件在windows上不会显示，需要按f5刷新。</p>
 <h1 data-number="3" id="smb协议分析"><span
 class="header-section-number">3</span> smb协议分析</h1>
-<ul>
-<li><a
-href="https://learn.microsoft.com/pdf?url=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Fopenspecs%2Fwindows_protocols%2Fms-smb2%2Ftoc.json">MS-SMB2</a></li>
-<li><a
-href="https://learn.microsoft.com/pdf?url=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Fopenspecs%2Fwindows_protocols%2Fms-fscc%2Ftoc.json">MS-FSCC</a></li>
-</ul>
-<h2 data-number="3.1"
-id="ms-smb2-2.2.35-smb2-change_notify-request"><span
-class="header-section-number">3.1</span> MS-SMB2 2.2.35 SMB2
-CHANGE_NOTIFY Request</h2>
-<p>SMB2 CHANGE_NOTIFY
-请求数据包由客户端发送，用于请求获取目录的变更通知。 该请求由一个 SMB2
-头（参见 2.2.1 节）以及紧随其后的该请求结构组成。</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> smb2_change_notify_req <span class="op">{</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> smb2_hdr hdr<span class="op">;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 客户端 必须 将该字段设置为 32，表示请求结构体的大小（不包含 SMB2 头）</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  __le16  StructureSize<span class="op">;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 指示该操作必须如何处理的标志。此字段必须为 0，或以下取值之一： SMB2_WATCH_TREE</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  __le16  Flags<span class="op">;</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 服务器在 SMB2 CHANGE_NOTIFY Response（见章节 2.2.36）中允许返回的最大字节数。</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  __le32  OutputBufferLength<span class="op">;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> <span class="op">{</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    __u64   PersistentFileId<span class="op">;</span> <span class="co">/* 不透明字节序 */</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    __u64   VolatileFileId<span class="op">;</span> <span class="co">/* 不透明字节序 */</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> fid<span class="op">;</span> <span class="co">// 用于监控变化的目录的 SMB2_FILEID 标识符</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 指定要监控的变更类型。可以选择多个触发条件。</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 在这种情况下，只要满足任意一个条件，客户端就会收到变更通知，并且 CHANGE_NOTIFY 操作会完成。</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 该字段 必须（MUST） 使用以下值来构造：</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">// FILE_NOTIFY_CHANGE_FILE_NAME ... FILE_NOTIFY_CHANGE_STREAM_WRITE</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  __le32  CompletionFilter<span class="op">;</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 此字段 不得使用（MUST NOT），并且 必须保留（MUST be reserved）。</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 客户端 必须（MUST） 将该字段设置为 0，服务器在接收时 必须（MUST） 忽略该字段。</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  __u32   Reserved<span class="op">;</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> __packed<span class="op">;</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">// Flags</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>SMB2_WATCH_TREE <span class="co">// 该请求必须监控由 FileId 指定的目录下的任何文件或子目录的变更。</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">// CompletionFilter</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_FILE_NAME    <span class="co">// 如果文件名发生变化，客户端会收到通知</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_DIR_NAME     <span class="co">// 如果目录名发生变化，客户端会收到通知</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_ATTRIBUTES   <span class="co">// 如果文件的属性发生变化，客户端会收到通知。可能的文件属性值在 [MS-FSCC] 第 2.6 节中进行了说明。</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_SIZE         <span class="co">// 如果文件的大小发生变化，客户端会收到通知。</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_LAST_WRITE   <span class="co">// 如果文件的最后写入时间发生变化，客户端会收到通知。</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_LAST_ACCESS  <span class="co">// 如果文件的最后访问时间发生变化，客户端会收到通知。</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_CREATION     <span class="co">// 如果文件的创建时间发生变化，客户端会收到通知。</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_EA           <span class="co">// 如果文件的扩展属性（EA）发生变化，客户端会收到通知。</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_SECURITY     <span class="co">// 如果文件的访问控制列表（ACL）设置发生变化，客户端会收到通知。</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_STREAM_NAME  <span class="co">// 如果向文件中添加了命名数据流，客户端会收到通知。</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_STREAM_SIZE  <span class="co">// 如果命名数据流的大小发生变化，客户端会收到通知。</span></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>FILE_NOTIFY_CHANGE_STREAM_WRITE <span class="co">// 如果命名数据流被修改，客户端会收到通知。</span></span></code></pre></div>
-<h2 data-number="3.2" id="ms-smb2-2.2.14.1-smb2_fileid"><span
-class="header-section-number">3.2</span> MS-SMB2 2.2.14.1
-SMB2_FILEID</h2>
-<p>SMB2 FILEID 用来表示对一个文件的打开（操作）。</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> <span class="op">{</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 当连接断开后重新连接时，该文件句柄依然保持持久存在，如 3.3.5.9.7 节所述。</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 服务器 必须（MUST） 在 SMB2 CREATE Response（见 2.2.14 节）中返回该文件句柄。</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  __u64   PersistentFileId<span class="op">;</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 当连接断开后重新连接时，该文件句柄可能会发生变化，如 3.3.5.9.7 节所述。</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 服务器 必须（MUST） 在 SMB2 CREATE Response（见 2.2.14 节）中返回该文件句柄。</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 此值 不得（MUST NOT） 发生变化，除非执行了重新连接操作。此值在同一会话范围内必须唯一，用于区分所有易失性句柄。</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  __u64   VolatileFileId<span class="op">;</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> fid<span class="op">;</span> <span class="co">// 用于监控变化的目录的 SMB2_FILEID 标识符</span></span></code></pre></div>
-<h2 data-number="3.3"
-id="ms-smb2-2.2.36-smb2-change_notify-response"><span
-class="header-section-number">3.3</span> MS-SMB2 2.2.36 SMB2
-CHANGE_NOTIFY Response</h2>
-<p>SMB2 CHANGE_NOTIFY 响应数据包由服务器发送，用于传输客户端 SMB2
-CHANGE_NOTIFY 请求（见 2.2.35 节）的结果。 该响应由一个 SMB2 头（参见
-2.2.1 节）以及紧随其后的响应结构组成。</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> smb2_change_notify_rsp <span class="op">{</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> smb2_hdr hdr<span class="op">;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 服务器 必须 将该字段设置为 9，以表示请求结构体的大小（不包括头部）。</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 无论实际发送的请求中 Buffer[] 的长度是多少，服务器 都必须 将该字段设置为该值。</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  __le16  StructureSize<span class="op">;</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 从 SMB2 头部起始位置到返回的更改信息的偏移量（以字节为单位）</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  __le16  OutputBufferOffset<span class="op">;</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 返回的更改信息的长度（以字节为单位）</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  __le32  OutputBufferLength<span class="op">;</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 一个可变长度的缓冲区，包含响应中返回的更改信息，其内容由 OutputBufferOffset 和 OutputBufferLength 字段描述。</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 该字段是一个 FILE_NOTIFY_INFORMATION 结构体数组，如 [MS-FSCC] 第 2.7.1 节所指定。</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  __u8    Buffer<span class="op">[];</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> __packed<span class="op">;</span></span></code></pre></div>
-<h2 data-number="3.4" id="ms-fscc-2.7.1-file_notify_information"><span
-class="header-section-number">3.4</span> MS-FSCC 2.7.1
-FILE_NOTIFY_INFORMATION</h2>
-<p>FILE_NOTIFY_INFORMATION
-结构体包含客户端被通知的更改信息。该结构体由以下内容组成。</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">/* response contains array of the following structures */</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> file_notify_information <span class="op">{</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 该字段表示从本结构体起始位置到下一个 FILE_NOTIFY_INFORMATION 结构体的偏移量（以字节为单位）。</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 如果不存在后续结构体，则 NextEntryOffset 字段 必须 为 0。</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// NextEntryOffset 必须 始终是 4 的整数倍。FileName 数组 必须 填充至从结构体起始位置算起的下一个 4 字节对齐边界。</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  __le32 NextEntryOffset<span class="op">;</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 文件上发生的更改。该字段 必须 包含以下值之一。FILE_ACTION_ADDED ... FILE_ACTION_TUNNELLED_ID_COLLISION</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 如果两个或更多文件被重命名，则每个文件重命名对应的 FILE_NOTIFY_INFORMATION 条目 必须在此响应中连续出现，</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 以便客户端能够正确对应旧名称和新名称。</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  __le32 Action<span class="op">;</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// FileName 字段中文件名的长度（以字节为单位）。</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  __le32 FileNameLength<span class="op">;</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 一个包含已更改文件名称的 Unicode 字符串。</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  __u8  FileName<span class="op">[];</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> __packed<span class="op">;</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">// 文件被添加，FileName 包含新文件名。仅当重命名操作改变了文件所在目录时才会发送此通知。</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">// 客户端还将收到一个 FILE_ACTION_REMOVED 通知。如果文件在同一目录内被重命名，则不会收到此通知。</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_ADDED</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">// 文件被删除，FileName 包含旧文件名。仅当重命名操作改变了文件所在目录时才会发送此通知。</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co">// 客户端还将收到一个 FILE_ACTION_ADDED 通知。如果文件在同一目录内被重命名，则不会收到此通知。</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_REMOVED</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co">// 文件被修改。可以是文件数据或属性的更改。</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_MODIFIED</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="co">// 文件被重命名，FileName 包含旧文件名。仅当重命名操作未改变文件所在目录时才会发送此通知。</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co">// 客户端还将收到一个 FILE_ACTION_RENAMED_NEW_NAME 通知。如果文件被重命名到不同目录，则不会收到此通知。</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_RENAMED_OLD_NAME</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co">// 文件被重命名，FileName 包含新文件名。仅当重命名操作未改变文件所在目录时才会发送此通知。</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="co">// 客户端还将收到一个 FILE_ACTION_RENAMED_OLD_NAME 通知。如果文件被重命名到不同目录，则不会收到此通知。</span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_RENAMED_NEW_NAME</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="co">// 文件被添加到命名流中。</span></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_ADDED_STREAM</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="co">// 文件从命名流中被移除。</span></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_REMOVED_STREAM</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="co">// 文件被修改。可以是文件数据或属性的更改。</span></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_MODIFIED_STREAM</span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="co">// 由于所引用的文件被删除，对象 ID 被移除。</span></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="co">// 仅当被监控的目录是特殊目录 \$Extend\$ObjId:$O:$INDEX_ALLOCATION 时才会发送此通知。</span></span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_REMOVED_BY_DELETE</span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="co">// 尝试将对象 ID 信息“隧道”到正在创建或重命名的文件失败，因为该对象 ID 已被同一卷上的其他文件使用。</span></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="co">// 仅当被监控的目录是特殊目录 \$Extend\$ObjId:$O:$INDEX_ALLOCATION 时才会发送此通知。</span></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_ID_NOT_TUNNELLED</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="co">// 尝试将对象 ID 信息“隧道”到正在重命名的文件失败，因为该文件已存在对象 ID。</span></span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="co">// 仅当被监控的目录是特殊目录 \$Extend\$ObjId:$O:$INDEX_ALLOCATION 时才会发送此通知。</span></span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>FILE_ACTION_TUNNELLED_ID_COLLISION</span></code></pre></div>
-<h1 data-number="4" id="ms-smb2-2.2.13-smb2-create-request"><span
-class="header-section-number">4</span> MS-SMB2 2.2.13 SMB2 CREATE
-Request</h1>
-<p>SMB2 CREATE 请求数据包由客户端发送，用于请求创建文件或访问文件。
-如果目标是命名管道或打印机，服务器 必须 创建一个新文件。</p>
-<p>该请求由一个 SMB2 数据包头组成（如 2.2.1
-节所述），后面跟随该请求结构体。</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> smb2_create_req <span class="op">{</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> smb2_hdr hdr<span class="op">;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  __le16 StructureSize<span class="op">;</span>   <span class="co">/* Must be 57 */</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  __u8   SecurityFlags<span class="op">;</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  __u8   RequestedOplockLevel<span class="op">;</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  __le32 ImpersonationLevel<span class="op">;</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  __le64 SmbCreateFlags<span class="op">;</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  __le64 Reserved<span class="op">;</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  __le32 DesiredAccess<span class="op">;</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  __le32 FileAttributes<span class="op">;</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  __le32 ShareAccess<span class="op">;</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  __le32 CreateDisposition<span class="op">;</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  __le32 CreateOptions<span class="op">;</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  __le16 NameOffset<span class="op">;</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  __le16 NameLength<span class="op">;</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  __le32 CreateContextsOffset<span class="op">;</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  __le32 CreateContextsLength<span class="op">;</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  __u8   Buffer<span class="op">[];</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> __packed<span class="op">;</span></span></code></pre></div>
-<h1 data-number="5" id="ms-smb2-2.2.1-smb2-packet-header"><span
-class="header-section-number">5</span> MS-SMB2 2.2.1 SMB2 Packet
-Header</h1>
-<p>SMB2 数据包头（也称 SMB2 Header） 是所有 SMB2 协议请求和响应的头部。
-该头部有两种变体：</p>
-<ul>
-<li>ASYNC</li>
-<li>SYNC</li>
-</ul>
-<p>如果 Flags 中设置了 SMB2_FLAGS_ASYNC_COMMAND 位，则使用 SMB2 Packet
-Header - ASYNC（见 2.2.1.1
-节）。这种头部格式用于服务器异步处理请求时的响应，如
-3.3.4.2、3.3.4.3、3.3.4.4 和 3.2.5.1.5 节所述。
-对于已经收到临时响应（interim response）的请求，SMB2 CANCEL 请求 必须
-使用这种格式，如 3.2.4.24 和 3.3.5.16 节所述。</p>
-<p>如果 Flags 中未设置 SMB2_FLAGS_ASYNC_COMMAND 位，则使用 SMB2 Packet
-Header - SYNC（见 2.2.1.2 节）。</p>
-<h1 data-number="6" id="tcpdump抓包分析"><span
-class="header-section-number">6</span> tcpdump抓包分析</h1>
+<p>请查看<a
+href="https://chenxiaosong.com/src/translation/smb/ms-doc.html">《SMB
+MS文档翻译》</a>。</p>
+<h1 data-number="4" id="tcpdump抓包分析"><span
+class="header-section-number">4</span> tcpdump抓包分析</h1>
 <p>在虚拟机中使用以下命令抓包:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">--interface</span><span class="op">=</span>any <span class="at">-w</span> smb-server.pcap</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">--interface</span><span class="op">=</span>any <span class="at">-w</span> smb-server.pcap</span></code></pre></div>
 <p>在wireshark中打开，用<code>smb2.cmd == 15</code>过滤。</p>
 <p>详细的分析过程请查看英文网页<a
 href="https://chenxiaosong.com/en/smb2-change-notify.html#tcpdump">《SMB2
 CHANGE_NOTIFY feature》</a>。</p>
-<h1 data-number="7" id="samba代码分析"><span
-class="header-section-number">7</span> samba代码分析</h1>
+<h1 data-number="5" id="samba代码分析"><span
+class="header-section-number">5</span> samba代码分析</h1>
 <p>samba的调试方法请查看<a
 href="https://chenxiaosong.com/course/smb/debug.html#samba-print">《smb调试方法》</a>。</p>
 <p>用<code>NT_STATUS_V()</code>得到错误码的值，但好像打印出来是个很大的负数，可以用<code>get_nt_error_c_code()</code>转换成字符串。</p>
 <p>详细的分析过程请查看英文网页<a
 href="https://chenxiaosong.com/en/smb2-change-notify.html#samba-code">《SMB2
 CHANGE_NOTIFY feature》</a>。</p>
-<h1 data-number="8" id="smb-server内核代码分析"><span
-class="header-section-number">8</span> smb server内核代码分析</h1>
+<h1 data-number="6" id="smb-server内核代码分析"><span
+class="header-section-number">6</span> smb server内核代码分析</h1>
 <p>异步等待和唤醒:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>smb2_lock</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  setup_async_work<span class="op">(...,</span> smb2_remove_blocked_lock<span class="op">,</span> <span class="op">...)</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    work<span class="op">-&gt;</span>cancel_fn <span class="op">=</span> fn</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  smb2_send_interim_resp<span class="op">(</span>work<span class="op">,</span> STATUS_PENDING<span class="op">);</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  ksmbd_vfs_posix_lock_wait</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>smb2_cancel</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  iter<span class="op">-&gt;</span>state <span class="op">=</span> KSMBD_WORK_CANCELLED</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  smb2_remove_blocked_lock <span class="co">// iter-&gt;cancel_fn</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    locks_delete_block</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>      __locks_delete_block</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        __locks_wake_up_blocks</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>          locks_wake_up_waiter</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>            wake_up<span class="op">(&amp;</span>flc<span class="op">-&gt;</span>flc_wait<span class="op">)</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>ksmbd_conn_handler_loop <span class="co">// default_conn_ops.process_fn</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  ksmbd_server_process_request</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    queue_ksmbd_work</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>      ksmbd_alloc_work_struct</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>        ksmbd_queue_work</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>          handle_ksmbd_work <span class="co">// queue_work(ksmbd_wq,</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>            __handle_ksmbd_work</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>              __process_request</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>              ksmbd_conn_try_dequeue_request</span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>                list_del_init<span class="op">(&amp;</span>work<span class="op">-&gt;</span>request_entry<span class="op">)</span> <span class="co">// 从async_requests链表中删除</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>smb2_lock</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  setup_async_work<span class="op">(...,</span> smb2_remove_blocked_lock<span class="op">,</span> <span class="op">...)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    work<span class="op">-&gt;</span>cancel_fn <span class="op">=</span> fn</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  smb2_send_interim_resp<span class="op">(</span>work<span class="op">,</span> STATUS_PENDING<span class="op">);</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  ksmbd_vfs_posix_lock_wait</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>smb2_cancel</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  iter<span class="op">-&gt;</span>state <span class="op">=</span> KSMBD_WORK_CANCELLED</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  smb2_remove_blocked_lock <span class="co">// iter-&gt;cancel_fn</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    locks_delete_block</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      __locks_delete_block</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        __locks_wake_up_blocks</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>          locks_wake_up_waiter</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>            wake_up<span class="op">(&amp;</span>flc<span class="op">-&gt;</span>flc_wait<span class="op">)</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>ksmbd_conn_handler_loop <span class="co">// default_conn_ops.process_fn</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  ksmbd_server_process_request</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    queue_ksmbd_work</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>      ksmbd_alloc_work_struct</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        ksmbd_queue_work</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>          handle_ksmbd_work <span class="co">// queue_work(ksmbd_wq,</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>            __handle_ksmbd_work</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>              __process_request</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>              ksmbd_conn_try_dequeue_request</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>                list_del_init<span class="op">(&amp;</span>work<span class="op">-&gt;</span>request_entry<span class="op">)</span> <span class="co">// 从async_requests链表中删除</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>                release_async_work</span></code></pre></div>
 <p>文件名处理:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>smb2_query_info</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  smb2_get_info_filesystem</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> smb2_query_info_rsp <span class="co">// MS-SMB2 2.2.38</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> <span class="op">(</span>FILE_SYSTEM_ATTRIBUTE_INFO <span class="op">*)</span>rsp<span class="op">-&gt;</span>Buffer<span class="op">;</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  smb2_get_info_file</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    smb2_get_ea</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      ptr <span class="op">=</span> <span class="op">(</span><span class="dt">char</span> <span class="op">*)</span>rsp<span class="op">-&gt;</span>Buffer</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>      eainfo <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> smb2_ea_info <span class="op">*)</span>ptr<span class="op">;</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>__handle_ksmbd_work</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  smb2_allocate_rsp_buf <span class="co">// conn-&gt;ops-&gt;allocate_rsp_buf</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span>max_trans_size <span class="op">=</span> SMB3_DEFAULT_TRANS_SIZE<span class="op">,</span></span></code></pre></div>
-<h1 data-number="9" id="smb-client内核代码分析"><span
-class="header-section-number">9</span> smb client内核代码分析</h1>
-<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ioctl</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  cifs_ioctl</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    smb3_notify</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>      SMB2_open</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        SMB2_open_init</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>          smb2_plain_req_init<span class="op">(</span>SMB2_CREATE<span class="op">,</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>      SMB2_change_notify</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        SMB2_notify_init</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>          smb2_plain_req_init<span class="op">(</span>SMB2_CHANGE_NOTIFY<span class="op">,</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>      SMB2_close</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        __SMB2_close</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>          smb2_handle_cancelled_close</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>            __smb2_handle_cancelled_cmd</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>              smb2_cancelled_close_fid <span class="co">// INIT_WORK(&amp;cancelled-&gt;work,</span></span></code></pre></div>
-<h1 data-number="10" id="fanotify"><span
-class="header-section-number">10</span> fanotify</h1>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>smb2_query_info</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  smb2_get_info_filesystem</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> smb2_query_info_rsp <span class="co">// MS-SMB2 2.2.38</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> <span class="op">(</span>FILE_SYSTEM_ATTRIBUTE_INFO <span class="op">*)</span>rsp<span class="op">-&gt;</span>Buffer<span class="op">;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  smb2_get_info_file</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    smb2_get_ea</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      ptr <span class="op">=</span> <span class="op">(</span><span class="dt">char</span> <span class="op">*)</span>rsp<span class="op">-&gt;</span>Buffer</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      eainfo <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> smb2_ea_info <span class="op">*)</span>ptr<span class="op">;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>__handle_ksmbd_work</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  smb2_allocate_rsp_buf <span class="co">// conn-&gt;ops-&gt;allocate_rsp_buf</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span>max_trans_size <span class="op">=</span> SMB3_DEFAULT_TRANS_SIZE<span class="op">,</span></span></code></pre></div>
+<h1 data-number="7" id="smb-client内核代码分析"><span
+class="header-section-number">7</span> smb client内核代码分析</h1>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ioctl</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  cifs_ioctl</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    smb3_notify</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      SMB2_open<span class="op">(</span>xid<span class="op">,</span> <span class="op">&amp;</span>oparms<span class="op">,</span> <span class="op">...)</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        SMB2_open_init</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>          smb2_plain_req_init<span class="op">(</span>SMB2_CREATE<span class="op">,</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      SMB2_change_notify</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        SMB2_notify_init</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>          smb2_plain_req_init<span class="op">(</span>SMB2_CHANGE_NOTIFY<span class="op">,</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        cifs_send_recv</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>          compound_send_recv</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>            smb2_setup_request <span class="co">// .setup_request</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>              smb2_seq_num_into_buf</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                smb2_seq_num_into_buf<span class="op">(</span>server<span class="op">,</span> shdr<span class="op">);</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>      SMB2_cancel</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        cifs_send_recv</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>          compound_send_recv</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>            smb_send_rqst</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>              __smb_send_rqst</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>                rc <span class="op">=</span> <span class="op">-</span>ERESTARTSYS</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="op">(</span>fatal_signal_pending<span class="op">(</span>current<span class="op">))</span> <span class="op">{</span> <span class="co">// 进程将要退出</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>                <span class="cf">goto</span> out</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="op">-</span>ERESTARTSYS</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>      SMB2_close</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        __SMB2_close</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>          rc <span class="op">=</span> cifs_send_recv <span class="co">// -ERESTARTSYS</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>          smb2_handle_cancelled_close</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>            __smb2_handle_cancelled_cmd</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>              smb2_cancelled_close_fid <span class="co">// INIT_WORK(&amp;cancelled-&gt;work,</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>                SMB2_close<span class="op">(</span><span class="dv">0</span><span class="op">,</span> tcon<span class="op">,</span> <span class="co">// 在工作队列中再次尝试</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>kthread</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  cifs_demultiplex_thread</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    cifs_handle_standard</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>      smb2_is_status_pending</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>revert_current_mid</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>revert_current_mid_from_hdr</span></code></pre></div>
+<h1 data-number="8" id="fanotify"><span
+class="header-section-number">8</span> fanotify</h1>
 <p>详细的分析过程请查看英文网页<a
 href="https://chenxiaosong.com/en/smb2-change-notify.html#fanotify">《SMB2
 CHANGE_NOTIFY feature》</a>。</p>
