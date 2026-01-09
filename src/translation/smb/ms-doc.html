@@ -138,6 +138,9 @@ SMB2_FILEID</a></li>
 id="toc-ms-smb2-2.2.36-smb2-change_notify-response"><span
 class="toc-section-number">1.5</span> MS-SMB2 2.2.36 SMB2 CHANGE_NOTIFY
 Response</a></li>
+<li><a href="#smb2-3.2.4.24" id="toc-smb2-3.2.4.24"><span
+class="toc-section-number">1.6</span> 3.2.4.24 Application Requests
+Canceling an Operation</a></li>
 </ul></li>
 <li><a href="#ms-fscc" id="toc-ms-fscc"><span
 class="toc-section-number">2</span> MS-FSCC</a>
@@ -278,6 +281,34 @@ CHANGE_NOTIFY 请求（见 2.2.35 节）的结果。 该响应由一个 SMB2 头
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 该字段是一个 FILE_NOTIFY_INFORMATION 结构体数组，如 [MS-FSCC] 第 2.7.1 节所指定。</span></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  __u8    Buffer<span class="op">[];</span></span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> __packed<span class="op">;</span></span></code></pre></div>
+<h2 data-number="1.6" id="smb2-3.2.4.24"><span
+class="header-section-number">1.6</span> 3.2.4.24 Application Requests
+Canceling an Operation</h2>
+<p>应用程序提供要取消的操作的 CancelId。</p>
+<p>客户端 必须（MUST） 枚举 ConnectionTable 中的所有连接，并在
+Connection.OutstandingRequests 中查找其 Request.CancelId
+与应用程序提供的 CancelId
+相匹配的请求。如果找到匹配项，客户端需要执行以下操作：</p>
+<p>客户端按照 第 2.2.30 节 中定义的语法初始化一个 SMB2 CANCEL 请求。SMB2
+头部按如下方式初始化：</p>
+<ul>
+<li>Command 字段 必须（MUST） 设置为 SMB2 CANCEL。</li>
+<li>MessageId 字段 应该（SHOULD）&lt;179&gt;
+设置为此前用于被取消请求的标识符。由于复用了相同的
+MessageId，取消请求不得（MUST NOT）消耗序列号。</li>
+<li>如果 Request.AsyncId
+非空，表示该命令此前已经返回过一个中间响应（interim response），则：
+客户端将 AsyncId 设置为 Request.AsyncId； 并在 Flags 字段中将
+SMB2_FLAGS_ASYNC_COMMAND 置为 TRUE。</li>
+</ul>
+<p>SessionId 字段 必须（MUST）
+设置为此前用于被取消请求的会话标识符。</p>
+<p>如果由 SessionId 标识的会话中 Session.SigningRequired 等于 TRUE，
+客户端必须在 Flags 字段中将 SMB2_FLAGS_SIGNED 置为 TRUE。</p>
+<p>SMB2 CANCEL 请求其余字段 必须 按照 第 2.2.30 节
+中规定的默认值进行初始化。</p>
+<p>该请求 必须（MUST） 发送到服务器。</p>
+<p>不会向调用方返回任何状态信息。</p>
 <h1 data-number="2" id="ms-fscc"><span
 class="header-section-number">2</span> MS-FSCC</h1>
 <ul>
