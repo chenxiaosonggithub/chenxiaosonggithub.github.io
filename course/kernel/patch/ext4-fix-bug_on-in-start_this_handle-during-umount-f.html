@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>b98535d09179 ext4: fix bug_on in start_this_handle during umount filesystem</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页:
+chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页:
+chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">b98535d09179 ext4: fix bug_on in start_this_handle
+during umount filesystem</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#内核构造补丁" id="toc-内核构造补丁"><span
+class="toc-section-number">2</span> 内核构造补丁</a></li>
+<li><a href="#构造脚本" id="toc-构造脚本"><span
+class="toc-section-number">3</span> 构造脚本</a></li>
+<li><a href="#代码流程" id="toc-代码流程"><span
+class="toc-section-number">4</span> 代码流程</a></li>
+</ul>
+</nav>
+<p><a
+href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://lore.kernel.org/all/20220322012419.725457-1-yebin10@huawei.com/"><code>b98535d09179 ext4: fix bug_on in start_this_handle during umount filesystem</code></a></p>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">------------[</span> cut here ]------------</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kernel</span> BUG at fs/jbd2/transaction.c:389!</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">invalid</span> opcode: 0000 <span class="pp">[</span><span class="ss">#1</span><span class="pp">]</span> PREEMPT SMP KASAN PTI</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">CPU:</span> 9 PID: 131 Comm: kworker/9:1 Not tainted 5.17.0-862.14.0.6.x86_64-00001-g23f87daf7d74-dirty <span class="co">#197</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Workqueue:</span> events flush_stashed_error_work</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">RIP:</span> 0010:start_this_handle+0x41c/0x1160</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">RSP:</span> 0018:ffff888106b47c20 EFLAGS: 00010202</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">RAX:</span> ffffed10251b8400 RBX: ffff888128dc204c RCX: ffffffffb52972ac</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">RDX:</span> 0000000000000200 RSI: 0000000000000004 RDI: ffff888128dc2050</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">RBP:</span> 0000000000000039 R08: 0000000000000001 R09: ffffed10251b840a</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">R10:</span> ffff888128dc204f R11: ffffed10251b8409 R12: ffff888116d78000</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">R13:</span> 0000000000000000 R14: dffffc0000000000 R15: ffff888128dc2000</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">FS:</span>  0000000000000000<span class="er">(</span><span class="ex">0000</span><span class="kw">)</span> <span class="ex">GS:ffff88839d680000</span><span class="er">(</span><span class="ex">0000</span><span class="kw">)</span> <span class="ex">knlGS:0000000000000000</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">CS:</span>  0010 DS: 0000 ES: 0000 CR0: 0000000080050033</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">CR2:</span> 0000000001620068 CR3: 0000000376c0e000 CR4: 00000000000006e0</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">DR0:</span> 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">DR3:</span> 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">Call</span> Trace:</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a> <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a> <span class="ex">jbd2__journal_start+0x38a/0x790</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a> <span class="ex">jbd2_journal_start+0x19/0x20</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a> <span class="ex">flush_stashed_error_work+0x110/0x2b3</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a> <span class="ex">process_one_work+0x688/0x1080</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a> <span class="ex">worker_thread+0x8b/0xc50</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a> <span class="ex">kthread+0x26f/0x310</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a> <span class="ex">ret_from_fork+0x22/0x30</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a> <span class="op">&lt;</span>/TASK<span class="op">&gt;</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="ex">Modules</span> linked in:</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ex">---[</span> end trace 0000000000000000 ]---</span></code></pre></div>
+<h1 data-number="2" id="内核构造补丁"><span
+class="header-section-number">2</span> 内核构造补丁</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>From d1a8dd46cc15f1df4453c2ae08d1c4f4a83c36e5 Mon Sep <span class="dv">17</span> <span class="bn">00</span><span class="op">:</span><span class="bn">00</span><span class="op">:</span><span class="bn">00</span> <span class="dv">2001</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>From<span class="op">:</span> ChenXiaoSong <span class="op">&lt;</span>chenxiaosongemail@foxmail<span class="op">.</span>com<span class="op">&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Date<span class="op">:</span> Sun<span class="op">,</span> <span class="dv">1</span> May <span class="dv">2022</span> <span class="dv">19</span><span class="op">:</span><span class="dv">53</span><span class="op">:</span><span class="dv">24</span> <span class="op">+</span><span class="dv">0</span><span class="er">800</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>Subject<span class="op">:</span> <span class="op">[</span>PATCH<span class="op">]</span> reproduce bug_on in start_this_handle<span class="op">()</span> during umount</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a> filesystem</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>Signed<span class="op">-</span>off<span class="op">-</span>by<span class="op">:</span> ChenXiaoSong <span class="op">&lt;</span>chenxiaosongemail@foxmail<span class="op">.</span>com<span class="op">&gt;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">---</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a> fs<span class="op">/</span>ext4<span class="op">/</span>super<span class="op">.</span>c   <span class="op">|</span> <span class="dv">7</span> <span class="op">+++++++</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a> fs<span class="op">/</span>jbd2<span class="op">/</span>journal<span class="op">.</span>c <span class="op">|</span> <span class="dv">4</span> <span class="op">++++</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a> <span class="dv">2</span> files changed<span class="op">,</span> <span class="dv">11</span> insertions<span class="op">(+)</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>diff <span class="op">--</span>git a<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>super<span class="op">.</span>c b<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>super<span class="op">.</span>c</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>index <span class="dv">81749</span><span class="er">eaddf4c..7cf8613a7841</span> <span class="dv">100644</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>super<span class="op">.</span>c</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>fs<span class="op">/</span>ext4<span class="op">/</span>super<span class="op">.</span>c</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">56</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">56</span><span class="op">,</span><span class="dv">7</span> @@</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&quot;acl.h&quot;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&quot;mballoc.h&quot;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&quot;fsmap.h&quot;</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>#include <span class="op">&lt;</span>linux<span class="op">/</span>delay<span class="op">.</span>h<span class="op">&gt;</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a> <span class="pp">#define CREATE_TRACE_POINTS</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&lt;trace/events/ext4.h&gt;</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">712</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">713</span><span class="op">,</span><span class="dv">9</span> @@ <span class="dt">static</span> <span class="dt">void</span> flush_stashed_error_work<span class="op">(</span><span class="kw">struct</span> work_struct <span class="op">*</span>work<span class="op">)</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    journal_t <span class="op">*</span>journal <span class="op">=</span> sbi<span class="op">-&gt;</span>s_journal<span class="op">;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    handle_t <span class="op">*</span>handle<span class="op">;</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,begin delay</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">);</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   mdelay<span class="op">(</span><span class="dv">5000</span><span class="op">);</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,end delay</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">);</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="co">/*</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co">     * If the journal is still running, we have to write out superblock</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co">     * through the journal to avoid collisions of other journalled sb</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="co">@@ -1211,6 +1215,9 @@ static void ext4_put_super(struct super_block *sb)</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co">     * Since we could still access attr_journal_task attribute via sysfs</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="co">     * path which could have sbi-&gt;s_journal-&gt;j_task as NULL</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">     */</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,begin delay</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">);</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   mdelay<span class="op">(</span><span class="dv">5000</span><span class="op">);</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,end delay</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">);</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    ext4_unregister_sysfs<span class="op">(</span>sb<span class="op">);</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>sbi<span class="op">-&gt;</span>s_journal<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>diff <span class="op">--</span>git a<span class="op">/</span>fs<span class="op">/</span>jbd2<span class="op">/</span>journal<span class="op">.</span>c b<span class="op">/</span>fs<span class="op">/</span>jbd2<span class="op">/</span>journal<span class="op">.</span>c</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>index fcacafa4510d<span class="op">.</span><span class="fl">.29</span><span class="bu">f</span><span class="er">fdd4f6686</span> <span class="dv">100644</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="op">---</span> a<span class="op">/</span>fs<span class="op">/</span>jbd2<span class="op">/</span>journal<span class="op">.</span>c</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="op">+++</span> b<span class="op">/</span>fs<span class="op">/</span>jbd2<span class="op">/</span>journal<span class="op">.</span>c</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">47</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">47</span><span class="op">,</span><span class="dv">7</span> @@</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&lt;linux/uaccess.h&gt;</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a> <span class="pp">#include </span><span class="im">&lt;asm/page.h&gt;</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>#include <span class="op">&lt;</span>linux<span class="op">/</span>delay<span class="op">.</span>h<span class="op">&gt;</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a> <span class="pp">#ifdef CONFIG_JBD2_DEBUG</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a> ushort jbd2_journal_enable_debug __read_mostly<span class="op">;</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>@@ <span class="op">-</span><span class="dv">290</span><span class="op">,</span><span class="dv">6</span> <span class="op">+</span><span class="dv">291</span><span class="op">,</span><span class="dv">9</span> @@ <span class="dt">static</span> <span class="dt">void</span> journal_kill_thread<span class="op">(</span>journal_t <span class="op">*</span>journal<span class="op">)</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a> <span class="op">{</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    write_lock<span class="op">(&amp;</span>journal<span class="op">-&gt;</span>j_state_lock<span class="op">);</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    journal<span class="op">-&gt;</span>j_flags <span class="op">|=</span> JBD2_UNMOUNT<span class="op">;</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,begin delay</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">);</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   mdelay<span class="op">(</span><span class="dv">5000</span><span class="op">);</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="op">+</span>   printk<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">:</span><span class="sc">%d</span><span class="st">,end delay</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> __func__<span class="op">,</span> __LINE__<span class="op">);</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>journal<span class="op">-&gt;</span>j_task<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>        write_unlock<span class="op">(&amp;</span>journal<span class="op">-&gt;</span>j_state_lock<span class="op">);</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="op">--</span> </span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a><span class="fl">2.25</span><span class="er">.1</span></span></code></pre></div>
+<h1 data-number="3" id="构造脚本"><span
+class="header-section-number">3</span> 构造脚本</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext4</span> <span class="at">-E</span> lazy_itable_init=0,lazy_journal_init=0 <span class="at">-b</span> 4096 <span class="at">-F</span> /dev/sda</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> /dev/sda /mnt</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt <span class="kw">&amp;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 2</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /sys/fs/ext4/sda/trigger_fs_error</span></code></pre></div>
+<h1 data-number="4" id="代码流程"><span
+class="header-section-number">4</span> 代码流程</h1>
+<p>修复补丁: <a
+href="https://lore.kernel.org/all/20220322012419.725457-1-yebin10@huawei.com/"><code>b98535d09179 ext4: fix bug_on in start_this_handle during umount filesystem</code></a></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mount</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  do_mount</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    path_mount</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>      do_new_mount</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        vfs_get_tree</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>          ext4_get_tree</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>            get_tree_bdev</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>              ext4_fill_super</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                __ext4_fill_super</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                  INIT_WORK<span class="op">(&amp;</span>sbi<span class="op">-&gt;</span>s_error_work<span class="op">,</span> flush_stashed_error_work<span class="op">)</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                  ext4_register_sysfs</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">// umount /mnt &amp;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>task_work_run</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  __cleanup_mnt</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    cleanup_mnt</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      deactivate_super</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        deactivate_locked_super</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>          kill_block_super</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>            generic_shutdown_super</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>              ext4_put_super</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>                flush_work<span class="op">(&amp;</span>sbi<span class="op">-&gt;</span>s_error_work<span class="op">)</span> <span class="co">// 等最后一个 work 执行完成</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>                jbd2_journal_destroy</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>                  journal_kill_thread</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">// echo 1 &gt; /sys/fs/ext4/sda/trigger_fs_error,建议使用这种方法构造</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>write</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  ksys_write</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    vfs_write</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>      new_sync_write</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        call_write_iter</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>          kernfs_fop_write_iter</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>            sysfs_kf_write</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>              ext4_attr_store</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>                trigger_test_error</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>                  ext4_error</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>                    ext4_handle_error</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>                      schedule_work<span class="op">(&amp;</span>EXT4_SB<span class="op">(</span>sb<span class="op">)-&gt;</span>s_error_work<span class="op">)</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="co">// cat /proc/fs/ext4/sda/mb_groups, 不建议使用这个方法构造</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>read</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  ksys_read</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    vfs_read</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>      new_sync_read</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>        call_read_iter</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>          proc_reg_read_iter</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>            seq_read_iter</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>              ext4_mb_seq_groups_show</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>                ext4_mb_load_buddy</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>                  ext4_mb_load_buddy_gfp</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>                    ext4_mb_init_group</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>                      ext4_mb_init_cache</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>                        ext4_read_block_bitmap_nowait</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>                          ext4_validate_block_bitmap</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>                            blk <span class="op">=</span> ext4_valid_block_bitmap</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>                            <span class="co">// 把 blk 强制赋值成 -1, 就能进入以下条件</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>                            <span class="cf">if</span> <span class="op">(</span>unlikely<span class="op">(</span>blk <span class="op">!=</span> <span class="dv">0</span><span class="op">))</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>process_one_work</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>  flush_stashed_error_work</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>    jbd2_journal_start</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>      jbd2__journal_start</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>        start_this_handle</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> <span class="op">(!</span>journal<span class="op">-&gt;</span>j_running_transaction<span class="op">)</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>          <span class="cf">goto</span> repeat</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="co">// 时序</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>        umount                   <span class="op">|</span> write procfs      <span class="op">|</span>      error_work</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="op">---------------------------------|-------------------|---------------------</span></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>ext4_put_super                   <span class="op">|</span>                   <span class="op">|</span>            </span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a> flush_work<span class="op">(&amp;</span>sbi<span class="op">-&gt;</span>s_error_work<span class="op">)</span>  <span class="op">|</span>                   <span class="op">|</span>            </span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>                                 <span class="op">|</span>trigger_test_error <span class="op">|</span>            </span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>                                 <span class="op">|</span> ext4_error        <span class="op">|</span>            </span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>                                 <span class="op">|</span>  ext4_handle_error<span class="op">|</span>            </span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>                                 <span class="op">|</span>   schedule_work   <span class="op">|</span>            </span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a> jbd2_journal_destroy            <span class="op">|</span>                   <span class="op">|</span>            </span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>  journal_kill_thread            <span class="op">|</span>                   <span class="op">|</span>            </span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>   journal<span class="op">-&gt;</span>j_flag <span class="op">|=</span> JBD2_UMOUNT<span class="op">|</span>                   <span class="op">|</span>            </span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>                                 <span class="op">|</span>                   <span class="op">|</span>flush_stashed_error_work</span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>                                 <span class="op">|</span>                   <span class="op">|</span> jbd2_journal_start</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>                                 <span class="op">|</span>                   <span class="op">|</span>  jbd2__journal_start</span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>                                 <span class="op">|</span>                   <span class="op">|</span>   start_this_handle</span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>                                 <span class="op">|</span>                   <span class="op">|</span>    BUG_ON<span class="op">(</span>journal<span class="op">-&gt;</span>j_flags <span class="op">&amp;</span> JBD2_UNMOUNT<span class="op">)</span></span></code></pre></div>
+</body>
+</html>
