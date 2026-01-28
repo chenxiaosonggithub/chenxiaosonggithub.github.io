@@ -103,25 +103,29 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
+<li><a href="#environment" id="toc-environment"><span
+class="toc-section-number">1</span> Environment</a>
+<ul>
 <li><a href="#windows11-environment"
-id="toc-windows11-environment"><span class="toc-section-number">1</span>
-Windows11 Environment</a></li>
+id="toc-windows11-environment"><span
+class="toc-section-number">1.1</span> Windows11 Environment</a></li>
 <li><a href="#samba-environment" id="toc-samba-environment"><span
-class="toc-section-number">2</span> Samba Environment</a></li>
+class="toc-section-number">1.2</span> Samba Environment</a></li>
 <li><a href="#xfstests-environment" id="toc-xfstests-environment"><span
-class="toc-section-number">3</span> Xfstests Environment</a></li>
+class="toc-section-number">1.3</span> Xfstests Environment</a></li>
+</ul></li>
 <li><a href="#test-result-for-cifs103"
 id="toc-test-result-for-cifs103"><span
-class="toc-section-number">4</span> Test Result for cifs/103</a></li>
+class="toc-section-number">2</span> Test Result for cifs/103</a></li>
 <li><a href="#test-result-for-generic533"
 id="toc-test-result-for-generic533"><span
-class="toc-section-number">5</span> Test Result for generic/533</a></li>
+class="toc-section-number">3</span> Test Result for generic/533</a></li>
 <li><a href="#test-result-for-generic565"
 id="toc-test-result-for-generic565"><span
-class="toc-section-number">6</span> Test Result for generic/565</a></li>
+class="toc-section-number">4</span> Test Result for generic/565</a></li>
 <li><a href="#test-result-for-git0003"
 id="toc-test-result-for-git0003"><span
-class="toc-section-number">7</span> Test Result for git/0003</a></li>
+class="toc-section-number">5</span> Test Result for git/0003</a></li>
 </ul>
 </nav>
 <p><a href="https://chenxiaosong.com/en/smb-test.html">Please refer to
@@ -129,8 +133,10 @@ class="toc-section-number">7</span> Test Result for git/0003</a></li>
 <p>This article describes some test cases on <a
 href="http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/">buildbot</a>
 (buildbot might be shut down).</p>
-<h1 data-number="1" id="windows11-environment"><span
-class="header-section-number">1</span> Windows11 Environment</h1>
+<h1 data-number="1" id="environment"><span
+class="header-section-number">1</span> Environment</h1>
+<h2 data-number="1.1" id="windows11-environment"><span
+class="header-section-number">1.1</span> Windows11 Environment</h2>
 <p>Enable File Sharing:</p>
 <ul>
 <li>Go to Settings &gt; Network &amp; Internet &gt; Advanced network
@@ -148,8 +154,8 @@ Sharing &gt; Advanced Sharing</li>
 <li>Check “Share this folder” and give it a name (e.g., test,
 test2)</li>
 </ul>
-<h1 data-number="2" id="samba-environment"><span
-class="header-section-number">2</span> Samba Environment</h1>
+<h2 data-number="1.2" id="samba-environment"><span
+class="header-section-number">1.2</span> Samba Environment</h2>
 <p><code>smb.conf</code> is configured as follows:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">[test]</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">comment</span> = content server share1</span>
@@ -163,8 +169,8 @@ class="header-section-number">2</span> Samba Environment</h1>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">public</span> = yes</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">read</span> <span class="va">only</span> <span class="op">=</span> <span class="va">no</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">writeable</span> = yes</span></code></pre></div>
-<h1 data-number="3" id="xfstests-environment"><span
-class="header-section-number">3</span> Xfstests Environment</h1>
+<h2 data-number="1.3" id="xfstests-environment"><span
+class="header-section-number">1.3</span> Xfstests Environment</h2>
 <p><code>local.config</code> is configured as follows:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">smb_server_ip</span><span class="op">=&lt;</span>Windows <span class="ex">Ip</span><span class="op">&gt;</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="va">smb_username</span><span class="op">=&lt;</span>Windows <span class="ex">Account</span> Name, it is an Email<span class="op">&gt;</span></span>
@@ -177,15 +183,15 @@ class="header-section-number">3</span> Xfstests Environment</h1>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MOUNT_OPTIONS</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${smb_mount_options}</span><span class="st">&quot;</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SCRATCH_DEV</span><span class="op">=</span>//<span class="va">${smb_server_ip}</span>/test2</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SCRATCH_MNT</span><span class="op">=</span>/tmp/test2</span></code></pre></div>
-<h1 data-number="4" id="test-result-for-cifs103"><span
-class="header-section-number">4</span> Test Result for cifs/103</h1>
+<h1 data-number="2" id="test-result-for-cifs103"><span
+class="header-section-number">2</span> Test Result for cifs/103</h1>
 <ul>
 <li><a
 href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildbot-log/xfstest-smb3mc-cifs-103.txt">xfstest-smb3mc-cifs-103.txt</a></li>
 </ul>
 <p>You need to apply <a
 href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/0001-xfstests-add-cifs-103.patch">0001-xfstests-add-cifs-103.patch</a>
-before running the test case.</p>
+to xfstests before running the test case.</p>
 <p>The test fails when both Samba and Windows are used as the server,
 and there is a memory leak:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check cifs/103</span>
@@ -242,8 +248,8 @@ here to view more detailed logs</a>):</p>
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.634261]  do_syscall_64+0x89/0x350</span>
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>[  161.635337]  <span class="er">entry_SYSCALL_64_after_hwframe+0x76/0x7e</span></span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
-<h1 data-number="5" id="test-result-for-generic533"><span
-class="header-section-number">5</span> Test Result for generic/533</h1>
+<h1 data-number="3" id="test-result-for-generic533"><span
+class="header-section-number">3</span> Test Result for generic/533</h1>
 <ul>
 <li><a
 href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildbot-log/xfstest-smb3mcmfs-generic-533.txt">xfstest-smb3mcmfs-generic-533.txt</a></li>
@@ -268,8 +274,8 @@ href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildb
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Failures:</span> generic/533</span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="ex">Failed</span> 1 of 1 tests</span></code></pre></div>
 <p>But the test passes when Samba is used as the server.</p>
-<h1 data-number="6" id="test-result-for-generic565"><span
-class="header-section-number">6</span> Test Result for generic/565</h1>
+<h1 data-number="4" id="test-result-for-generic565"><span
+class="header-section-number">4</span> Test Result for generic/565</h1>
 <ul>
 <li><a
 href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildbot-log/xfstest-smb3mcmfs-generic-565.txt">xfstest-smb3mcmfs-generic-565.txt</a></li>
@@ -294,15 +300,15 @@ href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildb
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Failures:</span> generic/565</span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="ex">Failed</span> 1 of 1 tests</span></code></pre></div>
 <p>But the test passes when Samba is used as the server.</p>
-<h1 data-number="7" id="test-result-for-git0003"><span
-class="header-section-number">7</span> Test Result for git/0003</h1>
+<h1 data-number="5" id="test-result-for-git0003"><span
+class="header-section-number">5</span> Test Result for git/0003</h1>
 <ul>
 <li><a
 href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildbot-log/xfstest-smb3mcmfs-git-0003.txt">xfstest-smb3mcmfs-git-0003.txt</a></li>
 </ul>
 <p>You need to apply <a
 href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/0001-xfstests-add-git-0003.patch">0001-xfstests-add-git-0003.patch</a>
-before running the test case.</p>
+to xfstests before running the test case.</p>
 <p>The test fails when both Samba and Windows are used as the
 server:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check git/0003</span>
