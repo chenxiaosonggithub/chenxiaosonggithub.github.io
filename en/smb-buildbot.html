@@ -114,9 +114,14 @@ class="toc-section-number">1.2</span> Samba Environment</a></li>
 <li><a href="#xfstests-environment" id="toc-xfstests-environment"><span
 class="toc-section-number">1.3</span> Xfstests Environment</a></li>
 </ul></li>
-<li><a href="#test-result-for-cifs103"
-id="toc-test-result-for-cifs103"><span
-class="toc-section-number">2</span> Test Result for cifs/103</a></li>
+<li><a href="#cifs103" id="toc-cifs103"><span
+class="toc-section-number">2</span> cifs/103</a>
+<ul>
+<li><a href="#test-result" id="toc-test-result"><span
+class="toc-section-number">2.1</span> Test Result</a></li>
+<li><a href="#debug" id="toc-debug"><span
+class="toc-section-number">2.2</span> Debug</a></li>
+</ul></li>
 <li><a href="#test-result-for-generic533"
 id="toc-test-result-for-generic533"><span
 class="toc-section-number">3</span> Test Result for generic/533</a></li>
@@ -153,6 +158,8 @@ settings &gt; Advanced sharing settings</li>
 Sharing &gt; Advanced Sharing</li>
 <li>Check “Share this folder” and give it a name (e.g., test,
 test2)</li>
+<li>Go to “Permissions”, check “Allow Full Control”. By default, “Allow
+Change” is not checked</li>
 </ul>
 <h2 data-number="1.2" id="samba-environment"><span
 class="header-section-number">1.2</span> Samba Environment</h2>
@@ -183,8 +190,10 @@ class="header-section-number">1.3</span> Xfstests Environment</h2>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MOUNT_OPTIONS</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${smb_mount_options}</span><span class="st">&quot;</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SCRATCH_DEV</span><span class="op">=</span>//<span class="va">${smb_server_ip}</span>/test2</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SCRATCH_MNT</span><span class="op">=</span>/tmp/test2</span></code></pre></div>
-<h1 data-number="2" id="test-result-for-cifs103"><span
-class="header-section-number">2</span> Test Result for cifs/103</h1>
+<h1 data-number="2" id="cifs103"><span
+class="header-section-number">2</span> cifs/103</h1>
+<h2 data-number="2.1" id="test-result"><span
+class="header-section-number">2.1</span> Test Result</h2>
 <ul>
 <li><a
 href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildbot-log/xfstest-smb3mc-cifs-103.txt">xfstest-smb3mc-cifs-103.txt</a></li>
@@ -192,65 +201,73 @@ href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildb
 <p>You need to apply <a
 href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/0001-xfstests-add-cifs-103.patch">0001-xfstests-add-cifs-103.patch</a>
 to xfstests before running the test case.</p>
-<p>The test fails when both Samba and Windows are used as the
-server:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check cifs/103</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   86.146096] kmemleak: Automatic <span class="er">memory</span> <span class="ex">scanning</span> thread ended</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> output mismatch <span class="er">(</span><span class="ex">see</span> /root/code/xfstests-dev/results//cifs/103.out.bad<span class="kw">)</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">---</span> tests/cifs/103.out      2026-01-28 17:51:01.833770569 +0800</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+++</span> /root/code/xfstests-dev/results//cifs/103.out.bad       2026-01-28 22:14:31.948665343 +0800</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@@</span> <span class="at">-1,2</span> +1,3 @@</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>     <span class="ex">QA</span> output created by 103</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-pread</span> <span class="at">-1</span> bytes</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+QA</span> output created by 103</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+/root/code/xfstests-dev/tests/cifs/103:</span> line 40: /data/xfstests-dev/src/pread-errno: No such file or directory</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">Run</span> <span class="st">&#39;diff -u /root/code/xfstests-dev/tests/cifs/103.out /root/code/xfstests-dev/results//cifs/103.out.bad&#39;</span>  to see the entire diff<span class="kw">)</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="ex">Ran:</span> cifs/103</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Failures:</span> cifs/103</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Failed</span> 1 of 1 tests</span></code></pre></div>
 <p>The following error is reported (<a
 href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/test/buildbot/cifs-103-log.txt">click
 here to view more detailed logs</a>) when Windows is used as the server
-(But it passes when Samba is used as the server) after executing
+(But no kmemleak when Samba is used as the server) after executing
 <code>modprobe -r cifs</code>, :</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">modprobe</span> <span class="at">-r</span> cifs</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check cifs/103 <span class="co"># success when server is windows</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">modprobe</span> <span class="at">-r</span> cifs</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   48.183282] kmemleak: Automatic <span class="er">memory</span> <span class="ex">scanning</span> thread ended</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.458074] =============================================================================</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>[  161.463042] <span class="er">BUG</span> <span class="ex">cifs_small_rq</span> <span class="er">(</span><span class="ex">Not</span> tainted<span class="kw">)</span><span class="bu">:</span> Objects remaining on __kmem_cache_shutdown<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.467606] -----------------------------------------------------------------------------</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>[  161.487883] <span class="er">WARNING:</span> <span class="ex">mm/slub.c:1251</span> at __kmem_cache_shutdown+0x34e/0x440, CPU#12: modprobe/1716</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.532948] Call Trace:</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.533720</span><span class="ex">]</span>  <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.534356]  <span class="pp">?</span> cifs_destroy_request_bufs+0x3e/0x50 <span class="er">[cifs</span><span class="ex">]</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.536713]  kmem_cache_destroy+0x94/0x190</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>[  161.537859]  <span class="er">cifs_destroy_request_bufs+0x3e/0x50</span> <span class="ex">[cifs]</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.540225]  cleanup_module+0x4e/0x540 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.542401</span><span class="ex">]</span>  __se_sys_delete_module+0x278/0x400</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.543640]  __x64_sys_delete_module+0x5f/0x70</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>[  161.544844]  <span class="er">?</span> <span class="ex">entry_SYSCALL_64_after_hwframe+0x76/0x7e</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.546316]  x64_sys_call+0x2299/0x2ff0</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>[  161.547454]  <span class="er">do_syscall_64+0x89/0x350</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.548488]  entry_SYSCALL_64_after_hwframe+0x76/0x7e</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>[  161.582052] <span class="er">kmem_cache_destroy</span> <span class="ex">cifs_small_rq:</span> Slab cache still has objects when called from cifs_destroy_request_bufs+0x3e/0x50 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.582974] WARNING: mm/slab_common.c:532 <span class="er">at</span> <span class="ex">kmem_cache_destroy+0x16b/0x190,</span> CPU#12: modprobe/1716</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.622928] Call Trace:</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.623691</span><span class="ex">]</span>  <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.624325]  cifs_destroy_request_bufs+0x3e/0x50 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.626809</span><span class="ex">]</span>  cleanup_module+0x4e/0x540 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.629085]  __se_sys_delete_module+0x278/0x400</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>[  161.630386]  <span class="er">__x64_sys_delete_module+0x5f/0x70</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.631655]  <span class="pp">?</span> entry_SYSCALL_64_after_hwframe+0x76/0x7e</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.633143</span><span class="ex">]</span>  x64_sys_call+0x2299/0x2ff0</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.634261]  do_syscall_64+0x89/0x350</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>[  161.635337]  <span class="er">entry_SYSCALL_64_after_hwframe+0x76/0x7e</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
+<p>The test fails when Samba is used as the server:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check cifs/103</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.458074] =============================================================================</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>[  161.463042] <span class="er">BUG</span> <span class="ex">cifs_small_rq</span> <span class="er">(</span><span class="ex">Not</span> tainted<span class="kw">)</span><span class="bu">:</span> Objects remaining on __kmem_cache_shutdown<span class="er">(</span><span class="kw">)</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.467606] -----------------------------------------------------------------------------</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>...</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>[  161.487883] <span class="er">WARNING:</span> <span class="ex">mm/slub.c:1251</span> at __kmem_cache_shutdown+0x34e/0x440, CPU#12: modprobe/1716</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.532948] Call Trace:</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.533720</span><span class="ex">]</span>  <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.534356]  <span class="pp">?</span> cifs_destroy_request_bufs+0x3e/0x50 <span class="er">[cifs</span><span class="ex">]</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.536713]  kmem_cache_destroy+0x94/0x190</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>[  161.537859]  <span class="er">cifs_destroy_request_bufs+0x3e/0x50</span> <span class="ex">[cifs]</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.540225]  cleanup_module+0x4e/0x540 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.542401</span><span class="ex">]</span>  __se_sys_delete_module+0x278/0x400</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.543640]  __x64_sys_delete_module+0x5f/0x70</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>[  161.544844]  <span class="er">?</span> <span class="ex">entry_SYSCALL_64_after_hwframe+0x76/0x7e</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.546316]  x64_sys_call+0x2299/0x2ff0</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>[  161.547454]  <span class="er">do_syscall_64+0x89/0x350</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.548488]  entry_SYSCALL_64_after_hwframe+0x76/0x7e</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>...</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>[  161.582052] <span class="er">kmem_cache_destroy</span> <span class="ex">cifs_small_rq:</span> Slab cache still has objects when called from cifs_destroy_request_bufs+0x3e/0x50 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.582974] WARNING: mm/slab_common.c:532 <span class="er">at</span> <span class="ex">kmem_cache_destroy+0x16b/0x190,</span> CPU#12: modprobe/1716</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.622928] Call Trace:</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.623691</span><span class="ex">]</span>  <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.624325]  cifs_destroy_request_bufs+0x3e/0x50 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.626809</span><span class="ex">]</span>  cleanup_module+0x4e/0x540 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.629085]  __se_sys_delete_module+0x278/0x400</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>[  161.630386]  <span class="er">__x64_sys_delete_module+0x5f/0x70</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.631655]  <span class="pp">?</span> entry_SYSCALL_64_after_hwframe+0x76/0x7e</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.633143</span><span class="ex">]</span>  x64_sys_call+0x2299/0x2ff0</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.634261]  do_syscall_64+0x89/0x350</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>[  161.635337]  <span class="er">entry_SYSCALL_64_after_hwframe+0x76/0x7e</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> output mismatch <span class="er">(</span><span class="ex">see</span> /root/code/xfstests-dev/results//cifs/103.out.bad<span class="kw">)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">---</span> tests/cifs/103.out      2026-01-28 17:51:01.833770569 +0800</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+++</span> /root/code/xfstests-dev/results//cifs/103.out.bad       2026-01-29 17:04:17.102524129 +0800</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@@</span> <span class="at">-1,2</span> +1,2 @@</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>     <span class="ex">QA</span> output created by 103</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-pread</span> <span class="at">-1</span> bytes</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+pread</span> 8 bytes</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">Run</span> <span class="st">&#39;diff -u /root/code/xfstests-dev/tests/cifs/103.out /root/code/xfstests-dev/results//cifs/103.out.bad&#39;</span>  to see the entire diff<span class="kw">)</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="ex">Ran:</span> cifs/103</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="ex">Failures:</span> cifs/103</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="ex">Failed</span> 1 of 1 tests</span></code></pre></div>
+<h2 data-number="2.2" id="debug"><span
+class="header-section-number">2.2</span> Debug</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="va">mnt_point</span><span class="op">=</span>/mnt</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="va">filename</span><span class="op">=</span><span class="va">$mnt_point</span>/testfile</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> cifs //192.168.53.210/test <span class="va">$mnt_point</span> <span class="at">-o</span> username=root,password=1,uid=<span class="va">$(</span><span class="fu">id</span> <span class="at">-u</span><span class="va">)</span>,gid=<span class="va">$(</span><span class="fu">id</span> <span class="at">-g</span><span class="va">)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> <span class="va">$filename</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/dev/zero of=<span class="va">$filename</span> bs=512 count=1000 oflag=direct <span class="op">&gt;</span>/dev/null <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sync</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">src/pread-errno</span> <span class="va">$filename</span></span></code></pre></div>
 <h1 data-number="3" id="test-result-for-generic533"><span
 class="header-section-number">3</span> Test Result for generic/533</h1>
 <ul>
@@ -258,24 +275,24 @@ class="header-section-number">3</span> Test Result for generic/533</h1>
 href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildbot-log/xfstest-smb3mcmfs-generic-533.txt">xfstest-smb3mcmfs-generic-533.txt</a></li>
 </ul>
 <p>The test fails when Windows is used as the server:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check generic/533</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> output mismatch <span class="er">(</span><span class="ex">see</span> /root/code/xfstests-dev/results//generic/533.out.bad<span class="kw">)</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">---</span> tests/generic/533.out   2025-11-09 16:32:21.071206222 +0800</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+++</span> /root/code/xfstests-dev/results//generic/533.out.bad    2026-01-28 16:26:11.606544044 +0800</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@@</span> <span class="at">-1,108</span> +1,91 @@</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>     <span class="ex">QA</span> output created by 533</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+touch:</span> cannot touch <span class="st">&#39;/tmp/test/syscalltest&#39;</span>: Permission denied</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+./common/attr:</span> line 217: /tmp/test/syscalltest.out: Permission denied</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+cat:</span> /tmp/test/syscalltest.out: No such file or directory</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+grep:</span> /tmp/test/syscalltest.out: No such file or directory</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+grep:</span> /tmp/test/syscalltest.out: No such file or directory</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">Run</span> <span class="st">&#39;diff -u /root/code/xfstests-dev/tests/generic/533.out /root/code/xfstests-dev/results//generic/533.out.bad&#39;</span>  to see the entire diff<span class="kw">)</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Ran:</span> generic/533</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Failures:</span> generic/533</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="ex">Failed</span> 1 of 1 tests</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check generic/533</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> output mismatch <span class="er">(</span><span class="ex">see</span> /root/code/xfstests-dev/results//generic/533.out.bad<span class="kw">)</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">---</span> tests/generic/533.out   2025-11-09 16:32:21.071206222 +0800</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+++</span> /root/code/xfstests-dev/results//generic/533.out.bad    2026-01-28 16:26:11.606544044 +0800</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@@</span> <span class="at">-1,108</span> +1,91 @@</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>     <span class="ex">QA</span> output created by 533</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+touch:</span> cannot touch <span class="st">&#39;/tmp/test/syscalltest&#39;</span>: Permission denied</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+./common/attr:</span> line 217: /tmp/test/syscalltest.out: Permission denied</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+cat:</span> /tmp/test/syscalltest.out: No such file or directory</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+grep:</span> /tmp/test/syscalltest.out: No such file or directory</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+grep:</span> /tmp/test/syscalltest.out: No such file or directory</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">Run</span> <span class="st">&#39;diff -u /root/code/xfstests-dev/tests/generic/533.out /root/code/xfstests-dev/results//generic/533.out.bad&#39;</span>  to see the entire diff<span class="kw">)</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Ran:</span> generic/533</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Failures:</span> generic/533</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="ex">Failed</span> 1 of 1 tests</span></code></pre></div>
 <p>But the test passes when Samba is used as the server.</p>
 <h1 data-number="4" id="test-result-for-generic565"><span
 class="header-section-number">4</span> Test Result for generic/565</h1>
@@ -284,24 +301,24 @@ class="header-section-number">4</span> Test Result for generic/565</h1>
 href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildbot-log/xfstest-smb3mcmfs-generic-565.txt">xfstest-smb3mcmfs-generic-565.txt</a></li>
 </ul>
 <p>The test fails when Windows is used as the server:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check generic/565</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> output mismatch <span class="er">(</span><span class="ex">see</span> /root/code/xfstests-dev/results//generic/565.out.bad<span class="kw">)</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">---</span> tests/generic/565.out   2025-11-09 16:32:21.073206335 +0800</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+++</span> /root/code/xfstests-dev/results//generic/565.out.bad    2026-01-28 16:17:34.138027989 +0800</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@@</span> <span class="at">-1,4</span> +1,6 @@</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>     <span class="ex">QA</span> output created by 565</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+mkdir:</span> cannot create directory <span class="st">&#39;/tmp/test/test-565&#39;</span>: Permission denied</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+/tmp/test2/copy:</span> Permission deniedcmp: /tmp/test/test-565/file: No such file or directory</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>     <span class="ex">md5sums</span> after xdev copy:</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-81615449a98aaaad8dc179b3bec87f38</span>  TEST_DIR/test-565/file</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-81615449a98aaaad8dc179b3bec87f38</span>  SCRATCH_MNT/copy</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+md5sum:</span> /tmp/test/test-565/file: No such file or directory</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">Run</span> <span class="st">&#39;diff -u /root/code/xfstests-dev/tests/generic/565.out /root/code/xfstests-dev/results//generic/565.out.bad&#39;</span>  to see the entire diff<span class="kw">)</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Ran:</span> generic/565</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Failures:</span> generic/565</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="ex">Failed</span> 1 of 1 tests</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check generic/565</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> output mismatch <span class="er">(</span><span class="ex">see</span> /root/code/xfstests-dev/results//generic/565.out.bad<span class="kw">)</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">---</span> tests/generic/565.out   2025-11-09 16:32:21.073206335 +0800</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+++</span> /root/code/xfstests-dev/results//generic/565.out.bad    2026-01-28 16:17:34.138027989 +0800</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@@</span> <span class="at">-1,4</span> +1,6 @@</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>     <span class="ex">QA</span> output created by 565</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+mkdir:</span> cannot create directory <span class="st">&#39;/tmp/test/test-565&#39;</span>: Permission denied</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+/tmp/test2/copy:</span> Permission deniedcmp: /tmp/test/test-565/file: No such file or directory</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>     <span class="ex">md5sums</span> after xdev copy:</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-81615449a98aaaad8dc179b3bec87f38</span>  TEST_DIR/test-565/file</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-81615449a98aaaad8dc179b3bec87f38</span>  SCRATCH_MNT/copy</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+md5sum:</span> /tmp/test/test-565/file: No such file or directory</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">Run</span> <span class="st">&#39;diff -u /root/code/xfstests-dev/tests/generic/565.out /root/code/xfstests-dev/results//generic/565.out.bad&#39;</span>  to see the entire diff<span class="kw">)</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Ran:</span> generic/565</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Failures:</span> generic/565</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="ex">Failed</span> 1 of 1 tests</span></code></pre></div>
 <p>But the test passes when Samba is used as the server.</p>
 <h1 data-number="5" id="test-result-for-git0003"><span
 class="header-section-number">5</span> Test Result for git/0003</h1>
@@ -314,23 +331,23 @@ href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/0001
 to xfstests before running the test case.</p>
 <p>The test fails when both Samba and Windows are used as the
 server:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check git/0003</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[failed,</span> exit status 1]- output mismatch <span class="er">(</span><span class="ex">see</span> /root/code/xfstests-dev/results//git/0003.out.bad<span class="kw">)</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">---</span> tests/git/0003.out      2026-01-28 22:39:42.799807504 +0800</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+++</span> /root/code/xfstests-dev/results//git/0003.out.bad       2026-01-28 22:42:08.560752296 +0800</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@@</span> <span class="at">-1,29</span> +1,5 @@</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+QA</span> output created by 0003</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>     <span class="ex">QA</span> output created by git 0003</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-ok</span> 1 <span class="at">-</span> open-quoted pathname</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-ok</span> 2 <span class="at">-</span> setup</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-ok</span> 3 <span class="at">-</span> command line checks</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-ok</span> 4 <span class="at">-</span> attribute test</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-ok</span> 5 <span class="at">-</span> attribute matching is case sensitive when core.ignorecase=0</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">Run</span> <span class="st">&#39;diff -u /root/code/xfstests-dev/tests/git/0003.out /root/code/xfstests-dev/results//git/0003.out.bad&#39;</span>  to see the entire diff<span class="kw">)</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Ran:</span> git/0003</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Failures:</span> git/0003</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="ex">Failed</span> 1 of 1 tests</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check git/0003</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[failed,</span> exit status 1]- output mismatch <span class="er">(</span><span class="ex">see</span> /root/code/xfstests-dev/results//git/0003.out.bad<span class="kw">)</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">---</span> tests/git/0003.out      2026-01-28 22:39:42.799807504 +0800</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+++</span> /root/code/xfstests-dev/results//git/0003.out.bad       2026-01-28 22:42:08.560752296 +0800</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@@</span> <span class="at">-1,29</span> +1,5 @@</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">+QA</span> output created by 0003</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>     <span class="ex">QA</span> output created by git 0003</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-ok</span> 1 <span class="at">-</span> open-quoted pathname</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-ok</span> 2 <span class="at">-</span> setup</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-ok</span> 3 <span class="at">-</span> command line checks</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-ok</span> 4 <span class="at">-</span> attribute test</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-ok</span> 5 <span class="at">-</span> attribute matching is case sensitive when core.ignorecase=0</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">Run</span> <span class="st">&#39;diff -u /root/code/xfstests-dev/tests/git/0003.out /root/code/xfstests-dev/results//git/0003.out.bad&#39;</span>  to see the entire diff<span class="kw">)</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Ran:</span> git/0003</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Failures:</span> git/0003</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="ex">Failed</span> 1 of 1 tests</span></code></pre></div>
 </body>
 </html>
