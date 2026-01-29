@@ -192,8 +192,8 @@ href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildb
 <p>You need to apply <a
 href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/0001-xfstests-add-cifs-103.patch">0001-xfstests-add-cifs-103.patch</a>
 to xfstests before running the test case.</p>
-<p>The test fails when both Samba and Windows are used as the server,
-and there is a memory leak:</p>
+<p>The test fails when both Samba and Windows are used as the
+server:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./check cifs/103</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>   86.146096] kmemleak: Automatic <span class="er">memory</span> <span class="ex">scanning</span> thread ended</span>
@@ -211,43 +211,46 @@ and there is a memory leak:</p>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="ex">Ran:</span> cifs/103</span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Failures:</span> cifs/103</span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="ex">Failed</span> 1 of 1 tests</span></code></pre></div>
-<p>After executing <code>modprobe -r cifs</code>, the following error is
-reported (<a
+<p>The following error is reported (<a
 href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/test/buildbot/cifs-103-log.txt">click
-here to view more detailed logs</a>):</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.458074] =============================================================================</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>[  161.463042] <span class="er">BUG</span> <span class="ex">cifs_small_rq</span> <span class="er">(</span><span class="ex">Not</span> tainted<span class="kw">)</span><span class="bu">:</span> Objects remaining on __kmem_cache_shutdown<span class="er">(</span><span class="kw">)</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.467606] -----------------------------------------------------------------------------</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>...</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>[  161.487883] <span class="er">WARNING:</span> <span class="ex">mm/slub.c:1251</span> at __kmem_cache_shutdown+0x34e/0x440, CPU#12: modprobe/1716</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.532948] Call Trace:</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.533720</span><span class="ex">]</span>  <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.534356]  <span class="pp">?</span> cifs_destroy_request_bufs+0x3e/0x50 <span class="er">[cifs</span><span class="ex">]</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.536713]  kmem_cache_destroy+0x94/0x190</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>[  161.537859]  <span class="er">cifs_destroy_request_bufs+0x3e/0x50</span> <span class="ex">[cifs]</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.540225]  cleanup_module+0x4e/0x540 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.542401</span><span class="ex">]</span>  __se_sys_delete_module+0x278/0x400</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.543640]  __x64_sys_delete_module+0x5f/0x70</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>[  161.544844]  <span class="er">?</span> <span class="ex">entry_SYSCALL_64_after_hwframe+0x76/0x7e</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.546316]  x64_sys_call+0x2299/0x2ff0</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>[  161.547454]  <span class="er">do_syscall_64+0x89/0x350</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.548488]  entry_SYSCALL_64_after_hwframe+0x76/0x7e</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>...</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>[  161.582052] <span class="er">kmem_cache_destroy</span> <span class="ex">cifs_small_rq:</span> Slab cache still has objects when called from cifs_destroy_request_bufs+0x3e/0x50 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.582974] WARNING: mm/slab_common.c:532 <span class="er">at</span> <span class="ex">kmem_cache_destroy+0x16b/0x190,</span> CPU#12: modprobe/1716</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.622928] Call Trace:</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.623691</span><span class="ex">]</span>  <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.624325]  cifs_destroy_request_bufs+0x3e/0x50 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.626809</span><span class="ex">]</span>  cleanup_module+0x4e/0x540 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.629085]  __se_sys_delete_module+0x278/0x400</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>[  161.630386]  <span class="er">__x64_sys_delete_module+0x5f/0x70</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.631655]  <span class="pp">?</span> entry_SYSCALL_64_after_hwframe+0x76/0x7e</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.633143</span><span class="ex">]</span>  x64_sys_call+0x2299/0x2ff0</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.634261]  do_syscall_64+0x89/0x350</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>[  161.635337]  <span class="er">entry_SYSCALL_64_after_hwframe+0x76/0x7e</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
+here to view more detailed logs</a>) when Windows is used as the server
+(But it passes when Samba is used as the server) after executing
+<code>modprobe -r cifs</code>, :</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">modprobe</span> <span class="at">-r</span> cifs</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.458074] =============================================================================</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>[  161.463042] <span class="er">BUG</span> <span class="ex">cifs_small_rq</span> <span class="er">(</span><span class="ex">Not</span> tainted<span class="kw">)</span><span class="bu">:</span> Objects remaining on __kmem_cache_shutdown<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.467606] -----------------------------------------------------------------------------</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>[  161.487883] <span class="er">WARNING:</span> <span class="ex">mm/slub.c:1251</span> at __kmem_cache_shutdown+0x34e/0x440, CPU#12: modprobe/1716</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.532948] Call Trace:</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.533720</span><span class="ex">]</span>  <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.534356]  <span class="pp">?</span> cifs_destroy_request_bufs+0x3e/0x50 <span class="er">[cifs</span><span class="ex">]</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.536713]  kmem_cache_destroy+0x94/0x190</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>[  161.537859]  <span class="er">cifs_destroy_request_bufs+0x3e/0x50</span> <span class="ex">[cifs]</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.540225]  cleanup_module+0x4e/0x540 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.542401</span><span class="ex">]</span>  __se_sys_delete_module+0x278/0x400</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.543640]  __x64_sys_delete_module+0x5f/0x70</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>[  161.544844]  <span class="er">?</span> <span class="ex">entry_SYSCALL_64_after_hwframe+0x76/0x7e</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.546316]  x64_sys_call+0x2299/0x2ff0</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>[  161.547454]  <span class="er">do_syscall_64+0x89/0x350</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.548488]  entry_SYSCALL_64_after_hwframe+0x76/0x7e</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>[  161.582052] <span class="er">kmem_cache_destroy</span> <span class="ex">cifs_small_rq:</span> Slab cache still has objects when called from cifs_destroy_request_bufs+0x3e/0x50 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.582974] WARNING: mm/slab_common.c:532 <span class="er">at</span> <span class="ex">kmem_cache_destroy+0x16b/0x190,</span> CPU#12: modprobe/1716</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.622928] Call Trace:</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.623691</span><span class="ex">]</span>  <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.624325]  cifs_destroy_request_bufs+0x3e/0x50 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.626809</span><span class="ex">]</span>  cleanup_module+0x4e/0x540 <span class="pp">[</span><span class="ss">cifs</span><span class="pp">]</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.629085]  __se_sys_delete_module+0x278/0x400</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>[  161.630386]  <span class="er">__x64_sys_delete_module+0x5f/0x70</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.631655]  <span class="pp">?</span> entry_SYSCALL_64_after_hwframe+0x76/0x7e</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">161.633143</span><span class="ex">]</span>  x64_sys_call+0x2299/0x2ff0</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  161.634261]  do_syscall_64+0x89/0x350</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>[  161.635337]  <span class="er">entry_SYSCALL_64_after_hwframe+0x76/0x7e</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
 <h1 data-number="3" id="test-result-for-generic533"><span
 class="header-section-number">3</span> Test Result for generic/533</h1>
 <ul>
