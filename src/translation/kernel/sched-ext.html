@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Extensible Scheduler Class</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">Extensible Scheduler Class</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#切换到和切换自-sched_ext"><span class="toc-section-number">1</span> 切换到和切换自 sched_ext</a></li>
+<li><a href="#基础"><span class="toc-section-number">2</span> 基础</a><ul>
+<li><a href="#调度队列"><span class="toc-section-number">2.1</span> 调度队列</a></li>
+<li><a href="#调度周期"><span class="toc-section-number">2.2</span> 调度周期</a></li>
+</ul></li>
+<li><a href="#查看位置where-to-look"><span class="toc-section-number">3</span> 查看位置（Where to Look）</a></li>
+<li><a href="#abi-不稳定性"><span class="toc-section-number">4</span> ABI 不稳定性</a></li>
+</ul>
+</nav>
+<p>本文档翻译自<a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/linux/kernel/sched-ext-origin.rst">sched-ext.rst</a>，翻译时sched-ext未合入主线，还在next仓库里，当时next仓库里的最新提交是<code>18b2bd03371b sched_ext: Documentation: Remove mentions of scx_bpf_switch_all</code>。大部分借助于ChatGPT翻译，仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<p>sched_ext 是一个调度器类，其行为可以通过一组 BPF 程序来定义——即 BPF 调度器。</p>
+<ul>
+<li>sched_ext 导出完整的调度接口，以便在其上实现任何调度算法。</li>
+<li>BPF 调度器可以根据需要将 CPU 分组并一起调度，因为任务在唤醒时不绑定到特定的 CPU。</li>
+<li>BPF 调度器可以随时动态开启和关闭。</li>
+<li>无论 BPF 调度器做了什么，系统完整性始终得到维护。每当检测到错误、可运行任务停滞或调用 SysRq 键序列 <code class="interpreted-text" data-role="kbd">SysRq-S</code> 时，默认的调度行为会恢复。</li>
+<li>当 BPF 调度器触发错误时，会转储调试信息以辅助调试。调试转储被传递给调度器二进制文件并打印出来。调试转储也可以通过 <span class="title-ref">sched_ext_dump</span> 跟踪点访问。SysRq 键序列 <code class="interpreted-text" data-role="kbd">SysRq-D</code> 会触发调试转储。这不会终止 BPF 调度器，只能通过跟踪点读取。</li>
+</ul>
+<h1 id="切换到和切换自-sched_ext"><span class="header-section-number">1</span> 切换到和切换自 sched_ext</h1>
+<p><code>CONFIG_SCHED_CLASS_EXT</code> 是启用 sched_ext 的配置选项，而 <code>tools/sched_ext</code> 包含示例调度器。使用 sched_ext 应启用以下配置选项:</p>
+<pre class="sourceCode none"><code>CONFIG_BPF=y
+CONFIG_SCHED_CLASS_EXT=y
+CONFIG_BPF_SYSCALL=y
+CONFIG_BPF_JIT=y
+CONFIG_DEBUG_INFO_BTF=y
+CONFIG_BPF_JIT_ALWAYS_ON=y
+CONFIG_BPF_JIT_DEFAULT_ON=y
+CONFIG_PAHOLE_HAS_SPLIT_BTF=y
+CONFIG_PAHOLE_HAS_BTF_TAG=y</code></pre>
+<p>只有在加载并运行 BPF 调度器时，sched_ext 才会被使用。</p>
+<p>如果任务显式设置其调度策略为 <code>SCHED_EXT</code>，则会被视为 <code>SCHED_NORMAL</code> 并由 CFS 调度，直到加载 BPF 调度器为止。</p>
+<p>当 BPF 调度器加载且 <code>SCX_OPS_SWITCH_PARTIAL</code> 在 <code>ops-&gt;flags</code> 中未设置时，所有 <code>SCHED_NORMAL</code>、<code>SCHED_BATCH</code>、<code>SCHED_IDLE</code> 和 <code>SCHED_EXT</code> 任务都由 sched_ext 调度。</p>
+<p>然而，当 BPF 调度器加载且 <code>SCX_OPS_SWITCH_PARTIAL</code> 在 <code>ops-&gt;flags</code> 中设置时，只有 <code>SCHED_EXT</code> 策略的任务由 sched_ext 调度，而 <code>SCHED_NORMAL</code>、<code>SCHED_BATCH</code> 和 <code>SCHED_IDLE</code> 策略的任务由 CFS 调度。</p>
+<p>终止 sched_ext 调度器程序、触发 <code class="interpreted-text" data-role="kbd">SysRq-S</code> 或检测到任何内部错误（包括停滞的可运行任务）都会中止 BPF 调度器并将所有任务恢复到 CFS。</p>
+<pre class="sourceCode none"><code># make -j16 -C tools/sched_ext
+# tools/sched_ext/scx_simple
+local=0 global=3
+local=5 global=24
+local=9 global=44
+local=13 global=56
+local=17 global=72
+^CEXIT: BPF scheduler unregistered</code></pre>
+<p>可以通过以下方式确定 BPF 调度器的当前状态:</p>
+<pre class="sourceCode none"><code># cat /sys/kernel/sched_ext/state
+enabled
+# cat /sys/kernel/sched_ext/root/ops
+simple</code></pre>
+<p><code>tools/sched_ext/scx_show_state.py</code> 是一个 drgn 脚本，显示更详细的信息:</p>
+<pre class="sourceCode none"><code># tools/sched_ext/scx_show_state.py
+ops           : simple
+enabled       : 1
+switching_all : 1
+switched_all  : 1
+enable_state  : enabled (2)
+bypass_depth  : 0
+nr_rejected   : 0</code></pre>
+<p>如果设置了 <code>CONFIG_SCHED_DEBUG</code>，可以通过以下方式确定给定任务是否在 sched_ext 上:</p>
+<pre class="sourceCode none"><code># grep ext /proc/self/sched
+ext.enabled                                  :                    1</code></pre>
+<h1 id="基础"><span class="header-section-number">2</span> 基础</h1>
+<p>用户空间可以通过加载一组实现了 <code>struct sched_ext_ops</code> 的 BPF 程序来实现任意的 BPF 调度器。唯一强制性的字段是 <code>ops.name</code>，它必须是一个有效的 BPF 对象名称。所有操作都是可选的。以下修改的摘录来自 <code>tools/sched_ext/scx_simple.bpf.c</code>，显示了一个最小的全局 FIFO 调度器。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb6-1" title="1"><span class="co">/*</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="co"> * 决定一个任务在被入队前应该迁移到哪个 CPU（无论是在唤醒、fork 时还是 exec 时）。如果默认的 ops.select_cpu() 实现找到一个空闲核心，</span></a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="co"> * 则直接将任务分发到 SCX_DSQ_LOCAL，并跳过 ops.enqueue() 回调。</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="co"> *</span></a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="co"> * 注意，这个实现的行为与默认的 ops.select_cpu 实现完全相同。如果实现只是没有定义 simple_select_cpu() struct_ops 程序，</span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="co"> * 调度器的行为将完全相同。</span></a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="co"> */</span></a>
+<a class="sourceLine" id="cb6-8" title="8">s32 BPF_STRUCT_OPS(simple_select_cpu, <span class="kw">struct</span> task_struct *p,</a>
+<a class="sourceLine" id="cb6-9" title="9">                   s32 prev_cpu, u64 wake_flags)</a>
+<a class="sourceLine" id="cb6-10" title="10">{</a>
+<a class="sourceLine" id="cb6-11" title="11">        s32 cpu;</a>
+<a class="sourceLine" id="cb6-12" title="12">        <span class="co">/* 需要初始化，否则 BPF 验证器会拒绝程序 */</span></a>
+<a class="sourceLine" id="cb6-13" title="13">        <span class="dt">bool</span> direct = false;</a>
+<a class="sourceLine" id="cb6-14" title="14"></a>
+<a class="sourceLine" id="cb6-15" title="15">        cpu = scx_bpf_select_cpu_dfl(p, prev_cpu, wake_flags, &amp;direct);</a>
+<a class="sourceLine" id="cb6-16" title="16"></a>
+<a class="sourceLine" id="cb6-17" title="17">        <span class="cf">if</span> (direct)</a>
+<a class="sourceLine" id="cb6-18" title="18">                scx_bpf_dispatch(p, SCX_DSQ_LOCAL, SCX_SLICE_DFL, <span class="dv">0</span>);</a>
+<a class="sourceLine" id="cb6-19" title="19"></a>
+<a class="sourceLine" id="cb6-20" title="20">        <span class="cf">return</span> cpu;</a>
+<a class="sourceLine" id="cb6-21" title="21">}</a>
+<a class="sourceLine" id="cb6-22" title="22"></a>
+<a class="sourceLine" id="cb6-23" title="23"><span class="co">/*</span></a>
+<a class="sourceLine" id="cb6-24" title="24"><span class="co"> * 将任务直接分发到全局 DSQ。只有在上面 ops.select_cpu() 中未找到核心进行分发时，才会调用此 ops.enqueue() 回调。</span></a>
+<a class="sourceLine" id="cb6-25" title="25"><span class="co"> *</span></a>
+<a class="sourceLine" id="cb6-26" title="26"><span class="co"> * 注意，这个实现的行为与默认的 ops.enqueue 实现完全相同，后者只是将任务分发到 SCX_DSQ_GLOBAL。如果实现只是没有定义 simple_enqueue struct_ops 程序，</span></a>
+<a class="sourceLine" id="cb6-27" title="27"><span class="co"> * 调度器的行为将完全相同。</span></a>
+<a class="sourceLine" id="cb6-28" title="28"><span class="co"> */</span></a>
+<a class="sourceLine" id="cb6-29" title="29"><span class="dt">void</span> BPF_STRUCT_OPS(simple_enqueue, <span class="kw">struct</span> task_struct *p, u64 enq_flags)</a>
+<a class="sourceLine" id="cb6-30" title="30">{</a>
+<a class="sourceLine" id="cb6-31" title="31">        scx_bpf_dispatch(p, SCX_DSQ_GLOBAL, SCX_SLICE_DFL, enq_flags);</a>
+<a class="sourceLine" id="cb6-32" title="32">}</a>
+<a class="sourceLine" id="cb6-33" title="33"></a>
+<a class="sourceLine" id="cb6-34" title="34">s32 BPF_STRUCT_OPS_SLEEPABLE(simple_init)</a>
+<a class="sourceLine" id="cb6-35" title="35">{</a>
+<a class="sourceLine" id="cb6-36" title="36">        <span class="co">/*</span></a>
+<a class="sourceLine" id="cb6-37" title="37"><span class="co">         * 默认情况下，所有 SCHED_EXT、SCHED_OTHER、SCHED_IDLE 和 SCHED_BATCH 任务应该使用 sched_ext。</span></a>
+<a class="sourceLine" id="cb6-38" title="38"><span class="co">         */</span></a>
+<a class="sourceLine" id="cb6-39" title="39">        <span class="cf">return</span> <span class="dv">0</span>;</a>
+<a class="sourceLine" id="cb6-40" title="40">}</a>
+<a class="sourceLine" id="cb6-41" title="41"></a>
+<a class="sourceLine" id="cb6-42" title="42"><span class="dt">void</span> BPF_STRUCT_OPS(simple_exit, <span class="kw">struct</span> scx_exit_info *ei)</a>
+<a class="sourceLine" id="cb6-43" title="43">{</a>
+<a class="sourceLine" id="cb6-44" title="44">        exit_type = ei-&gt;type;</a>
+<a class="sourceLine" id="cb6-45" title="45">}</a>
+<a class="sourceLine" id="cb6-46" title="46"></a>
+<a class="sourceLine" id="cb6-47" title="47">SEC(<span class="st">&quot;.struct_ops&quot;</span>)</a>
+<a class="sourceLine" id="cb6-48" title="48"><span class="kw">struct</span> sched_ext_ops simple_ops = {</a>
+<a class="sourceLine" id="cb6-49" title="49">        .select_cpu             = (<span class="dt">void</span> *)simple_select_cpu,</a>
+<a class="sourceLine" id="cb6-50" title="50">        .enqueue                = (<span class="dt">void</span> *)simple_enqueue,</a>
+<a class="sourceLine" id="cb6-51" title="51">        .init                   = (<span class="dt">void</span> *)simple_init,</a>
+<a class="sourceLine" id="cb6-52" title="52">        .exit                   = (<span class="dt">void</span> *)simple_exit,</a>
+<a class="sourceLine" id="cb6-53" title="53">        .name                   = <span class="st">&quot;simple&quot;</span>,</a>
+<a class="sourceLine" id="cb6-54" title="54">};</a></code></pre></div>
+<h2 id="调度队列"><span class="header-section-number">2.1</span> 调度队列</h2>
+<p>为了匹配调度器核心和 BPF 调度器之间的阻抗，sched_ext 使用 DSQ（调度队列），它可以同时作为 FIFO 和优先级队列运行。默认情况下，有一个全局 FIFO（<code>SCX_DSQ_GLOBAL</code>），以及每个 CPU 一个本地 DSQ（<code>SCX_DSQ_LOCAL</code>）。BPF 调度器可以使用 <code>scx_bpf_create_dsq()</code> 和 <code>scx_bpf_destroy_dsq()</code> 管理任意数量的 DSQ。</p>
+<p>CPU 始终从其本地 DSQ 中执行任务。一个任务被“分发”到一个 DSQ。一个非本地 DSQ 被“消费”以将任务转移到消费 CPU 的本地 DSQ。</p>
+<p>当 CPU 查找下一个要运行的任务时，如果本地 DSQ 不为空，则选择第一个任务。否则，CPU 尝试消费全局 DSQ。如果这也没有产生可运行的任务，则调用 <code>ops.dispatch()</code>。</p>
+<h2 id="调度周期"><span class="header-section-number">2.2</span> 调度周期</h2>
+<p>以下简要展示了一个唤醒任务如何被调度和执行。</p>
+<ol type="1">
+<li><p>当任务唤醒时，<code>ops.select_cpu()</code> 是第一个被调用的操作。这有两个目的。首先，是 CPU 选择优化提示。其次，是唤醒选定的空闲 CPU。</p>
+<p><code>ops.select_cpu()</code> 选择的 CPU 是一个优化提示，而不是绑定的。实际的决定在调度的最后一步做出。然而，如果 <code>ops.select_cpu()</code> 返回的 CPU 与任务最终运行的 CPU 匹配，可能会有小的性能提升。</p>
+<p>选择 CPU 的副作用是唤醒它从空闲状态。虽然 BPF 调度器可以使用 <code>scx_bpf_kick_cpu()</code> 帮助函数唤醒任何 CPU，但明智地使用 <code>ops.select_cpu()</code> 可以更简单和更高效。</p>
+<p>可以通过调用 <code>scx_bpf_dispatch()</code> 将任务立即分发到 DSQ。如果任务从 <code>ops.select_cpu()</code> 分发到 <code>SCX_DSQ_LOCAL</code>，它将被分发到 <code>ops.select_cpu()</code> 返回的 CPU 的本地 DSQ。此外，从 <code>ops.select_cpu()</code> 直接分发将跳过 <code>ops.enqueue()</code> 回调。</p>
+<p>请注意，调度器核心会忽略无效的 CPU 选择，例如，如果它超出了任务的允许 cpumask。</p></li>
+<li>一旦目标 CPU 被选择，<code>ops.enqueue()</code> 会被调用（除非任务是直接从 <code>ops.select_cpu()</code> 分发的）。<code>ops.enqueue()</code> 可以做出以下决定:
+<ul>
+<li>通过调用 <code>scx_bpf_dispatch()</code> 将任务立即分发到全局或本地 DSQ，分别为 <code>SCX_DSQ_GLOBAL</code> 或 <code>SCX_DSQ_LOCAL</code>。</li>
+<li>通过调用 <code>scx_bpf_dispatch()</code> 将任务立即分发到自定义 DSQ，DSQ ID 小于 2^63。</li>
+<li>在 BPF 端排队任务。</li>
+</ul></li>
+<li>当 CPU 准备调度时，它首先查看其本地 DSQ。如果为空，则查看全局 DSQ。如果仍然没有任务运行，则调用 <code>ops.dispatch()</code>，可以使用以下两个函数来填充本地 DSQ。
+<ul>
+<li><code>scx_bpf_dispatch()</code> 将任务分发到 DSQ。可以使用任何目标 DSQ——<code>SCX_DSQ_LOCAL</code>、<code>SCX_DSQ_LOCAL_ON | cpu</code>、<code>SCX_DSQ_GLOBAL</code> 或自定义 DSQ。虽然 <code>scx_bpf_dispatch()</code> 目前不能在持有 BPF 锁的情况下调用，但正在开发中并将支持。<code>scx_bpf_dispatch()</code> 调度分发而不是立即执行。可以有多达 <code>ops.dispatch_max_batch</code> 的待处理任务。</li>
+<li><code>scx_bpf_consume()</code> 将任务从指定的非本地 DSQ 转移到调度 DSQ。此函数不能在持有任何 BPF 锁的情况下调用。<code>scx_bpf_consume()</code> 在尝试消费指定 DSQ 之前，会刷新待处理的调度任务。</li>
+</ul></li>
+<li>在 <code>ops.dispatch()</code> 返回后，如果本地 DSQ 中有任务，CPU 运行第一个。如果为空，执行以下步骤:
+<ul>
+<li>尝试消费全局 DSQ。如果成功，运行任务。</li>
+<li>如果 <code>ops.dispatch()</code> 已调度任何任务，重试第 3 步。</li>
+<li>如果上一个任务是 SCX 任务并且仍然可运行，继续执行它（见 <code>SCX_OPS_ENQ_LAST</code>）。</li>
+<li>进入空闲状态。</li>
+</ul></li>
+</ol>
+<p>请注意，BPF 调度器总是可以选择在 <code>ops.enqueue()</code> 中立即调度任务，如上述简单示例所示。如果只使用内置 DSQ，则不需要实现 <code>ops.dispatch()</code>，因为任务从未排队到 BPF 调度器中，本地和全局 DSQ 会自动被消费。</p>
+<p><code>scx_bpf_dispatch()</code> 将任务排队到目标 DSQ 的 FIFO 中。使用 <code>scx_bpf_dispatch_vtime()</code> 进行优先级队列。内部 DSQ，如 <code>SCX_DSQ_LOCAL</code> 和 <code>SCX_DSQ_GLOBAL</code> 不支持优先级队列调度，必须使用 <code>scx_bpf_dispatch()</code> 进行调度。有关更多信息，请参见 <code>tools/sched_ext/scx_simple.bpf.c</code> 中的函数文档和用法。</p>
+<h1 id="查看位置where-to-look"><span class="header-section-number">3</span> 查看位置（Where to Look）</h1>
+<ul>
+<li><code>include/linux/sched/ext.h</code> 定义了核心数据结构、操作表和常量。</li>
+<li><code>kernel/sched/ext.c</code> 包含 sched_ext 核心实现和帮助函数。以 <code>scx_bpf_</code> 前缀的函数可以从 BPF 调度器调用。</li>
+<li><code>tools/sched_ext/</code> 托管示例 BPF 调度器实现。
+<ul>
+<li><code>scx_simple[.bpf].c</code>: 使用自定义 DSQ 的最小全局 FIFO 调度器示例。</li>
+<li><code>scx_qmap[.bpf].c</code>: 支持五级优先级的多级 FIFO 调度器，通过 <code>BPF_MAP_TYPE_QUEUE</code> 实现。</li>
+</ul></li>
+</ul>
+<h1 id="abi-不稳定性"><span class="header-section-number">4</span> ABI 不稳定性</h1>
+<p>sched_ext 提供给 BPF 调度器程序的 API 没有稳定性保证。这包括 <code>include/linux/sched/ext.h</code> 中定义的操作表回调和常量，以及 <code>kernel/sched/ext.c</code> 中定义的 <code>scx_bpf_</code> kfuncs。</p>
+<p>虽然我们会尽力提供相对稳定的 API 接口，但它们在内核版本之间可能会发生变化，恕不另行通知。</p>
+</body>
+</html>

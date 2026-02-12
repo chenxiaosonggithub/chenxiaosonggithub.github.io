@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>box64 Installing Wine64</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">box64 Installing Wine64</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#安装-wine64"><span class="toc-section-number">1</span> 安装 Wine64</a><ul>
+<li><a href="#概述"><span class="toc-section-number">1.1</span> 概述</a></li>
+<li><a href="#示例"><span class="toc-section-number">1.2</span> 示例</a><ul>
+<li><a href="#从-winehq-.deb-文件在-raspberry-pi-os-上安装-wine64-wine-for-box64-box86"><span class="toc-section-number">1.2.1</span> 从 WineHQ .deb 文件在 Raspberry Pi OS 上安装 Wine64 &amp; Wine for Box64 &amp; Box86</a></li>
+</ul></li>
+<li><a href="#安装-winetricks"><span class="toc-section-number">1.3</span> 安装 winetricks</a></li>
+<li><a href="#示例命令"><span class="toc-section-number">1.4</span> 示例命令</a></li>
+<li><a href="#其他注意事项"><span class="toc-section-number">1.5</span> 其他注意事项</a><ul>
+<li><a href="#wineprefixes以及-wine-初始化"><span class="toc-section-number">1.5.1</span> Wineprefixes（以及 Wine 初始化）</a></li>
+<li><a href="#移植-wineprefixes"><span class="toc-section-number">1.5.2</span> 移植 wineprefixes</a></li>
+<li><a href="#切换不同版本的-wine"><span class="toc-section-number">1.5.3</span> 切换不同版本的 Wine</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<p>本文翻译自<a href="https://github.com/ptitSeb/box64/blob/main/docs/X64WINE.md">box64 Installing Wine64</a>，翻译时文件的最新提交是<code>0cc04e5253aa31544ca9e234b37e20b1ab81232f Create X64WINE.md (#423)</code>。</p>
+<h1 id="安装-wine64"><span class="header-section-number">1</span> 安装 Wine64</h1>
+<p>在 64 位 ARM Linux 设备上运行 Wine64/Wine 可以使 x64/x86 Windows 程序在其上运行。</p>
+<ul>
+<li>Box64 需要在 ARM64（aarch64）设备上<strong>手动</strong>安装 <code>wine-amd64</code>。这将运行 64 位 Windows 程序（也称为 x86_64）。</li>
+<li>Box86 需要在 ARM32（armhf）设备上（或者在 ARM64 上使用 multiarch 或 chroot）<strong>手动</strong>安装 <code>wine-i386</code>。这将运行 32 位 Windows 程序（也称为 x86）。</li>
+<li><em>请注意，<code>wine:arm64</code> 和 <code>wine:armhf</code> 将无法与 Box64/Box86 一起工作。如果您要求设备的软件包管理器安装这些软件，它可能会尝试安装它们。</em></li>
+</ul>
+<p>请查看以下安装步骤（在 <a href="#examples">示例</a> 部分）。</p>
+<h2 id="概述"><span class="header-section-number">1.1</span> 概述</h2>
+<p>安装 Wine64 和 Wine for Box64 &amp; Box86 的一般步骤是:</p>
+<ul>
+<li>下载您希望安装的 Wine 版本的所有安装文件</li>
+<li>将安装文件解压缩或 dpkg 到一个文件夹中</li>
+<li>将该文件夹移动到您希望 Wine 运行的目录（通常默认为 <code>~/wine/</code>）</li>
+<li>进入 <code>/usr/local/bin</code> 并创建符号链接或脚本，将其指向您的主要 wine 二进制文件</li>
+<li>启动 wine 以创建一个新的 wineprefix</li>
+<li>下载 winetricks（这只是一个复杂的 bash 脚本），使其可执行，然后将其复制到 <code>/usr/local/bin</code>。</li>
+</ul>
+<h2 id="示例"><span class="header-section-number">1.2</span> 示例</h2>
+<h3 id="从-winehq-.deb-文件在-raspberry-pi-os-上安装-wine64-wine-for-box64-box86"><span class="header-section-number">1.2.1</span> 从 WineHQ .deb 文件在 Raspberry Pi OS 上安装 Wine64 &amp; Wine for Box64 &amp; Box86</h3>
+<p><em>链接来自 <a href="https://dl.winehq.org/wine-builds/debian/dists/">WineHQ 仓库</a></em></p>
+<p>这种安装方法允许您安装不同版本的 Wine64/Wine。您可以安装任何您希望的 Wine 版本/分支。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">    <span class="co"># 注意: 只能在 aarch64 上运行（因为 box64 只能在 aarch64 上运行）。</span></a>
+<a class="sourceLine" id="cb1-2" title="2">    <span class="co"># box64 运行 wine-amd64，box86 运行 wine-i386。</span></a>
+<a class="sourceLine" id="cb1-3" title="3"></a>
+<a class="sourceLine" id="cb1-4" title="4">    <span class="al">###</span><span class="co"> 用户定义的 Wine 版本变量 ################</span></a>
+<a class="sourceLine" id="cb1-5" title="5">    <span class="co"># - 请使用以下信息替换变量。</span></a>
+<a class="sourceLine" id="cb1-6" title="6">    <span class="co"># - 请注意，尽管我们要在 ARM 处理器上安装，但我们需要为 Box64 使用 amd64 版本。</span></a>
+<a class="sourceLine" id="cb1-7" title="7">    <span class="co"># - Note that we need the i386 version for Box86 even though we&#39;re installing it on our ARM processor.</span></a>
+<a class="sourceLine" id="cb1-8" title="8">    <span class="co"># - Wine download links from WineHQ: https://dl.winehq.org/wine-builds/</span></a>
+<a class="sourceLine" id="cb1-9" title="9">  </a>
+<a class="sourceLine" id="cb1-10" title="10">    <span class="bu">local</span> <span class="va">branch=</span><span class="st">&quot;devel&quot;</span> <span class="co">#example: devel, staging, or stable (wine-staging 4.5+ requires libfaudio0:i386)</span></a>
+<a class="sourceLine" id="cb1-11" title="11">    <span class="bu">local</span> <span class="va">version=</span><span class="st">&quot;7.1&quot;</span> <span class="co">#example: &quot;7.1&quot;</span></a>
+<a class="sourceLine" id="cb1-12" title="12">    <span class="bu">local</span> <span class="va">id=</span><span class="st">&quot;debian&quot;</span> <span class="co">#example: debian, ubuntu</span></a>
+<a class="sourceLine" id="cb1-13" title="13">    <span class="bu">local</span> <span class="va">dist=</span><span class="st">&quot;bullseye&quot;</span> <span class="co">#example (for debian): bullseye, buster, jessie, wheezy, ${VERSION_CODENAME}, etc </span></a>
+<a class="sourceLine" id="cb1-14" title="14">    <span class="bu">local</span> <span class="va">tag=</span><span class="st">&quot;-1&quot;</span> <span class="co">#example: -1 (some wine .deb files have -1 tag on the end and some don&#39;t)</span></a>
+<a class="sourceLine" id="cb1-15" title="15"></a>
+<a class="sourceLine" id="cb1-16" title="16">  <span class="co">########################################################</span></a>
+<a class="sourceLine" id="cb1-17" title="17"></a>
+<a class="sourceLine" id="cb1-18" title="18">    <span class="co"># 清理所有旧的 Wine 实例</span></a>
+<a class="sourceLine" id="cb1-19" title="19">    <span class="ex">wineserver</span> -k <span class="co"># stop any old wine installations from running</span></a>
+<a class="sourceLine" id="cb1-20" title="20">    <span class="fu">rm</span> -rf ~/.cache/wine <span class="co"># remove any old wine-mono/wine-gecko install files</span></a>
+<a class="sourceLine" id="cb1-21" title="21">    <span class="fu">rm</span> -rf ~/.local/share/applications/wine <span class="co"># remove any old program shortcuts</span></a>
+<a class="sourceLine" id="cb1-22" title="22"></a>
+<a class="sourceLine" id="cb1-23" title="23">    <span class="co"># 备份任何旧的 Wine 安装</span></a>
+<a class="sourceLine" id="cb1-24" title="24">    <span class="fu">rm</span> -rf ~/wine-old <span class="op">2&gt;</span>/dev/null<span class="kw">;</span> <span class="fu">mv</span> ~/wine ~/wine-old <span class="op">2&gt;</span>/dev/null</a>
+<a class="sourceLine" id="cb1-25" title="25">    <span class="fu">rm</span> -rf ~/.wine-old <span class="op">2&gt;</span>/dev/null<span class="kw">;</span> <span class="fu">mv</span> ~/.wine ~/.wine-old <span class="op">2&gt;</span>/dev/null</a>
+<a class="sourceLine" id="cb1-26" title="26">    <span class="fu">sudo</span> mv /usr/local/bin/wine /usr/local/bin/wine-old <span class="op">2&gt;</span>/dev/null</a>
+<a class="sourceLine" id="cb1-27" title="27">    <span class="fu">sudo</span> mv /usr/local/bin/wine64 /usr/local/bin/wine-old <span class="op">2&gt;</span>/dev/null</a>
+<a class="sourceLine" id="cb1-28" title="28">    <span class="fu">sudo</span> mv /usr/local/bin/wineboot /usr/local/bin/wineboot-old <span class="op">2&gt;</span>/dev/null</a>
+<a class="sourceLine" id="cb1-29" title="29">    <span class="fu">sudo</span> mv /usr/local/bin/winecfg /usr/local/bin/winecfg-old <span class="op">2&gt;</span>/dev/null</a>
+<a class="sourceLine" id="cb1-30" title="30">    <span class="fu">sudo</span> mv /usr/local/bin/wineserver /usr/local/bin/wineserver-old <span class="op">2&gt;</span>/dev/null</a>
+<a class="sourceLine" id="cb1-31" title="31"></a>
+<a class="sourceLine" id="cb1-32" title="32">    <span class="co"># Wine 的下载链接来自 WineHQ: https://dl.winehq.org/wine-builds/</span></a>
+<a class="sourceLine" id="cb1-33" title="33">    <span class="va">LNKA=</span><span class="st">&quot;https://dl.winehq.org/wine-builds/</span><span class="va">${id}</span><span class="st">/dists/</span><span class="va">${dist}</span><span class="st">/main/binary-amd64/&quot;</span> <span class="co">#amd64-wine links</span></a>
+<a class="sourceLine" id="cb1-34" title="34">    <span class="va">DEB_A1=</span><span class="st">&quot;wine-</span><span class="va">${branch}</span><span class="st">-amd64_</span><span class="va">${version}</span><span class="st">~</span><span class="va">${dist}${tag}</span><span class="st">_amd64.deb&quot;</span> <span class="co">#wine64 main bin</span></a>
+<a class="sourceLine" id="cb1-35" title="35">    <span class="va">DEB_A2=</span><span class="st">&quot;wine-</span><span class="va">${branch}</span><span class="st">_</span><span class="va">${version}</span><span class="st">~</span><span class="va">${dist}${tag}</span><span class="st">_amd64.deb&quot;</span> <span class="co">#wine64 support files (required for wine64 / can work alongside wine_i386 main bin)</span></a>
+<a class="sourceLine" id="cb1-36" title="36">        <span class="co">#DEB_A3=&quot;winehq-${branch}_${version}~${dist}${tag}_amd64.deb&quot; #shortcuts &amp; docs</span></a>
+<a class="sourceLine" id="cb1-37" title="37">    <span class="va">LNKB=</span><span class="st">&quot;https://dl.winehq.org/wine-builds/</span><span class="va">${id}</span><span class="st">/dists/</span><span class="va">${dist}</span><span class="st">/main/binary-i386/&quot;</span> <span class="co">#i386-wine links</span></a>
+<a class="sourceLine" id="cb1-38" title="38">    <span class="va">DEB_B1=</span><span class="st">&quot;wine-</span><span class="va">${branch}</span><span class="st">-i386_</span><span class="va">${version}</span><span class="st">~</span><span class="va">${dist}${tag}</span><span class="st">_i386.deb&quot;</span> <span class="co">#wine_i386 main bin</span></a>
+<a class="sourceLine" id="cb1-39" title="39">    <span class="va">DEB_B2=</span><span class="st">&quot;wine-</span><span class="va">${branch}</span><span class="st">_</span><span class="va">${version}</span><span class="st">~</span><span class="va">${dist}${tag}</span><span class="st">_i386.deb&quot;</span> <span class="co">#wine_i386 support files (required for wine_i386 if no wine64 / CONFLICTS WITH wine64 support files)</span></a>
+<a class="sourceLine" id="cb1-40" title="40">        <span class="co">#DEB_B3=&quot;winehq-${branch}_${version}~${dist}${tag}_i386.deb&quot; #shortcuts &amp; docs</span></a>
+<a class="sourceLine" id="cb1-41" title="41"></a>
+<a class="sourceLine" id="cb1-42" title="42">    <span class="co"># 安装 amd64-wine（64 位）以及 i386-wine（32 位）。</span></a>
+<a class="sourceLine" id="cb1-43" title="43">    <span class="bu">echo</span> -e <span class="st">&quot;Downloading wine . . .&quot;</span></a>
+<a class="sourceLine" id="cb1-44" title="44">    <span class="fu">wget</span> -q <span class="va">${LNKA}${DEB_A1}</span> </a>
+<a class="sourceLine" id="cb1-45" title="45">    <span class="fu">wget</span> -q <span class="va">${LNKA}${DEB_A2}</span> </a>
+<a class="sourceLine" id="cb1-46" title="46">    <span class="fu">wget</span> -q <span class="va">${LNKB}${DEB_B1}</span> </a>
+<a class="sourceLine" id="cb1-47" title="47">    <span class="bu">echo</span> -e <span class="st">&quot;Extracting wine . . .&quot;</span></a>
+<a class="sourceLine" id="cb1-48" title="48">    <span class="ex">dpkg-deb</span> -x <span class="va">${DEB_A1}</span> wine-installer</a>
+<a class="sourceLine" id="cb1-49" title="49">    <span class="ex">dpkg-deb</span> -x <span class="va">${DEB_A2}</span> wine-installer</a>
+<a class="sourceLine" id="cb1-50" title="50">    <span class="ex">dpkg-deb</span> -x <span class="va">${DEB_B1}</span> wine-installer</a>
+<a class="sourceLine" id="cb1-51" title="51">    <span class="bu">echo</span> -e <span class="st">&quot;Installing wine . . .&quot;</span></a>
+<a class="sourceLine" id="cb1-52" title="52">    <span class="fu">mv</span> wine-installer/opt/wine* ~/wine</a>
+<a class="sourceLine" id="cb1-53" title="53">    </a>
+<a class="sourceLine" id="cb1-54" title="54">    <span class="co"># 下载 Wine 的依赖项</span></a>
+<a class="sourceLine" id="cb1-55" title="55">    <span class="co"># - 这些软件包是在 64 位的 RPiOS 上通过 multiarch 运行 box86/wine-i386 所需的</span></a>
+<a class="sourceLine" id="cb1-56" title="56">    <span class="fu">sudo</span> dpkg --add-architecture armhf <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> apt-get update <span class="co"># enable multi-arch</span></a>
+<a class="sourceLine" id="cb1-57" title="57">    <span class="fu">sudo</span> apt-get install -y libasound2:armhf libc6:armhf libglib2.0-0:armhf libgphoto2-6:armhf libgphoto2-port12:armhf \</a>
+<a class="sourceLine" id="cb1-58" title="58">        libgstreamer-plugins-base1.0-0:armhf libgstreamer1.0-0:armhf libldap-2.4-2:armhf libopenal1:armhf libpcap0.8:armhf \</a>
+<a class="sourceLine" id="cb1-59" title="59">        libpulse0:armhf libsane1:armhf libudev1:armhf libusb-1.0-0:armhf libvkd3d1:armhf libx11-6:armhf libxext6:armhf \</a>
+<a class="sourceLine" id="cb1-60" title="60">        libasound2-plugins:armhf ocl-icd-libopencl1:armhf libncurses6:armhf libncurses5:armhf libcap2-bin:armhf libcups2:armhf \</a>
+<a class="sourceLine" id="cb1-61" title="61">        libdbus-1-3:armhf libfontconfig1:armhf libfreetype6:armhf libglu1-mesa:armhf libglu1:armhf libgnutls30:armhf \</a>
+<a class="sourceLine" id="cb1-62" title="62">        libgssapi-krb5-2:armhf libkrb5-3:armhf libodbc1:armhf libosmesa6:armhf libsdl2-2.0-0:armhf libv4l-0:armhf \</a>
+<a class="sourceLine" id="cb1-63" title="63">        libxcomposite1:armhf libxcursor1:armhf libxfixes3:armhf libxi6:armhf libxinerama1:armhf libxrandr2:armhf \</a>
+<a class="sourceLine" id="cb1-64" title="64">        libxrender1:armhf libxxf86vm1 libc6:armhf libcap2-bin:armhf <span class="co"># to run wine-i386 through box86:armhf on aarch64</span></a>
+<a class="sourceLine" id="cb1-65" title="65">        <span class="co"># This list found by downloading...</span></a>
+<a class="sourceLine" id="cb1-66" title="66">        <span class="co">#   wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/wine-devel-i386_7.1~bullseye-1_i386.deb</span></a>
+<a class="sourceLine" id="cb1-67" title="67">        <span class="co">#   wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/winehq-devel_7.1~bullseye-1_i386.deb</span></a>
+<a class="sourceLine" id="cb1-68" title="68">        <span class="co">#   wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/wine-devel_7.1~bullseye-1_i386.deb</span></a>
+<a class="sourceLine" id="cb1-69" title="69">        <span class="co"># then `dpkg-deb -I package.deb`. Read output, add `:armhf` to packages in dep list, then try installing them on Pi aarch64.</span></a>
+<a class="sourceLine" id="cb1-70" title="70">        </a>
+<a class="sourceLine" id="cb1-71" title="71">    <span class="co"># - 这些软件包是在 RPiOS 上运行 box64/wine-amd64 所需的（box64 只能在 64 位操作系统上运行）</span></a>
+<a class="sourceLine" id="cb1-72" title="72">    <span class="fu">sudo</span> apt-get install -y libasound2:arm64 libc6:arm64 libglib2.0-0:arm64 libgphoto2-6:arm64 libgphoto2-port12:arm64 \</a>
+<a class="sourceLine" id="cb1-73" title="73">        libgstreamer-plugins-base1.0-0:arm64 libgstreamer1.0-0:arm64 libldap-2.4-2:arm64 libopenal1:arm64 libpcap0.8:arm64 \</a>
+<a class="sourceLine" id="cb1-74" title="74">        libpulse0:arm64 libsane1:arm64 libudev1:arm64 libunwind8:arm64 libusb-1.0-0:arm64 libvkd3d1:arm64 libx11-6:arm64 libxext6:arm64 \</a>
+<a class="sourceLine" id="cb1-75" title="75">        ocl-icd-libopencl1:arm64 libasound2-plugins:arm64 libncurses6:arm64 libncurses5:arm64 libcups2:arm64 \</a>
+<a class="sourceLine" id="cb1-76" title="76">        libdbus-1-3:arm64 libfontconfig1:arm64 libfreetype6:arm64 libglu1-mesa:arm64 libgnutls30:arm64 \</a>
+<a class="sourceLine" id="cb1-77" title="77">        libgssapi-krb5-2:arm64 libjpeg62-turbo:arm64 libkrb5-3:arm64 libodbc1:arm64 libosmesa6:arm64 libsdl2-2.0-0:arm64 libv4l-0:arm64 \</a>
+<a class="sourceLine" id="cb1-78" title="78">        libxcomposite1:arm64 libxcursor1:arm64 libxfixes3:arm64 libxi6:arm64 libxinerama1:arm64 libxrandr2:arm64 \</a>
+<a class="sourceLine" id="cb1-79" title="79">        libxrender1:arm64 libxxf86vm1:arm64 libc6:arm64 libcap2-bin:arm64</a>
+<a class="sourceLine" id="cb1-80" title="80">        <span class="co"># This list found by downloading...</span></a>
+<a class="sourceLine" id="cb1-81" title="81">        <span class="co">#   wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-amd64/wine-devel_7.1~bullseye-1_amd64.deb</span></a>
+<a class="sourceLine" id="cb1-82" title="82">        <span class="co">#   wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-amd64/wine-devel-amd64_7.1~bullseye-1_amd64.deb</span></a>
+<a class="sourceLine" id="cb1-83" title="83">        <span class="co"># then `dpkg-deb -I package.deb`. Read output, add `:arm64` to packages in dep list, then try installing them on Pi aarch64.    </span></a>
+<a class="sourceLine" id="cb1-84" title="84"></a>
+<a class="sourceLine" id="cb1-85" title="85">    <span class="co"># 这些软件包是在 RPiOS 上运行 wine-staging 所需的（致谢: chills340）</span></a>
+<a class="sourceLine" id="cb1-86" title="86">    <span class="fu">sudo</span> apt install libstb0 -y</a>
+<a class="sourceLine" id="cb1-87" title="87">    <span class="bu">cd</span> ~/Downloads</a>
+<a class="sourceLine" id="cb1-88" title="88">    <span class="fu">wget</span> -r -l1 -np -nd -A <span class="st">&quot;libfaudio0_*~bpo10+1_i386.deb&quot;</span> http://ftp.us.debian.org/debian/pool/main/f/faudio/ <span class="co"># Download libfaudio i386 no matter its version number</span></a>
+<a class="sourceLine" id="cb1-89" title="89">    <span class="ex">dpkg-deb</span> -xv libfaudio0_*~bpo10+1_i386.deb libfaudio</a>
+<a class="sourceLine" id="cb1-90" title="90">    <span class="fu">sudo</span> cp -TRv libfaudio/usr/ /usr/</a>
+<a class="sourceLine" id="cb1-91" title="91">    <span class="fu">rm</span> libfaudio0_*~bpo10+1_i386.deb <span class="co"># clean up</span></a>
+<a class="sourceLine" id="cb1-92" title="92">    <span class="fu">rm</span> -rf libfaudio <span class="co"># clean up</span></a>
+<a class="sourceLine" id="cb1-93" title="93"></a>
+<a class="sourceLine" id="cb1-94" title="94">    <span class="co"># 安装符号链接</span></a>
+<a class="sourceLine" id="cb1-95" title="95">    <span class="fu">sudo</span> ln -s ~/wine/bin/wine /usr/local/bin/wine</a>
+<a class="sourceLine" id="cb1-96" title="96">    <span class="fu">sudo</span> ln -s ~/wine/bin/wine64 /usr/local/bin/wine64</a>
+<a class="sourceLine" id="cb1-97" title="97">    <span class="fu">sudo</span> ln -s ~/wine/bin/wineboot /usr/local/bin/wineboot</a>
+<a class="sourceLine" id="cb1-98" title="98">    <span class="fu">sudo</span> ln -s ~/wine/bin/winecfg /usr/local/bin/winecfg</a>
+<a class="sourceLine" id="cb1-99" title="99">    <span class="fu">sudo</span> ln -s ~/wine/bin/wineserver /usr/local/bin/wineserver</a>
+<a class="sourceLine" id="cb1-100" title="100">    <span class="fu">sudo</span> chmod +x /usr/local/bin/wine /usr/local/bin/wine64 /usr/local/bin/wineboot /usr/local/bin/winecfg /usr/local/bin/wineserver</a></code></pre></div>
+<h2 id="安装-winetricks"><span class="header-section-number">1.3</span> 安装 winetricks</h2>
+<p>Winetricks 是一个 bash 脚本，它使安装和配置任何所需的 Windows 核心系统软件包更加容易，这些软件包可能是某些 Windows 程序的依赖项。您可以使用 <code>apt</code> 安装它，或者按照下面的步骤手动安装。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">sudo</span> apt-get install cabextract -y                                                                   <span class="co"># winetricks needs this installed</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="fu">sudo</span> mv /usr/local/bin/winetricks /usr/local/bin/winetricks-old                                      <span class="co"># Backup old winetricks</span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="bu">cd</span> ~/Downloads <span class="kw">&amp;&amp;</span> <span class="fu">wget</span> https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks <span class="co"># Download</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="fu">sudo</span> chmod +x winetricks <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> mv winetricks /usr/local/bin/                                       <span class="co"># Install</span></a></code></pre></div>
+<p>每当我们运行 winetricks 时，我们必须告诉 Box86 抑制其信息横幅，否则 winetricks 将会崩溃。Box86 的信息横幅可以通过在调用 winetricks 之前设置 <code>BOX86_NOBANNER=1</code> 环境变量来抑制（例如: <code>BOX86_NOBANNER=1 winetricks</code>）。</p>
+<p>如果 <code>apt</code> 安装了 winetricks 的桌面菜单快捷方式（或者如果您为 winetricks 创建了自己的桌面快捷方式），则可能需要编辑该快捷方式以包含 Box86 的 BOX86_NOBANNER=1 环境变量。使用您喜欢的文本编辑器，编辑 <code>/usr/share/applications/winetricks.desktop</code> 并将 <code>Exec=winetricks --gui</code> 更改为 <code>Exec=env BOX86_NOBANNER=1 winetricks --gui</code>。</p>
+<h2 id="示例命令"><span class="header-section-number">1.4</span> 示例命令</h2>
+<p>创建一个 64 位的 wineprefix:</p>
+<p><code>wine64 wineboot</code> 或 <code>wine wineboot</code>（wineprefix 被创建在 <code>~/.wine/</code>）</p>
+<p><code>WINEPREFIX="$HOME/prefix64" wine wineboot</code>（wineprefix 被创建在 <code>~/prefix64/</code>） <em>注意: 您需要在每个命令之前调用 <code>WINEPREFIX="$HOME/prefix64"</code> 来使用这个 wineprefix。</em></p>
+<p>创建一个 32 位的 wineprefix:</p>
+<p><code>WINEARCH=win32 wine wineboot</code>（wineprefix 被创建在 <code>~/.wine/</code>）</p>
+<p>强制退出 wine:</p>
+<p><code>wineserver -k</code></p>
+<p>运行 Wine 配置:</p>
+<p><code>winecfg</code></p>
+<p>使用 winetricks:</p>
+<p><code>winetricks -q corefonts vcrun2010 dotnet20sp1</code></p>
+<p><em>此命令将以静默方式依次安装三个软件包: Windows 核心字体、VC++ 2010 运行库和 .NET 2.0 SP1。 <code>-q</code> 是“安装静默/安静”命令。</em></p>
+<p>调用 Box86 的日志功能（使用 <code>BOX86_LOG=1</code> 或类似命令）会导致 winetricks 崩溃。</p>
+<p>要查看 winetricks 可帮助您安装的所有不同的 Windows 软件包和库的列表，请运行 <code>winetricks list-all</code></p>
+<h2 id="其他注意事项"><span class="header-section-number">1.5</span> 其他注意事项</h2>
+<h3 id="wineprefixes以及-wine-初始化"><span class="header-section-number">1.5.1</span> Wineprefixes（以及 Wine 初始化）</h3>
+<p>当您第一次运行或启动 Wine (<code>wine wineboot</code>) 时，Wine 将创建一个新的用户环境，用于安装 Windows 软件。这个用户环境称为 “wineprefix”（或 “wine 瓶子”），默认位于 <code>~/.wine</code>（请注意，Linux 文件夹名字前面有一个 <code>.</code> 是 “隐藏” 文件夹）。将 wineprefix 视为 Wine 的虚拟 ‘硬盘’，用于安装软件和保存设置。wineprefix 是可移植且可删除的。有关更多 Wine 文档，请参阅 <a href="https://www.winehq.org/documentation">WineHQ</a>。</p>
+<p>如果您在默认的 wineprefix 中损坏了某些东西，您可以通过删除您的 <code>~/.wine</code> 目录（使用 <code>rm -rf ~/.wine</code> 命令）然后再次启动 wine 来重新开始 “新”。</p>
+<h3 id="移植-wineprefixes"><span class="header-section-number">1.5.2</span> 移植 wineprefixes</h3>
+<p>如果在 Box86 中无法安装 Wine 中的软件，但您在普通的 x86 Linux 计算机上安装了 Wine，则可以将 wineprefix 从 x86 Linux 计算机复制到运行 Box86 的设备上。这最容易通过在您的 x86 Linux 计算机上将 <code>~/.wine</code> 文件夹打包为一个 tar 文件（<code>tar -cvf winebottle.tar ~/.wine</code>），将 tar 文件传输到您的设备上，然后在运行 Box86 和 Wine 的设备上解压缩 tar 文件（<code>tar -xf winebottle.tar</code>）来完成。将 wineprefix 打包为 tar 文件可以保留其中的任何符号链接。</p>
+<h3 id="切换不同版本的-wine"><span class="header-section-number">1.5.3</span> 切换不同版本的 Wine</h3>
+<p>某些 Wine 版本与特定软件更配合。最好安装已知与您想要运行的软件配合的 Wine 版本。您可以从三个主要的 Wine 开发分支中选择，分别称为 wine-stable、wine-devel 和 wine-staging。<em>请注意，wine-staging 分支在树莓派上需要额外的安装步骤。</em></p>
+<p>您整个 Wine 安装可以存在于 Linux 计算机的一个单独文件夹中。TwisterOS 假定您的 Wine 安装位于 <code>~/wine/</code> 目录中。实际上，您将 <code>wine</code> 文件夹放在哪个目录下并不重要，只要您在 <code>/usr/local/bin/</code> 目录中有指向 <code>wine</code> 文件夹的符号链接，这样当您在终端中输入 <code>wine</code> 时，Linux 就能找到 Wine。</p>
+<p>您可以通过将旧的 <code>wine</code> 和 <code>.wine</code> 文件夹重命名为其他名称，然后将新的 <code>wine</code> 文件夹（包含您新版本的 Wine）放在原来的位置来更改运行的 Wine 版本。再次运行 <code>wine wineboot</code> 将使旧版本的 Wine 中的 wineprefix 迁移到您刚刚安装的新版本的 Wine 中可用。您可以使用 <code>wine --version</code> 命令检查您正在运行的 Wine 版本。</p>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Linux使用wine运行Windows软件</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">Linux使用wine运行Windows软件</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#运行环境"><span class="toc-section-number">1</span> 运行环境</a><ul>
+<li><a href="#x86_64"><span class="toc-section-number">1.1</span> x86_64</a></li>
+<li><a href="#aarch64"><span class="toc-section-number">1.2</span> aarch64</a></li>
+<li><a href="#运行exe程序"><span class="toc-section-number">1.3</span> 运行<code>exe</code>程序</a></li>
+</ul></li>
+<li><a href="#编译环境"><span class="toc-section-number">2</span> 编译环境</a><ul>
+<li><a href="#公共依赖软件"><span class="toc-section-number">2.1</span> 公共依赖软件</a></li>
+<li><a href="#x86架构编译环境"><span class="toc-section-number">2.2</span> x86架构编译环境</a></li>
+<li><a href="#aarch64架构编译环境"><span class="toc-section-number">2.3</span> aarch64架构编译环境</a></li>
+<li><a href="#编译"><span class="toc-section-number">2.4</span> 编译</a></li>
+</ul></li>
+<li><a href="#aarch64-ubuntu22.04运行x86_64的wine"><span class="toc-section-number">3</span> aarch64 ubuntu22.04运行<code>x86_64</code>的wine</a></li>
+<li><a href="#aarch64-ubuntu20.04运行x86_64的wine"><span class="toc-section-number">4</span> aarch64 ubuntu20.04运行<code>x86_64</code>的wine</a></li>
+<li><a href="#wine-ce"><span class="toc-section-number">5</span> wine-ce</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/video.html">点击这里查看配套的教学视频</a>。</p>
+<p>在Linux操作系统要运行Windows的<code>exe</code>程序，可以使用<code>wine</code>，还能跨cpu运行呢。</p>
+<h1 id="运行环境"><span class="header-section-number">1</span> 运行环境</h1>
+<p>源码安装之前，也建议先通过apt安装wine，安装完后运行环境就准备好了。</p>
+<ul>
+<li><a href="https://www.winehq.org/">WineHQ - Run Windows applications on Linux, BSD, Solaris and macOS</a></li>
+<li><a href="https://wiki.winehq.org/Winetricks">Winetricks - WineHQ Wiki</a></li>
+</ul>
+<h2 id="x86_64"><span class="header-section-number">1.1</span> x86_64</h2>
+<p>x86_64下使能32位架构:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">sudo</span> dpkg --add-architecture i386</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="fu">sudo</span> apt-get update -y</a></code></pre></div>
+<p>x86_64参考<a href="https://wiki.winehq.org/Ubuntu">Ubuntu WineHQ Repository - WineHQ Wiki</a>，有些网络可能安装不了，可以尝试换个网络（也有可能是服务器出了问题，稍后再试试）:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">sudo</span> mkdir -pm755 /etc/apt/keyrings</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="fu">sudo</span> wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="fu">sudo</span> wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources</a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="fu">sudo</span> apt-get update -y</a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="co"># Stable branch</span></a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="fu">sudo</span> apt install --install-recommends winehq-stable -y</a></code></pre></div>
+<p>如果无法安装，可以下载报错信息中<code>xxxx.deb</code>文件的链接，复制到位置<code>/var/cache/apt/archives</code>，再重新安装。</p>
+<h2 id="aarch64"><span class="header-section-number">1.2</span> aarch64</h2>
+<p>aarch64下使能32位架构:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">sudo</span> dpkg --add-architecture armhf</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="fu">sudo</span> apt-get update -y</a></code></pre></div>
+<p>aarch64用如下命令安装:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">sudo</span> apt install -y wine</a></code></pre></div>
+<h2 id="运行exe程序"><span class="header-section-number">1.3</span> 运行<code>exe</code>程序</h2>
+<p>可以尝试下载并直接运行免安装的<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html">putty</a>，x86_64架构下执行<code>wine putty-x86_64.exe</code>（下载x86_64版本），aarch64架构下执行<code>wine64 putty-arm64.exe</code>（下载arm64版本）。第一次运行时会提示: “Wine未找到到（两个到是什么鬼）用于支持.NET应用的wine-mono组件。Wine可以自动并下载安装该组件。注意: 推荐您安装为发行版定制的软件包。具体请参看 https://wiki.winehq.org/Mono 。“点击”安装“。</p>
+<p>x86_64下安装并运行<a href="https://pc.weixin.qq.com/?lang=en_US">微信</a>，注意c盘的位置在<code>${HOME}/.wine/drive_c/</code>，<code>wine WeChatSetup.exe</code>安装后，先进入<code>cd "${HOME}/.wine/drive_c/Program Files/Tencent/WeChat/[3.9.9.43]"</code>（有空格），再运行<code>wine WeChat.exe</code>。</p>
+<p>中文字体显示有问题，先安装<code>sudo apt install winetricks -y</code>，如果报错不能用，可以下载<a href="https://github.com/Winetricks/winetricks/blob/master/src/winetricks">源码文件</a>到<code>/usr/bin/winetricks</code>，并执行<code>sudo chown root:root /usr/bin/winetricks</code>和<code>sudo chmod 755 /usr/bin/winetricks</code>，但不知道搞什么东西，始终没法安装字体。</p>
+<p>最好是安装ubuntu中文或麒麟系统，这样中文显示就默认没有问题。</p>
+<h1 id="编译环境"><span class="header-section-number">2</span> 编译环境</h1>
+<ul>
+<li><a href="https://gitlab.winehq.org/wine/wine">gitlab源码</a></li>
+<li><a href="https://wiki.winehq.org/Developers">Developers - WineHQ Wiki</a></li>
+</ul>
+<h2 id="公共依赖软件"><span class="header-section-number">2.1</span> 公共依赖软件</h2>
+<p>首先安装<a href="https://wiki.winehq.org/Building_Wine">Building Wine - WineHQ Wiki</a>中<code>Satisfying Build Dependencies</code>一节提到的依赖，其中ubuntu安装debian一列的软件:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># Generally necessary</span></a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="fu">sudo</span> apt install -y gcc-mingw-w64 libasound2-dev libpulse-dev libdbus-1-dev libfontconfig-dev libfreetype-dev libgnutls28-dev libgl-dev libunwind-dev libx11-dev libxcomposite-dev libxcursor-dev libxfixes-dev libxi-dev libxrandr-dev libxrender-dev libxext-dev</a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="co"># Needed for many applications</span></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="fu">sudo</span> apt install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libosmesa6-dev libsdl2-dev libudev-dev libvulkan-dev</a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="co"># Rare or domain-specific</span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="fu">sudo</span> apt install -y libcapi20-dev libcups2-dev libgphoto2-dev libsane-dev libkrb5-dev samba-dev ocl-icd-opencl-dev libpcap-dev libusb-1.0-0-dev libv4l-dev</a></code></pre></div>
+<p>注意以上命令只是我自己整理方便后续部署时查阅，如果你安装的话最好查看网页，因为我不确定是否会新增一些依赖，毕竟wine软件在不断的发展。</p>
+<p>上面的开发依赖软件安装后，运行<code>./configure</code>后还是会报错或警告，根据报错或警告信息继续安装以下软件:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># 报错</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="fu">sudo</span> apt-get install -y flex bison gettext</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="fu">sudo</span> apt install -y libpcsclite-dev <span class="co"># x86_64下没用，还是报 libpcsclite not found, smart cards won&#39;t be supported.</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="fu">sudo</span> apt install -y libwayland-dev <span class="co"># 安装了还是报 Wayland 32-bit development files not found, the Wayland driver won&#39;t be supported.</span></a>
+<a class="sourceLine" id="cb6-5" title="5"></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="co">## opengl，用 glxinfo | grep &quot;OpenGL&quot; 能看到输出，但安装完后还是会有告警信息: No OpenGL library found on this system. OpenGL and Direct3D won&#39;t be supported.</span></a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="co">### 所以opengl的告警应该和以下软件无关，而是和i386相关的软件中的某个相关（不确定是哪个）</span></a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="co">### sudo apt-get install -y mesa-utils libglu1-mesa-dev freeglut3 freeglut3-dev</span></a></code></pre></div>
+<p><a href="http://www.opensound.com/download.cgi">Open Sound System Driver</a>驱动安装。</p>
+<h2 id="x86架构编译环境"><span class="header-section-number">2.2</span> x86架构编译环境</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="fu">sudo</span> apt install -y gcc-multilib <span class="co"># i386</span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="fu">sudo</span> apt-get install -y libx11-dev:i386 libfreetype-dev:i386</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="fu">sudo</span> apt-get install -y libxrender-dev:i386 libgnutls28-dev:i386 libvulkan-dev:i386 libxcursor-dev:i386 libxi-dev:i386 libxext-dev:i386 libxrandr-dev:i386 libxfixes-dev:i386 libxcomposite-dev:i386 libosmesa6-dev:i386 ocl-icd-opencl-dev:i386 libpcap-dev:i386 libdbus-1-dev:i386 libsane-dev:i386 libusb-1.0-0-dev:i386 libv4l-dev:i386 libgphoto2-dev:i386 libpulse-dev:i386 libudev-dev:i386 libsdl2-dev:i386 libcapi20-dev:i386 libcups2-dev:i386 libfontconfig-dev:i386 </a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="fu">sudo</span> apt-get install -y libgstreamer1.0-dev:i386 libgstreamer-plugins-base1.0-dev:i386</a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="fu">sudo</span> apt install -y libwayland-dev:i386 <span class="co"># 安装了还是报 Wayland 32-bit development files not found, the Wayland driver won&#39;t be supported.</span></a>
+<a class="sourceLine" id="cb7-6" title="6"></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="co"># 以下软件不能安装，不能安装，不能安装，安装了你的系统就完了，写出来只是记录一下曾经尝试的过程</span></a>
+<a class="sourceLine" id="cb7-8" title="8"></a>
+<a class="sourceLine" id="cb7-9" title="9"><span class="co"># 本来是为了解决 libkrb5 32-bit development files not found (or too old), Kerberos won&#39;t be supported.</span></a>
+<a class="sourceLine" id="cb7-10" title="10"><span class="co"># sudo mv /usr/bin/krb5-config.mit /usr/bin/krb5-config.mit.bak # 不执行这一步会出错</span></a>
+<a class="sourceLine" id="cb7-11" title="11"><span class="co"># sudo apt-get install libkrb5-dev:i386 # 不加 -y</span></a>
+<a class="sourceLine" id="cb7-12" title="12"></a>
+<a class="sourceLine" id="cb7-13" title="13"><span class="co"># 本来是为了解决 libnetapi not found, Samba NetAPI won&#39;t be supported.</span></a>
+<a class="sourceLine" id="cb7-14" title="14"><span class="co"># 但安装后图形界面没了，所以不能安装这个软件</span></a>
+<a class="sourceLine" id="cb7-15" title="15"><span class="co"># sudo apt-get install samba-dev:i386</span></a>
+<a class="sourceLine" id="cb7-16" title="16"></a>
+<a class="sourceLine" id="cb7-17" title="17"><span class="co"># 安装后图形界面没了，所以不能安装这个软件，其实这个软件并不需要</span></a>
+<a class="sourceLine" id="cb7-18" title="18"><span class="co"># sudo apt-get install -y libpcsclite-dev:i386</span></a></code></pre></div>
+<h2 id="aarch64架构编译环境"><span class="header-section-number">2.3</span> aarch64架构编译环境</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="fu">sudo</span> apt-get install -y libx11-dev:armhf libfreetype-dev:armhf</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="fu">sudo</span> apt-get install -y libxrender-dev:armhf libgnutls28-dev:armhf libvulkan-dev:armhf libxcursor-dev:armhf libxi-dev:armhf libxext-dev:armhf libxrandr-dev:armhf libxfixes-dev:armhf libxcomposite-dev:armhf libosmesa6-dev:armhf ocl-icd-opencl-dev:armhf libpcap-dev:armhf libdbus-1-dev:armhf libsane-dev:armhf libusb-1.0-0-dev:armhf libv4l-dev:armhf libgphoto2-dev:armhf libpulse-dev:armhf libudev-dev:armhf libsdl2-dev:armhf libcapi20-dev:armhf libcups2-dev:armhf libfontconfig-dev:armhf </a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="fu">sudo</span> apt-get install -y libgstreamer1.0-dev:armhf libgstreamer-plugins-base1.0-dev:armhf</a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="fu">sudo</span> apt install -y libwayland-dev:armhf <span class="co"># 安装了还是报 Wayland 32-bit development files not found, the Wayland driver won&#39;t be supported.</span></a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="fu">sudo</span> apt install -y clang lld</a></code></pre></div>
+<h2 id="编译"><span class="header-section-number">2.4</span> 编译</h2>
+<p>再运行以下命令编译安装:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="fu">git</span> clone https://gitlab.winehq.org/wine/wine.git wine-dirs/wine-source</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="fu">mkdir</span> wine-dirs/wine64-build/ -p</a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="fu">mkdir</span> wine-dirs/wine32-build/ -p</a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="co"># wine源码在 wine-dirs/wine-source</span></a>
+<a class="sourceLine" id="cb9-5" title="5"><span class="bu">cd</span> wine-dirs/wine64-build/ <span class="co"># 先到64位编译目录</span></a>
+<a class="sourceLine" id="cb9-6" title="6"><span class="ex">../wine-source/configure</span> --enable-win64 --prefix=/home/sonvhi/sw/wine</a>
+<a class="sourceLine" id="cb9-7" title="7"><span class="fu">make</span> -j12 <span class="co"># 12换成你的cpu核数</span></a>
+<a class="sourceLine" id="cb9-8" title="8"><span class="fu">make</span> install -j12 <span class="co"># 这时还无法运行微信</span></a>
+<a class="sourceLine" id="cb9-9" title="9"></a>
+<a class="sourceLine" id="cb9-10" title="10"><span class="bu">cd</span> ../wine32-build/ <span class="co"># 再到32位编译目录</span></a>
+<a class="sourceLine" id="cb9-11" title="11"><span class="co"># x86_64，前面可以加 PKG_CONFIG_PATH=/usr/lib32，也可不加</span></a>
+<a class="sourceLine" id="cb9-12" title="12"><span class="ex">../wine-source/configure</span> --with-wine64=../wine64-build --prefix=/home/sonvhi/sw/wine</a>
+<a class="sourceLine" id="cb9-13" title="13"><span class="co"># aarch64</span></a>
+<a class="sourceLine" id="cb9-14" title="14"><span class="ex">../wine-source/configure</span> --with-wine64=../wine64-build --prefix=/home/sonvhi/sw/wine</a>
+<a class="sourceLine" id="cb9-15" title="15"><span class="fu">make</span> -j12</a>
+<a class="sourceLine" id="cb9-16" title="16"><span class="fu">make</span> install -j12 <span class="co"># 这时可以运行微信了</span></a></code></pre></div>
+<h1 id="aarch64-ubuntu22.04运行x86_64的wine"><span class="header-section-number">3</span> aarch64 ubuntu22.04运行<code>x86_64</code>的wine</h1>
+<p>aarch64下还要安装box软件，32位box安装参考<a href="https://github.com/ptitSeb/box86/blob/master/docs/COMPILE.md">ptitSeb/box86/blob/master/docs/COMPILE.md</a>，64位box安装参考<a href="https://github.com/ptitSeb/box64/blob/main/docs/COMPILE.md">ptitSeb/box64/blob/main/docs/COMPILE.md</a>（要安装<code>box64</code>而不是<code>box64-arm64</code>）。</p>
+<p>wine的环境请参考<a href="https://chenxiaosong.com/src/translation/wine/box64-docs-X64WINE.html">box64 Installing Wine64翻译</a>和<a href="https://chenxiaosong.com/src/translation/wine/box86-docs-X86WINE.html">box86 Installing Wine (and winetricks)翻译</a>。</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="fu">rm</span> -rf ~/.wine-old<span class="kw">;</span> <span class="fu">mv</span> ~/.wine ~/.wine-old</a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="co"># 下载 Wine 的依赖项</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="co"># - 这些软件包是在 64 位的 RPiOS 上通过 multiarch 运行 box86/wine-i386 所需的</span></a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="fu">sudo</span> dpkg --add-architecture armhf <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> apt-get update <span class="co"># enable multi-arch</span></a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="fu">sudo</span> apt-get install -y libasound2:armhf libc6:armhf libglib2.0-0:armhf libgphoto2-6:armhf libgphoto2-port12:armhf \</a>
+<a class="sourceLine" id="cb10-6" title="6">    libgstreamer-plugins-base1.0-0:armhf libgstreamer1.0-0:armhf libopenal1:armhf libpcap0.8:armhf \</a>
+<a class="sourceLine" id="cb10-7" title="7">    libpulse0:armhf libsane1:armhf libudev1:armhf libusb-1.0-0:armhf libvkd3d1:armhf libx11-6:armhf libxext6:armhf \</a>
+<a class="sourceLine" id="cb10-8" title="8">    libasound2-plugins:armhf ocl-icd-libopencl1:armhf libncurses6:armhf libncurses5:armhf libcap2-bin:armhf libcups2:armhf \</a>
+<a class="sourceLine" id="cb10-9" title="9">    libdbus-1-3:armhf libfontconfig1:armhf libfreetype6:armhf libglu1-mesa:armhf libglu1:armhf libgnutls30:armhf \</a>
+<a class="sourceLine" id="cb10-10" title="10">    libgssapi-krb5-2:armhf libkrb5-3:armhf libodbc1:armhf libosmesa6:armhf libsdl2-2.0-0:armhf libv4l-0:armhf \</a>
+<a class="sourceLine" id="cb10-11" title="11">    libxcomposite1:armhf libxcursor1:armhf libxfixes3:armhf libxi6:armhf libxinerama1:armhf libxrandr2:armhf \</a>
+<a class="sourceLine" id="cb10-12" title="12">    libxrender1:armhf libxxf86vm1 libc6:armhf libcap2-bin:armhf <span class="co"># to run wine-i386 through box86:armhf on aarch64</span></a>
+<a class="sourceLine" id="cb10-13" title="13"><span class="co"># sudo apt-get install -y libldap-2.4-2:armhf # ubuntu下找不到</span></a>
+<a class="sourceLine" id="cb10-14" title="14"><span class="co"># - 这些软件包是在 RPiOS 上运行 box64/wine-amd64 所需的（box64 只能在 64 位操作系统上运行）</span></a>
+<a class="sourceLine" id="cb10-15" title="15"><span class="fu">sudo</span> apt-get install -y libasound2:arm64 libc6:arm64 libglib2.0-0:arm64 libgphoto2-6:arm64 libgphoto2-port12:arm64 \</a>
+<a class="sourceLine" id="cb10-16" title="16">    libgstreamer-plugins-base1.0-0:arm64 libgstreamer1.0-0:arm64 libopenal1:arm64 libpcap0.8:arm64 \</a>
+<a class="sourceLine" id="cb10-17" title="17">    libpulse0:arm64 libsane1:arm64 libudev1:arm64 libunwind8:arm64 libusb-1.0-0:arm64 libvkd3d1:arm64 libx11-6:arm64 libxext6:arm64 \</a>
+<a class="sourceLine" id="cb10-18" title="18">    ocl-icd-libopencl1:arm64 libasound2-plugins:arm64 libncurses6:arm64 libncurses5:arm64 libcups2:arm64 \</a>
+<a class="sourceLine" id="cb10-19" title="19">    libdbus-1-3:arm64 libfontconfig1:arm64 libfreetype6:arm64 libglu1-mesa:arm64 libgnutls30:arm64 \</a>
+<a class="sourceLine" id="cb10-20" title="20">    libgssapi-krb5-2:arm64 libkrb5-3:arm64 libodbc1:arm64 libosmesa6:arm64 libsdl2-2.0-0:arm64 libv4l-0:arm64 \</a>
+<a class="sourceLine" id="cb10-21" title="21">    libxcomposite1:arm64 libxcursor1:arm64 libxfixes3:arm64 libxi6:arm64 libxinerama1:arm64 libxrandr2:arm64 \</a>
+<a class="sourceLine" id="cb10-22" title="22">    libxrender1:arm64 libxxf86vm1:arm64 libc6:arm64 libcap2-bin:arm64</a>
+<a class="sourceLine" id="cb10-23" title="23"><span class="co"># sudo apt-get install -y libldap-2.4-2:arm64 libjpeg62-turbo:arm64 # ubuntu下找不到</span></a></code></pre></div>
+<p>在<code>x86_64</code>的机器上编译好<code>wine</code>后，复制到<code>aarch64</code>的家目录下，然后执行以下命令:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># 安装符号链接</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="fu">sudo</span> rm /usr/local/bin/wine /usr/local/bin/wine64 /usr/local/bin/wineboot /usr/local/bin/winecfg /usr/local/bin/wineserver</a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="fu">sudo</span> ln -s <span class="va">${PWD}</span>/wine/bin/wine /usr/local/bin/wine</a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="fu">sudo</span> ln -s <span class="va">${PWD}</span>/wine/bin/wine64 /usr/local/bin/wine64</a>
+<a class="sourceLine" id="cb11-5" title="5"><span class="fu">sudo</span> ln -s <span class="va">${PWD}</span>/wine/bin/wineboot /usr/local/bin/wineboot</a>
+<a class="sourceLine" id="cb11-6" title="6"><span class="fu">sudo</span> ln -s <span class="va">${PWD}</span>/wine/bin/winecfg /usr/local/bin/winecfg</a>
+<a class="sourceLine" id="cb11-7" title="7"><span class="fu">sudo</span> ln -s <span class="va">${PWD}</span>/wine/bin/wineserver /usr/local/bin/wineserver</a>
+<a class="sourceLine" id="cb11-8" title="8"><span class="fu">sudo</span> chmod +x /usr/local/bin/wine /usr/local/bin/wine64 /usr/local/bin/wineboot /usr/local/bin/winecfg /usr/local/bin/wineserver</a></code></pre></div>
+<p>这时就可以运行<code>x86_64</code>架构下的<code>exe</code>程序:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="fu">which</span> wine64 <span class="co"># 输出 /usr/local/bin/wine64</span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="ex">box64</span> wine64 --version <span class="co"># wine-9.6-73-g30a70548796</span></a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="ex">box64</span> wine64 putty-x86_64.exe</a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="ex">box64</span> wine64 WeChatSetup-x86_64.exe</a></code></pre></div>
+<h1 id="aarch64-ubuntu20.04运行x86_64的wine"><span class="header-section-number">4</span> aarch64 ubuntu20.04运行<code>x86_64</code>的wine</h1>
+<p>因为在<code>x86_64</code> ubuntu20.04上无法编译最新wine，所以要在<code>x86_64</code> ubuntu22.04的机器上编译好<code>wine</code>。还有除了以下 Wine 的依赖项外，其他都和ubuntu22.04步骤一样。</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="fu">sudo</span> dpkg --add-architecture armhf <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> apt-get update <span class="co"># enable multi-arch</span></a>
+<a class="sourceLine" id="cb13-2" title="2"></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="co"># 下载 Wine 的依赖项</span></a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="co"># - 这些软件包是在 64 位的 RPiOS 上通过 multiarch 运行 box86/wine-i386 所需的</span></a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="fu">sudo</span> apt-get install -y libasound2:armhf libc6:armhf libglib2.0-0:armhf libgphoto2-6:armhf libgphoto2-port12:armhf \</a>
+<a class="sourceLine" id="cb13-6" title="6">    libgstreamer-plugins-base1.0-0:armhf libgstreamer1.0-0:armhf libopenal1:armhf libpcap0.8:armhf \</a>
+<a class="sourceLine" id="cb13-7" title="7">    libpulse0:armhf libsane1:armhf libudev1:armhf libusb-1.0-0:armhf libvkd3d1:armhf libx11-6:armhf libxext6:armhf \</a>
+<a class="sourceLine" id="cb13-8" title="8">    libasound2-plugins:armhf ocl-icd-libopencl1:armhf libncurses6:armhf libncurses5:armhf libcap2-bin:armhf libcups2:armhf \</a>
+<a class="sourceLine" id="cb13-9" title="9">    libdbus-1-3:armhf libfontconfig1:armhf libfreetype6:armhf libgnutls30:armhf \</a>
+<a class="sourceLine" id="cb13-10" title="10">    libgssapi-krb5-2:armhf libkrb5-3:armhf libodbc1:armhf libosmesa6:armhf libsdl2-2.0-0:armhf libv4l-0:armhf \</a>
+<a class="sourceLine" id="cb13-11" title="11">    libxcomposite1:armhf libxcursor1:armhf libxfixes3:armhf libxi6:armhf libxinerama1:armhf libxrandr2:armhf \</a>
+<a class="sourceLine" id="cb13-12" title="12">    libxrender1:armhf libxxf86vm1 libc6:armhf libcap2-bin:armhf libldap-2.4-2:armhf <span class="co"># to run wine-i386 through box86:armhf on aarch64</span></a>
+<a class="sourceLine" id="cb13-13" title="13"><span class="co"># sudo apt install -y libglu1-mesa:armhf libglu1:armhf # ubuntu20.04找不到</span></a>
+<a class="sourceLine" id="cb13-14" title="14"><span class="co"># - 这些软件包是在 RPiOS 上运行 box64/wine-amd64 所需的（box64 只能在 64 位操作系统上运行）</span></a>
+<a class="sourceLine" id="cb13-15" title="15"><span class="fu">sudo</span> apt-get install -y libasound2:arm64 libc6:arm64 libglib2.0-0:arm64 libgphoto2-6:arm64 libgphoto2-port12:arm64 \</a>
+<a class="sourceLine" id="cb13-16" title="16">    libgstreamer-plugins-base1.0-0:arm64 libgstreamer1.0-0:arm64 libopenal1:arm64 libpcap0.8:arm64 \</a>
+<a class="sourceLine" id="cb13-17" title="17">    libpulse0:arm64 libsane1:arm64 libudev1:arm64 libunwind8:arm64 libusb-1.0-0:arm64 libvkd3d1:arm64 libx11-6:arm64 libxext6:arm64 \</a>
+<a class="sourceLine" id="cb13-18" title="18">    ocl-icd-libopencl1:arm64 libasound2-plugins:arm64 libncurses6:arm64 libncurses5:arm64 libcups2:arm64 \</a>
+<a class="sourceLine" id="cb13-19" title="19">    libdbus-1-3:arm64 libfontconfig1:arm64 libfreetype6:arm64 libglu1-mesa:arm64 libgnutls30:arm64 \</a>
+<a class="sourceLine" id="cb13-20" title="20">    libgssapi-krb5-2:arm64 libkrb5-3:arm64 libodbc1:arm64 libosmesa6:arm64 libsdl2-2.0-0:arm64 libv4l-0:arm64 \</a>
+<a class="sourceLine" id="cb13-21" title="21">    libxcomposite1:arm64 libxcursor1:arm64 libxfixes3:arm64 libxi6:arm64 libxinerama1:arm64 libxrandr2:arm64 \</a>
+<a class="sourceLine" id="cb13-22" title="22">    libxrender1:arm64 libxxf86vm1:arm64 libc6:arm64 libcap2-bin:arm64 libldap-2.4-2:arm64</a>
+<a class="sourceLine" id="cb13-23" title="23"><span class="co"># sudo apt-get install -y libjpeg62-turbo:arm64 # ubuntu下找不到</span></a></code></pre></div>
+<h1 id="wine-ce"><span class="header-section-number">5</span> wine-ce</h1>
+<ul>
+<li><a href="https://gitee.com/wine-ce">gitee仓库</a></li>
+<li><a href="https://www.bilibili.com/video/BV1gv4y1578t/">b站视频</a></li>
+<li><a href="https://www.bilibili.com/opus/781135473404805193">浅谈二进制翻译软件架构</a></li>
+<li><a href="https://www.bilibili.com/video/BV1ps4y1G7YZ/">b站: ARM转译x86项目Wine-CE测试(作者: 我梦见了电子羊)</a></li>
+</ul>
+</body>
+</html>

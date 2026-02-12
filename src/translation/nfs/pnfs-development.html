@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>linux-nfs.org PNFS Development</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">linux-nfs.org PNFS Development</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#pnfs-development"><span class="toc-section-number">1</span> PNFS Development</a><ul>
+<li><a href="#客户端信息"><span class="toc-section-number">1.1</span> 客户端信息</a></li>
+<li><a href="#服务器端信息"><span class="toc-section-number">1.2</span> 服务器端信息</a></li>
+<li><a href="#开发资源"><span class="toc-section-number">1.3</span> 开发资源</a></li>
+<li><a href="#提交错误"><span class="toc-section-number">1.4</span> 提交错误</a></li>
+<li><a href="#设计笔记"><span class="toc-section-number">1.5</span> 设计笔记</a></li>
+<li><a href="#历史内容"><span class="toc-section-number">1.6</span> 历史内容</a></li>
+</ul></li>
+<li><a href="#fedora-pnfs-client-setup"><span class="toc-section-number">2</span> Fedora pNFS Client Setup</a><ul>
+<li><a href="#installing-fedora"><span class="toc-section-number">2.1</span> Installing Fedora</a></li>
+<li><a href="#installing-pnfs-enabled-fedora-kernel"><span class="toc-section-number">2.2</span> Installing pNFS Enabled Fedora kernel</a></li>
+<li><a href="#target-and-blkmapd-setup-for-block-layout-client"><span class="toc-section-number">2.3</span> Target and blkmapd setup for block layout client</a></li>
+<li><a href="#mount-filesystem"><span class="toc-section-number">2.4</span> Mount Filesystem</a></li>
+<li><a href="#generate-traffic"><span class="toc-section-number">2.5</span> Generate Traffic</a></li>
+<li><a href="#unmount-and-disconnect"><span class="toc-section-number">2.6</span> Unmount and disconnect</a></li>
+<li><a href="#troubleshooting"><span class="toc-section-number">2.7</span> Troubleshooting</a></li>
+</ul></li>
+<li><a href="#pnfs-block-server-setup"><span class="toc-section-number">3</span> PNFS block server setup</a></li>
+<li><a href="#pnfs-setup-instructions"><span class="toc-section-number">4</span> PNFS Setup Instructions</a><ul>
+<li><a href="#file-layout"><span class="toc-section-number">4.1</span> File Layout</a><ul>
+<li><a href="#accessing-a-storage-system-with-pnfs"><span class="toc-section-number">4.1.1</span> Accessing a storage system with pNFS</a></li>
+<li><a href="#调试帮助"><span class="toc-section-number">4.1.2</span> 调试帮助</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#configuring-pnfsspnfsd"><span class="toc-section-number">5</span> Configuring pNFS/spnfsd</a><ul>
+<li><a href="#what-is-pnfs"><span class="toc-section-number">5.1</span> What is pNFS ?</a></li>
+<li><a href="#what-is-spnfs"><span class="toc-section-number">5.2</span> What is spNFS ?</a></li>
+<li><a href="#content-of-this-document"><span class="toc-section-number">5.3</span> Content of this document</a></li>
+<li><a href="#where-is-the-source-code"><span class="toc-section-number">5.4</span> Where is the source code?</a></li>
+<li><a href="#lets-go-configuring-now"><span class="toc-section-number">5.5</span> Let’s go configuring now…</a><ul>
+<li><a href="#building-the-pnfs-kernel"><span class="toc-section-number">5.5.1</span> Building the pnfs Kernel</a></li>
+<li><a href="#building-nfs-utils"><span class="toc-section-number">5.5.2</span> Building nfs-utils</a></li>
+<li><a href="#configuring-the-test-bed-to-used-pnfs-over-layout4_files"><span class="toc-section-number">5.5.3</span> Configuring the test bed to used pNFS over LAYOUT4_FILES</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#pnfs-server-projects"><span class="toc-section-number">6</span> PNFS server projects</a><ul>
+<li><a href="#files-based-projects"><span class="toc-section-number">6.1</span> files-based projects</a><ul>
+<li><a href="#spnfs"><span class="toc-section-number">6.1.1</span> spNFS</a></li>
+<li><a href="#gfs2"><span class="toc-section-number">6.1.2</span> gfs2</a></li>
+<li><a href="#ocfs2"><span class="toc-section-number">6.1.3</span> ocfs2</a></li>
+</ul></li>
+<li><a href="#block-based-projects"><span class="toc-section-number">6.2</span> block-based projects</a></li>
+<li><a href="#objects-based-projects"><span class="toc-section-number">6.3</span> objects-based projects</a><ul>
+<li><a href="#exofs"><span class="toc-section-number">6.3.1</span> exofs</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<p>本文档翻译自<a href="https://linux-nfs.org/wiki/index.php/PNFS_Development">linux-nfs.org中PNFS Development相关的内容</a>，大部分借助于ChatGPT。仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<h1 id="pnfs-development"><span class="header-section-number">1</span> PNFS Development</h1>
+<p><a href="https://linux-nfs.org/wiki/index.php/PNFS_Development">原网页</a>。</p>
+<p>Linux pNFS具有可插拔的客户端和服务器架构，通过为文件、对象和块布局启用动态支持，充分发挥了pNFS作为通用和可扩展的元数据协议的潜力。</p>
+<p>pNFS是第一个NFSv4小版本的一部分。这个空间用于跟踪和分享Linux pNFS实现的想法和问题。</p>
+<h2 id="客户端信息"><span class="header-section-number">1.1</span> 客户端信息</h2>
+<ul>
+<li>Fedora pNFS 客户端设置 - 如何设置 Fedora pNFS 客户端。</li>
+<li>Archlinux pNFS 客户端设置 - 如何设置 Archlinux pNFS 客户端。</li>
+</ul>
+<h2 id="服务器端信息"><span class="header-section-number">1.2</span> 服务器端信息</h2>
+<p>从4.0版本开始，上游服务器包含pNFS块支持。请参阅PNFS块服务器设置以获取说明。</p>
+<p>以下说明适用于过时的原型:</p>
+<ul>
+<li>pNFS设置说明 - 基本的pNFS设置说明。</li>
+<li>GFS2设置注意事项 - cluster3，2.6.27内核</li>
+</ul>
+<h2 id="开发资源"><span class="header-section-number">1.3</span> 开发资源</h2>
+<ul>
+<li>pNFS开发Git树</li>
+<li>pNFS Git树配方</li>
+<li>pNFS服务器文件系统API设计</li>
+<li>Wireshark补丁</li>
+</ul>
+<h2 id="提交错误"><span class="header-section-number">1.4</span> 提交错误</h2>
+<ul>
+<li>linux-nfs.org Bugzilla - “NFSv4.1相关错误”组成员可读/写访问
+<ul>
+<li>使用关键词: “NFSv4.1”和“pNFS”。</li>
+<li>“NFSv4.1相关错误”组用于跟踪我们的错误。您需要在bugzilla上拥有用户帐户，然后发送电子邮件给Trond将您添加到该组。</li>
+</ul></li>
+</ul>
+<h2 id="设计笔记"><span class="header-section-number">1.5</span> 设计笔记</h2>
+<ul>
+<li>pNFS开发路线图</li>
+<li>pNFS基于文件的状态标识分发</li>
+</ul>
+<h2 id="历史内容"><span class="header-section-number">1.6</span> 历史内容</h2>
+<p>pNFS原型设计</p>
+<h1 id="fedora-pnfs-client-setup"><span class="header-section-number">2</span> Fedora pNFS Client Setup</h1>
+<p><a href="https://linux-nfs.org/wiki/index.php/Fedora_pNFS_Client_Setup">原网页</a>。</p>
+<h2 id="installing-fedora"><span class="header-section-number">2.1</span> Installing Fedora</h2>
+<p>请查看原网页。</p>
+<h2 id="installing-pnfs-enabled-fedora-kernel"><span class="header-section-number">2.2</span> Installing pNFS Enabled Fedora kernel</h2>
+<p>从内核 3.1 开始，块布局客户端已包含在标准内核中，您可以跳过此部分。</p>
+<p>有两种安装启用 pNFS 的内核的方法。可以使用 yum 仓库或者直接下载。</p>
+<p>具体内容请查看原网页（陈孝松注: 我们测试是用最新的内核，肯定包含了pNFS功能，所以可以暂不用管这些内容）。</p>
+<h2 id="target-and-blkmapd-setup-for-block-layout-client"><span class="header-section-number">2.3</span> Target and blkmapd setup for block layout client</h2>
+<p>如果您使用文件或对象布局，请跳过此部分。如果您使用块布局与 iSCSI 目标，请按照以下说明操作。</p>
+<p>您需要 pnfs 版本的 nfs-utils。如果您已经添加了 pnfs yum 仓库，只需执行 “yum update” 即可获取此软件包。您还可以从 http://steved.fedorapeople.org/repos/pnfs 下载 rpm，或者从 git 源代码树 git://git.linux-nfs.org/projects/bhalevy/pnfs-nfs-utils.git 构建它。</p>
+<p>从版本 1.2.5 开始，标准的 nfs-utils 软件包包含了对 pNFS 的支持，包括块布局客户端，但您应用这个补丁以防止日志被垃圾填满: 0001-remove-pretty_sig.patch</p>
+<p>您需要在服务器上设置 iSCSI 目标，并根据本地政策设置任何登录或权限所需的操作。具体操作步骤取决于服务器。</p>
+<p>为了便于调试，您应该降低挂起任务的超时时间:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">sysctl</span> -w kernel.hung_task_timeout_secs=10</a></code></pre></div>
+<p>现在连接到您的 iSCSI 目标，类似于:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">iscsiadm</span> -m discovery -t sendtargets -p <span class="op">&lt;</span>iscsi-server<span class="op">&gt;</span> -l</a></code></pre></div>
+<p>然后启动块布局服务，它会加载内核模块并启动 blkmapd:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">service</span> blkmapd restart</a></code></pre></div>
+<p>如果您收到错误消息 “blkmapd: unrecognized service”，可能是缺少初始化文件。您可以从 CITI pnfs 网站安装它:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">wget</span> -O /etc/rc.d/init.d/blkmapd http://www.citi.umich.edu/projects/nfsv4/pnfs/block/download/rh-init.txt</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="fu">chmod</span> +x /etc/rc.d/init.d/blkmapd</a></code></pre></div>
+<h2 id="mount-filesystem"><span class="header-section-number">2.4</span> Mount Filesystem</h2>
+<p>在挂载服务器时使用 <code>-o minorversion=1</code> 挂载选项，类似于:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">mount</span> -t nfs4 -o minorversion=1 <span class="op">&lt;</span>server<span class="op">&gt;</span>:/export  /mnt</a></code></pre></div>
+<h2 id="generate-traffic"><span class="header-section-number">2.5</span> Generate Traffic</h2>
+<p>使用“dd”生成一些I/O或运行“Connectathon”。您可以从 http://www.connectathon.org 下载Connectathon。所有测试都应该顺利通过，没有错误。</p>
+<p>要验证 pNFS 是否正常工作，请在 /proc/self/mountstat 中使用 grep 查找单词 ‘LAYOUT’。您应该看到一些非零值。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">fedora</span># grep LAYOUT /proc/self/mountstats</a>
+<a class="sourceLine" id="cb6-2" title="2">        <span class="ex">nfsv4</span>:  bm0=0xfcff8fff,bm1=0x40f9bfff,acl=0x3,sessions,pnfs=LAYOUT_BLOCK_VOLUME</a>
+<a class="sourceLine" id="cb6-3" title="3">        <span class="ex">PNFS_LAYOUTGET</span>: 2561 2561 0 655616 256284 34 1698 2575</a>
+<a class="sourceLine" id="cb6-4" title="4">        <span class="ex">PNFS_LAYOUTCOMMIT</span>: 0 0 0 0 0 0 0 0</a>
+<a class="sourceLine" id="cb6-5" title="5">        <span class="ex">PNFS_LAYOUTRETURN</span>: 1 1 0 252 88 0 0 1</a></code></pre></div>
+<h2 id="unmount-and-disconnect"><span class="header-section-number">2.6</span> Unmount and disconnect</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="fu">umount</span> /mnt</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="ex">iscsiadm</span> -m node -U all</a></code></pre></div>
+<h2 id="troubleshooting"><span class="header-section-number">2.7</span> Troubleshooting</h2>
+<p>如果您正在使用文件或对象布局，请跳过此部分。如果您正在使用 iSCSI 目标的块布局，请按照以下说明操作。</p>
+<p>如果这对您没有用，请按照以下步骤查找问题。首先确保您的 iSCSI 目标已经被挂载。对于每个目标设备，在 <code>/var/log/messages</code> 中应该看到类似以下内容:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">Mar</span>  7 09:46:34 rhcl1 kernel: scsi 7:0:0:15: Direct-Access     DGC      RAID 5           0326 PQ: 0 ANSI: 4</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">Mar</span>  7 09:46:34 rhcl1 kernel: sd 7:0:0:15: Attached scsi generic sg32 type 0</a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="ex">Mar</span>  7 09:46:34 rhcl1 kernel: sd 7:0:0:15: [sdq] 1125628928 512-byte logical blocks: (576 GB/536 GiB)</a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="ex">Mar</span>  7 09:46:36 rhcl1 kernel: sd 7:0:0:15: [sdq] Write Protect is off</a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="ex">Mar</span>  7 09:46:37 rhcl1 kernel: sd 7:0:0:15: [sdq] Write cache: disabled, read cache: enabled, doesn<span class="st">&#39;t support DPO or FUA</span></a>
+<a class="sourceLine" id="cb8-6" title="6"><span class="st">Mar  7 09:46:37 rhcl1 kernel: sdq: unknown partition table</span></a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="st">Mar  7 09:46:38 rhcl1 kernel: sd 7:0:0:15: [sdq] Attached SCSI disk</span></a></code></pre></div>
+<p>您还应该在 <code>/sys/block</code> 目录中看到块设备:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="ex">pdsi7</span># ls /sys/block</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="ex">loop0</span>  loop6  ram11  ram3  ram9  sdae  sdak  sdaq  sdb  sdh  sdn  sdt  sdz</a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="ex">loop1</span>  loop7  ram12  ram4  sda   sdaf  sdal  sdar  sdc  sdi  sdo  sdu</a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="ex">loop2</span>  md127  ram13  ram5  sdaa  sdag  sdam  sdas  sdd  sdj  sdp  sdv</a>
+<a class="sourceLine" id="cb9-5" title="5"><span class="ex">loop3</span>  ram0   ram14  ram6  sdab  sdah  sdan  sdat  sde  sdk  sdq  sdw</a>
+<a class="sourceLine" id="cb9-6" title="6"><span class="ex">loop4</span>  ram1   ram15  ram7  sdac  sdai  sdao  sdau  sdf  sdl  sdr  sdx</a>
+<a class="sourceLine" id="cb9-7" title="7"><span class="ex">loop5</span>  ram10  ram2   ram8  sdad  sdaj  sdap  sdav  sdg  sdm  sds  sdy</a></code></pre></div>
+<p>接下来加载内核模块:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="ex">modprobe</span> blocklayoutdriver</a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="ex">pdsi7</span># modprobe blocklayoutdriver</a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="ex">pdsi7</span>#</a></code></pre></div>
+<p>现在以前台模式运行守护进程:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="ex">pdsi7</span># /usr/sbin/blkmapd -f</a></code></pre></div>
+<p>最后，运行您的挂载命令，并验证您是否有一个 pnfs 挂载（参见上面的“Mount Filesystem”和“Generate Traffic”）。守护进程在发现您的设备时应该打印一些消息:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="ex">pdsi7</span># /usr/sbin/blkmapd -f</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="ex">blkmapd</span>: process_deviceinfo: 12 vols</a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="ex">blkmapd</span>: decode_blk_signature: si_comps[0]: bs_length 4, bs_string 0x14</a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="ex">blkmapd</span>: decode_blk_signature: si_comps[1]: bs_length 32, bs_string APM000644032240000</a>
+<a class="sourceLine" id="cb12-5" title="5"><span class="ex">blkmapd</span>: read_cmp_blk_sig: /dev/sdn sig 0x14 at -65536</a>
+<a class="sourceLine" id="cb12-6" title="6"><span class="ex">blkmapd</span>: read_cmp_blk_sig: /dev/sdn sig APM000644032240000 at -65436</a>
+<a class="sourceLine" id="cb12-7" title="7"><span class="ex">blkmapd</span>: decode_blk_volume: simple 0</a>
+<a class="sourceLine" id="cb12-8" title="8"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb12-9" title="9"><span class="ex">blkmapd</span>: decode_blk_volume: stripe 10 nvols=10 unit=512</a>
+<a class="sourceLine" id="cb12-10" title="10"><span class="ex">blkmapd</span>: decode_blk_volume: concat 11 1</a>
+<a class="sourceLine" id="cb12-11" title="11"><span class="ex">blkmapd</span>: dm_device_create: 10 pnfs_vol_0 253:0</a>
+<a class="sourceLine" id="cb12-12" title="12"><span class="ex">blkmapd</span>: dm_device_create: 11 pnfs_vol_1 253:1</a></code></pre></div>
+<p>这些消息的内容取决于您的设备拓扑结构。如果您仍然没有 pnfs 挂载，守护进程可能会打印一些有用的信息，或者您可以在 <code>/var/log/messages</code> 中找到一些信息。</p>
+<h1 id="pnfs-block-server-setup"><span class="header-section-number">3</span> PNFS block server setup</h1>
+<p><a href="https://linux-nfs.org/wiki/index.php/PNFS_block_server_setup">原网页</a>。</p>
+<p>最近将基于块布局的 pNFS 服务器合并到了 Linux 内核中。使用时需要谨慎，参见下面的警告。</p>
+<p>要使用它，您需要:</p>
+<ul>
+<li>至少版本为 4.0 的内核，配置了 CONFIG_NFSD_PNFS，</li>
+<li>在服务器上同样较新的 nfs-utils（截至本文撰写时尚未正式发布；至少需要 steved 的 git 树中的 c08f1382e5609bc686c3df95ff1e267804b37a61 版本），以及</li>
+<li>一个共享的块设备，服务器和客户端都可以访问。</li>
+</ul>
+<p>格式化块设备为 xfs 文件系统，使用 “pnfs” 导出选项导出它，并启动 nfs 服务器，并按照下面的第二个警告创建一个 <code>/sbin/nfsd-recall-failed</code>。</p>
+<p>在客户端上: 启动 <code>blkmap</code> 守护进程。（在 Fedora 上: <code>systemctl enable nfs-blkmap</code> 和 <code>systemctl start nfs-blkmap</code>）。然后使用至少 4.1 版本的 nfs 进行挂载。</p>
+<p>客户端将通过直接读取或写入块设备而不是将 NFS 读取和写入发送到服务器来执行对普通文件的读取和写入。如果您可以在 <code>/proc/self/mountstats</code> 中看到 LAYOUTGET 调用，则可能正在工作。</p>
+<p>警告:</p>
+<ul>
+<li>客户端通过查看块设备的内容来确定要写入的块设备。如果客户端还可以访问相同文件系统的快照，可能会选择错误。这可能会损坏您的数据。</li>
+<li>服务器需要能够在需要时撤销客户端对数据的直接访问，例如，多个客户端需要同时访问的情况。如果客户端对正常的 NFS 回调请求无响应，服务器必须能够强制切断客户端的访问。为使此工作正常运行，您必须提供一个 <code>/sbin/nfsd-recall-failed</code> 脚本，它知道如何切断客户端的访问。详细信息请参阅 <a href="https://git.linux-nfs.org/?p=bfields/linux.git;a=blob;f=Documentation/filesystems/nfs/pnfs-block-server.txt;h=2143673cf1544bfc18502b8e0e4ee469234e7aae;hb=c517d838eb7d07bbe9507871fab3931deccff539"><code>Documentation/filesystems/nfs/pnfs-block-server.txt</code></a>。如果未能执行此操作，可能会再次损坏您的数据。</li>
+</ul>
+<h1 id="pnfs-setup-instructions"><span class="header-section-number">4</span> PNFS Setup Instructions</h1>
+<p><a href="https://linux-nfs.org/wiki/index.php/PNFS_Setup_Instructions">原网页</a>。</p>
+<p>这个PNFS代码的描述已经过时，不再继续开发。</p>
+<h2 id="file-layout"><span class="header-section-number">4.1</span> File Layout</h2>
+<h3 id="accessing-a-storage-system-with-pnfs"><span class="header-section-number">4.1.1</span> Accessing a storage system with pNFS</h3>
+<h4 id="步骤0-从pnfs开发git树中获取pnfs内核并在所有涉及的服务器上进行安装"><span class="header-section-number">4.1.1.1</span> 步骤0: 从PNFS开发Git树中获取pNFS内核，并在所有涉及的服务器上进行安装。</h4>
+<h4 id="步骤1-设置nfsv4服务器"><span class="header-section-number">4.1.1.2</span> 步骤1: 设置NFSv4服务器</h4>
+<ol type="1">
+<li></li>
+</ol>
+<p>在所有数据服务器（DS）和元数据服务器（MDS）上创建<code>/etc/exports</code>文件。</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="ex">/export</span>  *(rw,sync,fsid=0,insecure,no_subtree_check)</a></code></pre></div>
+<p>注意: 从2.6.32-rc1版本开始，需要使用“pnfs”导出选项。</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="ex">/export</span>  *(rw,sync,fsid=0,insecure,no_subtree_check,pnfs)</a></code></pre></div>
+<p>在<code>pnfs</code>导出选项公开发布之前，请从以下地址构建和安装<code>exportfs、rpc.mountd、rpc.nfsd</code>，以及可选的<code>nfsstat</code>:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="ex">git</span>://linux-nfs.org/~bhalevy/pnfs-nfs-utils.git</a>
+<a class="sourceLine" id="cb15-2" title="2"></a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="ex">To</span> install just the required binaries:</a>
+<a class="sourceLine" id="cb15-4" title="4"><span class="fu">cp</span> utils/exportfs/exportfs /usr/sbin/exportfs</a>
+<a class="sourceLine" id="cb15-5" title="5"><span class="fu">cp</span> utils/mountd/mountd /usr/sbin/rpc.mountd</a>
+<a class="sourceLine" id="cb15-6" title="6"><span class="fu">cp</span> utils/mountd/nfsd /usr/sbin/rpc.nfsd</a>
+<a class="sourceLine" id="cb15-7" title="7"><span class="fu">cp</span> utils/nfsstat/nfsstat /usr/sbin/nfsstat</a></code></pre></div>
+<ol start="2" type="1">
+<li></li>
+</ol>
+<p>告诉元数据服务器数据服务器的IP地址:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="bu">echo</span> <span class="st">&quot;/dev/sdc:192.168.0.1,192.168.0.2&quot;</span> <span class="op">&gt;</span>/proc/fs/nfsd/pnfs_dlm_device</a></code></pre></div>
+<p>(用托管导出的GFS2文件系统的设备名称替换<code>/dev/sdc</code>，并用数据服务器的IP地址替换IP地址。)</p>
+<ol start="3" type="1">
+<li></li>
+</ol>
+<p>如果需要启动NFS服务，则在元数据服务器上运行以下命令。</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" title="1"><span class="ex">/etc/init.d/nfs</span> restart</a>
+<a class="sourceLine" id="cb17-2" title="2"></a>
+<a class="sourceLine" id="cb17-3" title="3"><span class="ex">or</span></a>
+<a class="sourceLine" id="cb17-4" title="4"></a>
+<a class="sourceLine" id="cb17-5" title="5"><span class="ex">rpc.mountd</span></a>
+<a class="sourceLine" id="cb17-6" title="6"><span class="ex">rpc.nfsd</span> 8</a>
+<a class="sourceLine" id="cb17-7" title="7"><span class="ex">exportfs</span> -r</a></code></pre></div>
+<h4 id="第二步-在客户端加载布局驱动"><span class="header-section-number">4.1.1.3</span> 第二步: 在客户端加载布局驱动</h4>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1"><span class="ex">modprobe</span> nfs_layout_nfsv41_files</a></code></pre></div>
+<h4 id="第三步-挂载pnfs文件系统"><span class="header-section-number">4.1.1.4</span> 第三步: 挂载pNFS文件系统。</h4>
+<p>在pnfs客户端:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1"><span class="fu">mount</span> -t nfs4 -o minorversion=1 <span class="op">&lt;</span>mds_server<span class="op">&gt;</span>:/ /mnt/pnfs</a>
+<a class="sourceLine" id="cb19-2" title="2"></a>
+<a class="sourceLine" id="cb19-3" title="3">注意: 每个文件系统都有自己选择<span class="ex">MDS</span>的方式。确保只挂载MDS而不是DS。</a></code></pre></div>
+<h3 id="调试帮助"><span class="header-section-number">4.1.2</span> 调试帮助</h3>
+<p>nfs 调试:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1"><span class="bu">echo</span> 32767 <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug</a>
+<a class="sourceLine" id="cb20-2" title="2"><span class="bu">echo</span> 32767 <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug</a></code></pre></div>
+<h1 id="configuring-pnfsspnfsd"><span class="header-section-number">5</span> Configuring pNFS/spnfsd</h1>
+<p><a href="https://linux-nfs.org/wiki/index.php?title=Configuring_pNFS/spnfsd">原网页</a>。</p>
+<p>注意: spnfs已经从git://linux-nfs.org/~bhalevy/linux-pnfs.git pnfs-all-3.2中删除。</p>
+<h2 id="what-is-pnfs"><span class="header-section-number">5.1</span> What is pNFS ?</h2>
+<p>pNFS是NFSv4.1提供的新功能，也称为Parallel NFS。Parallel NFS（pNFS）扩展了网络文件共享版本4（NFSv4），允许客户端直接访问由NFSv4服务器使用的存储上的文件数据。这种绕过服务器进行数据访问的能力可以提高性能和并行性，但需要额外的客户端功能来进行数据访问，其中一些取决于所使用的存储类别。</p>
+<p>Parallel NFS具有多种直接访问数据的方式。目前，提供了三种“布局”:</p>
+<ul>
+<li>LAYOUT4_FILE: 跨多个NFS服务器进行条带化</li>
+<li>LAYOUT4_BLOCK_VOLUME: 允许客户端按块设备中存储的方式访问数据</li>
+<li>LAYOUT4_OSD2_OBJECTS: 基于OSD2协议。</li>
+</ul>
+<p>NFSv4.1和pNFS由以下RFC描述:</p>
+<ul>
+<li>RFC5661: 网络文件系统（NFS）版本4.1协议</li>
+<li>RFC5662: 网络文件系统（NFS）版本4.1，外部数据表示标准（XDR）描述</li>
+<li>RFC5663: 并行NFS（pNFS）块/卷布局</li>
+<li>RFC5664: 基于对象的并行NFS（pNFS）操作</li>
+</ul>
+<h2 id="what-is-spnfs"><span class="header-section-number">5.2</span> What is spNFS ?</h2>
+<p>spNFS是一个简单的pNFS LAYOUT4_FILE服务器实现，它使用独立的NFS服务器作为数据服务器，并将大部分MDS逻辑放在用户空间守护进程中。截至2011年初，它基本上没有维护，并且我们不再推荐使用它；如果您仍想尝试spNFS，可以使用以下步骤，但是您可能会更喜欢使用不同的服务器实现（请参阅 http://wiki.linux-nfs.org/wiki/index.php/PNFS_server_projects ）。</p>
+<h2 id="content-of-this-document"><span class="header-section-number">5.3</span> Content of this document</h2>
+<p>这份文档描述了如何使用3台机器设置一个基本的pNFS/LAYOUT4_FILE测试配置，使用服务器端的spNFS。</p>
+<p>（警告: 截至2011年2月，spNFS代码大部分未维护；我们不再推荐使用。）</p>
+<p>我使用的机器是:</p>
+<ul>
+<li>nfsmds，IP地址= XX.YY.ZZ.A，用作元数据服务器</li>
+<li>nfsds，IP地址= XX.YY.ZZ.B，用作数据服务器</li>
+<li>nfsclient，IP地址= XX.YY.ZZ.C，用作客户端</li>
+</ul>
+<h2 id="where-is-the-source-code"><span class="header-section-number">5.4</span> Where is the source code?</h2>
+<p>首先要做的是重新编译一个兼容的内核和nfs-utils发行版。我使用了Benny Halevy的git仓库中的那些。</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1"> <span class="co"># Get kernel repository</span></a>
+<a class="sourceLine" id="cb21-2" title="2"> <span class="fu">git</span> clone git://git.linux-nfs.org/projects/bhalevy/linux-pnfs.git</a>
+<a class="sourceLine" id="cb21-3" title="3"> </a>
+<a class="sourceLine" id="cb21-4" title="4"> <span class="co"># Get nfs-utils repository</span></a>
+<a class="sourceLine" id="cb21-5" title="5"> <span class="ex">git</span>://linux-nfs.org/~bhalevy/pnfs-nfs-utils.git</a></code></pre></div>
+<p>在这份文档中，我使用了具有以下状态的版本库。 - pnfs-nfs-utils: commit id = 2b5373db8615a52c47dbcf3ab968fad7cdcc6fed (pnfs-nfs-utils-1-2-2) - kernel linux-pnfs: commit id = cbd09e0fb2b160a06a44aad1c21786b99401823f (pnfs-all-2.6.33-2010-03-09)</p>
+<h2 id="lets-go-configuring-now"><span class="header-section-number">5.5</span> Let’s go configuring now…</h2>
+<h3 id="building-the-pnfs-kernel"><span class="header-section-number">5.5.1</span> Building the pnfs Kernel</h3>
+<p>内核编译正常。只需确保在<code>.config</code>文件中配置了正确的选项。</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb22-1" title="1">       <span class="va">CONFIG_NETWORK_FILESYSTEMS=</span>y</a>
+<a class="sourceLine" id="cb22-2" title="2">       <span class="va">CONFIG_NFS_FS=</span>m</a>
+<a class="sourceLine" id="cb22-3" title="3">       <span class="va">CONFIG_NFS_V4=</span>y</a>
+<a class="sourceLine" id="cb22-4" title="4">       <span class="va">CONFIG_NFS_V4_1=</span>y</a>
+<a class="sourceLine" id="cb22-5" title="5">       <span class="va">CONFIG_PNFS=</span>y</a>
+<a class="sourceLine" id="cb22-6" title="6">       <span class="va">CONFIG_NFSD=</span>m</a>
+<a class="sourceLine" id="cb22-7" title="7">       <span class="va">CONFIG_PNFSD=</span>y</a>
+<a class="sourceLine" id="cb22-8" title="8">       <span class="co"># CONFIG_PNFSD_LOCAL_EXPORT is not set</span></a>
+<a class="sourceLine" id="cb22-9" title="9">       <span class="va">CONFIG_SPNFS=</span>y</a>
+<a class="sourceLine" id="cb22-10" title="10">       <span class="va">CONFIG_SPNFS_LAYOUTSEGMENTS=</span>y</a></code></pre></div>
+<p>使用2.6.34或更高版本的内核，添加（应该与<code>CONFIG_NFS_FS</code>相同）。</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb23-1" title="1"><span class="va">CONFIG_PNFS_FILE_LAYOUT=</span>m</a></code></pre></div>
+<h3 id="building-nfs-utils"><span class="header-section-number">5.5.2</span> Building nfs-utils</h3>
+<p>编译pnfs-nfs-utils将按照以下步骤进行。</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1"> <span class="co"># autoreconf --instal</span></a>
+<a class="sourceLine" id="cb24-2" title="2"> <span class="co"># ./configure --prefix=/usr &amp;&amp; make &amp;&amp; make install</span></a></code></pre></div>
+<p>但是您必须确保已安装以下产品（所有节点都使用Fedora 12安装）:</p>
+<ul>
+<li>libtirpc + libtirpc-dev</li>
+<li>tcp_wrappers + tcp_wrapper-libs + tcp_wrappers-devel</li>
+<li>libblkid + libblkid-devel</li>
+<li>libevent + libevent-devel</li>
+<li>libnfsidmap</li>
+<li>device-mapper-devel (starting Fedora 15)</li>
+</ul>
+<p>你会发现它们都是rpm包，但是libnfsidmap不是。对于这个包，您需要获取最新版本，进行编译和安装（不要忘记指定“./configure –prefix=/usr”）。您可以从nfs-utils-lib-devel-1.1.4-8或更高版本获取它。</p>
+<p>基本上，类似以下命令的命令应该可以完成所有必需的工作（以Fedora 15为例）:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1"> <span class="co"># yum install libtirpc{,-devel} tcp_wrappers{,-devel} libevent{,-devel} libnfsidmap{,-devel} openldap-devel \</span></a>
+<a class="sourceLine" id="cb25-2" title="2">               <span class="ex">libgssglue</span><span class="dt">{,-devel}</span> krb5-devel libblkid<span class="dt">{,-devel}</span> device-mapper-devel libcap<span class="dt">{,-devel}</span></a></code></pre></div>
+<h3 id="configuring-the-test-bed-to-used-pnfs-over-layout4_files"><span class="header-section-number">5.5.3</span> Configuring the test bed to used pNFS over LAYOUT4_FILES</h3>
+<p>在这种配置中，客户端（nfsclient）将挂载MDS（nfsmds）。客户端插入了一个特定的内核模块，称为布局驱动程序，用于连接到DS。所有的元数据流量将通过MDS传递，但数据流量将在DS和客户端之间进行。</p>
+<p>MDS应该能够挂载DS并在其上具有root访问权限。它运行一个用户空间守护程序，spnfsd（它是nfs-utils的一部分），使用此挂载点从DS获取信息。</p>
+<h4 id="configuring-the-spnfs-data-server"><span class="header-section-number">5.5.3.1</span> Configuring the spNFS Data Server</h4>
+<p>数据服务器只是一个普通的NFSv4.1服务器。重要的是，元数据服务器必须具有对其的root访问权限，以防止由于EPERM错误导致的奇怪行为。</p>
+<p>数据服务器的<code>/etc/exports</code>在nfsds上将如下所示:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb26-1" title="1"><span class="ex">/export/spnfs</span>  *(rw,sync,fsid=0,insecure,no_subtree_check,pnfs,no_root_squash)</a></code></pre></div>
+<h4 id="configuring-the-spnfs-metadata-server"><span class="header-section-number">5.5.3.2</span> Configuring the spNFS Metadata Server</h4>
+<p>MDS是DS的客户端，并运行spnfsd。它也是启用了pNFS的NFSv4.1服务器。</p>
+<p>spnfsd配置分两步进行:</p>
+<ul>
+<li>将MDS配置为DS的客户端</li>
+<li>编写<code>/etc/spnfsd.conf</code>文件</li>
+</ul>
+<p>在MDS上，/etc/fstab应包含以下行:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb27-1" title="1"><span class="ex">nfsds</span>:/       /spnfs/XX.YY.ZZ.B   nfs4    minorversion=1        0 0</a></code></pre></div>
+<p>必须通过NFSv4进行挂载，并将<code>minorversion</code>设置为1。</p>
+<p>它的<code>/etc/spnfsd</code>配置文件将如下所示（这是一个单个DS配置）:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb28-1" title="1"> [<span class="ex">General</span>]</a>
+<a class="sourceLine" id="cb28-2" title="2"> <span class="ex">Verbosity</span> = 1</a>
+<a class="sourceLine" id="cb28-3" title="3"> <span class="ex">Stripe-size</span> = 8192</a>
+<a class="sourceLine" id="cb28-4" title="4"> <span class="ex">Dense-striping</span> = 0</a>
+<a class="sourceLine" id="cb28-5" title="5"> <span class="ex">Pipefs-Directory</span> = /var/lib/nfs/rpc_pipefs</a>
+<a class="sourceLine" id="cb28-6" title="6"> <span class="ex">DS-Mount-Directory</span> = /spnfs</a>
+<a class="sourceLine" id="cb28-7" title="7"> </a>
+<a class="sourceLine" id="cb28-8" title="8"> [<span class="ex">DataServers</span>]</a>
+<a class="sourceLine" id="cb28-9" title="9"> <span class="ex">NumDS</span> = 1</a>
+<a class="sourceLine" id="cb28-10" title="10"> <span class="ex">DS1_IP</span> = XX.YY.ZZ.B</a>
+<a class="sourceLine" id="cb28-11" title="11"> <span class="ex">DS1_PORT</span> = 2049</a>
+<a class="sourceLine" id="cb28-12" title="12"> <span class="ex">DS1_ROOT</span> = /</a>
+<a class="sourceLine" id="cb28-13" title="13"> <span class="ex">DS1_ID</span> = 1</a></code></pre></div>
+<p>最后，<code>/etc/exports</code>将如下所示:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb29-1" title="1"> <span class="ex">/export</span>  *(rw,sync,pnfs,fsid=0,insecure,no_subtree_check,no_root_squash)</a></code></pre></div>
+<p>注意在<code>exports</code>选项中有<code>pnfs</code>。</p>
+<h4 id="configuring-the-client"><span class="header-section-number">5.5.3.3</span> Configuring the client</h4>
+<p>客户端将作为普通的NFSv4.1客户端使用。唯一要做的就是确保布局驱动程序内核模块已加载。</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb30-1" title="1"><span class="co"># modprobe nfs_layout_nfsv41_files</span></a></code></pre></div>
+<p>（在2.6.26之前的内核中被称为nfslayoutdriver）</p>
+<p>然后，您可以在客户端上挂载MDS:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb31-1" title="1"><span class="co"># mount -t nfs4 -o minorversion=1 nfsmds:/ /mnt</span></a></code></pre></div>
+<p>警告: 在进行任何读/写操作之前，请确保NFSv4的宽限期已经过去。通常，在nfs服务启动后需要90秒。</p>
+<h4 id="basic-test"><span class="header-section-number">5.5.3.4</span> Basic test</h4>
+<p>第一个测试非常简单: 在客户端上，我向文件写入50个字节:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb32-1" title="1"> <span class="co"># echo &quot;jljlkjljjhkjhkhkjhkjhkjhkjhkjhkjhkjhkjhkjhkjhkjhk&quot; &gt; ./myfile</span></a>
+<a class="sourceLine" id="cb32-2" title="2"> <span class="co"># ls -i ./myfile</span></a>
+<a class="sourceLine" id="cb32-3" title="3"> <span class="ex">330246</span> myfile</a></code></pre></div>
+<p>在数据服务器上，我应该看到一个新文件，其文件名包含了myfile的文件ID，并位于其导出给MDS的根目录中。</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb33-1" title="1"> <span class="co"># ls -l /export/spnfs/330246*</span></a>
+<a class="sourceLine" id="cb33-2" title="2"> <span class="ex">-rwxrwxrwx</span> 1 root root 50 Mar 24 10:49 /export/spnfs/330246.2343187478</a>
+<a class="sourceLine" id="cb33-3" title="3"> <span class="co"># cat /export/spnfs/330246.2343187478</span></a>
+<a class="sourceLine" id="cb33-4" title="4"> <span class="ex">jljlkjljjhkjhkhkjhkjhkjhkjhkjhkjhkjhkjhkjhkjhkjhk</span></a></code></pre></div>
+<p>正如您所见，这个文件位于数据服务器上，包含了客户端写入的数据。</p>
+<p>在MDS上，文件具有正确的大小，但如果在NFS之外查看，它没有分配任何块。它不包含任何数据。</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb34-1" title="1"> <span class="co"># cd /export</span></a>
+<a class="sourceLine" id="cb34-2" title="2"> <span class="co"># stat myfile</span></a>
+<a class="sourceLine" id="cb34-3" title="3"> <span class="ex">File</span>: <span class="kw">`</span><span class="ex">myfile</span><span class="st">&#39;</span></a>
+<a class="sourceLine" id="cb34-4" title="4"><span class="st"> Size: 50              Blocks: 0            IO Block: 4096   regular file</span></a>
+<a class="sourceLine" id="cb34-5" title="5"><span class="st"> Device: fd00h/64768d    Inode: 330246      Links: 1</span></a>
+<a class="sourceLine" id="cb34-6" title="6"><span class="st"> Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)</span></a>
+<a class="sourceLine" id="cb34-7" title="7"><span class="st"> Access: 2010-03-24 12:56:02.331151053 +0100</span></a>
+<a class="sourceLine" id="cb34-8" title="8"><span class="st"> Modify: 2010-03-24 10:49:08.997150735 +0100</span></a>
+<a class="sourceLine" id="cb34-9" title="9"><span class="st"> Change: 2010-03-24 10:49:08.997150735 +0100</span></a>
+<a class="sourceLine" id="cb34-10" title="10"><span class="st"> </span></a>
+<a class="sourceLine" id="cb34-11" title="11"><span class="st"> # cat myfile</span></a>
+<a class="sourceLine" id="cb34-12" title="12"><span class="st"> (no output, the file is empty)</span></a></code></pre></div>
+<p>– Philippe Deniel 2010-04-07</p>
+<h1 id="pnfs-server-projects"><span class="header-section-number">6</span> PNFS server projects</h1>
+<p><a href="http://wiki.linux-nfs.org/wiki/index.php/PNFS_server_projects">原网页</a>。</p>
+<p>这是我们知道的一些可能被包含在主要Linux发行版中的项目列表。这意味着它们需要在Linux上运行，以自由/开源软件许可发布，并具备足够的质量、性能和实用性，以说服上游项目（如Linux内核），证明它们值得额外代码的投入。</p>
+<p>对于每个项目，我们想知道还有多少工作要做才能满足这些要求。</p>
+<h2 id="files-based-projects"><span class="header-section-number">6.1</span> files-based projects</h2>
+<h3 id="spnfs"><span class="header-section-number">6.1.1</span> spNFS</h3>
+<p>将后端数据存储在普通的本地磁盘文件系统中（如ext3），采用混合用户/内核（类似fuse）设计，并通过IO与元数据服务器通信。 (2008 connectathon presentation.)</p>
+<p>目前未维护。可能需要进行一两次重新设计。</p>
+<h3 id="gfs2"><span class="header-section-number">6.1.2</span> gfs2</h3>
+<p>基于文件的服务器，使用gfs2在元数据服务器和数据服务器之间共享数据。</p>
+<p>初步原型已存在。已通过一些简单测试。已知在协议上有些作弊（基于早期的4.1代码，尚未在数据服务器上强制使用stateid）。已经有使用中的崩溃报告。关于性能还没有详细信息。</p>
+<h3 id="ocfs2"><span class="header-section-number">6.1.3</span> ocfs2</h3>
+<p>现在没有这样的实现。但是，似乎可以使用集群软件的用户空间部分（对内核文件系统代码进行最少或没有修改）来实现简单的pNFS。因此，对gfs2的任何工作也应该可以轻松应用于ocfs2（因为它们共享用户空间基础设施）。</p>
+<h2 id="block-based-projects"><span class="header-section-number">6.2</span> block-based projects</h2>
+<p>Rick McNeal，LSI Logic，发布了: http://git.linux-nfs.org/?p=rmcneal/linux-pnfs.git;a=summary 和 http://git.linux-nfs.org/?p=rmcneal/ctl.git;a=summary</p>
+<p>基于spnfs基础设施实现基于块的pNFS MDS。计划将其合并到pnfs树中，一旦我们有了一些最基本的文档，描述如何设置服务器。</p>
+<p>Rick McNeal说: “我想我应该介入并谈谈关于块布局工作的事情。pNFS服务器可以运行在任何愿意提供inode到块映射函数的文件系统上。由于客户端被期望具有与服务器相同的对存储的块级访问，因此不会给存储设备增加额外的负载。</p>
+<p>[1] 还有几个其他部分，但问题的核心是需要将inode映射到<code>devid/extent_list</code>。”</p>
+<p>未维护。看起来仍然是一个非常原型阶段的项目。</p>
+<h2 id="objects-based-projects"><span class="header-section-number">6.3</span> objects-based projects</h2>
+<h3 id="exofs"><span class="header-section-number">6.3.1</span> exofs</h3>
+<p>基于对象的文件系统，部分用作pNFS后端。Exofs目前已合并，并支持nfs导出。打算支持跨多个OSD的镜像和raid0。当前状态不确定。</p>
+<p>Benny Halevy在2009年2月15日表示: “我们对对象后端的计划是将exofs（扩展对象文件系统）导出到pNFS上。Exofs是内核驻留的，使用OSD进行持久存储。目前它支持单个OSD，对多个OSD的支持已经在路线图上。关于集群化，pNFS over exofs的架构是集中的，因此有一个单独的MDS运行文件系统代码的单个实例，并且有多个OSD，文件系统管理器和客户端都在与之通信。”</p>
+</body>
+</html>

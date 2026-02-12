@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ef09ed5d37b8 ext4: fix bug_on in ext4_writepages</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">ef09ed5d37b8 ext4: fix bug_on in ext4_writepages</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#构造"><span class="toc-section-number">2</span> 构造</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">3</span> 代码分析</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://patchwork.ozlabs.org/project/linux-ext4/patch/20220516122634.1690462-1-yebin10@huawei.com/"><code>ef09ed5d37b8 ext4: fix bug_on in ext4_writepages</code></a></p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">EXT4-fs</span> error (device loop0)<span class="bu">:</span> ext4_mb_generate_buddy:1141: group 0, block bitmap and bg descriptor inconsistent: 25 vs 31513 free cls</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="ex">------------</span>[ cut here ]------------</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="ex">kernel</span> BUG at fs/ext4/inode.c:2708!</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="ex">invalid</span> opcode: 0000 [#1] PREEMPT SMP KASAN PTI</a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="ex">CPU</span>: 2 PID: 2147 Comm: rep Not tainted 5.18.0-rc2-next-20220413+ <span class="co">#155</span></a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="ex">RIP</span>: 0010:ext4_writepages+0x1977/0x1c10</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="ex">RSP</span>: 0018:ffff88811d3e7880 EFLAGS: 00010246</a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="ex">RAX</span>: 0000000000000000 RBX: 0000000000000001 RCX: ffff88811c098000</a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="ex">RDX</span>: 0000000000000000 RSI: ffff88811c098000 RDI: 0000000000000002</a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="ex">RBP</span>: ffff888128140f50 R08: ffffffffb1ff6387 R09: 0000000000000000</a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="ex">R10</span>: 0000000000000007 R11: ffffed10250281ea R12: 0000000000000001</a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="ex">R13</span>: 00000000000000a4 R14: ffff88811d3e7bb8 R15: ffff888128141028</a>
+<a class="sourceLine" id="cb1-13" title="13"><span class="ex">FS</span>:  00007f443aed9740(0000) <span class="ex">GS</span>:ffff8883aef00000(0000) <span class="ex">knlGS</span>:0000000000000000</a>
+<a class="sourceLine" id="cb1-14" title="14"><span class="ex">CS</span>:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033</a>
+<a class="sourceLine" id="cb1-15" title="15"><span class="ex">CR2</span>: 0000000020007200 CR3: 000000011c2a4000 CR4: 00000000000006e0</a>
+<a class="sourceLine" id="cb1-16" title="16"><span class="ex">DR0</span>: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000</a>
+<a class="sourceLine" id="cb1-17" title="17"><span class="ex">DR3</span>: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400</a>
+<a class="sourceLine" id="cb1-18" title="18"><span class="ex">Call</span> Trace:</a>
+<a class="sourceLine" id="cb1-19" title="19"> <span class="op">&lt;</span><span class="ex">TASK</span><span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb1-20" title="20"> <span class="ex">do_writepages+0x130/0x3a0</span></a>
+<a class="sourceLine" id="cb1-21" title="21"> <span class="ex">filemap_fdatawrite_wbc+0x83/0xa0</span></a>
+<a class="sourceLine" id="cb1-22" title="22"> <span class="ex">filemap_flush+0xab/0xe0</span></a>
+<a class="sourceLine" id="cb1-23" title="23"> <span class="ex">ext4_alloc_da_blocks+0x51/0x120</span></a>
+<a class="sourceLine" id="cb1-24" title="24"> <span class="ex">__ext4_ioctl+0x1534/0x3210</span></a>
+<a class="sourceLine" id="cb1-25" title="25"> <span class="ex">__x64_sys_ioctl+0x12c/0x170</span></a>
+<a class="sourceLine" id="cb1-26" title="26"> <span class="ex">do_syscall_64+0x3b/0x90</span></a></code></pre></div>
+<h1 id="构造"><span class="header-section-number">2</span> 构造</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">mkfs.ext4</span> -O inline_data -b 4096 -F /dev/sda</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="fu">mount</span> /dev/sda /mnt</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="bu">echo</span> 1 <span class="op">&gt;</span> /mnt/file <span class="co"># 小文件</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="co"># 大文件，60个字符好像不够, 注意是追加 &gt;&gt;, 否则用 &gt; 会删除文件重新创建</span></a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="bu">echo</span> 123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 <span class="op">&gt;&gt;</span> /mnt/file</a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="ex">fallocate</span> -l 10M /mnt/file</a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="fu">sync</span></a></code></pre></div>
+<h1 id="代码分析"><span class="header-section-number">3</span> 代码分析</h1>
+<p>修复补丁: <a href="https://patchwork.ozlabs.org/project/linux-ext4/patch/20220516122634.1690462-1-yebin10@huawei.com/"><code>ef09ed5d37b8 ext4: fix bug_on in ext4_writepages</code></a></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb3-1" title="1"><span class="co">// 创建小文件，再追加大量数据</span></a>
+<a class="sourceLine" id="cb3-2" title="2">write</a>
+<a class="sourceLine" id="cb3-3" title="3">  ksys_write</a>
+<a class="sourceLine" id="cb3-4" title="4">    vfs_write</a>
+<a class="sourceLine" id="cb3-5" title="5">      new_sync_write</a>
+<a class="sourceLine" id="cb3-6" title="6">        call_write_iter</a>
+<a class="sourceLine" id="cb3-7" title="7">          ext<span class="dv">4</span><span class="er">_file_write_iter</span></a>
+<a class="sourceLine" id="cb3-8" title="8">            ext<span class="dv">4</span><span class="er">_buffered_write_iter</span></a>
+<a class="sourceLine" id="cb3-9" title="9">              generic_perform_write</a>
+<a class="sourceLine" id="cb3-10" title="10">                ext<span class="dv">4</span><span class="er">_da_write_begin</span></a>
+<a class="sourceLine" id="cb3-11" title="11">                  ext<span class="dv">4</span><span class="er">_da_write_inline_data_begin</span></a>
+<a class="sourceLine" id="cb3-12" title="12">                    ext4_da_convert_inline_data_to_extent <span class="co">// 先创建小文件，再追加大量数据, 执行到这里</span></a>
+<a class="sourceLine" id="cb3-13" title="13">                      SetPageDirty(page)</a>
+<a class="sourceLine" id="cb3-14" title="14">                      ext4_clear_inode_state(inode, EXT4_STATE_MAY_INLINE_DATA)</a>
+<a class="sourceLine" id="cb3-15" title="15"></a>
+<a class="sourceLine" id="cb3-16" title="16"><span class="co">// fallocate命令注入故障</span></a>
+<a class="sourceLine" id="cb3-17" title="17">fallocate</a>
+<a class="sourceLine" id="cb3-18" title="18">  ksys_fallocate</a>
+<a class="sourceLine" id="cb3-19" title="19">    vfs_fallocate</a>
+<a class="sourceLine" id="cb3-20" title="20">      ext<span class="dv">4</span><span class="er">_fallocate</span></a>
+<a class="sourceLine" id="cb3-21" title="21">        ext<span class="dv">4</span><span class="er">_convert_inline_data</span></a>
+<a class="sourceLine" id="cb3-22" title="22">          ext<span class="dv">4</span><span class="er">_convert_inline_data_nolock</span></a>
+<a class="sourceLine" id="cb3-23" title="23">            error = ext<span class="dv">4</span><span class="er">_map_blocks</span></a>
+<a class="sourceLine" id="cb3-24" title="24">            <span class="co">// 注入故障</span></a>
+<a class="sourceLine" id="cb3-25" title="25">            <span class="cf">if</span> (strcmp(current-&gt;comm, <span class="st">&quot;fallocate&quot;</span>) == <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb3-26" title="26">            error = -ENOSPC</a>
+<a class="sourceLine" id="cb3-27" title="27">            <span class="cf">goto</span> out_restore</a>
+<a class="sourceLine" id="cb3-28" title="28">            ext<span class="dv">4</span><span class="er">_restore_inline_data</span></a>
+<a class="sourceLine" id="cb3-29" title="29">              ext4_set_inode_state(inode, EXT4_STATE_MAY_INLINE_DATA)</a>
+<a class="sourceLine" id="cb3-30" title="30"></a>
+<a class="sourceLine" id="cb3-31" title="31"><span class="co">// 回写触发 bug on</span></a>
+<a class="sourceLine" id="cb3-32" title="32">kthread</a>
+<a class="sourceLine" id="cb3-33" title="33">  process_one_work</a>
+<a class="sourceLine" id="cb3-34" title="34">    wb_workfn</a>
+<a class="sourceLine" id="cb3-35" title="35">      wb_do_writeback</a>
+<a class="sourceLine" id="cb3-36" title="36">        wb_check_old_data_flush</a>
+<a class="sourceLine" id="cb3-37" title="37">          wb_writeback</a>
+<a class="sourceLine" id="cb3-38" title="38">            __writeback_inodes_wb</a>
+<a class="sourceLine" id="cb3-39" title="39">              writeback_sb_inodes</a>
+<a class="sourceLine" id="cb3-40" title="40">                __writeback_single_inode</a>
+<a class="sourceLine" id="cb3-41" title="41">                  do_writepages</a>
+<a class="sourceLine" id="cb3-42" title="42">                    ext<span class="dv">4</span><span class="er">_writepages</span></a>
+<a class="sourceLine" id="cb3-43" title="43">                      <span class="cf">if</span> (ext4_has_inline_data(inode))</a>
+<a class="sourceLine" id="cb3-44" title="44">                      BUG_ON(ext4_test_inode_state(inode, EXT4_STATE_MAY_INLINE_DATA))</a>
+<a class="sourceLine" id="cb3-45" title="45">                      ext<span class="dv">4</span><span class="er">_destroy_inline_data</span></a></code></pre></div>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>nfsv3缓存占用太多的问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">nfsv3缓存占用太多的问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#vmcore分析"><span class="toc-section-number">2</span> 20251105 vmcore分析</a></li>
+<li><a href="#vmcore分析-1"><span class="toc-section-number">3</span> 20251202 vmcore分析</a></li>
+<li><a href="#reproduce"><span class="toc-section-number">4</span> 构造复现</a><ul>
+<li><a href="#vmcore解析"><span class="toc-section-number">4.1</span> vmcore解析</a></li>
+</ul></li>
+<li><a href="#normal-debug"><span class="toc-section-number">5</span> 正常情况调试</a><ul>
+<li><a href="#vmcore解析-1"><span class="toc-section-number">5.1</span> vmcore解析</a></li>
+</ul></li>
+<li><a href="#找出缓存大于特定值的文件"><span class="toc-section-number">6</span> 找出缓存大于特定值的文件</a></li>
+<li><a href="#code-analysis"><span class="toc-section-number">7</span> 代码分析</a></li>
+<li><a href="#解决方案"><span class="toc-section-number">8</span> 解决方案</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>nfsv3的文件占用缓存太多，使用<code>echo 3 &gt; /proc/sys/vm/drop_caches</code>命令依然无法释放缓存。</p>
+<h1 id="vmcore分析"><span class="header-section-number">2</span> 20251105 vmcore分析</h1>
+<p><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-cannot-drop-cache/nfsv3-cannot-drop-cache-vmcore-20251105.md">详细的crash输出请点击这里查看</a>。</p>
+<p>占用缓存最多的inode地址为<code>0xffff8dc8f6cb4380</code>，找出超级块地址:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> struct inode.i_sb 0xffff8dc8f6cb4380</a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="ex">i_sb</span> = 0xffff8df33b6a5800,</a></code></pre></div>
+<p>在挂载信息中找不到这个超级块地址:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> mount <span class="kw">|</span> <span class="fu">grep</span> ffff8df33b6a5800</a></code></pre></div>
+<p>根据以下在虚拟机中验证可知，在导出vmcore之前，环境已经执行过<code>umount -l</code>。</p>
+<p>查看第一个page，可以看到private标记没有清除:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffffc7b0a71abc40</a>
+<a class="sourceLine" id="cb3-2" title="2">      <span class="ex">PAGE</span>         PHYSICAL      MAPPING       INDEX CNT FLAGS</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="ex">ffffc7b0a71abc40</span> 19c6af1000 ffff8db67005d210     3773  2 17ffffc000102a error,uptodate,lru,private</a></code></pre></div>
+<p>文件的大小为<code>613G</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> struct inode.i_size 0xffff8dc8f6cb4380</a>
+<a class="sourceLine" id="cb4-2" title="2">  <span class="ex">i_size</span> = 658510457197,</a></code></pre></div>
+<h1 id="vmcore分析-1"><span class="header-section-number">3</span> 20251202 vmcore分析</h1>
+<p><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-cannot-drop-cache/nfsv3-cannot-drop-cache-vmcore-20251202.md">详细的crash输出请点击这里查看</a>。</p>
+<p>占用缓存最多的inode地址为<code>0xffff9d9eeca42da0</code>，找出超级块地址:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> struct inode.i_sb 0xffff9d9eeca42da0</a>
+<a class="sourceLine" id="cb5-2" title="2">  <span class="ex">i_sb</span> = 0xffff9dae81c1d000,</a></code></pre></div>
+<p>在挂载信息中找不到这个超级块地址:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> mount <span class="kw">|</span> <span class="fu">grep</span> ffff9dae81c1d000</a></code></pre></div>
+<p>根据以下在虚拟机中验证可知，在导出vmcore之前，环境已经执行过<code>umount -l</code>。</p>
+<p>查看第一个page，可以看到private标记没有清除:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> kmem fffffae836418f40</a>
+<a class="sourceLine" id="cb7-2" title="2">      <span class="ex">PAGE</span>         PHYSICAL      MAPPING       INDEX CNT FLAGS</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="ex">fffffae836418f40</span> ad9063d000 ffff9d9eeca42f10  54e470e  2 197ffffc000102a error,uptodate,lru,private</a></code></pre></div>
+<p>文件的大小为<code>613G</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> struct inode.i_size 0xffff9d9eeca42da0</a>
+<a class="sourceLine" id="cb8-2" title="2">  <span class="ex">i_size</span> = 658367030190,</a></code></pre></div>
+<h1 id="reproduce"><span class="header-section-number">4</span> 构造复现</h1>
+<p>合入补丁<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/0001-reproduce-4.19-nfsv3-cannot-drop-cache.patch">0001-reproduce-4.19-nfsv3-cannot-drop-cache.patch</a>。</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="fu">mount</span> -t nfs -o vers=3 192.168.53.211:/tmp/s_test /mnt</a></code></pre></div>
+<p>测试步骤:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="bu">echo</span> something <span class="op">&gt;</span> something</a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="bu">echo</span> something_else <span class="op">&gt;</span> something_else</a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="bu">echo</span> something_else_again <span class="op">&gt;</span> something_else_again</a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="co"># 为什么不直接用 echo something &gt; /mnt/file 呢，因为用ps无法查看到echo进程</span></a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="fu">cat</span> something <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></a>
+<a class="sourceLine" id="cb10-6" title="6"><span class="fu">cat</span> something_else <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="fu">cat</span> something_else_again <span class="op">&gt;</span> /mnt/file <span class="kw">&amp;</span></a></code></pre></div>
+<h2 id="vmcore解析"><span class="header-section-number">4.1</span> vmcore解析</h2>
+<p><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-cannot-drop-cache/nfsv3-cannot-drop-cache-vmcore-reproduce.md">详细的crash命令输出请点击这里查看</a>。</p>
+<p>我们看到page的flags中的private没有清除:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffffea000434e4c0</a>
+<a class="sourceLine" id="cb11-2" title="2">      <span class="ex">PAGE</span>       PHYSICAL      MAPPING       INDEX CNT FLAGS</a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="ex">ffffea000434e4c0</span> 10d393000 ffff8881037967f0        0  3 17ffffc000102b locked,error,uptodate,lru,private</a></code></pre></div>
+<p>执行完<code>echo 3 &gt; /proc/sys/vm/drop_caches</code>后，还是一样。</p>
+<h1 id="normal-debug"><span class="header-section-number">5</span> 正常情况调试</h1>
+<p>挂载:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="fu">mount</span> -t nfs -o vers=3 192.168.53.209:/tmp/s_test /mnt</a></code></pre></div>
+<p><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-cannot-drop-cache/test.c">用户态程序<code>test.c</code>请点击这里查看</a>。</p>
+<p>编译运行:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="fu">dd</span> if=/dev/random of=/mnt/file bs=1M count=1024 <span class="co"># 文件大小1G</span></a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="fu">gcc</span> test.c</a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="ex">./a.out</span> <span class="kw">&amp;</span> <span class="co"># 读100M数据</span></a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="bu">cd</span> /mnt <span class="co"># 进入挂载点</span></a></code></pre></div>
+<h2 id="vmcore解析-1"><span class="header-section-number">5.1</span> vmcore解析</h2>
+<p>参考<a href="https://chenxiaosong.com/course/kernel/debug.html#kdump-crash">《内核调试方法》</a>在虚拟机中导出vmcore。</p>
+<p><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfsv3-cannot-drop-cache/nfsv3-cannot-drop-cache-vmcore-debug.md">详细的crash命令输出请点击这里查看</a>。</p>
+<p>查看地址空间中有<code>25728</code>个page，每个page有4K大小，总共<code>100M</code>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> struct address_space.nrpages 0xffff88810437dd38</a>
+<a class="sourceLine" id="cb14-2" title="2">  <span class="ex">nrpages</span> = 25728, <span class="co"># 执行完 echo 3 &gt; /proc/sys/vm/drop_caches 后 nrpages 为 0</span></a></code></pre></div>
+<p>执行<code>umount -l</code>后重新再<code>mount</code>（挂载参数一样，路径可以不同），<code>mount</code>命令输出中包含inode所在的super block，<code>files</code>命令也可以找到打开这个文件的进程:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> mount <span class="kw">|</span> <span class="fu">grep</span> ffff88812ae61800</a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="ex">ffff8881002ce880</span> ffff88812ae61800 nfs    192.168.53.209:/tmp/s_test /mnt</a>
+<a class="sourceLine" id="cb15-3" title="3"></a>
+<a class="sourceLine" id="cb15-4" title="4"><span class="ex">crash</span><span class="op">&gt;</span> foreach files -R mnt</a>
+<a class="sourceLine" id="cb15-5" title="5"><span class="ex">PID</span>: 923      TASK: ffff8881045bcd40  CPU: 14   COMMAND: <span class="st">&quot;a.out&quot;</span></a>
+<a class="sourceLine" id="cb15-6" title="6"><span class="ex">ROOT</span>: /    CWD: /root </a>
+<a class="sourceLine" id="cb15-7" title="7"> <span class="ex">FD</span>       FILE            DENTRY           INODE       TYPE PATH</a>
+<a class="sourceLine" id="cb15-8" title="8">  <span class="ex">3</span> ffff88800ee72a80 ffff888004e1c000 ffff88810437dbc8 REG  /mnt/file</a></code></pre></div>
+<p>执行<code>umount -l</code>后重新再<code>mount</code>（挂载参数不同），<code>mount</code>命令输出中不包含inode所在的super block，<code>files</code>命令也找不到打开文件的进程:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> mount <span class="kw">|</span> <span class="fu">grep</span> ffff88812ae61800 <span class="co"># 找不到</span></a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="ex">crash</span><span class="op">&gt;</span> foreach files -R mnt <span class="co"># 没有找到</span></a></code></pre></div>
+<h1 id="找出缓存大于特定值的文件"><span class="header-section-number">6</span> 找出缓存大于特定值的文件</h1>
+<p>麒麟服务器v10没有vmtouch，可以<a href="https://mirrors.tuna.tsinghua.edu.cn/epel/8/Everything/x86_64/Packages/v/vmtouch-1.3.1-1.el8.x86_64.rpm">在这里下载vmtouch rpm包</a>。</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" title="1"><span class="va">mount_point=</span>/mnt</a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="bu">export</span> <span class="va">size_threshold_mb=</span>100</a>
+<a class="sourceLine" id="cb17-3" title="3"></a>
+<a class="sourceLine" id="cb17-4" title="4"><span class="fu">find</span> <span class="va">${mount_point}</span> -type f -print0 <span class="kw">|</span> <span class="fu">xargs</span> -0 -n1 -P16 sh -c <span class="st">&#39;</span></a>
+<a class="sourceLine" id="cb17-5" title="5"><span class="st">    for file do</span></a>
+<a class="sourceLine" id="cb17-6" title="6"><span class="st">        out=$(vmtouch -v &quot;$file&quot;)</span></a>
+<a class="sourceLine" id="cb17-7" title="7"><span class="st">        pages=$(echo &quot;$out&quot; | awk &quot;/Resident Pages:/ {print \$3}&quot; | cut -d/ -f1)</span></a>
+<a class="sourceLine" id="cb17-8" title="8"><span class="st">        mb=$((pages*4096/1024/1024))</span></a>
+<a class="sourceLine" id="cb17-9" title="9"><span class="st">        if [ &quot;$mb&quot; -gt ${size_threshold_mb} ]; then</span></a>
+<a class="sourceLine" id="cb17-10" title="10"><span class="st">            echo &quot;$file Cached_MB=${mb}&quot;</span></a>
+<a class="sourceLine" id="cb17-11" title="11"><span class="st">        fi</span></a>
+<a class="sourceLine" id="cb17-12" title="12"><span class="st">    done</span></a>
+<a class="sourceLine" id="cb17-13" title="13"><span class="st">  &#39;</span> sh</a></code></pre></div>
+<h1 id="code-analysis"><span class="header-section-number">7</span> 代码分析</h1>
+<p>其他相关的分析请查看以两个链接:</p>
+<ul>
+<li><a href="https://chenxiaosong.com/course/nfs/issue/4.19-null-ptr-deref-in-nfs_updatepage.html">4.19 nfs_updatepage()空指针解引用问题</a></li>
+<li><a href="https://chenxiaosong.com/course/nfs/issue/4.19-nfs-soft-lockup-in-nfs_wb_page.html">4.19 nfs_wb_page() soft lockup的问题</a></li>
+</ul>
+<p>page设置private的地方:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb18-1" title="1">nfs_inode_add_request</a>
+<a class="sourceLine" id="cb18-2" title="2">  SetPagePrivate(req-&gt;wb_page);</a></code></pre></div>
+<p>page清除private的地方:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb19-1" title="1">nfs_write_error_remove_page</a>
+<a class="sourceLine" id="cb19-2" title="2">  <span class="co">// 在这里打印出inode地址</span></a>
+<a class="sourceLine" id="cb19-3" title="3">  req-&gt;wb_context-&gt;dentry-&gt;d_inode</a>
+<a class="sourceLine" id="cb19-4" title="4">  <span class="co">// 出问题的代码合入补丁 22876f540bdf NFS: Don&#39;t call generic_error_remove_page() while holding locks</span></a>
+<a class="sourceLine" id="cb19-5" title="5">  <span class="co">// 以下函数不会调用</span></a>
+<a class="sourceLine" id="cb19-6" title="6">  generic_error_remove_page</a>
+<a class="sourceLine" id="cb19-7" title="7">    truncate_inode_page</a>
+<a class="sourceLine" id="cb19-8" title="8">      truncate_cleanup_page</a>
+<a class="sourceLine" id="cb19-9" title="9">        do_invalidatepage</a>
+<a class="sourceLine" id="cb19-10" title="10">          nfs_invalidate_page</a>
+<a class="sourceLine" id="cb19-11" title="11">            nfs_wb_page_cancel</a>
+<a class="sourceLine" id="cb19-12" title="12">              nfs_inode_remove_request</a>
+<a class="sourceLine" id="cb19-13" title="13">                <span class="co">// 由于没调用generic_error_remove_page()</span></a>
+<a class="sourceLine" id="cb19-14" title="14">                <span class="co">// 所以不会执行到这里，也不会清除private标记</span></a>
+<a class="sourceLine" id="cb19-15" title="15">                ClearPagePrivate(head-&gt;wb_page);</a></code></pre></div>
+<p>调用<code>nfs_write_error_remove_page()</code>的地方:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb20-1" title="1"><span class="co">// done</span></a>
+<a class="sourceLine" id="cb20-2" title="2">nfs_async_write_error</a>
+<a class="sourceLine" id="cb20-3" title="3"></a>
+<a class="sourceLine" id="cb20-4" title="4"><span class="co">// todo</span></a>
+<a class="sourceLine" id="cb20-5" title="5">nfs_page_async_flush <span class="co">// 这个在软锁问题那里分析过，也有可能有些流程会不触发软锁</span></a></code></pre></div>
+<p>调用<code>nfs_async_write_error()</code>的地方:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb21-1" title="1"><span class="co">// done</span></a>
+<a class="sourceLine" id="cb21-2" title="2">nfs_async_write_reschedule_io</a>
+<a class="sourceLine" id="cb21-3" title="3"></a>
+<a class="sourceLine" id="cb21-4" title="4"><span class="co">// done</span></a>
+<a class="sourceLine" id="cb21-5" title="5">.error_cleanup</a></code></pre></div>
+<p>调用<code>nfs_async_write_reschedule_io()</code>的地方:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb22-1" title="1"><span class="co">// done，pnfs不涉及</span></a>
+<a class="sourceLine" id="cb22-2" title="2">ff_layout_reset_write</a>
+<a class="sourceLine" id="cb22-3" title="3">  .reschedule_io</a></code></pre></div>
+<p>调用<code>.error_cleanup</code>的地方:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb23-1" title="1"><span class="co">// todo</span></a>
+<a class="sourceLine" id="cb23-2" title="2">nfs_pageio_cleanup_request</a>
+<a class="sourceLine" id="cb23-3" title="3"></a>
+<a class="sourceLine" id="cb23-4" title="4"><span class="co">// todo</span></a>
+<a class="sourceLine" id="cb23-5" title="5">nfs_pageio_error_cleanup</a>
+<a class="sourceLine" id="cb23-6" title="6"></a>
+<a class="sourceLine" id="cb23-7" title="7"><span class="co">// todo</span></a>
+<a class="sourceLine" id="cb23-8" title="8">nfs_pageio_resend</a></code></pre></div>
+<h1 id="解决方案"><span class="header-section-number">8</span> 解决方案</h1>
+<p>回退补丁<a href="https://lore.kernel.org/all/20190407175912.23528-20-trond.myklebust@hammerspace.com/">14bebe3c90b3 NFS: Don’t interrupt file writeout due to fatal errors</a>。</p>
+</body>
+</html>

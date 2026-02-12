@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>源码编译的samba通过systemd启动超时的问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">源码编译的samba通过systemd启动超时的问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#二分"><span class="toc-section-number">2</span> 二分</a></li>
+<li><a href="#调试"><span class="toc-section-number">3</span> 调试</a></li>
+<li><a href="#解决方案"><span class="toc-section-number">4</span> 解决方案</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/smb/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p><a href="https://chenxiaosong.com/course/smb/environment.html#build-samba-from-source">通过源码安装的samba</a>通过systemd启动失败，2025.05.22测试时提交记录是<code>57a57a189bd  lib/torture: assert that a test doesn't create new talloc children of context-&gt;ev</code>。</p>
+<h1 id="二分"><span class="header-section-number">2</span> 二分</h1>
+<p>二分定位到以下几个记录:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">有问题 <span class="ex">0b8be756eb3</span> wafsamba: Adjust <span class="st">&#39;match&#39;</span> logic to override paths in config.check()</a>
+<a class="sourceLine" id="cb1-2" title="2">编译有问题 <span class="ex">6e504e022d0</span> dynconfig/wscript: Adjust default cleanup for waf 2.1.5</a>
+<a class="sourceLine" id="cb1-3" title="3">编译有问题 <span class="ex">4c7d3cc74b8</span> wafsamba: Adjust for waf 2.1.5 case of some Options.options attributes</a>
+<a class="sourceLine" id="cb1-4" title="4">编译有问题 <span class="ex">e8bf7f501cd</span> wafsamba: Adjust for waf 2.1.5 wafsamba_options_parse_cmd_args return</a>
+<a class="sourceLine" id="cb1-5" title="5">编译有问题 <span class="ex">307121c0f1a</span> third_party: Update waf to version 2.1.5</a>
+<a class="sourceLine" id="cb1-6" title="6">没问题 <span class="ex">f8428b56488</span> wafsamba: Set env variables before calling command</a></code></pre></div>
+<h1 id="调试"><span class="header-section-number">3</span> 调试</h1>
+<p>打开调试开关，修改<code>/etc/samba/smb.conf</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">[<span class="ex">global</span>]</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="ex">log</span> level = 4</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="co"># 日志文件路径（默认通常是/var/log/samba/）</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="ex">log</span> file = /var/log/samba/log.%m</a></code></pre></div>
+<p>日志看着没问题。而且不用systemd，直接运行<code>/usr/local/samba/sbin/smbd --foreground --no-process-group $SMBDOPTIONS</code>服务启动正常，所以应该是systemd的问题。</p>
+<h1 id="解决方案"><span class="header-section-number">4</span> 解决方案</h1>
+<p>有以下两种方案:</p>
+<ul>
+<li>将<code>/usr/lib/systemd/system/smb.service</code>中的<code>Type=notify</code>改为<code>Type=simple</code>。这种方案调试尝试一下，不建议用这种方案。</li>
+<li>编译时使用<code>./configure --with-systemd</code>。</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>cifs newfstatat()系统调用报错ENOTSUPP</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">cifs newfstatat()系统调用报错ENOTSUPP</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#strace调试"><span class="toc-section-number">2</span> <code>strace</code>调试</a></li>
+<li><a href="#kprobe调试"><span class="toc-section-number">3</span> <code>kprobe</code>调试</a></li>
+<li><a href="#复现"><span class="toc-section-number">4</span> 复现</a><ul>
+<li><a href="#host-is-down"><span class="toc-section-number">4.1</span> <code>Host is down</code></a></li>
+</ul></li>
+<li><a href="#代码分析"><span class="toc-section-number">5</span> 代码分析</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/smb/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>5.4内核。</p>
+<p>挂载参数:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># &#39;LAPTOP-OBA5M86D F&#39; 是包含空格的目录名</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="ex">//127.0.0.1/LAPTOP-OBA5M86D</span> F on /media/LAPTOP-OBA5M86D F type cifs (rw,relatime,sync,vers=2.1,cache=strict,username=vagrant-3234,uid=0,noforceuid,gid=0,noforcegid,addr=127.0.0.1,file_mode=0777,dir_mode=0777,iocharset=utf8,soft,nounix,mapposix,noperm,rsize=1048576,wsize=1048576,bsize=1048576,echo_interval=2,actimeo=2)</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="co"># 第二次复现</span></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="ex">//127.0.0.1/media-root-365C-B654</span> on /media/media-root-365C-B654 type cifs (rw,relatime,sync,vers=2.1,cache=strict,username=vagrant-3236,uid=0,noforceuid,gid=0,noforcegid,addr=127.0.0.1,file_mode=0777,dir_mode=0777,iocharset=utf8,soft,nounix,mapposix,noperm,rsize=1048576,wsize=1048576,bsize=1048576,echo_interval=2,actimeo=2)</a></code></pre></div>
+<p><code>dmesg</code> 日志:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">[<span class="ex">16634.819041</span>] CIFS VFS: <span class="dt">\\</span>127.0.0.1 cifs_put_smb_ses: Session Logoff failure rc=-78</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb2-3" title="3">[<span class="ex">23080.736515</span>] CIFS VFS: <span class="dt">\\</span>127.0.0.1 has not responded in 6 seconds. Reconnecting...</a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb2-5" title="5">[<span class="ex">23080.900680</span>] CIFS VFS: <span class="dt">\\</span>127.0.0.1 disabling echoes and oplocks</a></code></pre></div>
+<h1 id="strace调试"><span class="header-section-number">2</span> <code>strace</code>调试</h1>
+<p>使用<code>strace -o strace.out -f -v -s 4096 ls /media/media-root-365C-B654</code>得到以下日志:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="co"># 偶尔会报错 (Host is down)</span></a>
+<a class="sourceLine" id="cb3-2" title="2"> <span class="ex">79</span> 241573 newfstatat(AT_FDCWD, <span class="st">&quot;/media/media-root-365C-B654&quot;</span>, 0x5587298b58, 0) = <span class="ex">-1</span> ENOTSUPP (Unknown error 524)</a>
+<a class="sourceLine" id="cb3-3" title="3"> <span class="ex">97</span> 241573 write(2, <span class="st">&quot;ls: &quot;</span>, 4)              = <span class="ex">4</span></a>
+<a class="sourceLine" id="cb3-4" title="4"> <span class="ex">98</span> 241573 write(2, <span class="st">&quot;cannot access &#39;/media/media-root-365C-B654&#39;&quot;</span>, 43) = <span class="ex">43</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="ex">111</span> 241573 write(2, <span class="st">&quot;: Unknown error 524&quot;</span>, 19) = <span class="ex">19</span></a></code></pre></div>
+<p><code>newfstatat</code>系统调用大部分时候返回<code>ENOTSUPP(524)</code>错误。</p>
+<h1 id="kprobe调试"><span class="header-section-number">3</span> <code>kprobe</code>调试</h1>
+<p>麒麟arm64系统下无法用<code>kprobe trace</code>，内核配置<code>CONFIG_TRACING</code>没打开。也没法用<code>systemtap</code>。</p>
+<p>使用<code>kretprobe</code>模块代码，<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/smb/kretprobe_smb.c"><code>kretprobe_smb.c</code></a>和<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/smb/Makefile"><code>Makefile</code></a>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">make</span> -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="ex">insmod</span> ./kretprobe_smb.ko func=<span class="st">&quot;compound_send_recv&quot;</span> <span class="co"># compound_send_recv可替换为其他函数名</span></a></code></pre></div>
+<p>尝试跟踪这几个返回<code>-ENOTSUPP</code>的函数:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb5-1" title="1">cifs_enable_signing</a>
+<a class="sourceLine" id="cb5-2" title="2">cifs_writev_requeue</a>
+<a class="sourceLine" id="cb5-3" title="3">cifs_fiemap</a>
+<a class="sourceLine" id="cb5-4" title="4">smb<span class="dv">2</span><span class="er">_adjust_credits</span></a>
+<a class="sourceLine" id="cb5-5" title="5">handle_read_data</a>
+<a class="sourceLine" id="cb5-6" title="6">wait_for_free_credits</a>
+<a class="sourceLine" id="cb5-7" title="7">wait_for_compound_request <span class="co">// 无法直接跟踪，可以跟踪 compound_send_recv</span></a></code></pre></div>
+<p>发现返回<code>-ENOTSUPP</code>的是<code>wait_for_compound_request()</code>函数。</p>
+<p>替换为主线内核，得到如下日志:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="bu">[</span> 7296.825123] CPU: 2 PID: 51185 Comm: ls Kdump: loaded Tainted: G           OE      6.10.0+ <span class="co">#1</span></a>
+<a class="sourceLine" id="cb6-2" title="2">[ 7296.825133] Hardware name: RDO OpenStack Compute, BIOS 0.0.0 02/06/2015</a>
+<a class="sourceLine" id="cb6-3" title="3">[ 7296.825135] Call trace:</a>
+<a class="sourceLine" id="cb6-4" title="4">...</a>
+<a class="sourceLine" id="cb6-5" title="5">[ 7296.825189]  compound_send_recv+0x0/0xbc8 [cifs]</a>
+<a class="sourceLine" id="cb6-6" title="6">[ 7296.825242]  smb2_query_path_info+0x128/0x3e4 [cifs]</a>
+<a class="sourceLine" id="cb6-7" title="7">[ 7296.825279]  cifs_get_fattr+0x354/0x920 [cifs]</a>
+<a class="sourceLine" id="cb6-8" title="8">[ 7296.825312]  cifs_get_inode_info+0x80/0x150 [cifs]</a>
+<a class="sourceLine" id="cb6-9" title="9">[ 7296.825344]  cifs_revalidate_dentry_attr+0x19c/0x2e4 [cifs]</a>
+<a class="sourceLine" id="cb6-10" title="10">[ 7296.825376]  cifs_getattr+0xa8/0x27c [cifs]</a>
+<a class="sourceLine" id="cb6-11" title="11">[ 7296.825408]  vfs_getattr_nosec+0xb4/0xd4</a>
+<a class="sourceLine" id="cb6-12" title="12">[ 7296.825411]  vfs_getattr+0x50/0x6c</a>
+<a class="sourceLine" id="cb6-13" title="13">[ 7296.825413]  vfs_statx_path+0x2c/0xf8</a>
+<a class="sourceLine" id="cb6-14" title="14">[ 7296.825415]  vfs_statx+0x9c/0x100</a>
+<a class="sourceLine" id="cb6-15" title="15">[ 7296.825416]  vfs_fstatat+0x5c/0xd8</a>
+<a class="sourceLine" id="cb6-16" title="16">[ 7296.825419]  __do_sys_newfstatat+0x28/0x64</a>
+<a class="sourceLine" id="cb6-17" title="17">...</a>
+<a class="sourceLine" id="cb6-18" title="18"></a>
+<a class="sourceLine" id="cb6-19" title="19">[ 7296.825445] compound_send_recv returned 4294967261 and took 325120 ns to execute</a></code></pre></div>
+<h1 id="复现"><span class="header-section-number">4</span> 复现</h1>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="co"># -o iocharset=utf8 可能报错 CIFS VFS: CIFS mount error: iocharset utf8 not found</span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="fu">mount</span> -t cifs -o rw,relatime,vers=2.1,cache=strict,uid=0,noforceuid,gid=0,noforcegid,addr=127.0.0.1,file_mode=0777,dir_mode=0777,soft,nounix,mapposix,noperm,rsize=1048576,wsize=1048576,bsize=1048576,echo_interval=2,actimeo=2 //localhost/TEST /mnt</a></code></pre></div>
+<h2 id="host-is-down"><span class="header-section-number">4.1</span> <code>Host is down</code></h2>
+<p>报错<code>Host is down</code>的情况很好构造。</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">ifconfig</span> lo down</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">strace</span> -o strace.out -f -v -s 4096 ls /mnt</a></code></pre></div>
+<h1 id="代码分析"><span class="header-section-number">5</span> 代码分析</h1>
+<p><a href="https://chenxiaosong.com/course/smb/patch/cifs-Fix-in-error-types-returned-for-out-of-credit-s.html">相关补丁</a>。</p>
+<p>执行<code>ls /mnt</code>时，返回<code>-ENOTSUPP</code>错误的一个流程:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb9-1" title="1">statx</a>
+<a class="sourceLine" id="cb9-2" title="2">  vfs_statx</a>
+<a class="sourceLine" id="cb9-3" title="3">    vfs_getattr_nosec</a>
+<a class="sourceLine" id="cb9-4" title="4">      cifs_getattr</a>
+<a class="sourceLine" id="cb9-5" title="5">        cifs_revalidate_dentry_attr</a>
+<a class="sourceLine" id="cb9-6" title="6">          cifs_get_inode_info</a>
+<a class="sourceLine" id="cb9-7" title="7">            smb<span class="dv">2</span><span class="er">_query_path_info</span></a>
+<a class="sourceLine" id="cb9-8" title="8">              open_shroot</a>
+<a class="sourceLine" id="cb9-9" title="9">                wait_for_free_credits</a>
+<a class="sourceLine" id="cb9-10" title="10">              SMB<span class="dv">2</span><span class="er">_query_info</span></a>
+<a class="sourceLine" id="cb9-11" title="11">                query_info</a>
+<a class="sourceLine" id="cb9-12" title="12">                  cifs_send_recv</a>
+<a class="sourceLine" id="cb9-13" title="13">                    wait_for_free_credits</a>
+<a class="sourceLine" id="cb9-14" title="14">              close_shroot</a>
+<a class="sourceLine" id="cb9-15" title="15">                SMB<span class="dv">2</span><span class="er">_close</span></a>
+<a class="sourceLine" id="cb9-16" title="16">                  SMB<span class="dv">2</span><span class="er">_close_flags</span></a>
+<a class="sourceLine" id="cb9-17" title="17">                    cifs_send_recv</a>
+<a class="sourceLine" id="cb9-18" title="18">                      wait_for_free_credits</a></code></pre></div>
+<p>和 <code>statx</code> 系统调用一样，<code>newfstatat</code>最终执行到<code>vfs_statx</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb10-1" title="1">newfstatat</a>
+<a class="sourceLine" id="cb10-2" title="2">  vfs_fstatat</a>
+<a class="sourceLine" id="cb10-3" title="3">    vfs_statx</a></code></pre></div>
+<p>返回-EHOSTDOWN错误的路径:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb11-1" title="1">statx</a>
+<a class="sourceLine" id="cb11-2" title="2">  do_statx</a>
+<a class="sourceLine" id="cb11-3" title="3">    vfs_statx</a>
+<a class="sourceLine" id="cb11-4" title="4">      vfs_getattr</a>
+<a class="sourceLine" id="cb11-5" title="5">        vfs_getattr_nosec</a>
+<a class="sourceLine" id="cb11-6" title="6">          cifs_getattr</a>
+<a class="sourceLine" id="cb11-7" title="7">            cifs_revalidate_dentry_attr</a>
+<a class="sourceLine" id="cb11-8" title="8">              cifs_get_inode_info</a>
+<a class="sourceLine" id="cb11-9" title="9">                cifs_get_fattr</a>
+<a class="sourceLine" id="cb11-10" title="10">                  smb<span class="dv">2</span><span class="er">_query_path_info</span></a>
+<a class="sourceLine" id="cb11-11" title="11">                    smb<span class="dv">2</span><span class="er">_compound_op</span></a>
+<a class="sourceLine" id="cb11-12" title="12">                      SMB<span class="dv">2</span><span class="er">_open_init</span></a>
+<a class="sourceLine" id="cb11-13" title="13">                        smb<span class="dv">2</span><span class="er">_plain_req_init</span></a>
+<a class="sourceLine" id="cb11-14" title="14">                          smb<span class="dv">2</span><span class="er">_reconnect</span></a>
+<a class="sourceLine" id="cb11-15" title="15">                            cifs_wait_for_server_reconnect</a>
+<a class="sourceLine" id="cb11-16" title="16">                              <span class="cf">return</span> -EHOSTDOWN</a></code></pre></div>
+</body>
+</html>

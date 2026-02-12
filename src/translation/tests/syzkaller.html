@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>syzkaller - kernel fuzzer</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">syzkaller - kernel fuzzer</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#syzkaller---kernel-fuzzer"><span class="toc-section-number">1</span> syzkaller - kernel fuzzer</a><ul>
+<li><a href="#文档"><span class="toc-section-number">1.1</span> 文档</a></li>
+<li><a href="#免责声明"><span class="toc-section-number">1.2</span> 免责声明</a></li>
+</ul></li>
+<li><a href="#how-to-set-up-syzkallerdocssetup.md"><span class="toc-section-number">2</span> How to set up syzkaller(docs/setup.md)</a></li>
+<li><a href="#how-to-set-up-syzkallerdocslinuxsetup.md"><span class="toc-section-number">3</span> How to set up syzkaller(docs/linux/setup.md)</a><ul>
+<li><a href="#install"><span class="toc-section-number">3.1</span> install</a><ul>
+<li><a href="#go-和-syzkaller"><span class="toc-section-number">3.1.1</span> Go 和 syzkaller</a></li>
+<li><a href="#环境"><span class="toc-section-number">3.1.2</span> 环境</a></li>
+<li><a href="#c-编译器"><span class="toc-section-number">3.1.3</span> C 编译器</a></li>
+<li><a href="#linux-内核"><span class="toc-section-number">3.1.4</span> Linux 内核</a></li>
+<li><a href="#虚拟机设置"><span class="toc-section-number">3.1.5</span> 虚拟机设置</a></li>
+<li><a href="#故障排除"><span class="toc-section-number">3.1.6</span> 故障排除</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#setup-ubuntu-host-qemu-vm-x86-64-kernel"><span class="toc-section-number">4</span> Setup: Ubuntu host, QEMU vm, x86-64 kernel</a><ul>
+<li><a href="#安装先决条件"><span class="toc-section-number">4.1</span> 安装先决条件</a></li>
+<li><a href="#gcc"><span class="toc-section-number">4.2</span> GCC</a></li>
+<li><a href="#内核"><span class="toc-section-number">4.3</span> 内核</a><ul>
+<li><a href="#检出-linux-内核源码"><span class="toc-section-number">4.3.1</span> 检出 Linux 内核源码</a></li>
+<li><a href="#生成默认配置"><span class="toc-section-number">4.3.2</span> 生成默认配置</a></li>
+<li><a href="#启用必需的配置选项"><span class="toc-section-number">4.3.3</span> 启用必需的配置选项</a></li>
+<li><a href="#build-the-kernel"><span class="toc-section-number">4.3.4</span> Build the Kernel</a></li>
+</ul></li>
+<li><a href="#image"><span class="toc-section-number">4.4</span> Image</a><ul>
+<li><a href="#install-debootstrap"><span class="toc-section-number">4.4.1</span> Install debootstrap</a></li>
+<li><a href="#创建-debian-bullseye-linux-映像"><span class="toc-section-number">4.4.2</span> 创建 Debian Bullseye Linux 映像</a></li>
+<li><a href="#或者创建不同版本的-debian-linux-映像"><span class="toc-section-number">4.4.3</span> 或者创建不同版本的 Debian Linux 映像</a></li>
+<li><a href="#映像额外工具"><span class="toc-section-number">4.4.4</span> 映像额外工具</a></li>
+</ul></li>
+<li><a href="#qemu"><span class="toc-section-number">4.5</span> QEMU</a><ul>
+<li><a href="#install-qemu"><span class="toc-section-number">4.5.1</span> Install QEMU</a></li>
+<li><a href="#验证"><span class="toc-section-number">4.5.2</span> 验证</a></li>
+<li><a href="#疑难解答"><span class="toc-section-number">4.5.3</span> 疑难解答</a></li>
+</ul></li>
+<li><a href="#syzkaller"><span class="toc-section-number">4.6</span> syzkaller</a></li>
+</ul></li>
+<li><a href="#how-to-use-syzkaller"><span class="toc-section-number">5</span> How to use syzkaller</a><ul>
+<li><a href="#运行"><span class="toc-section-number">5.1</span> 运行</a></li>
+<li><a href="#崩溃"><span class="toc-section-number">5.2</span> 崩溃</a></li>
+<li><a href="#集线器"><span class="toc-section-number">5.3</span> 集线器</a></li>
+<li><a href="#报告漏洞"><span class="toc-section-number">5.4</span> 报告漏洞</a></li>
+</ul></li>
+<li><a href="#how-to-reproduce-crashes"><span class="toc-section-number">6</span> How to reproduce crashes</a></li>
+</ul>
+</nav>
+<p>本文档翻译自<a href="https://github.com/google/syzkaller"><code>google/syzkaller</code></a>，大部分借助于ChatGPT。仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<h1 id="syzkaller---kernel-fuzzer"><span class="header-section-number">1</span> syzkaller - kernel fuzzer</h1>
+<p>翻译自<a href="https://github.com/google/syzkaller/blob/master/README.md"><code>README.md</code></a>, 翻译时文件的最新提交是<code>c6f10907c38ce49ddc321539f75aabf0a9ad6c71 all: remove akaros support</code>。</p>
+<p><a href="https://github.com/google/syzkaller/actions?query=workflow/ci"><img src="https://github.com/google/syzkaller/workflows/ci/badge.svg" alt="CI Status" /></a> <a href="https://bugs.chromium.org/p/oss-fuzz/issues/list?q=label:Proj-syzkaller"><img src="https://oss-fuzz-build-logs.storage.googleapis.com/badges/syzkaller.svg" alt="OSS-Fuzz" /></a> <a href="https://goreportcard.com/report/github.com/google/syzkaller"><img src="https://goreportcard.com/badge/github.com/google/syzkaller" alt="Go Report Card" /></a> <a href="https://codecov.io/gh/google/syzkaller"><img src="https://codecov.io/gh/google/syzkaller/graph/badge.svg" alt="Coverage Status" /></a> <a href="https://godoc.org/github.com/google/syzkaller"><img src="https://godoc.org/github.com/google/syzkaller?status.svg" alt="GoDoc" /></a> <a href="https://github.com/google/syzkaller/blob/master/LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License" /></a></p>
+<p><code>syzkaller</code> (<code>[siːzˈkɔːlə]</code>) 是一个无监督的覆盖率引导内核模糊测试工具。<br />
+支持的操作系统: <code>FreeBSD</code>、<code>Fuchsia</code>、<code>gVisor</code>、<code>Linux</code>、<code>NetBSD</code>、<code>OpenBSD</code>、<code>Windows</code>。</p>
+<p>邮件列表: <a href="https://groups.google.com/forum/#!forum/syzkaller">syzkaller@googlegroups.com</a>（通过<a href="https://groups.google.com/forum/#!forum/syzkaller">网页</a>或<a href="mailto:syzkaller+subscribe@googlegroups.com">电子邮件</a>加入）。</p>
+<p>发现的漏洞: <a href="https://github.com/google/syzkaller/blob/master/docs/darwin/README.md">Darwin/XNU</a>，<a href="https://github.com/google/syzkaller/blob/master/docs/freebsd/found_bugs.md">FreeBSD</a>，<a href="https://github.com/google/syzkaller/blob/master/docs/linux/found_bugs.md">Linux</a>，<a href="https://github.com/google/syzkaller/blob/master/docs/netbsd/found_bugs.md">NetBSD</a>，<a href="https://github.com/google/syzkaller/blob/master/docs/openbsd/found_bugs.md">OpenBSD</a>，<a href="https://github.com/google/syzkaller/blob/master/docs/windows/README.md">Windows</a>。</p>
+<h2 id="文档"><span class="header-section-number">1.1</span> 文档</h2>
+<p>最初，syzkaller 是为 Linux 内核模糊测试开发的，但现在它正在扩展以支持其他操作系统内核。 目前大部分文档与 <a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup.md">Linux</a> 内核相关。 对于其他操作系统内核，请参阅: <a href="https://github.com/google/syzkaller/blob/master/docs/darwin/README.md">Darwin/XNU</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/freebsd/README.md">FreeBSD</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/fuchsia/README.md">Fuchsia</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/netbsd/README.md">NetBSD</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/openbsd/setup.md">OpenBSD</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/starnix/README.md">Starnix</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/windows/README.md">Windows</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/gvisor/README.md">gVisor</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/akaros/README.md">Akaros</a>。</p>
+<ul>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/setup.md">如何安装 syzkaller</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/usage.md">如何使用 syzkaller</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/internals.md">syzkaller 如何工作</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/setup_syzbot.md">如何安装 syzbot</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/contributing.md">如何为 syzkaller 做贡献</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/linux/reporting_kernel_bugs.md">如何报告 Linux 内核漏洞</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/talks.md">技术演讲和文章</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/research.md">基于 syzkaller 的研究工作</a></li>
+</ul>
+<h2 id="免责声明"><span class="header-section-number">1.2</span> 免责声明</h2>
+<p>这不是谷歌的官方产品。</p>
+<h1 id="how-to-set-up-syzkallerdocssetup.md"><span class="header-section-number">2</span> How to set up syzkaller(docs/setup.md)</h1>
+<p>翻译自<a href="https://github.com/google/syzkaller/blob/master/docs/setup.md"><code>docs/setup.md</code></a>, 翻译时文件的最新提交是<code>c6f10907c38ce49ddc321539f75aabf0a9ad6c71 all: remove akaros support</code>。</p>
+<p>通用的 Linux 内核模糊测试设置说明请参见<a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup.md">这里</a>。</p>
+<p>其他内核的设置请参见: <a href="https://github.com/google/syzkaller/blob/master/docs/freebsd/README.md">FreeBSD</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/darwin/README.md">Darwin/XNU</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/fuchsia/README.md">Fuchsia</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/netbsd/README.md">NetBSD</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/openbsd/setup.md">OpenBSD</a>， <a href="https://github.com/google/syzkaller/blob/master/docs/windows/README.md">Windows</a>。</p>
+<p>按照这些说明操作后，你应该能够运行 <code>syz-manager</code>，看到它执行程序，并能够访问暴露在 <code>http://127.0.0.1:56741</code>（或你在 manager 配置中指定的其他地址）的统计信息。 如果一切正常，典型的执行日志应如下所示:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="ex">./bin/syz-manager</span> -config=my.cfg</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="ex">2017/06/14</span> 16:39:05 loading corpus...</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="ex">2017/06/14</span> 16:39:05 loaded 0 programs (0 total, 0 deleted)</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="ex">2017/06/14</span> 16:39:05 serving http on http://127.0.0.1:56741</a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="ex">2017/06/14</span> 16:39:05 serving rpc on tcp://127.0.0.1:34918</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="ex">2017/06/14</span> 16:39:05 booting test machines...</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="ex">2017/06/14</span> 16:39:05 wait for the connection from test machine...</a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="ex">2017/06/14</span> 16:39:59 received first connection from test machine vm-9</a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="ex">2017/06/14</span> 16:40:05 executed 293, cover 43260, crashes 0, repro 0</a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="ex">2017/06/14</span> 16:40:15 executed 5992, cover 88463, crashes 0, repro 0</a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="ex">2017/06/14</span> 16:40:25 executed 10959, cover 116991, crashes 0, repro 0</a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="ex">2017/06/14</span> 16:40:35 executed 15504, cover 132403, crashes 0, repro 0</a></code></pre></div>
+<p>此时，确保 syzkaller 能够收集已执行程序的代码覆盖率（除非你在配置中指定 <code>"cover": false</code> 或者你正在模糊测试的内核尚不支持覆盖率）。 网页上的 <code>cover</code> 计数器应为非零。</p>
+<p>更多关于配置文件格式的信息，请参见<a href="https://github.com/google/syzkaller/blob/master/docs/configuration.md">这里</a>。</p>
+<p>故障排除提示请参见<a href="https://github.com/google/syzkaller/blob/master/docs/troubleshooting.md">此页面</a>。</p>
+<h1 id="how-to-set-up-syzkallerdocslinuxsetup.md"><span class="header-section-number">3</span> How to set up syzkaller(docs/linux/setup.md)</h1>
+<p>翻译自<a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup.md"><code>docs/linux/setup.md</code></a>，翻译时文件的最新提交是<code>dd26401e5ae3c1fe62beadcfb937ee5d06f304e2 docs: update required Go version</code>。</p>
+<p>关于如何使用 syzkaller 进行 Linux 内核模糊测试的通用说明如下所示<a href="#install">below</a>。</p>
+<p>特定虚拟机类型或内核架构的说明可以在以下页面找到:</p>
+<ul>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup_ubuntu-host_qemu-vm_x86-64-kernel.md">设置: Ubuntu 主机，QEMU 虚拟机，x86-64 内核</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup_linux-host_qemu-vm_arm64-kernel.md">设置: Linux 主机，QEMU 虚拟机，arm64 内核</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup_linux-host_qemu-vm_arm-kernel.md">设置: Linux 主机，QEMU 虚拟机，arm 内核</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup_linux-host_qemu-vm_riscv64-kernel.md">设置: Linux 主机，QEMU 虚拟机，riscv64 内核</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup_linux-host_qemu-vm_s390x-kernel.md">设置: Linux 主机，QEMU 虚拟机，s390x 内核</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup_linux-host_android-device_arm-kernel.md">设置: Linux 主机，安卓设备，arm32/64 内核</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup_linux-host_isolated.md">设置: Linux 隔离主机</a></li>
+<li><a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup_ubuntu-host_vmware-vm_x86-64-kernel.md">设置: Ubuntu 主机，VMware 虚拟机，x86-64 内核</a></li>
+</ul>
+<h2 id="install"><span class="header-section-number">3.1</span> install</h2>
+<p>使用 syzkaller 需要以下组件:</p>
+<ul>
+<li>Go 编译器和 syzkaller 本身</li>
+<li>支持覆盖率的 C 编译器</li>
+<li>添加了覆盖率的 Linux 内核</li>
+<li>虚拟机或物理设备</li>
+</ul>
+<p>如果遇到任何问题，请查看<a href="https://github.com/google/syzkaller/blob/master/docs/troubleshooting.md">故障排除</a>页面。</p>
+<h3 id="go-和-syzkaller"><span class="header-section-number">3.1.1</span> Go 和 syzkaller</h3>
+<p><code>syzkaller</code> 是用 <a href="https://golang.org">Go</a> 编写的，构建需要 <code>Go 1.21+</code> 工具链。 通常我们旨在支持 Go 的两个最新版本。 可以通过以下方式安装工具链:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">wget</span> https://dl.google.com/go/go1.21.4.linux-amd64.tar.gz</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="fu">tar</span> -xf go1.21.4.linux-amd64.tar.gz</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="bu">export</span> <span class="va">GOROOT=</span><span class="kw">`</span><span class="bu">pwd</span><span class="kw">`</span>/go</a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="bu">export</span> <span class="va">PATH=$GOROOT</span>/bin:<span class="va">$PATH</span></a></code></pre></div>
+<p>请参阅 <a href="https://golang.org/doc/install">Go: 下载和安装</a> 以了解其他选项。</p>
+<p>下载和构建 <code>syzkaller</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">git</span> clone https://github.com/google/syzkaller</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="bu">cd</span> syzkaller</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="fu">make</span></a></code></pre></div>
+<p>编译后的二进制文件应出现在 <code>bin/</code> 目录中。</p>
+<p>注意: 如果您想进行跨操作系统/架构测试，您需要在 <code>make</code> 中指定 <code>TARGETOS</code>、<code>TARGETVMARCH</code> 和 <code>TARGETARCH</code> 参数。详情请参阅 <a href="https://github.com/google/syzkaller/blob/master/Makefile">Makefile</a>。</p>
+<h3 id="环境"><span class="header-section-number">3.1.2</span> 环境</h3>
+<p>如果您在跨架构环境中进行模糊测试，可能需要正确设置 <code>binutils</code>，具体描述见<a href="https://github.com/google/syzkaller/blob/master/docs/linux/coverage.md#binutils">这里</a>。</p>
+<h3 id="c-编译器"><span class="header-section-number">3.1.3</span> C 编译器</h3>
+<p>Syzkaller 是一个覆盖率引导的模糊测试器，因此需要内核用覆盖率支持进行构建，这需要一个最新版本的 GCC。 覆盖率支持已提交到 GCC，并在 GCC 6.1.0 或更高版本中发布。 确保您的 GCC 满足此要求，或者获取一个 <a href="https://github.com/google/syzkaller/blob/master/docs/syzbot.md">syzbot</a> 使用的 GCC，<a href="https://github.com/google/syzkaller/blob/master/docs/syzbot.md#crash-does-not-reproduce">点击这里</a>。</p>
+<h3 id="linux-内核"><span class="header-section-number">3.1.4</span> Linux 内核</h3>
+<p>除了 GCC 中的覆盖率支持，您还需要在内核端的支持。 KCOV 在 Linux 内核主线版本 4.6 中添加，并可以通过内核配置选项 <code>CONFIG_KCOV=y</code> 启用。 对于较旧的内核，您至少需要回移提交 <a href="https://github.com/torvalds/linux/commit/5c9a8750a6409c63a0f01d51a9024861022f6593">kernel: add kcov code coverage</a>。 除此之外，建议回移所有涉及 <code>kernel/kcov.c</code> 的内核补丁。</p>
+<p>为了启用更多 syzkaller 功能并提高错误检测能力，建议使用额外的配置选项。 详情请参阅<a href="https://github.com/google/syzkaller/blob/master/docs/linux/kernel_configs.md">此页面</a>。</p>
+<h3 id="虚拟机设置"><span class="header-section-number">3.1.5</span> 虚拟机设置</h3>
+<p>Syzkaller 在工作虚拟机或物理设备上执行内核模糊测试。 这些工作环境被称为虚拟机（VM）。 开箱即用的 syzkaller 支持 QEMU、kvmtool 和 GCE 虚拟机、安卓设备和 Odroid C2 板。</p>
+<p>以下是 syzkaller 虚拟机的一般要求:</p>
+<ul>
+<li>模糊测试进程与外界通信，因此虚拟机镜像需要包含网络支持。</li>
+<li>模糊测试进程的程序文件通过 SSH 传输到虚拟机中，因此虚拟机镜像需要运行 SSH 服务器。</li>
+<li>虚拟机的 SSH 配置应设置为允许 <code>syz-manager</code> 配置中包含的身份进行 root 访问。换句话说，您应该能够执行 <code>ssh -i $SSHID -p $PORT root@localhost</code> 而无需输入密码（其中 <code>SSHID</code> 是 SSH 身份文件，<code>PORT</code> 是 <code>syz-manager</code> 配置文件中指定的端口）。</li>
+<li>内核通过 debugfs 条目导出覆盖率信息，因此虚拟机镜像需要在 <code>/sys/kernel/debug</code> 挂载 debugfs 文件系统。</li>
+</ul>
+<p>要使用 QEMU syzkaller 虚拟机，您必须在主机系统上安装 QEMU，详情请参阅 <a href="http://wiki.qemu.org/Manual">QEMU 文档</a>。 <a href="https://github.com/google/syzkaller/blob/master/tools/create-image.sh">create-image.sh</a> 脚本可用于创建合适的 Linux 镜像。</p>
+<p>有关为 QEMU、安卓和其他类型的虚拟机设置 syzkaller 的说明，请参阅文档顶部的链接。</p>
+<h3 id="故障排除"><span class="header-section-number">3.1.6</span> 故障排除</h3>
+<ul>
+<li><p>QEMU 需要 root 权限才能使用 <code>-enable-kvm</code>。</p>
+<p>解决方案: 将您的用户添加到 <code>kvm</code> 组（<code>sudo usermod -a -G kvm</code> 并重新登录）。</p></li>
+<li><p>QEMU 崩溃，错误信息为:</p>
+<pre><code>qemu-system-x86_64: error: failed to set MSR 0x48b to 0x159ff00000000
+qemu-system-x86_64: /build/qemu-EmNSP4/qemu-4.2/target/i386/kvm.c:2947: kvm_put_msrs: Assertion `ret == cpu-&gt;kvm_msr_buf-&gt;nmsrs&#39; failed.</code></pre>
+<p>解决方案: 从 QEMU 命令行中删除 <code>-cpu host,migratable=off</code>。最简单的方法是将 <code>syz-manager</code> 配置文件中的 <code>qemu_args</code> 设置为 <code>-enable-kvm</code>。</p></li>
+</ul>
+<h1 id="setup-ubuntu-host-qemu-vm-x86-64-kernel"><span class="header-section-number">4</span> Setup: Ubuntu host, QEMU vm, x86-64 kernel</h1>
+<p>翻译自<a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup_ubuntu-host_qemu-vm_x86-64-kernel.md"><code>docs/linux/setup_ubuntu-host_qemu-vm_x86-64-kernel.md</code></a>，翻译时文件的最新提交是<code>d4d447cd780753901f9e00aa246cc835458a8f06 tools/create-image.sh: upgrade default release to bullseye</code>。</p>
+<p>以下是如何在主机运行 Ubuntu，QEMU 实例运行 Debian Bullseye 的情况下，在 QEMU 中对 x86-64 内核进行模糊测试的说明。</p>
+<p>在下面的说明中，<code>$VAR</code> 表示法（例如 <code>$GCC</code>、<code>$KERNEL</code> 等）用于表示在执行说明时创建的目录（例如解压 GCC 压缩包时将创建一个目录），或者你需要在运行说明之前自己创建的目录。手动替换这些变量的值。</p>
+<h2 id="安装先决条件"><span class="header-section-number">4.1</span> 安装先决条件</h2>
+<p>命令:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">sudo</span> apt update</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="fu">sudo</span> apt install make gcc flex bison libncurses-dev libelf-dev libssl-dev</a></code></pre></div>
+<h2 id="gcc"><span class="header-section-number">4.2</span> GCC</h2>
+<p>如果你的发行版中的 GCC 版本较旧，最好从<a href="https://github.com/google/syzkaller/blob/master/docs/syzbot.md#crash-does-not-reproduce">此列表</a>获取最新的 GCC。下载并解压到 <code>$GCC</code>，你应该在 <code>$GCC/bin/</code> 目录下有 GCC 二进制文件。</p>
+<blockquote>
+<p><strong>Ubuntu 20.04 LTS</strong>: 你可以忽略本节。GCC 已经是最新的版本。</p>
+</blockquote>
+<p>命令:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="fu">ls</span> <span class="va">$GCC</span>/bin/</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="co"># Sample output:</span></a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="co"># cpp     gcc-ranlib  x86_64-pc-linux-gnu-gcc        x86_64-pc-linux-gnu-gcc-ranlib</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="co"># gcc     gcov        x86_64-pc-linux-gnu-gcc-9.0.0</span></a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="co"># gcc-ar  gcov-dump   x86_64-pc-linux-gnu-gcc-ar</span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="co"># gcc-nm  gcov-tool   x86_64-pc-linux-gnu-gcc-nm</span></a></code></pre></div>
+<h2 id="内核"><span class="header-section-number">4.3</span> 内核</h2>
+<h3 id="检出-linux-内核源码"><span class="header-section-number">4.3.1</span> 检出 Linux 内核源码</h3>
+<p>命令:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="fu">git</span> clone --branch v6.2 git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git <span class="va">$KERNEL</span></a></code></pre></div>
+<blockquote>
+<p>我们建议从最新的稳定版本开始。v6.2 是一个示例。</p>
+</blockquote>
+<h3 id="生成默认配置"><span class="header-section-number">4.3.2</span> 生成默认配置</h3>
+<p>命令:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="bu">cd</span> <span class="va">$KERNEL</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="fu">make</span> defconfig</a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="fu">make</span> kvm_guest.config</a></code></pre></div>
+<p>或者如果你想指定一个编译器。</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="bu">cd</span> <span class="va">$KERNEL</span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="fu">make</span> CC=<span class="st">&quot;</span><span class="va">$GCC</span><span class="st">/bin/gcc&quot;</span> defconfig</a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="fu">make</span> CC=<span class="st">&quot;</span><span class="va">$GCC</span><span class="st">/bin/gcc&quot;</span> kvm_guest.config</a></code></pre></div>
+<h3 id="启用必需的配置选项"><span class="header-section-number">4.3.3</span> 启用必需的配置选项</h3>
+<p>根据<a href="https://github.com/google/syzkaller/blob/master/docs/linux/kernel_configs.md">kernel_configs.md</a>中的描述，启用内核配置选项以支持syzkaller。 不需要全部启用，但至少需要如下配置:</p>
+<pre class="make"><code># Coverage collection.
+CONFIG_KCOV=y
+
+# Debug info for symbolization.
+CONFIG_DEBUG_INFO_DWARF4=y
+
+# Memory bug detector
+CONFIG_KASAN=y
+CONFIG_KASAN_INLINE=y
+
+# Required for Debian Stretch and later
+CONFIG_CONFIGFS_FS=y
+CONFIG_SECURITYFS=y</code></pre>
+<p>编辑<code>.config</code>文件并手动启用这些选项（或者如果你更喜欢，可以通过<code>make menuconfig</code>完成）。</p>
+<p>由于启用这些选项会导致更多的子选项可用，我们需要重新生成配置:</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="fu">make</span> olddefconfig</a></code></pre></div>
+<p>或者如果你想指定一个编译器。</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="fu">make</span> CC=<span class="st">&quot;</span><span class="va">$GCC</span><span class="st">/bin/gcc&quot;</span> olddefconfig</a></code></pre></div>
+<p>你可能还希望禁用可预测的网络接口命名机制。这可以在syzkaller配置中禁用（详细信息请参见<a href="https://github.com/google/syzkaller/blob/master/docs/linux/troubleshooting.md">troubleshooting.md</a>），或者通过更新以下内核配置参数来实现:</p>
+<pre class="make"><code>CONFIG_CMDLINE_BOOL=y
+CONFIG_CMDLINE=&quot;net.ifnames=0&quot;</code></pre>
+<h3 id="build-the-kernel"><span class="header-section-number">4.3.4</span> Build the Kernel</h3>
+<p>命令:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="fu">make</span> -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></a></code></pre></div>
+<p>或者如果你想指定一个编译器。</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="fu">make</span> CC=<span class="st">&quot;</span><span class="va">$GCC</span><span class="st">/bin/gcc&quot;</span> -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></a></code></pre></div>
+<p>现在你应该有<code>vmlinux</code>（内核二进制文件）和<code>bzImage</code>（压缩内核镜像）:</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="fu">ls</span> <span class="va">$KERNEL</span>/vmlinux</a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="co"># sample output - $KERNEL/vmlinux</span></a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="fu">ls</span> <span class="va">$KERNEL</span>/arch/x86/boot/bzImage</a>
+<a class="sourceLine" id="cb16-4" title="4"><span class="co"># sample output - $KERNEL/arch/x86/boot/bzImage</span></a></code></pre></div>
+<h2 id="image"><span class="header-section-number">4.4</span> Image</h2>
+<h3 id="install-debootstrap"><span class="header-section-number">4.4.1</span> Install debootstrap</h3>
+<p>命令:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" title="1"><span class="fu">sudo</span> apt install debootstrap</a></code></pre></div>
+<h3 id="创建-debian-bullseye-linux-映像"><span class="header-section-number">4.4.2</span> 创建 Debian Bullseye Linux 映像</h3>
+<p>创建一个包含最小必要软件包集的Debian Bullseye Linux镜像。</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1"><span class="fu">mkdir</span> <span class="va">$IMAGE</span></a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="bu">cd</span> <span class="va">$IMAGE</span>/</a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="fu">wget</span> https://raw.githubusercontent.com/google/syzkaller/master/tools/create-image.sh -O create-image.sh</a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="fu">chmod</span> +x create-image.sh</a>
+<a class="sourceLine" id="cb18-5" title="5"><span class="ex">./create-image.sh</span></a></code></pre></div>
+<p>结果应该是 <code>$IMAGE/bullseye.img</code> 磁盘映像。</p>
+<h3 id="或者创建不同版本的-debian-linux-映像"><span class="header-section-number">4.4.3</span> 或者创建不同版本的 Debian Linux 映像</h3>
+<p>要创建不同版本的 Debian 映像（例如 buster、stretch、sid），请指定 <code>--distribution</code> 选项。</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1"><span class="ex">./create-image.sh</span> --distribution buster</a></code></pre></div>
+<h3 id="映像额外工具"><span class="header-section-number">4.4.4</span> 映像额外工具</h3>
+<p>有时在虚拟机中拥有一些额外的软件包和工具是有用的，即使它们不是运行 syzkaller 所必需的。要安装我们认为有用的一组工具，请执行以下操作（请随意编辑脚本中的工具列表）:</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1"><span class="ex">./create-image.sh</span> --feature full</a></code></pre></div>
+<p>要安装 perf（不需要运行 syzkaller；需要 <code>$KERNEL</code> 指向内核源代码）:</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1"><span class="ex">./create-image.sh</span> --add-perf</a></code></pre></div>
+<p>有关 <code>create-image.sh</code> 的其他选项，请参考 <code>./create-image.sh -h</code></p>
+<h2 id="qemu"><span class="header-section-number">4.5</span> QEMU</h2>
+<h3 id="install-qemu"><span class="header-section-number">4.5.1</span> Install QEMU</h3>
+<p>命令:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb22-1" title="1"><span class="fu">sudo</span> apt install qemu-system-x86</a></code></pre></div>
+<h3 id="验证"><span class="header-section-number">4.5.2</span> 验证</h3>
+<p>确保内核启动并且 <code>sshd</code> 启动。</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb23-1" title="1"><span class="ex">qemu-system-x86_64</span> \</a>
+<a class="sourceLine" id="cb23-2" title="2">    -m 2G \</a>
+<a class="sourceLine" id="cb23-3" title="3">    -smp 2 \</a>
+<a class="sourceLine" id="cb23-4" title="4">    -kernel <span class="va">$KERNEL</span>/arch/x86/boot/bzImage \</a>
+<a class="sourceLine" id="cb23-5" title="5">    -append <span class="st">&quot;console=ttyS0 root=/dev/sda earlyprintk=serial net.ifnames=0&quot;</span> \</a>
+<a class="sourceLine" id="cb23-6" title="6">    -drive file=<span class="va">$IMAGE</span>/bullseye.img,format=raw \</a>
+<a class="sourceLine" id="cb23-7" title="7">    -net user,host=10.0.2.10,hostfwd=tcp:127.0.0.1:10021-:22 \</a>
+<a class="sourceLine" id="cb23-8" title="8">    -net nic,model=e1000 \</a>
+<a class="sourceLine" id="cb23-9" title="9">    -enable-kvm \</a>
+<a class="sourceLine" id="cb23-10" title="10">    -nographic \</a>
+<a class="sourceLine" id="cb23-11" title="11">    -pidfile vm.pid \</a>
+<a class="sourceLine" id="cb23-12" title="12">    <span class="op">2&gt;&amp;1</span> <span class="kw">|</span> <span class="fu">tee</span> vm.log</a></code></pre></div>
+<pre class="text"><code>early console in setup code
+early console in extract_kernel
+input_data: 0x0000000005d9e276
+input_len: 0x0000000001da5af3
+output: 0x0000000001000000
+output_len: 0x00000000058799f8
+kernel_total_size: 0x0000000006b63000
+
+Decompressing Linux... Parsing ELF... done.
+Booting the kernel.
+[    0.000000] Linux version 4.12.0-rc3+ ...
+[    0.000000] Command line: console=ttyS0 root=/dev/sda debug earlyprintk=serial
+...
+[ ok ] Starting enhanced syslogd: rsyslogd.
+[ ok ] Starting periodic command scheduler: cron.
+[ ok ] Starting OpenBSD Secure Shell server: sshd.</code></pre>
+<p>之后，你应该能够在另一个终端中 ssh 到 QEMU 实例。</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1"><span class="fu">ssh</span> -i <span class="va">$IMAGE</span>/bullseye.id_rsa -p 10021 -o <span class="st">&quot;StrictHostKeyChecking no&quot;</span> root@localhost</a></code></pre></div>
+<h3 id="疑难解答"><span class="header-section-number">4.5.3</span> 疑难解答</h3>
+<p>如果出现 “too many tries” 错误，可能是 ssh 在传递显式传递的 <code>-i</code> 密钥之前传递了默认密钥。添加选项 <code>-o "IdentitiesOnly yes"</code>。</p>
+<p>要终止正在运行的 QEMU 实例，按 <code>Ctrl+A</code> 然后 <code>X</code> 或运行:</p>
+<p>命令:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb26-1" title="1"><span class="bu">kill</span> <span class="va">$(</span><span class="fu">cat</span> vm.pid<span class="va">)</span></a></code></pre></div>
+<p>如果 QEMU 正常工作，内核启动并且 ssh 成功，你可以关闭 QEMU 并尝试运行 syzkaller。</p>
+<h2 id="syzkaller"><span class="header-section-number">4.6</span> syzkaller</h2>
+<p>按照<a href="https://github.com/google/syzkaller/blob/master/docs/linux/setup.md#go-and-syzkaller">此处</a>所述构建 syzkaller。 然后创建如下所示的管理器配置，使用实际值替换环境变量 <code>$GOPATH</code>、<code>$KERNEL</code> 和 <code>$IMAGE</code>。</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb27-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb27-2" title="2">    <span class="dt">&quot;target&quot;</span><span class="fu">:</span> <span class="st">&quot;linux/amd64&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-3" title="3">    <span class="dt">&quot;http&quot;</span><span class="fu">:</span> <span class="st">&quot;127.0.0.1:56741&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-4" title="4">    <span class="dt">&quot;workdir&quot;</span><span class="fu">:</span> <span class="st">&quot;$GOPATH/src/github.com/google/syzkaller/workdir&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-5" title="5">    <span class="dt">&quot;kernel_obj&quot;</span><span class="fu">:</span> <span class="st">&quot;$KERNEL&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-6" title="6">    <span class="dt">&quot;image&quot;</span><span class="fu">:</span> <span class="st">&quot;$IMAGE/bullseye.img&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-7" title="7">    <span class="dt">&quot;sshkey&quot;</span><span class="fu">:</span> <span class="st">&quot;$IMAGE/bullseye.id_rsa&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-8" title="8">    <span class="dt">&quot;syzkaller&quot;</span><span class="fu">:</span> <span class="st">&quot;$GOPATH/src/github.com/google/syzkaller&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-9" title="9">    <span class="dt">&quot;procs&quot;</span><span class="fu">:</span> <span class="dv">8</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-10" title="10">    <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;qemu&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-11" title="11">    <span class="dt">&quot;vm&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb27-12" title="12">        <span class="dt">&quot;count&quot;</span><span class="fu">:</span> <span class="dv">4</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-13" title="13">        <span class="dt">&quot;kernel&quot;</span><span class="fu">:</span> <span class="st">&quot;$KERNEL/arch/x86/boot/bzImage&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-14" title="14">        <span class="dt">&quot;cpu&quot;</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb27-15" title="15">        <span class="dt">&quot;mem&quot;</span><span class="fu">:</span> <span class="dv">2048</span></a>
+<a class="sourceLine" id="cb27-16" title="16">    <span class="fu">}</span></a>
+<a class="sourceLine" id="cb27-17" title="17"><span class="fu">}</span></a></code></pre></div>
+<p>运行 syzkaller 管理器:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb28-1" title="1"><span class="fu">mkdir</span> workdir</a>
+<a class="sourceLine" id="cb28-2" title="2"><span class="ex">./bin/syz-manager</span> -config=my.cfg</a></code></pre></div>
+<p>现在 syzkaller 应该正在运行，你可以使用浏览器在 <code>127.0.0.1:56741</code> 查看管理器状态。</p>
+<p>如果在 <code>syz-manager</code> 启动后遇到问题，请考虑使用 <code>-debug</code> 标志运行它。 还可以参考<a href="https://github.com/google/syzkaller/blob/master/docs/troubleshooting.md">此页面</a>获取故障排除技巧。</p>
+<h1 id="how-to-use-syzkaller"><span class="header-section-number">5</span> How to use syzkaller</h1>
+<p>翻译自<a href="https://github.com/google/syzkaller/blob/master/docs/usage.md"><code>README.md</code></a>, 翻译时文件的最新提交是<code>7016057751ec811d92392186ea96c53a7253ea5e docs/usage.md: correct grammatical error</code>。</p>
+<h2 id="运行"><span class="header-section-number">5.1</span> 运行</h2>
+<p>启动 <code>syz-manager</code> 进程，命令如下:</p>
+<pre><code>./bin/syz-manager -config my.cfg</code></pre>
+<p><code>syz-manager</code> 进程将启动虚拟机并在其中开始模糊测试。 <code>-config</code> 命令行选项指定配置文件的位置，配置文件描述见<a href="https://github.com/google/syzkaller/blob/master/docs/configuration.md">这里</a>。 发现的崩溃、统计数据和其他信息会显示在管理器配置中指定的 HTTP 地址上。</p>
+<h2 id="崩溃"><span class="header-section-number">5.2</span> 崩溃</h2>
+<p>一旦 syzkaller 在某个虚拟机中检测到内核崩溃，它将自动开始重现该崩溃的过程（除非你在配置中指定了 <code>"reproduce": false</code>）。 默认情况下，它将使用 4 个虚拟机来重现崩溃，然后最小化导致崩溃的程序。 这可能会暂停模糊测试，因为所有虚拟机可能都忙于重现检测到的崩溃。</p>
+<p>重现一次崩溃的过程可能需要几分钟到一个小时不等，这取决于崩溃是否容易重现或根本无法重现。 由于这个过程并不完美，因此可以按照<a href="https://github.com/google/syzkaller/blob/master/docs/reproducing_crashes.md">这里</a>描述的方式尝试手动重现崩溃。</p>
+<p>如果成功找到重现器，它可以生成两种形式之一: syzkaller 程序或 C 程序。 Syzkaller 总是尝试生成更用户友好的 C 重现器，但有时由于各种原因（例如略有不同的时间安排）会失败。 如果 syzkaller 仅生成了 syzkaller 程序，可以按照<a href="https://github.com/google/syzkaller/blob/master/docs/reproducing_crashes.md">这里</a>的方式手动执行它们以重现和调试崩溃。</p>
+<h2 id="集线器"><span class="header-section-number">5.3</span> 集线器</h2>
+<p>如果你运行多个 <code>syz-manager</code> 实例，可以将它们连接在一起并允许交换程序和重现器，详细信息见<a href="https://github.com/google/syzkaller/blob/master/docs/hub.md">这里</a>。</p>
+<h2 id="报告漏洞"><span class="header-section-number">5.4</span> 报告漏洞</h2>
+<p>有关如何报告 Linux 内核漏洞的说明，请查看<a href="https://github.com/google/syzkaller/blob/master/docs/linux/reporting_kernel_bugs.md">这里</a>。</p>
+<h1 id="how-to-reproduce-crashes"><span class="header-section-number">6</span> How to reproduce crashes</h1>
+<p>翻译自<a href="https://github.com/google/syzkaller/blob/master/docs/reproducing_crashes.md"><code>docs/reproducing_crashes.md</code></a>, 翻译时文件的最新提交是<code>52c8379f77b5f292e2d527c66dfe17a899381d20 docs: update docs to reflect the new `async` flag</code>。</p>
+<p>创建syzkaller错误的重现程序的过程是自动化的，但它并不完美，因此syzkaller提供了一些工具用于手动执行和重现程序。</p>
+<p>在manager <code>workdir/crashes</code> 目录中创建的崩溃日志包含在崩溃前执行的程序。在并行执行模式下（当manager配置中的<code>procs</code>参数设置为大于1的值时），导致崩溃的程序不一定立即在崩溃前执行；有问题的程序可能在之前的某个地方。有两个工具可以帮助你识别和最小化导致崩溃的程序: <code>tools/syz-execprog</code> 和 <code>tools/syz-prog2c</code>。</p>
+<p><code>tools/syz-execprog</code> 在各种模式下执行单个syzkaller程序或一组程序（一次或无限循环；在线程/碰撞模式下（见下文），有或没有覆盖收集）。你可以通过循环运行崩溃日志中的所有程序来开始，以检查是否至少有一个程序确实使内核崩溃: <code>./syz-execprog -executor=./syz-executor -repeat=0 -procs=16 -cover=0 crash-log</code>。然后尝试识别导致崩溃的单个程序，可以用 <code>./syz-execprog -executor=./syz-executor -repeat=0 -procs=16 -cover=0 file-with-a-single-program</code> 测试程序。</p>
+<p>注意: <code>syz-execprog</code> 在本地执行程序。所以你需要将 <code>syz-execprog</code> 和 <code>syz-executor</code> 复制到带有测试内核的虚拟机中并在那里运行。</p>
+<p>一旦你有了导致崩溃的单个程序，尝试通过从程序中删除单个系统调用来最小化它（你可以在行首添加<code>#</code>来注释掉单行），以及删除不必要的数据（例如，将<code>&amp;(0x7f0000001000)="73656c6600"</code>系统调用参数替换为 <code>&amp;(0x7f0000001000)=nil</code>）。你还可以尝试将所有的mmap调用合并为一个映射整个所需区域的单个mmap调用。再次使用 <code>syz-execprog</code> 工具测试最小化。</p>
+<p>现在你有了一个最小化的程序，检查如果使用 <code>./syz-execprog -threaded=0 -collide=0</code> 标志崩溃仍然重现。如果没有，那么你需要稍后做一些额外的工作。</p>
+<p>现在，运行 <code>syz-prog2c</code> 工具处理程序。它会给你可执行的C源代码。如果崩溃在使用 <code>-threaded/collide=0</code> 标志时重现，那么这个C程序也应该导致崩溃。</p>
+<p>如果崩溃在使用 <code>-threaded/collide=0</code> 标志时不可重现，那么你需要最后一步。你可以将线程模式视为每个系统调用在其自己的线程中执行。为了模拟这种执行模式，将单个系统调用移动到单独的线程中。你可以在这里看到一个例子: https://groups.google.com/d/msg/syzkaller/fHZ42YrQM-Y/Z4Xf-BbUDgAJ。</p>
+<p>这个过程在 <code>syz-repro</code> 实用程序中有一定程度的自动化。你需要提供你的manager配置和崩溃报告文件。你可以参考<a href="https://github.com/google/syzkaller/blob/master//pkg/mgrconfig/testdata/qemu.cfg">示例配置文件</a>。</p>
+<pre><code>./syz-repro -config my.cfg crash-qemu-1-1455745459265726910</code></pre>
+<p>它将尝试找到有问题的程序并最小化它。但由于有很多因素可以影响可重现性，它并不总是有效。</p>
+</body>
+</html>

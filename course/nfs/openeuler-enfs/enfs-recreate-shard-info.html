@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>openEuler的nfs+重新插入enfs模块时生成shard信息的功能</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">openEuler的nfs+重新插入enfs模块时生成shard信息的功能</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#需求描述"><span class="toc-section-number">1</span> 需求描述</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">2</span> 代码分析</a></li>
+<li><a href="#实现"><span class="toc-section-number">3</span> 实现</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="需求描述"><span class="header-section-number">1</span> 需求描述</h1>
+<p>执行以下操作后重新生成shard信息:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">mount</span> -t nfs -o vers=3,localaddrs=192.168.53.209~192.168.53.52,remoteaddrs=10.42.43.92~10.42.43.93 10.42.43.92:/enfs-test /mnt/</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="ex">modprobe</span> -r enfs</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="ex">modprobe</span> enfs</a></code></pre></div>
+<h1 id="代码分析"><span class="header-section-number">2</span> 代码分析</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb2-1" title="1">mount</a>
+<a class="sourceLine" id="cb2-2" title="2">  path_mount</a>
+<a class="sourceLine" id="cb2-3" title="3">    do_new_mount</a>
+<a class="sourceLine" id="cb2-4" title="4">      vfs_get_tree</a>
+<a class="sourceLine" id="cb2-5" title="5">        nfs_get_tree</a>
+<a class="sourceLine" id="cb2-6" title="6">          nfs_try_get_tree</a>
+<a class="sourceLine" id="cb2-7" title="7">            nfs_try_mount_request</a>
+<a class="sourceLine" id="cb2-8" title="8">              nfs<span class="dv">3</span><span class="er">_create_server</span></a>
+<a class="sourceLine" id="cb2-9" title="9">                nfs_create_server</a>
+<a class="sourceLine" id="cb2-10" title="10">                  nfs_probe_fsinfo</a>
+<a class="sourceLine" id="cb2-11" title="11">                    nfs3_proc_fsinfo <span class="co">// clp-&gt;rpc_ops-&gt;fsinfo</span></a>
+<a class="sourceLine" id="cb2-12" title="12">                      do_proc_fsinfo</a>
+<a class="sourceLine" id="cb2-13" title="13">                        nfs<span class="dv">3</span><span class="er">_rpc_wrapper</span></a>
+<a class="sourceLine" id="cb2-14" title="14">                          rpc_call_sync</a>
+<a class="sourceLine" id="cb2-15" title="15">                            rpc_run_task</a>
+<a class="sourceLine" id="cb2-16" title="16">                              rpc_task_set_client</a>
+<a class="sourceLine" id="cb2-17" title="17">                                rpc_task_set_transport</a>
+<a class="sourceLine" id="cb2-18" title="18">                                  rpc_multipath_ops_set_transport</a>
+<a class="sourceLine" id="cb2-19" title="19">                                    enfs_set_transport <span class="co">// mops-&gt;set_transport</span></a>
+<a class="sourceLine" id="cb2-20" title="20">                                      shard_set_transport</a>
+<a class="sourceLine" id="cb2-21" title="21">                                        get_uuid_from_task</a>
+<a class="sourceLine" id="cb2-22" title="22">                                          <span class="co">// 这里task-&gt;tk_msg.rpc_proc为空</span></a>
+<a class="sourceLine" id="cb2-23" title="23">                              rpc_task_set_rpc_message <span class="co">// 直到这里才设置task-&gt;tk_msg.rpc_proc</span></a>
+<a class="sourceLine" id="cb2-24" title="24">                              rpc_execute</a>
+<a class="sourceLine" id="cb2-25" title="25">                                __rpc_execute</a>
+<a class="sourceLine" id="cb2-26" title="26">                                  call_start</a>
+<a class="sourceLine" id="cb2-27" title="27">                                    rpc_task_set_transport</a>
+<a class="sourceLine" id="cb2-28" title="28">                                      rpc_multipath_ops_set_transport</a>
+<a class="sourceLine" id="cb2-29" title="29">                                        enfs_set_transport <span class="co">// mops-&gt;set_transport</span></a>
+<a class="sourceLine" id="cb2-30" title="30">                                          shard_set_transport</a>
+<a class="sourceLine" id="cb2-31" title="31">                                            get_uuid_from_task</a>
+<a class="sourceLine" id="cb2-32" title="32">                                              insert_and_update_shard</a>
+<a class="sourceLine" id="cb2-33" title="33">                                                query_and_update_shard</a>
+<a class="sourceLine" id="cb2-34" title="34">                                                  dorado_query_fs_shard <span class="co">// 请求成功</span></a>
+<a class="sourceLine" id="cb2-35" title="35">                                                  dorado_query_lsId</a>
+<a class="sourceLine" id="cb2-36" title="36">                                                    <span class="co">// </span><span class="al">TODO</span><span class="co">: 这里为什么失败</span></a>
+<a class="sourceLine" id="cb2-37" title="37">                                                    dorado_extend_op <span class="co">// 返回错误 EINVAL</span></a>
+<a class="sourceLine" id="cb2-38" title="38">            nfs_get_tree_common</a>
+<a class="sourceLine" id="cb2-39" title="39">              nfs_get_root</a>
+<a class="sourceLine" id="cb2-40" title="40">                nfs<span class="dv">3</span><span class="er">_proc_get_root</span></a>
+<a class="sourceLine" id="cb2-41" title="41">                  do_proc_get_root <span class="co">// 这里会再发送fsinfo请求</span></a>
+<a class="sourceLine" id="cb2-42" title="42"></a>
+<a class="sourceLine" id="cb2-43" title="43"><span class="co">// 遍历nfs_server</span></a>
+<a class="sourceLine" id="cb2-44" title="44">list_for_each_entry(pos, &amp;nn-&gt;nfs_volume_list, master_link)</a>
+<a class="sourceLine" id="cb2-45" title="45"></a>
+<a class="sourceLine" id="cb2-46" title="46">vfs_kern_mount</a>
+<a class="sourceLine" id="cb2-47" title="47">  fs_context_for_mount</a>
+<a class="sourceLine" id="cb2-48" title="48">    alloc_fs_context</a>
+<a class="sourceLine" id="cb2-49" title="49">      nfs_init_fs_context <span class="co">// fc-&gt;fs_type-&gt;init_fs_context</span></a>
+<a class="sourceLine" id="cb2-50" title="50">        ctx-&gt;mntfh = nfs_alloc_fhandle();</a>
+<a class="sourceLine" id="cb2-51" title="51">        fc-&gt;fs_private = ctx</a>
+<a class="sourceLine" id="cb2-52" title="52">        fc-&gt;ops = &amp;nfs_fs_context_ops</a>
+<a class="sourceLine" id="cb2-53" title="53">  put_fs_context</a>
+<a class="sourceLine" id="cb2-54" title="54">    nfs_fs_context_free <span class="co">// fc-&gt;ops-&gt;free(fc)</span></a>
+<a class="sourceLine" id="cb2-55" title="55">      nfs_free_fhandle(ctx-&gt;mntfh)</a>
+<a class="sourceLine" id="cb2-56" title="56"></a>
+<a class="sourceLine" id="cb2-57" title="57">nfs<span class="dv">3</span><span class="er">_xdr_enc_getattr3args</span></a>
+<a class="sourceLine" id="cb2-58" title="58"></a>
+<a class="sourceLine" id="cb2-59" title="59">nfs<span class="dv">3</span><span class="er">_xdr_dec_fsinfo3res</span></a></code></pre></div>
+<h1 id="实现"><span class="header-section-number">3</span> 实现</h1>
+<p><a href="https://gitee.com/openeuler/kernel/pulls/17973/commits">请查看pr</a>。</p>
+</body>
+</html>

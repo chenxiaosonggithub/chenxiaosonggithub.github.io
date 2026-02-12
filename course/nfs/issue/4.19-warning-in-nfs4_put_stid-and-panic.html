@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>4.19 nfs4_put_stid()报warning紧接着panic的问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">4.19 nfs4_put_stid()报warning紧接着panic的问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#解析vmcore"><span class="toc-section-number">2</span> 解析<code>vmcore</code></a><ul>
+<li><a href="#v2101.ky10.aarch64"><span class="toc-section-number">2.1</span> <code>4.19.90-24.4.v2101.ky10.aarch64</code></a></li>
+<li><a href="#v2101.ky10.aarch64-1"><span class="toc-section-number">2.2</span> <code>4.19.90-23.45.v2101.ky10.aarch64</code></a></li>
+<li><a href="#报warning的函数调用栈"><span class="toc-section-number">2.3</span> 报warning的函数调用栈</a></li>
+</ul></li>
+<li><a href="#修复补丁"><span class="toc-section-number">3</span> 修复补丁</a></li>
+<li><a href="#社区邮件"><span class="toc-section-number">4</span> 社区邮件</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">5</span> 代码分析</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>邮件列表类似问题的讨论: <a href="https://lore.kernel.org/all/76C32636621C40EC87811F625761F2AF@alyakaslap/">nfsd: radix tree warning in nfs4_put_stid and kernel panic</a></p>
+<h1 id="解析vmcore"><span class="header-section-number">2</span> 解析<code>vmcore</code></h1>
+<h2 id="v2101.ky10.aarch64"><span class="header-section-number">2.1</span> <code>4.19.90-24.4.v2101.ky10.aarch64</code></h2>
+<p>环境信息:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> sys</a>
+<a class="sourceLine" id="cb1-2" title="2">      <span class="ex">KERNEL</span>: vmlinux</a>
+<a class="sourceLine" id="cb1-3" title="3">    <span class="ex">DUMPFILE</span>: 0037/127.0.0.1-2024-01-05-09:05:11/vmcore  [PARTIAL DUMP]</a>
+<a class="sourceLine" id="cb1-4" title="4">        <span class="ex">CPUS</span>: 128</a>
+<a class="sourceLine" id="cb1-5" title="5">        <span class="ex">DATE</span>: Fri Jan  5 09:03:20 CST 2024</a>
+<a class="sourceLine" id="cb1-6" title="6">      <span class="ex">UPTIME</span>: 14:23:28</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="ex">LOAD</span> AVERAGE: 0.13, 0.11, 0.04</a>
+<a class="sourceLine" id="cb1-8" title="8">       <span class="ex">TASKS</span>: 1395</a>
+<a class="sourceLine" id="cb1-9" title="9">    <span class="ex">NODENAME</span>: xzh-act-obbaknas-t</a>
+<a class="sourceLine" id="cb1-10" title="10">     <span class="ex">RELEASE</span>: 4.19.90-24.4.v2101.ky10.aarch64</a>
+<a class="sourceLine" id="cb1-11" title="11">     <span class="ex">VERSION</span>: <span class="co">#1 SMP Mon May 24 14:45:37 CST 2021</span></a>
+<a class="sourceLine" id="cb1-12" title="12">     <span class="ex">MACHINE</span>: aarch64  (unknown Mhz)</a>
+<a class="sourceLine" id="cb1-13" title="13">      <span class="ex">MEMORY</span>: 512 GB</a>
+<a class="sourceLine" id="cb1-14" title="14">       <span class="ex">PANIC</span>: <span class="st">&quot;Internal error: Oops: 8600000e [#1] SMP&quot;</span> (check log for details)</a></code></pre></div>
+<p>日志:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">[<span class="ex">51807.593752</span>] WARNING: CPU: 56 PID: 53252 at lib/radix-tree.c:784 delete_node+0x98/0x250</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb2-3" title="3">[<span class="ex">51807.593800</span>] CPU: 56 PID: 53252 Comm: kworker/u256:5 Kdump: loaded Not tainted 4.19.90-24.4.v2101.ky10.aarch64 <span class="co">#1</span></a>
+<a class="sourceLine" id="cb2-4" title="4">[<span class="ex">51807.593801</span>] Hardware name: WUZHOU S627K4/BC82AMDYA, BIOS 6.55 03/23/2023</a>
+<a class="sourceLine" id="cb2-5" title="5">[<span class="ex">51807.593824</span>] Workqueue: nfsd4_callbacks nfsd4_run_cb_work [nfsd]</a>
+<a class="sourceLine" id="cb2-6" title="6">[<span class="ex">51807.593826</span>] pstate: 20c00009 (nzCv daif +PAN +UAO)</a>
+<a class="sourceLine" id="cb2-7" title="7">[<span class="ex">51807.593828</span>] pc : delete_node+0x98/0x250</a>
+<a class="sourceLine" id="cb2-8" title="8">[<span class="ex">51807.593829</span>] lr : __radix_tree_delete+0x94/0xc0</a>
+<a class="sourceLine" id="cb2-9" title="9">[<span class="ex">51807.593830</span>] sp : ffffa62ac5b27c90</a>
+<a class="sourceLine" id="cb2-10" title="10">[<span class="ex">51807.593830</span>] x29: ffffa62ac5b27c90 x28: 0000000000000000 </a>
+<a class="sourceLine" id="cb2-11" title="11">[<span class="ex">51807.593832</span>] x27: 0000000000000000 x26: ffff505f0afc6b00 </a>
+<a class="sourceLine" id="cb2-12" title="12">[<span class="ex">51807.593833</span>] x25: ffffa629f5b648f0 x24: 0000000000000003 </a>
+<a class="sourceLine" id="cb2-13" title="13">[<span class="ex">51807.593834</span>] x23: 0000000000000000 x22: ffff505f0a38d588 </a>
+<a class="sourceLine" id="cb2-14" title="14">[<span class="ex">51807.593835</span>] x21: 0000000000000000 x20: ffffc64a6c17c7c0 </a>
+<a class="sourceLine" id="cb2-15" title="15">[<span class="ex">51807.593836</span>] x19: ffffa64af54fe8b0 x18: ffffc64a6c17c7c0 </a>
+<a class="sourceLine" id="cb2-16" title="16">[<span class="ex">51807.593837</span>] x17: 0000000000011000 x16: ffff505f0a388930 </a>
+<a class="sourceLine" id="cb2-17" title="17">[<span class="ex">51807.593838</span>] x15: 0000000000000000 x14: ffffa628c7d2bd20 </a>
+<a class="sourceLine" id="cb2-18" title="18">[<span class="ex">51807.593839</span>] x13: ffffa628c7d2bb10 x12: 0000000000000000 </a>
+<a class="sourceLine" id="cb2-19" title="19">[<span class="ex">51807.593840</span>] x11: ffffa628c7d2bb38 x10: 0000000000000000 </a>
+<a class="sourceLine" id="cb2-20" title="20">[<span class="ex">51807.593841</span>] x9 : 000000000000003e x8 : 0000000000000043 </a>
+<a class="sourceLine" id="cb2-21" title="21">[<span class="ex">51807.593842</span>] x7 : ffffa628c7d2bd21 x6 : 000000000000003d </a>
+<a class="sourceLine" id="cb2-22" title="22">[<span class="ex">51807.593843</span>] x5 : 0000000000000000 x4 : 0000000000000000 </a>
+<a class="sourceLine" id="cb2-23" title="23">[<span class="ex">51807.593844</span>] x3 : ffffa628c7d2bb28 x2 : 000000000000003f </a>
+<a class="sourceLine" id="cb2-24" title="24">[<span class="ex">51807.593845</span>] x1 : ffff505f0a38d588 x0 : ffffa64af5b06230 </a>
+<a class="sourceLine" id="cb2-25" title="25">[<span class="ex">51807.593847</span>] Call trace:</a>
+<a class="sourceLine" id="cb2-26" title="26">[<span class="ex">51807.593848</span>]  delete_node+0x98/0x250</a>
+<a class="sourceLine" id="cb2-27" title="27">[<span class="ex">51807.593850</span>]  __radix_tree_delete+0x94/0xc0</a>
+<a class="sourceLine" id="cb2-28" title="28">[<span class="ex">51807.593851</span>]  radix_tree_delete_item+0x50/0xc8</a>
+<a class="sourceLine" id="cb2-29" title="29">[<span class="ex">51807.593852</span>]  idr_remove+0x18/0x20</a>
+<a class="sourceLine" id="cb2-30" title="30">[<span class="ex">51807.593862</span>]  nfs4_put_stid+0x40/0xa0 [nfsd]</a>
+<a class="sourceLine" id="cb2-31" title="31">[<span class="ex">51807.593870</span>]  nfsd4_cb_recall_release+0x20/0x30 [nfsd]</a>
+<a class="sourceLine" id="cb2-32" title="32">[<span class="ex">51807.593878</span>]  nfsd4_run_cb_work+0xcc/0x110 [nfsd]</a>
+<a class="sourceLine" id="cb2-33" title="33">[<span class="ex">51807.593880</span>]  process_one_work+0x1f8/0x490</a>
+<a class="sourceLine" id="cb2-34" title="34">[<span class="ex">51807.593881</span>]  worker_thread+0x50/0x4b8</a>
+<a class="sourceLine" id="cb2-35" title="35">[<span class="ex">51807.593882</span>]  kthread+0x134/0x138</a>
+<a class="sourceLine" id="cb2-36" title="36">[<span class="ex">51807.593885</span>]  ret_from_fork+0x10/0x18</a>
+<a class="sourceLine" id="cb2-37" title="37">[<span class="ex">51807.593886</span>] ---[ end trace e77f38e6ef8f5232 ]---</a>
+<a class="sourceLine" id="cb2-38" title="38">[<span class="ex">51807.645972</span>] Unable to handle kernel read from unreadable memory at virtual address ffffa628c7d2bb28</a>
+<a class="sourceLine" id="cb2-39" title="39">[<span class="ex">51807.655614</span>] Mem abort info:</a>
+<a class="sourceLine" id="cb2-40" title="40">[<span class="ex">51807.658887</span>]   ESR = 0x8600000e</a>
+<a class="sourceLine" id="cb2-41" title="41">[<span class="ex">51807.662420</span>]   Exception class = IABT (current EL), <span class="ex">IL</span> = 32 bits</a>
+<a class="sourceLine" id="cb2-42" title="42">[<span class="ex">51807.668870</span>]   SET = 0, FnV = 0</a>
+<a class="sourceLine" id="cb2-43" title="43">[<span class="ex">51807.672402</span>]   EA = 0, S1PTW = 0</a>
+<a class="sourceLine" id="cb2-44" title="44">[<span class="ex">51807.676029</span>] swapper pgtable: 64k pages, 48-bit VAs, pgdp = 000000000ecf001e</a>
+<a class="sourceLine" id="cb2-45" title="45">[<span class="ex">51807.683534</span>] [ffffa628c7d2bb28] pgd=0000205fbffc0803, pud=0000205fbffc0803, pmd=0068003d80000f11</a>
+<a class="sourceLine" id="cb2-46" title="46">[<span class="ex">51807.692808</span>] Internal error: Oops: 8600000e [#1] SMP</a>
+<a class="sourceLine" id="cb2-47" title="47"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb2-48" title="48">[<span class="ex">51807.773886</span>] Process swapper/96 (pid: 0, stack limit = 0x00000000aa7d66c2)</a>
+<a class="sourceLine" id="cb2-49" title="49">[<span class="ex">51807.788356</span>] CPU: 96 PID: 0 Comm: swapper/96 Kdump: loaded Tainted: G        W         4.19.90-24.4.v2101.ky10.aarch64 <span class="co">#1</span></a>
+<a class="sourceLine" id="cb2-50" title="50">[<span class="ex">51807.807135</span>] Hardware name: WUZHOU S627K4/BC82AMDYA, BIOS 6.55 03/23/2023</a>
+<a class="sourceLine" id="cb2-51" title="51">[<span class="ex">51807.818018</span>] pstate: a0400009 (NzCv daif +PAN -UAO)</a>
+<a class="sourceLine" id="cb2-52" title="52">[<span class="ex">51807.826949</span>] pc : 0xffffa628c7d2bb28</a>
+<a class="sourceLine" id="cb2-53" title="53">[<span class="ex">51807.834500</span>] lr : rcu_process_callbacks+0x224/0x590</a>
+<a class="sourceLine" id="cb2-54" title="54">[<span class="ex">51807.843382</span>] sp : ffffc64afebafec0</a>
+<a class="sourceLine" id="cb2-55" title="55">[<span class="ex">51807.850791</span>] x29: ffffc64afebafec0 x28: 000000000000000a </a>
+<a class="sourceLine" id="cb2-56" title="56">[<span class="ex">51807.860198</span>] x27: 000075ebf3f90000 x26: ffff505f0afa5000 </a>
+<a class="sourceLine" id="cb2-57" title="57">[<span class="ex">51807.869582</span>] x25: ffff505f0ab953c8 x24: ffff505f0ab90000 </a>
+<a class="sourceLine" id="cb2-58" title="58">[<span class="ex">51807.878968</span>] x23: ffff505f0afce000 x22: ffff505f0afe0e80 </a>
+<a class="sourceLine" id="cb2-59" title="59">[<span class="ex">51807.888274</span>] x21: ffffc64afebaff40 x20: ffffc64afebb1538 </a>
+<a class="sourceLine" id="cb2-60" title="60">[<span class="ex">51807.897503</span>] x19: ffffc64afebb1500 x18: ffff505f0afa1000 </a>
+<a class="sourceLine" id="cb2-61" title="61">[<span class="ex">51807.906639</span>] x17: 0000000000000000 x16: ffff505f0a38d6b8 </a>
+<a class="sourceLine" id="cb2-62" title="62">[<span class="ex">51807.915682</span>] x15: 0000000000000000 x14: 0000000000000000 </a>
+<a class="sourceLine" id="cb2-63" title="63">[<span class="ex">51807.924667</span>] x13: ffffa64af7224d90 x12: 0000000000000000 </a>
+<a class="sourceLine" id="cb2-64" title="64">[<span class="ex">51807.933574</span>] x11: 0000000000000001 x10: ffffc64afebaff28 </a>
+<a class="sourceLine" id="cb2-65" title="65">[<span class="ex">51807.942413</span>] x9 : 0000000000000000 x8 : 0000000000000060 </a>
+<a class="sourceLine" id="cb2-66" title="66">[<span class="ex">51807.951156</span>] x7 : ffffa64af517c430 x6 : ffff7fe992bd45c0 </a>
+<a class="sourceLine" id="cb2-67" title="67">[<span class="ex">51807.959831</span>] x5 : 0000000000210d00 x4 : ffff7fe992bd45e0 </a>
+<a class="sourceLine" id="cb2-68" title="68">[<span class="ex">51807.968417</span>] x3 : 000000000070006d x2 : ffffa628c7d2bb28 </a>
+<a class="sourceLine" id="cb2-69" title="69">[<span class="ex">51807.976901</span>] x1 : ffffa628c7d2bb28 x0 : ffffa628c7d2bb28 </a>
+<a class="sourceLine" id="cb2-70" title="70">[<span class="ex">51807.985289</span>] Call trace:</a>
+<a class="sourceLine" id="cb2-71" title="71">[<span class="ex">51807.990701</span>]  0xffffa628c7d2bb28</a>
+<a class="sourceLine" id="cb2-72" title="72">[<span class="ex">51807.996719</span>]  __do_softirq+0x114/0x32c</a>
+<a class="sourceLine" id="cb2-73" title="73">[<span class="ex">51808.003175</span>]  irq_exit+0x108/0x120</a>
+<a class="sourceLine" id="cb2-74" title="74">[<span class="ex">51808.009195</span>]  __handle_domain_irq+0x6c/0xc0</a>
+<a class="sourceLine" id="cb2-75" title="75">[<span class="ex">51808.016016</span>]  gic_handle_irq+0x6c/0x170</a>
+<a class="sourceLine" id="cb2-76" title="76">[<span class="ex">51808.022432</span>]  el1_irq+0xb8/0x140</a>
+<a class="sourceLine" id="cb2-77" title="77">[<span class="ex">51808.028154</span>]  arch_cpu_idle+0x38/0x1c0</a>
+<a class="sourceLine" id="cb2-78" title="78">[<span class="ex">51808.034334</span>]  default_idle_call+0x24/0x58</a>
+<a class="sourceLine" id="cb2-79" title="79">[<span class="ex">51808.040696</span>]  do_idle+0x1a4/0x268</a>
+<a class="sourceLine" id="cb2-80" title="80">[<span class="ex">51808.046264</span>]  cpu_startup_entry+0x2c/0x78</a>
+<a class="sourceLine" id="cb2-81" title="81">[<span class="ex">51808.052481</span>]  secondary_start_kernel+0x17c/0x1c8</a>
+<a class="sourceLine" id="cb2-82" title="82">[<span class="ex">51808.059303</span>] Code: f54fe8b0 ffffa64a 6c17c7c0 ffffc64a (c7d2bb28) </a>
+<a class="sourceLine" id="cb2-83" title="83">[<span class="ex">51808.067801</span>] SMP: stopping secondary CPUs</a>
+<a class="sourceLine" id="cb2-84" title="84">[<span class="ex">51808.079832</span>] Starting crashdump kernel...</a>
+<a class="sourceLine" id="cb2-85" title="85">[<span class="ex">51808.086525</span>] Bye!</a></code></pre></div>
+<p>用<code>faddr2line</code>脚本解析:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">./scripts/faddr2line</span> vmlinux delete_node+0x98/0x250</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="ex">delete_node+0x98</span>/0x250:</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="ex">delete_node</span> at lib/radix-tree.c:784</a></code></pre></div>
+<p><code>WARNING</code>发生在<code>delete_node</code>函数的<code>WARN_ON_ONCE(!list_empty(&amp;node-&gt;private_list))</code>。从时间戳可以看出<code>Unable to handle kernel read from unreadable memory</code>是在<code>WARNING</code>后立刻发生的。</p>
+<p>报<code>WARNING</code>是在<code>delete_node</code>函数的<code>0x98</code>偏移量，<code>delete_node</code>函数前面一部分的汇编:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> dis -lx delete_node</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-24.4.v2101.ky10.aarch64/lib</span>/radix-tree.c: <span class="ex">762</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="ex">0xffff505f0a38d778</span> <span class="op">&lt;</span>delete_node+0x60<span class="op">&gt;</span>:  ldrb    w2, [x0,#2]</a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="co"># x0为node的地址，x0中的值加24为node-&gt;private_list的值，存储在x3中（既x3 == &amp;node-&gt;private_list）</span></a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="ex">0xffff505f0a38d77c</span> <span class="op">&lt;</span>delete_node+0x64<span class="op">&gt;</span>:  add     x3, x0, <span class="co">#0x18 # 表示将寄存器 x0 的值与十六进制数 0x18 相加，然后将结果存储到寄存器 x3 中</span></a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb4-8" title="8"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-24.4.v2101.ky10.aarch64/./include/linux</span>/compiler.h: <span class="ex">223</span></a>
+<a class="sourceLine" id="cb4-9" title="9"><span class="ex">0xffff505f0a38d7a4</span> <span class="op">&lt;</span>delete_node+0x8c<span class="op">&gt;</span>:  ldr     x0, [x0,#24] <span class="co"># 将存储在内存地址 [x0 + 24] 处的值加载到寄存器 x0 中</span></a>
+<a class="sourceLine" id="cb4-10" title="10"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-24.4.v2101.ky10.aarch64/lib</span>/radix-tree.c: <span class="ex">784</span></a>
+<a class="sourceLine" id="cb4-11" title="11"><span class="ex">0xffff505f0a38d7a8</span> <span class="op">&lt;</span>delete_node+0x90<span class="op">&gt;</span>:  cmp     x3, x0</a>
+<a class="sourceLine" id="cb4-12" title="12"><span class="ex">0xffff505f0a38d7ac</span> <span class="op">&lt;</span>delete_node+0x94<span class="op">&gt;</span>:  b.eq    0xffff505f0a38d8e8</a>
+<a class="sourceLine" id="cb4-13" title="13"><span class="ex">0xffff505f0a38d7b0</span> <span class="op">&lt;</span>delete_node+0x98<span class="op">&gt;</span>:  brk     <span class="co">#0x800</span></a></code></pre></div>
+<p>我们看到panic时无法读的地址<code>ffffa628c7d2bb28</code>是报<code>WARNING</code>时的<code>x3</code>寄存器，解析vmcore <code>crash&gt; struct radix_tree_node.private_list -xo</code> 可知<code>private_list</code>的偏移量为<code>24</code>，根据<code>&lt;delete_node+0x64&gt;:  add     x3, x0, #0x18</code>这一行的汇编可知<code>x3</code>是<code>&amp;node-&gt;private_list</code>，为什么在<code>lib/radix-tree.c: 762 if (node-&gt;count) {</code>这一行取出<code>&amp;node-&gt;private_list</code>的值呢，是gcc优化所致。</p>
+<p>报<code>WARNING</code>时执行到<code>list_empty()</code>函数的<code>return READ_ONCE(head-&gt;next) == head</code>，<code>include/linux/compiler.h: 223</code>是执行到<code>__read_once_size</code>函数，所以<code>ldr     x0, [x0,#24]</code>代表执行<code>head-&gt;next</code>，所以<code>x0</code>是<code>head-&gt;next</code>的值，<code>x3</code>是<code>head</code>的值，也就是<code>&amp;node-&gt;private_list</code>的值（数据类型为<code>struct list_head *</code>），指向下一个<code>radix_tree_node</code>的链表指针。再看<code>struct radix_tree_node</code>结构体中<code>rcu_head</code>的偏移量和<code>private_list</code>是一样的（在同一个<code>union</code>中）。</p>
+<p>再看panic时的栈，在软中断的执行<code>__do_softirq</code>函数中，我们看<code>lr</code>寄存器知道这时执行到<code>rcu_process_callbacks</code>函数，是从<code>radix_tree_node_free() -&gt; call_rcu</code>触发的。反汇编<code>rcu_process_callbacks</code>函数:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> dis -lx rcu_process_callbacks</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-24.4.v2101.ky10.aarch64/kernel/rcu</span>/rcu.h: <span class="ex">226</span></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="ex">0xffff505f099276fc</span> <span class="op">&lt;</span>rcu_process_callbacks+0x214<span class="op">&gt;</span>:       ldr     x2, [x0,#8]</a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-24.4.v2101.ky10.aarch64/kernel/rcu</span>/rcu.h: <span class="ex">229</span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="ex">0xffff505f09927700</span> <span class="op">&lt;</span>rcu_process_callbacks+0x218<span class="op">&gt;</span>:       cmp     x2, <span class="co">#0xfff</span></a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="ex">0xffff505f09927704</span> <span class="op">&lt;</span>rcu_process_callbacks+0x21c<span class="op">&gt;</span>:       b.ls    0xffff505f09927970</a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-24.4.v2101.ky10.aarch64/kernel/rcu</span>/rcu.h: <span class="ex">236</span></a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="ex">0xffff505f09927708</span> <span class="op">&lt;</span>rcu_process_callbacks+0x220<span class="op">&gt;</span>:       blr     x2</a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-24.4.v2101.ky10.aarch64/kernel/rcu</span>/tree.c: <span class="ex">2589</span></a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="ex">0xffff505f0992770c</span> <span class="op">&lt;</span>rcu_process_callbacks+0x224<span class="op">&gt;</span>:       ldr     x1, [x29,#144]</a></code></pre></div>
+<p>用<code>faddr2line</code>脚本解析:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">scripts/faddr2line</span> vmlinux rcu_process_callbacks+0x224/0x590</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="ex">rcu_process_callbacks+0x224</span>/0x590:</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="ex">rcu_do_batch</span> at kernel/rcu/tree.c:2589 <span class="co"># 这一行是 __rcu_reclaim里的head-&gt;func(head)，应该是执行到2583行</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="kw">(</span><span class="ex">inlined</span> by<span class="kw">)</span> <span class="ex">invoke_rcu_callbacks</span> at kernel/rcu/tree.c:2896</a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="kw">(</span><span class="ex">inlined</span> by<span class="kw">)</span> <span class="ex">__rcu_process_callbacks</span> at kernel/rcu/tree.c:2863</a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="kw">(</span><span class="ex">inlined</span> by<span class="kw">)</span> <span class="ex">rcu_process_callbacks</span> at kernel/rcu/tree.c:2880</a></code></pre></div>
+<p><code>&lt;rcu_process_callbacks+0x214&gt;:       ldr     x2, [x0,#8]</code>处的汇编将存储在内存地址 <code>[x0 + 8] = ffffa628c7d2bb30</code> 处的值加载到寄存器 <code>x2</code> 中:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> rd ffffa628c7d2bb30</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="ex">ffffa628c7d2bb30</span>:  ffffa628c7d2bb28</a></code></pre></div>
+<p><code>&lt;rcu_process_callbacks+0x220&gt;:       blr     x2</code>处的汇编将寄存器 <code>x2</code> 中保存的地址加载到程序计数器（<code>pc</code>）中，实现了一个函数调用，并将返回地址保存在链接寄存器（<code>lr</code>）中。所以panic是发生在<code>__rcu_reclaim</code>函数的<code>head-&gt;func(head);</code>一行，参数<code>struct rcu_head *head</code>的值就是报panic的地址<code>ffffa628c7d2bb28</code>。</p>
+<p>查看内存中的值:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> rd ffffa628c7d2bb28 20</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">ffffa628c7d2bb28</span>:  ffffa628c7d2bb28 ffffa628c7d2bb28   (...(...(...(...</a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="ex">ffffa628c7d2bb38</span>:  0000000000000000 0000000000000000   ................</a>
+<a class="sourceLine" id="cb8-4" title="4"></a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="ex">crash</span><span class="op">&gt;</span> struct list_head ffffa628c7d2bb28 </a>
+<a class="sourceLine" id="cb8-6" title="6"><span class="ex">struct</span> list_head {</a>
+<a class="sourceLine" id="cb8-7" title="7">  <span class="ex">next</span> = 0xffffa628c7d2bb28, </a>
+<a class="sourceLine" id="cb8-8" title="8">  <span class="ex">prev</span> = 0xffffa628c7d2bb28</a>
+<a class="sourceLine" id="cb8-9" title="9">}</a>
+<a class="sourceLine" id="cb8-10" title="10"></a>
+<a class="sourceLine" id="cb8-11" title="11"><span class="ex">crash</span><span class="op">&gt;</span> struct callback_head ffffa628c7d2bb28</a>
+<a class="sourceLine" id="cb8-12" title="12"><span class="ex">struct</span> callback_head {</a>
+<a class="sourceLine" id="cb8-13" title="13">  <span class="ex">next</span> = 0xffffa628c7d2bb28, </a>
+<a class="sourceLine" id="cb8-14" title="14">  <span class="ex">func</span> = 0xffffa628c7d2bb28</a>
+<a class="sourceLine" id="cb8-15" title="15">}</a></code></pre></div>
+<p>我们看到，<code>struct rcu_head *head</code>中的值已经被重新初始化了，可能是被<code>INIT_LIST_HEAD()</code>初始化了。</p>
+<h2 id="v2101.ky10.aarch64-1"><span class="header-section-number">2.2</span> <code>4.19.90-23.45.v2101.ky10.aarch64</code></h2>
+<p>解压提取<code>vmlinux</code>和<code>ko</code>文件:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="ex">rpm2cpio</span> kernel-debuginfo-4.19.90-23.45.v2101.ky10.aarch64.rpm <span class="kw">|</span> <span class="fu">cpio</span> -div</a></code></pre></div>
+<p>加载<code>ko</code>文件:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfsd usr/lib/debug/lib/modules/4.19.90-23.45.v2101.ky10.aarch64/kernel/fs/nfsd/nfsd.ko.debug</a></code></pre></div>
+<p>在x86环境上用<code>faddr2line</code>脚本解析:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="ex">./scripts/faddr2line</span> vmlinux radix_tree_free_nodes+0x8c/0xe0</a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="ex">radix_tree_free_nodes+0x8c</span>/0xe0:</a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="ex">radix_tree_free_nodes</span> at lib/radix-tree.c:889 (discriminator 1)</a></code></pre></div>
+<p><code>WARNING</code>也是发生在<code>radix_tree_free_nodes</code>函数的<code>WARN_ON_ONCE(!list_empty(&amp;old-&gt;private_list))</code>。</p>
+<p><code>WARNING</code>发生在时刻<code>34052.859997</code>，<code>Unable to handle kernel read from unreadable memory</code>发生在时刻<code>34052.941212</code>，两个时间点是一前一后紧挨着。</p>
+<h2 id="报warning的函数调用栈"><span class="header-section-number">2.3</span> 报warning的函数调用栈</h2>
+<p>整理几次panic前报warning的调用栈。</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># 2023-05-18-09:46:52</span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="co"># 2024-01-04-18:37:07</span></a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="co"># 2024-01-05-09:05:11</span></a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="ex">idr_remove+0x18/0x20</span></a>
+<a class="sourceLine" id="cb12-5" title="5"><span class="ex">nfs4_put_stid+0x40/0xa0</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-6" title="6"><span class="ex">nfsd4_cb_recall_release+0x20/0x30</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-7" title="7"><span class="ex">nfsd4_run_cb_work+0xcc/0x110</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-8" title="8"><span class="ex">process_one_work+0x1f8/0x490</span></a>
+<a class="sourceLine" id="cb12-9" title="9"><span class="ex">worker_thread+0x50/0x4b8</span></a>
+<a class="sourceLine" id="cb12-10" title="10"><span class="ex">kthread+0x134/0x138</span></a>
+<a class="sourceLine" id="cb12-11" title="11"></a>
+<a class="sourceLine" id="cb12-12" title="12"><span class="co"># 20240710</span></a>
+<a class="sourceLine" id="cb12-13" title="13"><span class="co"># 20240712-104419</span></a>
+<a class="sourceLine" id="cb12-14" title="14"><span class="co"># 20240712-105545</span></a>
+<a class="sourceLine" id="cb12-15" title="15"><span class="co"># 20240713</span></a>
+<a class="sourceLine" id="cb12-16" title="16"><span class="co"># 20240715</span></a>
+<a class="sourceLine" id="cb12-17" title="17"><span class="ex">idr_remove+0x18/0x20</span></a>
+<a class="sourceLine" id="cb12-18" title="18"><span class="ex">nfs4_put_stid+0x40/0xa0</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-19" title="19"><span class="ex">nfsd4_cb_recall_release+0x20/0x30</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-20" title="20"><span class="ex">nfsd4_cb_release+0x30/0x58</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-21" title="21"><span class="ex">rpc_free_task+0x2c/0x70</span> [sunrpc]</a>
+<a class="sourceLine" id="cb12-22" title="22"><span class="ex">__rpc_execute+0x438/0x4a8</span> [sunrpc]</a>
+<a class="sourceLine" id="cb12-23" title="23"><span class="ex">rpc_async_schedule+0x20/0x30</span> [sunrpc]</a>
+<a class="sourceLine" id="cb12-24" title="24"><span class="ex">process_one_work+0x1f8/0x490</span></a>
+<a class="sourceLine" id="cb12-25" title="25"><span class="ex">worker_thread+0x50/0x4b8</span></a>
+<a class="sourceLine" id="cb12-26" title="26"><span class="ex">kthread+0x134/0x138</span></a>
+<a class="sourceLine" id="cb12-27" title="27"></a>
+<a class="sourceLine" id="cb12-28" title="28"><span class="co"># 20240714-005120</span></a>
+<a class="sourceLine" id="cb12-29" title="29"><span class="ex">radix_tree_free_nodes+0x8c/0xe0</span></a>
+<a class="sourceLine" id="cb12-30" title="30"><span class="ex">idr_destroy+0x44/0x60</span></a>
+<a class="sourceLine" id="cb12-31" title="31"><span class="ex">free_client+0xdc/0x110</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-32" title="32"><span class="ex">__destroy_client+0x1d8/0x218</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-33" title="33"><span class="ex">expire_client+0x30/0x40</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-34" title="34"><span class="ex">nfsd4_create_session+0x5c0/0x710</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-35" title="35"><span class="ex">nfsd4_proc_compound+0x4b8/0x700</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-36" title="36"><span class="ex">nfsd_dispatch+0x104/0x248</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-37" title="37"><span class="ex">svc_process_common+0x314/0x7b8</span> [sunrpc]</a>
+<a class="sourceLine" id="cb12-38" title="38"><span class="ex">svc_process+0xb0/0xc8</span> [sunrpc]</a>
+<a class="sourceLine" id="cb12-39" title="39"><span class="ex">nfsd+0xf0/0x160</span> [nfsd]</a>
+<a class="sourceLine" id="cb12-40" title="40"><span class="ex">kthread+0x134/0x138</span></a>
+<a class="sourceLine" id="cb12-41" title="41"></a>
+<a class="sourceLine" id="cb12-42" title="42"><span class="co"># 20240711，无warning栈，只有rcu panic栈</span></a>
+<a class="sourceLine" id="cb12-43" title="43"><span class="ex">Unable</span> to handle kernel read from unreadable memory at virtual address ffff8003a1a13000</a>
+<a class="sourceLine" id="cb12-44" title="44"><span class="ex">WARNING</span>: CPU: 7 PID: 0 at kernel/rcu/tree.c:2669 rcu_process_callbacks+0x540/0x590</a>
+<a class="sourceLine" id="cb12-45" title="45"></a>
+<a class="sourceLine" id="cb12-46" title="46"><span class="co"># 20240714-115213，无warning栈，只有rcu panic栈</span></a>
+<a class="sourceLine" id="cb12-47" title="47"><span class="ex">Unable</span> to handle kernel read from unreadable memory at virtual address ffff8003a0b23ff8</a>
+<a class="sourceLine" id="cb12-48" title="48"></a>
+<a class="sourceLine" id="cb12-49" title="49"><span class="co"># 20240714-145204，无warning栈，只有rcu panic栈</span></a>
+<a class="sourceLine" id="cb12-50" title="50"><span class="ex">Unable</span> to handle kernel read from unreadable memory at virtual address ffff8003a51c1930</a></code></pre></div>
+<h1 id="修复补丁"><span class="header-section-number">3</span> 修复补丁</h1>
+<p>修复补丁为: <a href="https://chenxiaosong.com/course/nfs/patch/nfsd-Fix-races-between-nfsd4_cb_release-and-nfsd4_sh.html"><code>2bbfed98a4d8 nfsd: Fix races between nfsd4_cb_release() and nfsd4_shutdown_callback()</code></a>。</p>
+<h1 id="社区邮件"><span class="header-section-number">4</span> 社区邮件</h1>
+<p>邮件列表类似问题的讨论: <a href="https://lore.kernel.org/all/76C32636621C40EC87811F625761F2AF@alyakaslap/">nfsd: radix tree warning in nfs4_put_stid and kernel panic</a></p>
+<p>邮件中提到<a href="https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1840650">ubuntu遇到的类似问题</a>换成<code>d1abaeb3be7b (tag: v5.3-rc5) Linux 5.3-rc5</code>内核，从<a href="https://launchpadlibrarian.net/439175966/storage_uptime.png">2019年8月22日测试到8月27日5天无重启</a>。邮件中认为<a href="https://chenxiaosong.com/course/nfs/patch/nfsd-Fix-races-between-nfsd4_cb_release-and-nfsd4_sh.html"><code>2bbfed98a4d8 nfsd: Fix races between nfsd4_cb_release() and nfsd4_shutdown_callback()</code></a>更像是修复补丁，但这个补丁在<code>v5.5-rc1</code>提出来的（用<code>git name-rev 2bbfed98a4d8</code>查看），时间对不上。邮件中提到的另一个补丁<a href="https://chenxiaosong.com/course/nfs/patch/nfsd-Don-t-release-the-callback-slot-unless-it-was-a.html"><code>e6abc8caa6de nfsd: Don't release the callback slot unless it was actually held</code></a>是<code>v5.1-rc7</code>提出来的，已经合入了。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/patch/nfsd4-use-reference-count-to-free-client.html"><code>59f8e91b75ec nfsd4: use reference count to free client</code></a>是规避补丁，能够极大降低复现概率，是在<code>tags/v5.3-rc1</code>引入的，所以社区邮件讨论的<code>d1abaeb3be7b (tag: v5.3-rc5) Linux 5.3-rc5</code>内核不复现就能解释了。</p>
+<h1 id="代码分析"><span class="header-section-number">5</span> 代码分析</h1>
+<p><code>struct radix_tree_node</code>的<code>private_list</code>没有被nfs相关的代码使用，所以执行到<code>delete_node()</code>时<code>node-&gt;private_list</code>链表正常情况下肯定为空，但出问题时这里的链表却不为空，应该是有其他进程并发操作<code>node-&gt;private_list</code>。</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb13-1" title="1">nfsd<span class="dv">4</span><span class="er">_run_cb_work</span></a>
+<a class="sourceLine" id="cb13-2" title="2">  <span class="cf">if</span> (!clnt) { <span class="co">// 回调通道中断，或客户端被终止；放弃。</span></a>
+<a class="sourceLine" id="cb13-3" title="3">  nfsd4_cb_recall_release <span class="co">// cb-&gt;cb_ops-&gt;release</span></a>
+<a class="sourceLine" id="cb13-4" title="4">    nfs<span class="dv">4</span><span class="er">_put_stid</span></a>
+<a class="sourceLine" id="cb13-5" title="5">      idr_remove</a>
+<a class="sourceLine" id="cb13-6" title="6">        radix_tree_delete_item</a>
+<a class="sourceLine" id="cb13-7" title="7">          __radix_tree_delete</a>
+<a class="sourceLine" id="cb13-8" title="8">            delete_node</a>
+<a class="sourceLine" id="cb13-9" title="9">              WARN_ON_ONCE(!list_empty(&amp;node-&gt;private_list)) <span class="co">// &amp;node-&gt;private_list链表不为空</span></a>
+<a class="sourceLine" id="cb13-10" title="10">              radix_tree_node_free</a>
+<a class="sourceLine" id="cb13-11" title="11">                call_rcu(..., func=radix_tree_node_rcu_free)</a>
+<a class="sourceLine" id="cb13-12" title="12">                  __call_rcu</a>
+<a class="sourceLine" id="cb13-13" title="13">                    head-&gt;func = func <span class="co">// 正常情况下这里被赋值成了函数</span></a>
+<a class="sourceLine" id="cb13-14" title="14">                    head-&gt;next = NULL</a>
+<a class="sourceLine" id="cb13-15" title="15"></a>
+<a class="sourceLine" id="cb13-16" title="16"><span class="co">// 有可能是从 nfsd4_run_cb_work 调用了 rpc_call_async</span></a>
+<a class="sourceLine" id="cb13-17" title="17">nfsd4_cb_release <span class="co">// nfsd4_cb_ops-&gt;rpc_release</span></a>
+<a class="sourceLine" id="cb13-18" title="18">  nfsd<span class="dv">4</span><span class="er">_cb_recall_release</span></a></code></pre></div>
+<p>通过上面<code>vmcore</code>分析过程可以看到，执行到<code>__rcu_reclaim()</code>时<code>struct rcu_head *head</code>正常情况下应该是函数<code>radix_tree_node_rcu_free()</code>的值，但出问题时却变成了空链表，可能是被<code>INIT_LIST_HEAD()</code>之类的宏定义初始化成空链表了，所以这里也应该是有其他进程并发操作<code>struct rcu_head *head</code>。</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb14-1" title="1">__do_softirq</a>
+<a class="sourceLine" id="cb14-2" title="2">  rcu_process_callbacks</a>
+<a class="sourceLine" id="cb14-3" title="3">    __rcu_process_callbacks</a>
+<a class="sourceLine" id="cb14-4" title="4">      invoke_rcu_callbacks</a>
+<a class="sourceLine" id="cb14-5" title="5">        rcu_do_batch</a>
+<a class="sourceLine" id="cb14-6" title="6">          __rcu_reclaim</a>
+<a class="sourceLine" id="cb14-7" title="7">            <span class="co">// 这里的 head 就是 delete_node() 中 node-&gt;private_list 的值</span></a>
+<a class="sourceLine" id="cb14-8" title="8">            <span class="co">// 也就是 node-&gt;rcu_head 的值</span></a>
+<a class="sourceLine" id="cb14-9" title="9">            head-&gt;func(head) <span class="co">// 这里panic</span></a>
+<a class="sourceLine" id="cb14-10" title="10">              radix_tree_node_rcu_free <span class="co">// 通过 call_rcu 调用，panic时还未执行到</span></a>
+<a class="sourceLine" id="cb14-11" title="11">                INIT_LIST_HEAD(&amp;node-&gt;private_list); <span class="co">// panic时还未执行到</span></a>
+<a class="sourceLine" id="cb14-12" title="12">              </a></code></pre></div>
+<p>其中<code>idr_remove()</code>移除的id是在<code>nfs4_alloc_stid() -&gt; idr_alloc_cyclic()</code>分配的。</p>
+</body>
+</html>

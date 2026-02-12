@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>shell和shell脚本</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">shell和shell脚本</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#ps"><span class="toc-section-number">1</span> <code>ps</code></a><ul>
+<li><a href="#ps-auxww"><span class="toc-section-number">1.1</span> <code>ps auxww</code></a></li>
+<li><a href="#ps-eLf"><span class="toc-section-number">1.2</span> <code>ps eLf</code></a></li>
+</ul></li>
+<li><a href="#export"><span class="toc-section-number">2</span> <code>export</code></a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
+<h1 id="ps"><span class="header-section-number">1</span> <code>ps</code></h1>
+<h2 id="ps-auxww"><span class="header-section-number">1.1</span> <code>ps auxww</code></h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># a: 所有终端用户进程</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="co"># u: 用户详细格式</span></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="co"># x: 无终端进程</span></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co"># ww: 两个w表示宽度不限制</span></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="co"># 要用aux（没有-号），不要用-aux，不要用-aux</span></a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="co"># 输出列: USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND</span></a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="co">#   USER    进程所有者（用户名）</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="co">#   PID 进程 ID（唯一标识）</span></a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="co">#   %CPU    CPU 使用率百分比（最近一次采样周期内）</span></a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="co">#   %MEM    物理内存使用率百分比</span></a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="co">#   VSZ 虚拟内存大小（Virtual Memory Size，单位 KB）</span></a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="co">#   RSS 驻留集大小（Resident Set Size，实际占用的物理内存，单位 KB）</span></a>
+<a class="sourceLine" id="cb1-13" title="13"><span class="co">#   TTY 关联的终端设备：</span></a>
+<a class="sourceLine" id="cb1-14" title="14"><span class="co">#       ? = 无终端（守护进程）</span></a>
+<a class="sourceLine" id="cb1-15" title="15"><span class="co">#       pts/0 = 终端窗口</span></a>
+<a class="sourceLine" id="cb1-16" title="16"><span class="co">#   STAT    进程状态（关键字母组合）：</span></a>
+<a class="sourceLine" id="cb1-17" title="17"><span class="co">#       R = 运行中或可运行（在运行队列）</span></a>
+<a class="sourceLine" id="cb1-18" title="18"><span class="co">#       S = 可中断睡眠（等待事件）</span></a>
+<a class="sourceLine" id="cb1-19" title="19"><span class="co">#       D = 不可中断睡眠（通常等待 I/O）</span></a>
+<a class="sourceLine" id="cb1-20" title="20"><span class="co">#       Z = 僵尸进程（已终止但未回收）</span></a>
+<a class="sourceLine" id="cb1-21" title="21"><span class="co">#       T = 暂停状态（如 Ctrl+Z）</span></a>
+<a class="sourceLine" id="cb1-22" title="22"><span class="co">#       I = 空闲内核线程</span></a>
+<a class="sourceLine" id="cb1-23" title="23"><span class="co">#       s = 会话领导者</span></a>
+<a class="sourceLine" id="cb1-24" title="24"><span class="co">#       &lt; = 高优先级</span></a>
+<a class="sourceLine" id="cb1-25" title="25"><span class="co">#       N = 低优先级</span></a>
+<a class="sourceLine" id="cb1-26" title="26"><span class="co">#       + = 前台进程组</span></a>
+<a class="sourceLine" id="cb1-27" title="27"><span class="co">#   START   进程启动时间（24小时制）：</span></a>
+<a class="sourceLine" id="cb1-28" title="28"><span class="co">#       当天启动：HH:MM</span></a>
+<a class="sourceLine" id="cb1-29" title="29"><span class="co">#       跨天：月 日（如 Jul15）</span></a>
+<a class="sourceLine" id="cb1-30" title="30"><span class="co">#   TIME    累计占用 CPU 时间（格式 [分:]秒）</span></a>
+<a class="sourceLine" id="cb1-31" title="31"><span class="co">#   COMMAND 启动命令（完整路径或名称）：</span></a>
+<a class="sourceLine" id="cb1-32" title="32"><span class="co">#       [kthreadd] = 内核线程</span></a>
+<a class="sourceLine" id="cb1-33" title="33"><span class="co">#       带参数的命令会被截断（可用 ps auxww 查看完整命令）</span></a>
+<a class="sourceLine" id="cb1-34" title="34"><span class="fu">ps</span> auxww</a></code></pre></div>
+<h2 id="ps-eLf"><span class="header-section-number">1.2</span> <code>ps eLf</code></h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># -e: 显示 所有进程（等价于 -A）</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="co"># -L: 显示线程（Light Weight Process），新增两列：LWP（线程ID）和 NLWP（线程数量）</span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="co"># -f: 使用 完整格式（Full-format） 显示信息</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="co"># 输出列:</span></a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="co">#   UID 进程所有者的用户名</span></a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="co">#   PID 进程ID（主线程的PID与进程ID相同）</span></a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="co">#   PPID    父进程ID</span></a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="co">#   LWP 线程ID（Light Weight Process ID），线程的唯一标识</span></a>
+<a class="sourceLine" id="cb2-9" title="9"><span class="co">#   C   CPU 利用率（百分比）</span></a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="co">#   NLWP    进程中线程的数量（Number of Light Weight Processes）</span></a>
+<a class="sourceLine" id="cb2-11" title="11"><span class="co">#   STIME   进程启动时间</span></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="co">#   TTY 关联的终端（? 表示无终端，通常是守护进程）</span></a>
+<a class="sourceLine" id="cb2-13" title="13"><span class="co">#   TIME    累计占用CPU时间</span></a>
+<a class="sourceLine" id="cb2-14" title="14"><span class="co">#   CMD 启动进程的完整命令（参数可能被截断）</span></a>
+<a class="sourceLine" id="cb2-15" title="15"><span class="fu">ps</span> -eLf</a></code></pre></div>
+<h1 id="export"><span class="header-section-number">2</span> <code>export</code></h1>
+<p>曾经遇到过一个坑，配置<code>http_proxy</code>和<code>https_proxy</code>时，前面没加<code>export</code>，proxy怎么都用不了。所以在这里记录一下<code>export</code>命令的笔记。</p>
+<p><code>http_proxy=http://10.42.20.221:7890</code>作用的是当前shell，子进程不可见，只是设置一个临时变量。</p>
+<p>而<code>export https_proxy=http://10.42.20.221:7890</code>作用范围是当前shell+子进程，一般影响外部工具的环境配置就要在前面加<code>export</code>。</p>
+</body>
+</html>

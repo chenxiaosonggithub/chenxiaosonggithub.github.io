@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>nfs_ctx_key_to_expire()引用计数泄露和空指针解引用的问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">nfs_ctx_key_to_expire()引用计数泄露和空指针解引用的问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题现象"><span class="toc-section-number">1</span> 问题现象</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">2</span> 代码分析</a></li>
+<li><a href="#构造复现"><span class="toc-section-number">3</span> 构造复现</a></li>
+<li><a href="#rcu相关函数注释翻译"><span class="toc-section-number">4</span> rcu相关函数注释翻译</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="问题现象"><span class="header-section-number">1</span> 问题现象</h1>
+<p>这个问题是以前华为同事在<a href="https://gitee.com/openeuler/kernel/tree/OLK-5.10/">openeuler的OLK-5.10分支</a>上遇到的（现在我在麒麟软件），详情请看类似的<a href="https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1968096"><code>[UBUNTU 20.04] Null Pointer issue in nfs code running Ubuntu on IBM Z</code></a>，这个网页上提到修复补丁<code>ca05cbae2a04 NFS: Fix up nfs_ctx_key_to_expire()</code>。</p>
+<p><a href="https://lore.kernel.org/all/1563453840-19778-1-git-send-email-liuzhengyuan@kylinos.cn/">内存屏障相关的补丁可以参考<code>c0e48f9dea91 io_uring: add a memory barrier before atomic_read</code></a></p>
+<h1 id="代码分析"><span class="header-section-number">2</span> 代码分析</h1>
+<p>华为的vmcore拿不出来，根据华为同事的解析结果，空指针解引用发生在<code>unx_match()</code>中的<code>if (!uid_eq(cred-&gt;cr_cred-&gt;fsuid, acred-&gt;cred-&gt;fsuid)</code>，<code>cred-&gt;cr_cred</code>的值为<code>NULL</code>。</p>
+<p>合入<code>ca05cbae2a04 NFS: Fix up nfs_ctx_key_to_expire()</code>补丁前:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb1-1" title="1"><span class="co">// pwrite64系统调用</span></a>
+<a class="sourceLine" id="cb1-2" title="2">ksys_pwrite<span class="dv">64</span></a>
+<a class="sourceLine" id="cb1-3" title="3">  vfs_write</a>
+<a class="sourceLine" id="cb1-4" title="4">    new_sync_write</a>
+<a class="sourceLine" id="cb1-5" title="5">      nfs_file_write</a>
+<a class="sourceLine" id="cb1-6" title="6">        nfs_key_timeout_notify</a>
+<a class="sourceLine" id="cb1-7" title="7">          nfs_ctx_key_to_expire</a>
+<a class="sourceLine" id="cb1-8" title="8">            unx_match <span class="co">// cred-&gt;cr_ops-&gt;crmatch</span></a>
+<a class="sourceLine" id="cb1-9" title="9">              <span class="co">// cred-&gt;cr_cred为NULL，发生空指针解引用</span></a>
+<a class="sourceLine" id="cb1-10" title="10">              <span class="cf">if</span> (!uid_eq(cred-&gt;cr_cred-&gt;fsuid</a>
+<a class="sourceLine" id="cb1-11" title="11">            unx_lookup_cred, <span class="co">// auth-&gt;au_ops-&gt;lookup_cred</span></a>
+<a class="sourceLine" id="cb1-12" title="12">            gss_key_timeout <span class="co">// cred-&gt;cr_ops-&gt;crkey_timeout</span></a>
+<a class="sourceLine" id="cb1-13" title="13"></a>
+<a class="sourceLine" id="cb1-14" title="14"><span class="co">// 释放cr_cred不一定是从nfs_ctx_key_to_expire()调用到put_rpccred()，但这是比较好构造的情况吧</span></a>
+<a class="sourceLine" id="cb1-15" title="15">nfs_ctx_key_to_expire</a>
+<a class="sourceLine" id="cb1-16" title="16">  put_rpccred</a>
+<a class="sourceLine" id="cb1-17" title="17">    unx_destroy_cred</a>
+<a class="sourceLine" id="cb1-18" title="18">      call_rcu(&amp;cred-&gt;cr_rcu, unx_free_cred_callback)</a>
+<a class="sourceLine" id="cb1-19" title="19">        put_cred(rpc_cred-&gt;cr_cred)</a>
+<a class="sourceLine" id="cb1-20" title="20">          __put_cred <span class="co">// 释放 cr_cred</span></a>
+<a class="sourceLine" id="cb1-21" title="21"></a>
+<a class="sourceLine" id="cb1-22" title="22"><span class="co">// 注意write系统调用会加锁file-&gt;f_pos_lock</span></a>
+<a class="sourceLine" id="cb1-23" title="23">ksys_write / do_writev</a>
+<a class="sourceLine" id="cb1-24" title="24">  fdget_pos</a>
+<a class="sourceLine" id="cb1-25" title="25">    __fdget_pos</a>
+<a class="sourceLine" id="cb1-26" title="26">      mutex_lock(&amp;file-&gt;f_pos_lock) <span class="co">// write在这里加锁，不会并发</span></a></code></pre></div>
+<p>当然空指针解引用问题涉及到乱序执行、内存屏障等，不好构造。这里我们先分析一下引用计数泄露的情况:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb2-1" title="1">ksys_pwrite<span class="dv">64</span></a>
+<a class="sourceLine" id="cb2-2" title="2">  vfs_write</a>
+<a class="sourceLine" id="cb2-3" title="3">    new_sync_write</a>
+<a class="sourceLine" id="cb2-4" title="4">      nfs_file_write</a>
+<a class="sourceLine" id="cb2-5" title="5">        nfs_key_timeout_notify</a>
+<a class="sourceLine" id="cb2-6" title="6">          nfs_ctx_key_to_expire</a>
+<a class="sourceLine" id="cb2-7" title="7">            unx_lookup_cred, <span class="co">// auth-&gt;au_ops-&gt;lookup_cred</span></a>
+<a class="sourceLine" id="cb2-8" title="8">            <span class="co">// 两个进程同时lookup_cred成功，都对ll_cred进行了赋值，</span></a>
+<a class="sourceLine" id="cb2-9" title="9">            <span class="co">// 先赋值的cred没执行put_rpccred()，造成了引用计数泄露</span></a>
+<a class="sourceLine" id="cb2-10" title="10">            ctx-&gt;ll_cred = cred</a></code></pre></div>
+<h1 id="构造复现"><span class="header-section-number">3</span> 构造复现</h1>
+<p>我们构造一下两个进程并发执行到<code>nfs_ctx_key_to_expire()</code>的情况，内核修改以下内容:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">---</span> a/fs/nfs/write.c</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="ex">+++</span> b/fs/nfs/write.c</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="ex">@@</span> -37,6 +37,7 @@</a>
+<a class="sourceLine" id="cb3-4" title="4"> <span class="co">#include &quot;pnfs.h&quot;</span></a>
+<a class="sourceLine" id="cb3-5" title="5"> </a>
+<a class="sourceLine" id="cb3-6" title="6"> <span class="co">#include &quot;nfstrace.h&quot;</span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="ex">+</span>#include <span class="op">&lt;</span>linux/delay.h<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb3-8" title="8"> </a>
+<a class="sourceLine" id="cb3-9" title="9"> <span class="co">#define NFSDBG_FACILITY                NFSDBG_PAGECACHE</span></a>
+<a class="sourceLine" id="cb3-10" title="10"> </a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="ex">@@</span> -1237,6 +1238,9 @@ bool nfs_ctx_key_to_expire(struct nfs_open_context *ctx, struct inode *inode)</a>
+<a class="sourceLine" id="cb3-12" title="12">        <span class="ex">struct</span> auth_cred acred = {</a>
+<a class="sourceLine" id="cb3-13" title="13">                <span class="ex">.cred</span> = ctx-<span class="op">&gt;</span>cred,</a>
+<a class="sourceLine" id="cb3-14" title="14">        };</a>
+<a class="sourceLine" id="cb3-15" title="15"><span class="ex">+</span>       printk(<span class="st">&quot;%s:%d, pid:%d, comm:%s, begin delay\n&quot;</span>, __func__, __LINE__, current-<span class="op">&gt;</span>pid, current-<span class="op">&gt;</span>comm);</a>
+<a class="sourceLine" id="cb3-16" title="16"><span class="ex">+</span>       mdelay(10 * 1000);</a>
+<a class="sourceLine" id="cb3-17" title="17"><span class="ex">+</span>       printk(<span class="st">&quot;%s:%d, pid:%d, comm:%s, end delay\n&quot;</span>, __func__, __LINE__, current-<span class="op">&gt;</span>pid, current-<span class="op">&gt;</span>comm);</a>
+<a class="sourceLine" id="cb3-18" title="18"> </a>
+<a class="sourceLine" id="cb3-19" title="19">        <span class="kw">if</span> <span class="kw">(</span><span class="ex">cred</span> <span class="kw">&amp;&amp;</span> !<span class="ex">cred-</span><span class="op">&gt;</span>cr_ops-<span class="op">&gt;</span>crmatch(<span class="kw">&amp;</span><span class="ex">acred</span>, cred, 0<span class="kw">)</span>) <span class="kw">{</span></a>
+<a class="sourceLine" id="cb3-20" title="20">                <span class="ex">put_rpccred</span>(cred);</a></code></pre></div>
+<p>用户态程序<code>test.c</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb4-1" title="1"><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="pp">#include </span><span class="im">&lt;string.h&gt;</span></a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="pp">#include </span><span class="im">&lt;errno.h&gt;</span></a>
+<a class="sourceLine" id="cb4-6" title="6"></a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="dt">int</span> main() {</a>
+<a class="sourceLine" id="cb4-8" title="8">    <span class="dt">const</span> <span class="dt">char</span> *file_path = <span class="st">&quot;/mnt/file&quot;</span>;</a>
+<a class="sourceLine" id="cb4-9" title="9">    <span class="dt">const</span> <span class="dt">char</span> *message = <span class="st">&quot;Hello, pwrite64!&quot;</span>;</a>
+<a class="sourceLine" id="cb4-10" title="10">    off_t offset = <span class="dv">10</span>;  <span class="co">// 从文件的第10个字节开始写</span></a>
+<a class="sourceLine" id="cb4-11" title="11"></a>
+<a class="sourceLine" id="cb4-12" title="12">    <span class="co">// 打开文件，如果文件不存在则创建</span></a>
+<a class="sourceLine" id="cb4-13" title="13">    <span class="dt">int</span> fd = open(file_path, O_WRONLY | O_CREAT | O_TRUNC, <span class="bn">0644</span>);</a>
+<a class="sourceLine" id="cb4-14" title="14">    <span class="cf">if</span> (fd == -<span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb4-15" title="15">        perror(<span class="st">&quot;open&quot;</span>);</a>
+<a class="sourceLine" id="cb4-16" title="16">        <span class="cf">return</span> <span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb4-17" title="17">    }</a>
+<a class="sourceLine" id="cb4-18" title="18"></a>
+<a class="sourceLine" id="cb4-19" title="19">    <span class="co">// 使用 pwrite 写数据</span></a>
+<a class="sourceLine" id="cb4-20" title="20">    <span class="dt">ssize_t</span> bytes_written = pwrite(fd, message, strlen(message), offset);</a>
+<a class="sourceLine" id="cb4-21" title="21">    <span class="cf">if</span> (bytes_written == -<span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb4-22" title="22">        perror(<span class="st">&quot;pwrite&quot;</span>);</a>
+<a class="sourceLine" id="cb4-23" title="23">        close(fd);</a>
+<a class="sourceLine" id="cb4-24" title="24">        <span class="cf">return</span> <span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb4-25" title="25">    }</a>
+<a class="sourceLine" id="cb4-26" title="26"></a>
+<a class="sourceLine" id="cb4-27" title="27">    printf(<span class="st">&quot;Wrote %zd bytes to %s at offset %ld</span><span class="sc">\n</span><span class="st">&quot;</span>, bytes_written, file_path, offset);</a>
+<a class="sourceLine" id="cb4-28" title="28"></a>
+<a class="sourceLine" id="cb4-29" title="29">    <span class="co">// 关闭文件</span></a>
+<a class="sourceLine" id="cb4-30" title="30">    close(fd);</a>
+<a class="sourceLine" id="cb4-31" title="31">    <span class="cf">return</span> <span class="dv">0</span>;</a>
+<a class="sourceLine" id="cb4-32" title="32">}</a></code></pre></div>
+<p>编译运行:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">gcc</span> -o test test.c</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="ex">./test</span> <span class="kw">&amp;</span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="fu">sleep</span> 1</a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="ex">./test</span></a></code></pre></div>
+<p>现在构造出了两个进程同时执行到<code>nfs_ctx_key_to_expire()</code>的情况，引用计数泄露的情况只要同时<code>lookup_cred()</code>成功，然后都执行<code>ctx-&gt;ll_cred = cred</code>就会发生。后续再尝试。</p>
+<p>至于空指针解引用的情况不好构造，因为涉及到乱序执行、内存屏障等，后面有时间再慢慢尝试构造。</p>
+<h1 id="rcu相关函数注释翻译"><span class="header-section-number">4</span> rcu相关函数注释翻译</h1>
+<p>趁此机会，顺便翻译一下rcu相关函数的注释，学习一下，请查看<a href="https://chenxiaosong.com/course/kernel/sync.html">《内核同步》</a>。</p>
+</body>
+</html>

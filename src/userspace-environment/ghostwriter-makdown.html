@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ghostwriter: 一款makdown编辑器</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">ghostwriter: 一款makdown编辑器</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#linux下源码安装"><span class="toc-section-number">1</span> Linux下源码安装</a></li>
+<li><a href="#预览界面显示缺陷"><span class="toc-section-number">2</span> 预览界面显示缺陷</a></li>
+</ul>
+</nav>
+<p>写文档，最爽的格式就是markdown。</p>
+<p>曾经尝试过几款自由开源的markdown编辑器，但都不够理想，不是功能不完善就是缺陷多。</p>
+<p>现在我是直接在<a href="https://chenxiaosong.com/">自己的个人网站</a>上查看最终的显示效果，具体可以看<a href="https://chenxiaosong.com/course/gnu-linux/blog-web.html">《如何拥有个人域名的网站和邮箱》</a>。</p>
+<p>尝试的其中一款编辑器就是<a href="https://ghostwriter.kde.org/">KDE的ghostwriter</a>，这个markdown编辑器功能挺完善，但缺陷也不少。</p>
+<p>2021年时我解决了一个<strong>严重的预览界面显示缺陷</strong><a href="https://github.com/KDE/ghostwriter/pull/618/commits">Chinese preview in HTML is complete now. Update README.md.</a>。</p>
+<p>如果各位朋友想自己修改或增加功能，可以使用<a href="https://github.com/KDE/ghostwriter">github源码</a>安装。</p>
+<h1 id="linux下源码安装"><span class="header-section-number">1</span> Linux下源码安装</h1>
+<p>ghostwriter是跨平台的，在Linux、macOS、Windows下都能运行，这里我只介绍Fedora（Linux）下的编译运行，其他平台请参考<a href="https://github.com/KDE/ghostwriter/blob/master/README.md">README.md</a>。</p>
+<p>先安装Fedora下编译所需的软件:</p>
+<pre class="shell"><code>sudo dnf install qt-devel qt5-qtbase-devel qt5-qtsvg-devel qt5-qtmultimedia-devel qt5-qtwebengine-devel hunspell-devel qt5-linguist -y</code></pre>
+<p>在<a href="https://github.com/KDE/ghostwriter">源码</a>目录下编译:</p>
+<pre class="shell"><code>qmake-qt5
+make
+# 安装命令可不执行
+# make install</code></pre>
+<p>运行软件:</p>
+<pre class="shell"><code>cd build/release/
+./ghostwriter</code></pre>
+<p>这个软件曾经用着感觉还行。</p>
+<h1 id="预览界面显示缺陷"><span class="header-section-number">2</span> 预览界面显示缺陷</h1>
+<p>2021年6月刚用ghostwriter时，一个很明显的预览界面显示缺陷摆在我面前: 预览界面中文显示不完整，刚开始想放弃这个软件，但又觉得其他功能挺完善的，最后还是决定自己解决缺陷。</p>
+<p>现在把这个缺陷介绍一下，也希望各位朋友能和我一起完善ghostwriter。</p>
+<p>导致这个缺陷的<a href="https://github.com/KDE/ghostwriter/commit/795de8ba2b3717e23543170c40f2dd2379530a33">commit</a>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb4-1" title="1"><span class="co">// src/cmarkgfmapi.cpp</span></a>
+<a class="sourceLine" id="cb4-2" title="2">-    cmark_parser_feed(parser, text.toLatin1().data(), text.length());</a>
+<a class="sourceLine" id="cb4-3" title="3">+    cmark_parser_feed(parser, text.toUtf8().data(), text.length());</a></code></pre></div>
+<p>定位到这个原因后，我修改成如下代码:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb5-1" title="1"><span class="co">// src/cmarkgfmapi.cpp</span></a>
+<a class="sourceLine" id="cb5-2" title="2">cmark_parser_feed(parser, text.toLatin1().data(), text.toLocal8Bit().length());</a></code></pre></div>
+<p>中文是Unicode编码，一个汉字占2个字节，而<code>QString.length()</code>一个汉字只当成一个字节，需要修改成<code>QString.toLocal8Bit().length()</code>。</p>
+<p>我的修改方案是<a href="https://github.com/KDE/ghostwriter/pull/618/commits">Chinese preview in HTML is complete now. Update README.md.</a>，lioneie是我曾经的签名。</p>
+<p>你没看错，就是这么容易解决，参与到自由软件就是这么简单，参与到开源软件就是这么简单。</p>
+</body>
+</html>

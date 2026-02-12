@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>OpenHarmony开发</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">OpenHarmony开发</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#环境"><span class="toc-section-number">1</span> 环境</a><ul>
+<li><a href="#docker环境搭建"><span class="toc-section-number">1.1</span> docker环境搭建</a></li>
+<li><a href="#获取代码"><span class="toc-section-number">1.2</span> 获取代码</a></li>
+<li><a href="#编译"><span class="toc-section-number">1.3</span> 编译</a></li>
+</ul></li>
+<li><a href="#运行和调试"><span class="toc-section-number">2</span> 运行和调试</a><ul>
+<li><a href="#烧写"><span class="toc-section-number">2.1</span> 烧写</a></li>
+<li><a href="#hdc工具"><span class="toc-section-number">2.2</span> hdc工具</a></li>
+<li><a href="#关闭selinux"><span class="toc-section-number">2.3</span> 关闭selinux</a></li>
+<li><a href="#日志"><span class="toc-section-number">2.4</span> 日志</a></li>
+<li><a href="#crash调试"><span class="toc-section-number">2.5</span> crash调试</a></li>
+<li><a href="#qemu运行调试环境"><span class="toc-section-number">2.6</span> qemu运行调试环境</a></li>
+</ul></li>
+<li><a href="#tdd"><span class="toc-section-number">3</span> tdd</a></li>
+<li><a href="#libfuse在qemu虚拟机中运行调试"><span class="toc-section-number">4</span> libfuse在qemu虚拟机中运行调试</a></li>
+<li><a href="#hmdfs在qemu虚拟机中调试"><span class="toc-section-number">5</span> hmdfs在qemu虚拟机中调试</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/harmony/harmony.html">点击跳转到鸿蒙课程所有目录</a>。</p>
+<p>这里记录一下曾经<a href="https://chenxiaosong.com/course/harmony/contribution.html">开发鸿蒙端云协同功能</a>的一些笔记。</p>
+<h1 id="环境"><span class="header-section-number">1</span> 环境</h1>
+<p>开发板使用<a href="http://www.hihope.org/pro/pro1.aspx?mtt=54">大禹系列｜HH-SCDAYU200开发套件（Quad-core Cortex-A55 up to 2.0GHz）</a>。</p>
+<h2 id="docker环境搭建"><span class="header-section-number">1.1</span> docker环境搭建</h2>
+<p>在宿主机环境上可能会遇到各种各样的问题，可以使用 docker 编译, 以ubuntu22.04为例，说明环境的搭建。</p>
+<p><a href="https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/quick-start/quickstart-pkg-install-tool.md"><code>hb</code>工具安装指导</a></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># 获取代码环境</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="ex">apt-get</span> update -y <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> install python3 python3-pip -y</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="ex">apt-get</span> install git git-lfs -y</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="fu">mkdir</span> -p ~/.local/bin/</a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="ex">curl</span> -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 <span class="op">&gt;</span> /home/sonvhi/chenxiaosong/sw/repo</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="fu">chmod</span> a+x ~/.local/bin/repo</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="ex">pip3</span> install -i https://repo.huaweicloud.com/repository/pypi/simple requests</a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="fu">ln</span> -s /usr/bin/python3 /usr/bin/python</a>
+<a class="sourceLine" id="cb1-9" title="9"></a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="co"># 编译环境</span></a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="ex">apt-get</span> update <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> install binutils git git-lfs gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip m4 bc gnutls-bin python3 python3-pip ruby libtinfo-dev libtinfo5 -y</a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="ex">apt</span> install file -y</a>
+<a class="sourceLine" id="cb1-13" title="13"><span class="ex">apt-get</span> install default-jdk -y <span class="co"># 如果报错: javac: command not found</span></a>
+<a class="sourceLine" id="cb1-14" title="14"><span class="ex">apt</span> install libelf-dev -y <span class="co"># error: Cannot resolve BTF IDs for CONFIG_DEBUG_INFO_BTF</span></a>
+<a class="sourceLine" id="cb1-15" title="15"><span class="ex">apt-get</span> install libssl-dev -y <span class="co"># scripts/extract-cert.c:21:10: fatal error: &#39;openssl/bio.h&#39; file not found</span></a>
+<a class="sourceLine" id="cb1-16" title="16"><span class="ex">apt</span> install liblz4-tool -y <span class="co"># /bin/sh: 1: lz4c: not found</span></a>
+<a class="sourceLine" id="cb1-17" title="17"><span class="ex">apt-get</span> install genext2fs -y <span class="co"># make-boot.sh: line 22: genext2fs: command not found</span></a>
+<a class="sourceLine" id="cb1-18" title="18"><span class="ex">apt-get</span> install cpio -y</a>
+<a class="sourceLine" id="cb1-19" title="19"></a>
+<a class="sourceLine" id="cb1-20" title="20"><span class="co"># 头文件找不到解决方法</span></a>
+<a class="sourceLine" id="cb1-21" title="21"><span class="ex">apt</span> install apt-file -y</a>
+<a class="sourceLine" id="cb1-22" title="22"><span class="ex">apt-file</span> search X11/Xcursor/Xcursor.h <span class="co"># libxcursor-dev: /usr/include/X11/Xcursor/Xcursor.h</span></a>
+<a class="sourceLine" id="cb1-23" title="23"><span class="ex">apt-file</span> search X11/extensions/Xrandr.h <span class="co"># libxrandr-dev: /usr/include/X11/extensions/Xrandr.h</span></a>
+<a class="sourceLine" id="cb1-24" title="24"><span class="ex">apt-file</span> search X11/extensions/Xinerama.h <span class="co"># libxinerama-dev: /usr/include/X11/extensions/Xinerama.h</span></a>
+<a class="sourceLine" id="cb1-25" title="25"><span class="ex">apt</span> install libxcursor-dev libxrandr-dev libxinerama-dev -y</a></code></pre></div>
+<h2 id="获取代码"><span class="header-section-number">1.2</span> 获取代码</h2>
+<p><a href="https://gitee.com/hihope_iot/docs/blob/master/HiHope_DAYU200/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E7%BC%96%E8%AF%91%E6%8C%87%E5%8D%97.md">HiHope_DAYU200 搭建开发环境</a>。</p>
+<p>还可以参考openharmony<a href="https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/quick-start/quickstart-pkg-sourcecode.md">获取源码</a></p>
+<p>执行以下命令获取代码:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">repo</span> init -u https://gitee.com/openharmony/manifest.git -b master --no-repo-verify <span class="kw">&amp;&amp;</span> <span class="ex">repo</span> sync -c <span class="kw">&amp;&amp;</span> <span class="ex">repo</span> forall -c <span class="st">&#39;git lfs pull&#39;</span> <span class="kw">&amp;&amp;</span> <span class="fu">bash</span> build/prebuilts_download.sh</a></code></pre></div>
+<h2 id="编译"><span class="header-section-number">1.3</span> 编译</h2>
+<p>编译命令如下:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="co"># 镜像输出在 out/rk3568/packages/phone/images 目录下</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="co"># 32位</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="ex">./build.sh</span> --product-name rk3568 --ccache</a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="ex">./build.sh</span> --product-name rk3568 --ccache --fast-rebuild <span class="co"># --fast-rebuild 增量编译时跳过一些已经完成的步骤</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="ex">./build.sh</span> --product-name rk3568 --ccache --build-target dfs_service --fast-rebuild</a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="co"># 64位</span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="ex">./build.sh</span> --product-name rk3568 --ccache --target-cpu arm64</a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="ex">./build.sh</span> --product-name rk3568 --ccache --target-cpu arm64 --fast-rebuild <span class="co"># 增量编译时跳过一些已经完成的步骤</span></a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="ex">./build.sh</span> --product-name rk3568 --ccache --target-cpu arm64 --build-target dfs_service --fast-rebuild <span class="co"># --build-target dfs_service 只编译某个service</span></a></code></pre></div>
+<h1 id="运行和调试"><span class="header-section-number">2</span> 运行和调试</h1>
+<h2 id="烧写"><span class="header-section-number">2.1</span> 烧写</h2>
+<p>linux上压缩image文件:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">zip</span> -jr images.zip out/rk3568/packages/phone/images/</a></code></pre></div>
+<p><a href="https://gitee.com/hihope_iot/docs/tree/master/HiHope_DAYU200/%E7%83%A7%E5%86%99%E5%B7%A5%E5%85%B7%E5%8F%8A%E6%8C%87%E5%8D%97">烧写工具及指南</a>。</p>
+<p>特别需要注意的是: 软件路径中不要含有中文，尤其是对英文版的windows系统。</p>
+<p>windows安装<code>DriverAssitant_v5.1.1\DriverInstall.exe</code>后，打开<code>RKDevTool.exe</code>， 配置以下路径:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">0x00000000</span> Loader MiniLoaderAll.bin</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="ex">0x00000000</span> Parameter parameter.txt</a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="ex">0x00002000</span> Uboot uboot.img</a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="ex">0x00006000</span> resource resource.img</a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="ex">0x00004000</span> misc 可不选</a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="ex">0x00009000</span> Boot_linux boot_linux.img</a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="ex">0x00039000</span> ramdisk ramdisk.img</a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="ex">0x0003B000</span> System system.img</a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="ex">0x0043B000</span> Vendor vendor.img</a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="ex">0x0063B000</span> sys-prod 可不选</a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="ex">0x00654000</span> chip-prod 可不选</a>
+<a class="sourceLine" id="cb5-12" title="12"><span class="ex">0x0066D000</span> updater updater.img</a>
+<a class="sourceLine" id="cb5-13" title="13"><span class="ex">0x00677000</span> Userdata userdata.img</a></code></pre></div>
+<p>配置重新导出为文件<code>config.cfg</code>。</p>
+<p>winodws usb线连接rk3568板子上的<code>usb3.0 OTG</code>，在rk3568板子上按<code>reset</code>键，再长按<code>vol+/recovery</code>键，进入loader模式，点击<code>RKDevTool</code>工具上的<code>执行</code>按钮。可以只烧录<code>System</code>和<code>Userdata</code>（包含数据库）。</p>
+<p>复制so文件的脚本<code>scp_dfs_service_so.bat</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="fu">scp</span> -r -P 55555 sonvhi@chenxiaosong.com:/home/sonvhi/chenxiaosong/code/openharmony/openharmony/out/rk3568/filemanagement/dfs_service/ .</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="ex">@pause</span></a></code></pre></div>
+<p>传输so文件到板子上的脚本<code>push_dfs_service_so.bat</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="ex">hdc</span> shell mount -o rw,remount /</a>
+<a class="sourceLine" id="cb7-2" title="2"></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="ex">hdc</span> file send .\dfs_service\libcloud_adapter.z.so                           /system/lib/</a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="ex">hdc</span> file send .\dfs_service\libcloud_daemon_kit_inner.z.so                  /system/lib/</a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="ex">hdc</span> file send .\dfs_service\libcloudfiledaemon.z.so                         /system/lib/</a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="ex">hdc</span> file send .\dfs_service\libcloudsync_asset_kit_inner.z.so               /system/lib/platformsdk/</a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="ex">hdc</span> file send .\dfs_service\libcloudsync_kit_inner.z.so                     /system/lib/</a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="ex">hdc</span> file send .\dfs_service\libcloudsyncmanager.z.so                        /system/lib/module/file/</a>
+<a class="sourceLine" id="cb7-9" title="9"><span class="ex">hdc</span> file send .\dfs_service\libcloudsync_sa.z.so                            /system/lib/</a>
+<a class="sourceLine" id="cb7-10" title="10"><span class="ex">hdc</span> file send .\dfs_service\libcloudsync.z.so                               /system/lib/module/file/</a>
+<a class="sourceLine" id="cb7-11" title="11"><span class="ex">hdc</span> file send .\dfs_service\libdistributed_file_daemon_kit_inner.z.so       /system/lib/</a>
+<a class="sourceLine" id="cb7-12" title="12"><span class="ex">hdc</span> file send .\dfs_service\libdistributedfiledaemon.z.so                   /system/lib/</a>
+<a class="sourceLine" id="cb7-13" title="13"><span class="ex">hdc</span> file send .\dfs_service\libdistributedfiledentry.z.so                   /system/lib/</a>
+<a class="sourceLine" id="cb7-14" title="14"><span class="ex">hdc</span> file send .\dfs_service\libdistributedfileutils.z.so                    /system/lib/</a>
+<a class="sourceLine" id="cb7-15" title="15"></a>
+<a class="sourceLine" id="cb7-16" title="16"><span class="ex">hdc</span> shell sync</a>
+<a class="sourceLine" id="cb7-17" title="17"><span class="ex">hdc</span> shell reboot</a>
+<a class="sourceLine" id="cb7-18" title="18"><span class="ex">@pause</span></a></code></pre></div>
+<h2 id="hdc工具"><span class="header-section-number">2.2</span> hdc工具</h2>
+<p><a href="https://docs.openharmony.cn/pages/v3.2/zh-cn/device-dev/subsystems/subsys-toolchain-hdc-guide.md/">hdc使用指导</a>, <a href="https://docs.openharmony.cn/pages/v3.1/zh-cn/device-dev/subsystems/subsys-toolchain-hdc-guide.md/">hdc_std使用指导</a>。</p>
+<p><code>hdc</code>工具从<a href="http://ci.openharmony.cn/workbench/cicd/dailybuild/dailylist">每日构建</a>中搜索<code>ohos-sdk</code>。</p>
+<p><code>hdc shell</code> usb线连接rk3568板子上的<code>usb3.0 OTG</code>，<strong>注意不是<code>DEBUG</code>串口</strong>。</p>
+<p>如果始终无法连接，<code>win+r</code>，输入<code>regedit</code>回车，找到注册表 <code>计算机\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{88bae032-5a81-49f0-bc3d-a4ff138216d6}</code>，确认是否有<code>Upperfilters</code>和<code>Lowerfilters</code>，删除后重新插拔。</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># 从开发板上获取数据库文件</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">hdc</span> file recv /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db .</a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="ex">hdc</span> file recv /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db-wal .</a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="ex">hdc</span> file recv /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/media_library.db-shm .</a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="co"># 整个文件夹</span></a>
+<a class="sourceLine" id="cb8-6" title="6"><span class="ex">hdc</span> file recv /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb/. .</a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="co"># 向开发板发送数据库文件</span></a>
+<a class="sourceLine" id="cb8-8" title="8"><span class="ex">hdc</span> file send .\media_library.db /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb</a>
+<a class="sourceLine" id="cb8-9" title="9"><span class="ex">hdc</span> file send .\media_library.db-wal /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb</a>
+<a class="sourceLine" id="cb8-10" title="10"><span class="ex">hdc</span> file send .\media_library.db-shm /data/app/el2/100/database/com.ohos.medialibrary.medialibrarydata/rdb</a></code></pre></div>
+<h2 id="关闭selinux"><span class="header-section-number">2.3</span> 关闭selinux</h2>
+<p>有些功能可能会被selinux阻止，可以关闭selinux测试:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="fu">mount</span> -o rw,remount / <span class="co"># 重新可读可写挂载</span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="bu">echo</span> <span class="st">&quot;SELINUX=permissive&quot;</span> <span class="op">&gt;</span> /etc/selinux/config <span class="co"># 重启后生效，默认是 SELINUX=enforcing</span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="ex">setenforce</span> 0</a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="fu">sync</span></a></code></pre></div>
+<h2 id="日志"><span class="header-section-number">2.4</span> 日志</h2>
+<p><code>hilog</code>日志设置:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># -w 开启日志落盘任务，start表示开始，stop表示停止</span></a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="co"># -f 设置日志文件名</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="co"># -l 单个日志文件大小</span></a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="ex">hilog</span> -w start -f cxsTest -l 1M -n 5 -m zlib -j 11</a>
+<a class="sourceLine" id="cb10-5" title="5"></a>
+<a class="sourceLine" id="cb10-6" title="6"><span class="ex">hilog</span> -Q domainoff</a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="ex">hilog</span> -p off <span class="co"># -p &lt;on/off&gt;, --privacy &lt;on/off&gt;</span></a>
+<a class="sourceLine" id="cb10-8" title="8"><span class="ex">hilog</span> -Q pidoff</a>
+<a class="sourceLine" id="cb10-9" title="9"><span class="ex">hilog</span> -Q domainoff</a>
+<a class="sourceLine" id="cb10-10" title="10"><span class="ex">hilog</span> -r</a>
+<a class="sourceLine" id="cb10-11" title="11"><span class="ex">hilog</span> -G 20M</a>
+<a class="sourceLine" id="cb10-12" title="12"><span class="ex">hilog</span> --baselevel=DEBUG</a>
+<a class="sourceLine" id="cb10-13" title="13"><span class="ex">hilog</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&quot;CloudFileDaemon\|CLOUDSYNC_SA\|StorageDaemon&quot;</span> <span class="co"># 端云协同的日志</span></a></code></pre></div>
+<h2 id="crash调试"><span class="header-section-number">2.5</span> crash调试</h2>
+<p>当程序crash时，可以把相关日志文件导出来分析:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="ex">hdc</span> file recv /data/log/faultlog/faultlogger/. .</a></code></pre></div>
+<p>日志文件如下:</p>
+<pre><code>Generated by HiviewDFX@OpenHarmony
+================================================================
+Device info:OpenHarmony 3.2
+Build info:OpenHarmony 4.0.7.1
+Module name:cloudfiledaemon
+Pid:516
+Uid:1009
+Reason:Signal:SIGSEGV(SEGV_MAPERR)@     (nil) 
+Thread name:cloudfiledaemon
+#00 pc 0000d2b8 /system/lib/libcloudfiledaemon.z.so(3d07c6d63b58da9d13918497b907cd8a)
+#01 pc 000c7718 /system/lib/ld-musl-arm.so.1
+#02 pc 00066078 /system/lib/ld-musl-arm.so.1</code></pre>
+<p>找到 <code>libcloudfiledaemon</code> 相关的库文件:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="fu">find</span> out -name <span class="st">&quot;libcloudfiledaemon*&quot;</span></a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="co"># 注意要选unstripped: out/rk3568/lib.unstripped/filemanagement/dfs_service/libcloudfiledaemon.z.so</span></a></code></pre></div>
+<p>找出 <code>0000d2b8</code> 对应的代码行:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="co"># 找到foundation/filemanagement/dfs_service/services/cloudfiledaemon/src/fuse_manager/fuse_manager.cpp:353</span></a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="ex">prebuilts/gcc/linux-x86/aarch64/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-addr2line</span> -e out/rk3568/lib.unstripped/filemanagement/dfs_service/libcloudfiledaemon.z.so -a 0000d2b8 <span class="co"># 32位用aarch64-linux-gnu-addr2line</span></a>
+<a class="sourceLine" id="cb14-3" title="3"></a>
+<a class="sourceLine" id="cb14-4" title="4"><span class="ex">prebuilts/clang/ohos/linux-x86_64/15.0.4/llvm/bin/llvm-addr2line</span> -e out/rk3568/lib.unstripped/filemanagement/dfs_service/libcloudfiledaemon.z.so -a xxxxxxxx <span class="co"># 64位要用llvm-addr2line</span></a></code></pre></div>
+<h2 id="qemu运行调试环境"><span class="header-section-number">2.6</span> qemu运行调试环境</h2>
+<p><a href="https://gitee.com/openharmony/device_qemu#https://gitee.com/openharmony/device_qemu/blob/HEAD/arm_mps3_an547/README_zh.md">device_qemu</a></p>
+<p><a href="https://gitee.com/openharmony/device_qemu/blob/HEAD/arm_virt/linux/README_zh.md">QEMU教程 for arm - linux</a></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="co"># 编译qemu-arm-linux-headless失败的issue，还未解决: https://gitee.com/openharmony/device_qemu/issues/I6AH7L?from=project-issue</span></a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="ex">docker</span> run --rm -v <span class="st">&quot;</span><span class="va">$PWD</span><span class="st">&quot;</span>:/usr/src/myapp -w /usr/src/myapp ubuntu-openharmony:22.04 ./build.sh --product-name qemu-arm-linux-headless --ccache --jobs 64</a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="ex">docker</span> run --rm -v <span class="st">&quot;</span><span class="va">$PWD</span><span class="st">&quot;</span>:/usr/src/myapp -w /usr/src/myapp ubuntu-openharmony:22.04 ./build.sh --product-name qemu-arm-linux-min --ccache --jobs 64</a></code></pre></div>
+<h1 id="tdd"><span class="header-section-number">3</span> tdd</h1>
+<p>合入补丁<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/harmony/src/0001-fuse-read-debug-dentry_meta_file_test-tdd.patch">0001-fuse-read-debug-dentry_meta_file_test-tdd.patch</a>后，编译和运行tdd:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="co"># 含调试信息的编译结果: out/rk3568/exe.unstripped/tests/unittest/filemanagement/dfs_service/dentry_meta_file_test</span></a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="co"># 不含调试信息的编译结果: out/rk3568/tests/unittest/filemanagement/dfs_service/dentry_meta_file_test</span></a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="ex">./build.sh</span> --product-name rk3568 --ccache --build-target dentry_meta_file_test --fast-rebuild <span class="co"># 32位</span></a>
+<a class="sourceLine" id="cb16-4" title="4"><span class="ex">./build.sh</span> --product-name rk3568 --ccache --target-cpu arm64 --build-target dentry_meta_file_test --fast-rebuild <span class="co"># 64位</span></a>
+<a class="sourceLine" id="cb16-5" title="5"></a>
+<a class="sourceLine" id="cb16-6" title="6"><span class="co"># 从windows复制到 rk3568 板子上运行</span></a>
+<a class="sourceLine" id="cb16-7" title="7"><span class="ex">hdc</span> shell rm /data/dentry_meta_file_test -rf</a>
+<a class="sourceLine" id="cb16-8" title="8"><span class="ex">hdc</span> file send .\dentry_meta_file_test /data</a>
+<a class="sourceLine" id="cb16-9" title="9"><span class="ex">hdc</span> shell</a>
+<a class="sourceLine" id="cb16-10" title="10"><span class="fu">chmod</span> a+x /data/dentry_meta_file_test</a>
+<a class="sourceLine" id="cb16-11" title="11"><span class="bu">cd</span> /data/</a>
+<a class="sourceLine" id="cb16-12" title="12"><span class="ex">/data/dentry_meta_file_test</span> --gtest_list_tests</a>
+<a class="sourceLine" id="cb16-13" title="13"><span class="fu">rm</span> -rf /data/service/el2/100/hmdfs/cache/account_cache/dentry_cache/*</a>
+<a class="sourceLine" id="cb16-14" title="14"><span class="ex">/data/dentry_meta_file_test</span> --gtest_filter=DentryMetaFileTest.MetaFileCreate</a>
+<a class="sourceLine" id="cb16-15" title="15"></a>
+<a class="sourceLine" id="cb16-16" title="16"><span class="co"># 改变dentryfile目录权限</span></a>
+<a class="sourceLine" id="cb16-17" title="17"><span class="fu">chmod</span> -R 777 /data/service/el2/100/hmdfs/cache/account_cache/dentry_cache/</a>
+<a class="sourceLine" id="cb16-18" title="18"><span class="fu">ls</span> -lh /data/service/el2/100/hmdfs/cache/account_cache/dentry_cache/cloud/ <span class="co"># 检查</span></a>
+<a class="sourceLine" id="cb16-19" title="19"></a>
+<a class="sourceLine" id="cb16-20" title="20"><span class="co"># device_view目录</span></a>
+<a class="sourceLine" id="cb16-21" title="21"><span class="fu">ls</span> -lh /mnt/hmdfs/100/account/device_view/cloud/</a>
+<a class="sourceLine" id="cb16-22" title="22"><span class="fu">cat</span> /mnt/hmdfs/100/account/device_view/cloud/dir1/dir2/file4</a>
+<a class="sourceLine" id="cb16-23" title="23"></a>
+<a class="sourceLine" id="cb16-24" title="24"><span class="co"># cloud_merge_view目录</span></a>
+<a class="sourceLine" id="cb16-25" title="25"><span class="fu">ls</span> -lh /mnt/hmdfs/100/account/cloud_merge_view/</a>
+<a class="sourceLine" id="cb16-26" title="26"><span class="fu">cat</span> /mnt/hmdfs/100/account/cloud_merge_view/dir1/dir2/file4</a></code></pre></div>
+<p>storage_daemon 单元测试:</p>
+<pre class="shell"><code>./build.sh --product-name rk3568 --cacch --target-cpu arm64 --build-target storage_daemon_unit_test --build-target storage_manager_unit_test</code></pre>
+<h1 id="libfuse在qemu虚拟机中运行调试"><span class="header-section-number">4</span> libfuse在qemu虚拟机中运行调试</h1>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1"><span class="co"># 安装依赖软件</span></a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="ex">apt</span> install meson -y</a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="ex">apt</span> install cmake -y</a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="ex">apt-get</span> install pkg-config -y</a>
+<a class="sourceLine" id="cb18-5" title="5"><span class="ex">apt</span> install udev -y</a>
+<a class="sourceLine" id="cb18-6" title="6"></a>
+<a class="sourceLine" id="cb18-7" title="7"><span class="co"># 编译安装</span></a>
+<a class="sourceLine" id="cb18-8" title="8"><span class="fu">git</span> clone https://github.com/libfuse/libfuse.git</a>
+<a class="sourceLine" id="cb18-9" title="9"><span class="bu">cd</span> libfuse</a>
+<a class="sourceLine" id="cb18-10" title="10"><span class="fu">mkdir</span> build<span class="kw">;</span> <span class="bu">cd</span> build</a>
+<a class="sourceLine" id="cb18-11" title="11"><span class="ex">meson</span> setup ..</a>
+<a class="sourceLine" id="cb18-12" title="12"><span class="ex">meson</span> configure -D buildtype=debug</a>
+<a class="sourceLine" id="cb18-13" title="13"><span class="ex">ninja</span></a>
+<a class="sourceLine" id="cb18-14" title="14"><span class="ex">ninja</span> install <span class="co"># 运行 example 可以不安装</span></a>
+<a class="sourceLine" id="cb18-15" title="15"></a>
+<a class="sourceLine" id="cb18-16" title="16"><span class="fu">mkdir</span> -p /mnt/cloud_dir</a>
+<a class="sourceLine" id="cb18-17" title="17"><span class="co"># gdb调试: ./example/passthrough_ll -o source=/tmp /mnt/cloud_dir -d</span></a>
+<a class="sourceLine" id="cb18-18" title="18"><span class="fu">gdb</span> ./example/passthrough_ll</a>
+<a class="sourceLine" id="cb18-19" title="19"><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="kw">set</span> <span class="ex">args</span> -o source=/tmp /mnt/cloud_dir -d <span class="co"># 设置运行选项</span></a>
+<a class="sourceLine" id="cb18-20" title="20"><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">b</span> lo_lookup</a>
+<a class="sourceLine" id="cb18-21" title="21"><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">r</span></a></code></pre></div>
+<h1 id="hmdfs在qemu虚拟机中调试"><span class="header-section-number">5</span> hmdfs在qemu虚拟机中调试</h1>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10">kernel_linux_5.10</a>在虚拟机中运行:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1"><span class="fu">mkdir</span> -p /mnt/dst</a>
+<a class="sourceLine" id="cb19-2" title="2"><span class="fu">mkdir</span> -p /mnt/cache_dir/dentry_cache/cloud</a>
+<a class="sourceLine" id="cb19-3" title="3"><span class="fu">mkdir</span> -p /mnt/cloud_dir</a>
+<a class="sourceLine" id="cb19-4" title="4"><span class="fu">mkdir</span> -p /mnt/src</a>
+<a class="sourceLine" id="cb19-5" title="5"><span class="bu">echo</span> 123456789 <span class="op">&gt;</span> /mnt/cloud_dir/file1</a>
+<a class="sourceLine" id="cb19-6" title="6"><span class="co"># 设置xattr，dentryfile文件由tdd生成，注意复制到其他系统，xattr要重新设置</span></a>
+<a class="sourceLine" id="cb19-7" title="7"><span class="ex">setfattr</span> -n user.hmdfs_cache -v <span class="st">&quot;/&quot;</span> /mnt/cache_dir/dentry_cache/cloud/cloud_000000000000002f</a>
+<a class="sourceLine" id="cb19-8" title="8"><span class="ex">setfattr</span> -n user.hmdfs_cache -v <span class="st">&quot;/dir1&quot;</span> /mnt/cache_dir/dentry_cache/cloud/cloud_0000000002c55df3</a>
+<a class="sourceLine" id="cb19-9" title="9"><span class="ex">setfattr</span> -n user.hmdfs_cache -v <span class="st">&quot;/dir1/dir2&quot;</span> /mnt/cache_dir/dentry_cache/cloud/cloud_0004ba7c447bbfe1</a>
+<a class="sourceLine" id="cb19-10" title="10"><span class="co"># 挂载</span></a>
+<a class="sourceLine" id="cb19-11" title="11"><span class="fu">mount</span> -t hmdfs -o merge,local_dst=/mnt/dst,cache_dir=/mnt/cache_dir,cloud_dir=/mnt/cloud_dir /mnt/src /mnt/dst</a>
+<a class="sourceLine" id="cb19-12" title="12"><span class="co"># 输出云端文件内容</span></a>
+<a class="sourceLine" id="cb19-13" title="13"><span class="fu">ls</span> /mnt/dst/device_view/cloud/</a>
+<a class="sourceLine" id="cb19-14" title="14"><span class="fu">cat</span> /mnt/dst/device_view/cloud/file1</a></code></pre></div>
+</body>
+</html>

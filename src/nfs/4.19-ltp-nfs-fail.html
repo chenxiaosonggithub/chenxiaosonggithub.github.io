@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>4.19 ltp nfs测试失败问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">4.19 ltp nfs测试失败问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#定位"><span class="toc-section-number">2</span> 定位</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">3</span> 代码分析</a></li>
+</ul>
+</nav>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p><a href="https://distro-images.kylinos.cn:8802/web_pungi/download/share/vYTMm38Pkaq0KRGzg9pBsWf2c16FUwJL/">Kylin-Server-V10-SP3-General-Release-2303-X86_64.iso</a>执行<code>systemctl start nfs-server; cd /opt/ltp/testcases/bin; PATH=$PATH:$PWD ./nfs01.sh -v 4 -t tcp</code>成功:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">nfs01</span> 1 TINFO: initialize <span class="st">&#39;lhost&#39;</span> <span class="st">&#39;ltp_ns_veth2&#39;</span> interface</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="ex">nfs01</span> 1 TINFO: add local addr 10.0.0.2/24</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="ex">nfs01</span> 1 TINFO: add local addr fd00:1:1:1::2/64</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="ex">nfs01</span> 1 TINFO: initialize <span class="st">&#39;rhost&#39;</span> <span class="st">&#39;ltp_ns_veth1&#39;</span> interface</a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="ex">nfs01</span> 1 TINFO: add remote addr 10.0.0.1/24</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="ex">nfs01</span> 1 TINFO: add remote addr fd00:1:1:1::1/64</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="ex">nfs01</span> 1 TINFO: Network config (local -- remote)<span class="bu">:</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="ex">nfs01</span> 1 TINFO: ltp_ns_veth2 -- ltp_ns_veth1</a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="ex">nfs01</span> 1 TINFO: 10.0.0.2/24 -- 10.0.0.1/24</a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="ex">nfs01</span> 1 TINFO: fd00:1:1:1::2/64 -- fd00:1:1:1::1/64</a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="ex">nfs01</span> 1 TINFO: timeout per run is 0h 5m 0s</a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="ex">nfs01</span> 1 TINFO: mount.nfs: (linux nfs-utils 2.5.1)</a>
+<a class="sourceLine" id="cb1-13" title="13"><span class="ex">nfs01</span> 1 TINFO: setup NFSv4, socket type tcp</a>
+<a class="sourceLine" id="cb1-14" title="14"><span class="ex">nfs01</span> 1 TINFO: Mounting NFS: mount -v -t nfs -o proto=tcp,vers=4 10.0.0.2:/tmp/LTP_nfs01.T8ifnS128N/4/tcp /tmp/LTP_nfs01.T8ifnS128N/4/0</a>
+<a class="sourceLine" id="cb1-15" title="15"><span class="ex">mount.nfs</span>: mount(2)<span class="bu">:</span> No such file or directory</a>
+<a class="sourceLine" id="cb1-16" title="16"><span class="ex">mount.nfs</span>: mounting 10.0.0.2:/tmp/LTP_nfs01.T8ifnS128N/4/tcp failed, reason given by server: No such file or directory</a>
+<a class="sourceLine" id="cb1-17" title="17"><span class="ex">mount.nfs</span>: timeout set for Mon Apr 22 17:00:23 2024</a>
+<a class="sourceLine" id="cb1-18" title="18"><span class="ex">mount.nfs</span>: trying text-based options <span class="st">&#39;proto=tcp,vers=4.2,addr=10.0.0.2,clientaddr=10.0.0.1&#39;</span></a>
+<a class="sourceLine" id="cb1-19" title="19"><span class="ex">nfs01</span> 1 TBROK: mount command failed</a>
+<a class="sourceLine" id="cb1-20" title="20"><span class="ex">nfs01</span> 1 TINFO: Cleaning up testcase</a>
+<a class="sourceLine" id="cb1-21" title="21"></a>
+<a class="sourceLine" id="cb1-22" title="22"><span class="ex">Summary</span>:</a>
+<a class="sourceLine" id="cb1-23" title="23"><span class="ex">passed</span>   0</a>
+<a class="sourceLine" id="cb1-24" title="24"><span class="ex">failed</span>   0</a>
+<a class="sourceLine" id="cb1-25" title="25"><span class="ex">broken</span>   1</a>
+<a class="sourceLine" id="cb1-26" title="26"><span class="ex">skipped</span>  0</a>
+<a class="sourceLine" id="cb1-27" title="27"><span class="ex">warnings</span> 0</a></code></pre></div>
+<p>配置文件<code>/etc/exports</code>修改成如下内容:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">/tmp/</span> *(rw,no_root_squash,fsid=0)</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="ex">/tmp/s_test/</span> *(rw,no_root_squash,fsid=1)</a></code></pre></div>
+<p>但在debian bullseye上测试成功。</p>
+<p>在<a href="https://distro-images.kylinos.cn:8802/web_pungi/download/share/vYTMm38Pkaq0KRGzg9pBsWf2c16FUwJL/">Kylin-Server-V10-SP3-General-Release-2303-X86_64.iso</a>上，重启服务<code>systemctl restart nfs-server</code>，手动挂载<code>mount -v -t nfs -o proto=tcp,vers=4 10.0.0.2:/s_test /mnt</code>，挂载成功，说明nfs功能正常。</p>
+<h1 id="定位"><span class="header-section-number">2</span> 定位</h1>
+<p>单步执行测试用例:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">systemctl</span> restart nfs-server</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="fu">mkdir</span> /tmp/s_test -p</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="ex">exportfs</span> -u *:/tmp/s_test</a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches <span class="co"># 也可以不清缓存</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="ex">exportfs</span> -i -o fsid=148252,no_root_squash,rw *:/tmp/s_test</a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="fu">mount</span> -v -t nfs -o proto=tcp,vers=4 localhost:/tmp/s_test /mnt</a></code></pre></div>
+<p>同时满足以下几个条件挂载失败:</p>
+<ul>
+<li><a href="https://distro-images.kylinos.cn:8802/web_pungi/download/share/vYTMm38Pkaq0KRGzg9pBsWf2c16FUwJL/">Kylin-Server-V10-SP3-General-Release-2303-X86_64.iso</a>发行版的server</li>
+<li><a href="https://distro-images.kylinos.cn:8802/web_pungi/download/share/vYTMm38Pkaq0KRGzg9pBsWf2c16FUwJL/">Kylin-Server-V10-SP3-General-Release-2303-X86_64.iso</a>发行版的client</li>
+<li>4.19内核，包括社区4.19 stable</li>
+</ul>
+<p>以下几种组合，都能挂载成功:</p>
+<ul>
+<li>麒麟server, 主线内核</li>
+<li>debian bullseye，4.19内核</li>
+<li>4.19内核，server和client有一个是debian bullseye</li>
+</ul>
+<h1 id="代码分析"><span class="header-section-number">3</span> 代码分析</h1>
+<p><code>tcpdump</code>抓包看到<code>lookup</code>请求nfs server返回错误<code>NFS4ERR_NOENT</code>。</p>
+<p>麒麟系统挂载报错，server返回错误的流程:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb4-1" title="1">kthread</a>
+<a class="sourceLine" id="cb4-2" title="2">  nfsd</a>
+<a class="sourceLine" id="cb4-3" title="3">    svc_process</a>
+<a class="sourceLine" id="cb4-4" title="4">      svc_process_common</a>
+<a class="sourceLine" id="cb4-5" title="5">        nfsd_dispatch</a>
+<a class="sourceLine" id="cb4-6" title="6">          nfsd<span class="dv">4</span><span class="er">_proc_compound</span></a>
+<a class="sourceLine" id="cb4-7" title="7">            nfsd<span class="dv">4</span><span class="er">_lookup</span></a>
+<a class="sourceLine" id="cb4-8" title="8">              nfsd_lookup</a>
+<a class="sourceLine" id="cb4-9" title="9">                err = nfsd_lookup_dentry = -NFS<span class="dv">4</span><span class="er">ERR_NOENT</span></a>
+<a class="sourceLine" id="cb4-10" title="10">                  host_err = nfsd_cross_mnt = -<span class="dv">2</span></a>
+<a class="sourceLine" id="cb4-11" title="11">                    exp2 = rqst_exp_get_by_name = -<span class="dv">2</span></a>
+<a class="sourceLine" id="cb4-12" title="12">                      <span class="cf">if</span> (rqstp-&gt;rq_client == NULL) <span class="co">// 条件不满足</span></a>
+<a class="sourceLine" id="cb4-13" title="13">                      exp_get_by_name</a>
+<a class="sourceLine" id="cb4-14" title="14">                        err = cache_check = -<span class="dv">2</span></a>
+<a class="sourceLine" id="cb4-15" title="15">                          rv = cache_is_valid = -<span class="dv">2</span></a>
+<a class="sourceLine" id="cb4-16" title="16">                            <span class="cf">if</span> (test_bit(CACHE_NEGATIVE, &amp;h-&gt;flags)) <span class="co">// 条件成立</span></a>
+<a class="sourceLine" id="cb4-17" title="17">                            <span class="cf">return</span> -ENOENT</a></code></pre></div>
+<p>麒麟系统server:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb5-1" title="1"><span class="co">// (gdb) p $lx_current().comm exportfs</span></a>
+<a class="sourceLine" id="cb5-2" title="2">write</a>
+<a class="sourceLine" id="cb5-3" title="3">  ksys_write(fd=&lt;optimized out&gt;, buf=<span class="st">&quot;-test-client- /tmp/s_test  3 9248 65534 65534 0</span><span class="sc">\n</span><span class="st">&quot;</span>, count=<span class="dv">48</span>)</a>
+<a class="sourceLine" id="cb5-4" title="4">    vfs_write</a>
+<a class="sourceLine" id="cb5-5" title="5">      __vfs_write</a>
+<a class="sourceLine" id="cb5-6" title="6">        proc_reg_write</a>
+<a class="sourceLine" id="cb5-7" title="7">          cache_write_procfs</a>
+<a class="sourceLine" id="cb5-8" title="8">            cache_write</a>
+<a class="sourceLine" id="cb5-9" title="9">              cache_downcall</a>
+<a class="sourceLine" id="cb5-10" title="10">                cache_do_downcall</a>
+<a class="sourceLine" id="cb5-11" title="11">                  svc_export_parse</a>
+<a class="sourceLine" id="cb5-12" title="12">                    <span class="cf">if</span> (err == -ENOENT) <span class="co">// 条件不满足</span></a>
+<a class="sourceLine" id="cb5-13" title="13"></a>
+<a class="sourceLine" id="cb5-14" title="14"><span class="co">// (gdb) p $lx_current().comm rpc.mountd</span></a>
+<a class="sourceLine" id="cb5-15" title="15">write</a>
+<a class="sourceLine" id="cb5-16" title="16">  ksys_write (fd=&lt;optimized out&gt;, buf=<span class="bn">0x7ffe06cef970</span> <span class="st">&quot;* / 1715158097 74753 65534 65534 0 secinfo 4 390003 74753 390004 74753 390005 74753 1 74753 uuid </span><span class="sc">\\</span><span class="st">x35a888ad211b41ad9103996db1e3dd2c </span><span class="sc">\n</span><span class="st">&quot;</span>, count=<span class="dv">133</span>)</a>
+<a class="sourceLine" id="cb5-17" title="17">    vfs_write</a>
+<a class="sourceLine" id="cb5-18" title="18">      __vfs_write</a>
+<a class="sourceLine" id="cb5-19" title="19">        proc_reg_write</a>
+<a class="sourceLine" id="cb5-20" title="20">          cache_write_procfs</a>
+<a class="sourceLine" id="cb5-21" title="21">            cache_write</a>
+<a class="sourceLine" id="cb5-22" title="22">              cache_downcall</a>
+<a class="sourceLine" id="cb5-23" title="23">                cache_do_downcall</a>
+<a class="sourceLine" id="cb5-24" title="24">                  svc_export_parse</a>
+<a class="sourceLine" id="cb5-25" title="25">                    <span class="cf">if</span> (err == -ENOENT) <span class="co">// 条件不满足</span></a>
+<a class="sourceLine" id="cb5-26" title="26"></a>
+<a class="sourceLine" id="cb5-27" title="27"><span class="co">// (gdb) p $lx_current().comm rpc.mountd</span></a>
+<a class="sourceLine" id="cb5-28" title="28">write</a>
+<a class="sourceLine" id="cb5-29" title="29">  ksys_write (fd=&lt;optimized out&gt;, buf=<span class="bn">0x7ffe06cef970</span> <span class="st">&quot;* /tmp 1715158103 66561 65534 65534 0 secinfo 4 390003 66561 390004 66561 390005 66561 1 66561 </span><span class="sc">\n</span><span class="st"> </span><span class="sc">\\</span><span class="st">x35a888ad211b41ad9103996db1e3dd2c </span><span class="sc">\n</span><span class="st">&quot;</span>, count=<span class="dv">96</span>)</a>
+<a class="sourceLine" id="cb5-30" title="30">    vfs_write</a>
+<a class="sourceLine" id="cb5-31" title="31">      __vfs_write</a>
+<a class="sourceLine" id="cb5-32" title="32">        proc_reg_write</a>
+<a class="sourceLine" id="cb5-33" title="33">          cache_write_procfs</a>
+<a class="sourceLine" id="cb5-34" title="34">            cache_write</a>
+<a class="sourceLine" id="cb5-35" title="35">              cache_downcall</a>
+<a class="sourceLine" id="cb5-36" title="36">                cache_do_downcall</a>
+<a class="sourceLine" id="cb5-37" title="37">                  svc_export_parse</a>
+<a class="sourceLine" id="cb5-38" title="38">                    <span class="cf">if</span> (err == -ENOENT) <span class="co">// 条件不满足</span></a>
+<a class="sourceLine" id="cb5-39" title="39"></a>
+<a class="sourceLine" id="cb5-40" title="40"><span class="co">// (gdb) p $lx_current().comm rpc.mountd</span></a>
+<a class="sourceLine" id="cb5-41" title="41">write</a>
+<a class="sourceLine" id="cb5-42" title="42">  ksys_write (fd=&lt;optimized out&gt;, buf=<span class="bn">0x7ffe06cef970</span> <span class="st">&quot;* /tmp 1715158106 </span><span class="sc">\n</span><span class="st">6561 65534 65534 0 secinfo 4 390003 66561 390004 66561 390005 66561 1 66561 </span><span class="sc">\n</span><span class="st"> </span><span class="sc">\\</span><span class="st">x35a888ad211b41ad9103996db1e3dd2c </span><span class="sc">\n</span><span class="st">&quot;</span>, count=<span class="dv">19</span>)</a>
+<a class="sourceLine" id="cb5-43" title="43">    vfs_write</a>
+<a class="sourceLine" id="cb5-44" title="44">      __vfs_write</a>
+<a class="sourceLine" id="cb5-45" title="45">        proc_reg_write</a>
+<a class="sourceLine" id="cb5-46" title="46">          cache_write_procfs</a>
+<a class="sourceLine" id="cb5-47" title="47">            cache_write</a>
+<a class="sourceLine" id="cb5-48" title="48">              cache_downcall</a>
+<a class="sourceLine" id="cb5-49" title="49">                cache_do_downcall</a>
+<a class="sourceLine" id="cb5-50" title="50">                  svc_export_parse</a>
+<a class="sourceLine" id="cb5-51" title="51">                    <span class="cf">if</span> (err == -ENOENT) <span class="co">// 条件满足</span></a>
+<a class="sourceLine" id="cb5-52" title="52">                    set_bit(CACHE_NEGATIVE, &amp;exp.h.flags);</a></code></pre></div>
+<p>debian系统server:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"></code></pre></div>
+</body>
+</html>

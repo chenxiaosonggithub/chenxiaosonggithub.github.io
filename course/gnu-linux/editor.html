@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>编辑器</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">编辑器</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#vim"><span class="toc-section-number">1</span> vim</a><ul>
+<li><a href="#vim配置"><span class="toc-section-number">1.1</span> vim配置</a></li>
+<li><a href="#vim快捷键"><span class="toc-section-number">1.2</span> vim快捷键</a></li>
+<li><a href="#ctags"><span class="toc-section-number">1.3</span> ctags</a></li>
+<li><a href="#浏览器插件vimium"><span class="toc-section-number">1.4</span> 浏览器插件vimium</a></li>
+</ul></li>
+<li><a href="#emacs"><span class="toc-section-number">2</span> emacs</a><ul>
+<li><a href="#安装与配置"><span class="toc-section-number">2.1</span> 安装与配置</a></li>
+<li><a href="#常用快捷键"><span class="toc-section-number">2.2</span> 常用快捷键</a></li>
+</ul></li>
+<li><a href="#cscope"><span class="toc-section-number">3</span> cscope</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
+<h1 id="vim"><span class="header-section-number">1</span> vim</h1>
+<p>本节目的是为了查找命令方便，也希望可以给同样喜爱vim的朋友一些参考。</p>
+<p>至于vim最基础的知识，可以在shell下输入<code>vimtutor</code>命令查看，网上也有很多翻译的文档，请自行搜索。</p>
+<h2 id="vim配置"><span class="header-section-number">1.1</span> vim配置</h2>
+<p>配置文件 <code>~/.vimrc</code> ，可以参考<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/config-file/vimrc">我的配置文件</a></p>
+<p>加载其他的.vimrc，在~/.vimrc中加入以下内容:</p>
+<p><code>auto bufread      vim打开时所在的路径      so         .vimrc的路径/.vimrc</code></p>
+<h2 id="vim快捷键"><span class="header-section-number">1.2</span> vim快捷键</h2>
+<p>大小写转换:</p>
+<pre><code>快捷键 ~
+先用v选中，然后gu小写，gU大写</code></pre>
+<p>多文件查找:</p>
+<pre><code>:help vimgrep       （查看帮助文档）
+
+:vimgrep /pattern/*     （当前目录下查找模式pattern）
+:vimgrep /pattern/**    （当前目录和子目录下查找模式pattern）
+:vimgrep /pattern/**/*  （子目录下查找模式pattern，不含当前目录）
+
+:cn     （查找下一个）
+:cp     （查找上一个）
+:cw     （打开quickfix窗口）</code></pre>
+<p>多文件替换:</p>
+<pre><code>:args **/**             （打开当前目录和子目录下的所有文件）
+:args **/*.c            （打开当前目录和子目录下的.c文件）
+:args *                 （打开当前目录下的所有文件）
+:args *.c               （打开当前目录下的.c文件）
+:args */*.c             （打开下一级目录下的.c文件，不含当前目录）
+
+:argdo %s/old/new/gc | update   （old替换成new，需要确认，update表示自动保存）</code></pre>
+<p>查找:</p>
+<pre><code>*   向后查找单词
+#   向前查找单词
+/\c     不区分大小写向后查找（向前查找用?）
+/\&lt;word\&gt;   匹配头尾向后查找（向前查找用?）</code></pre>
+<p>替换:</p>
+<pre><code>:%s/old/new/gc
+加g表示替换一行中的所有，不加g表示只替换一行中的第一个
+加c表示需要确认，不加c表示不需要确认
+加%表示替换所有行，不加%表示替换当前行
+
+:n,ms/old/new/gc    （替换第n行到第m行）
+省略n表示从当前行开始替换
+m为$时表示最后一行</code></pre>
+<p>跳转（cscope提供的跳转快捷键查看cscope章节）:</p>
+<pre><code>ctrl加]  ctags提供的跳转定义
+:ts     显示定义列表
+ctrl加t  ctags提供的跳回
+gd  局部变量跳转
+gf  跳到头文件
+ctrl加o  后退跳转
+ctrl加i  前进跳转</code></pre>
+<p>文件回车符设置:</p>
+<pre><code>:set ff?    （查看文件的回车符类型）
+:set ff=unix    （设置为unix回车符）
+:set ff=dos     （设置为dos回车符）</code></pre>
+<p>折叠:</p>
+<pre><code>zc zC zm zM 折叠
+zo zO zr zR 展开</code></pre>
+<p>可视:</p>
+<pre><code>v   小写v按字符选择可视范围
+V   大写V按行选择可视范围
+ctrl+v  块选择可视范围
+多行插入    ctrl+v按块选择多行然后按下大写i</code></pre>
+<p>其他操作:</p>
+<pre><code>撤销行 大写U
+撤销10次   10u
+不断重做    .(点号)
+删除到行首   d^
+删除到行尾   d$
+选中可视范围后，按&lt;键向前缩进，按&gt;键向后缩进
+不选中可视范围时，按两次&lt;键向前缩进，按两次&gt;键向后缩进
+取消查找高亮  :nohlsearch (简写成noh)
+将当前行和下一行合并  大写J
+将匹配到的所有行删除        :g/pattern/d
+将没有匹配到的所有行删除        :g!/pattern/d</code></pre>
+<h2 id="ctags"><span class="header-section-number">1.3</span> ctags</h2>
+<p>安装ctags: <code>sudo dnf install ctags -y</code>。</p>
+<p>使用<code>ctags -R</code>编译代码生成<code>tags</code>文件，在<code>tags</code>文件所在目录打开<code>vim</code>即可加载<code>tags</code>文件。</p>
+<p><code>ctrl加]</code>跳转定义，<code>:ts</code>显示定义列表，<code>ctrl加t</code>回退</p>
+<p>加载tags文件 <code>:set tags+=文件路径/tags</code></p>
+<h2 id="浏览器插件vimium"><span class="header-section-number">1.4</span> 浏览器插件vimium</h2>
+<p>我是自由软件狂热者，平时工作环境基本都是字符界面，在图形界面下也是用键盘代替鼠标，键盘使用的是自定义的HHKB（可用键盘移动鼠标光标）。在浏览器中搜索资料时，移动鼠标光标效率太低，可以使用浏览器插件vimium。</p>
+<p>以自由软件浏览器firefox为例，说明vimium的安装和使用。</p>
+<p>firefox浏览器 <strong>Add-ons -&gt; Extensions -&gt; Find more add-ons -&gt; Vimium-FF</strong> 。</p>
+<p>至于使用帮助，按 ? （问号）会弹出<strong>Vimium Help</strong>弹窗，可以查看快捷键的提示，基本和vim的使用一致。</p>
+<h1 id="emacs"><span class="header-section-number">2</span> emacs</h1>
+<p>这节记录一下emacs环境以及我常用的emacs快捷键，更多的内容请查看emacs的教学文档和帮助文档。</p>
+<h2 id="安装与配置"><span class="header-section-number">2.1</span> 安装与配置</h2>
+<p>我使用的配置文件<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/config-file/emacs">.emacs</a>。</p>
+<pre><code>M-x package-refresh-contents 刷新包存储库中可用的包内容
+M-x package-list-packages 显示当前已安装的包和可用的包，安装需要的包，如evil（模拟vim）</code></pre>
+<p>如果你使用的是cscope插件来浏览代码，将<a href="https://gitee.com/chenxiaosonggitee/cscope/blob/configure.chenxiaosong/contrib/xcscope/cscope-indexer">cscope-indexer</a>所在路径添加到PATH中。关于cscope的更多内容请查看<a href="https://chenxiaosong.com/linux/vim.html">《vim编辑器》</a>。</p>
+<p>如果你使用的是gtags插件（要先安装<code>apt install global -y</code>）来浏览代码，在配置文件中添加<a href="https://gitee.com/chenxiaosonggitee/cscope/blob/configure.chenxiaosong/contrib/xcscope/xcscope.el">xcscope.el</a>所在的路径<code>(add-to-list 'load-path  "/your_path/cscope/contrib/xcscope")</code>。使用<code>gtags</code>命令生成索引文件，Linux内核代码使用<code>make gtags</code>生成索引文件。</p>
+<h2 id="常用快捷键"><span class="header-section-number">2.2</span> 常用快捷键</h2>
+<pre><code>C-&lt;chr&gt;: ctrl和&lt;chr&gt;键同时按
+
+M-&lt;chr&gt;: meta(alt)和&lt;chr&gt;键同时按，等效 ESC放开后再按&lt;chr&gt;
+
+C-x     字符扩展。  C-x 之后输入另一个字符或者组合键。
+M-x     命令名扩展。M-x 之后输入一个命令
+
+字符界面启动: emacs -nw
+
+退出: C-x C-c
+取消: C-g
+取消ESC: 再按两次ESC
+
+下一屏: C-v
+上一屏: M-v
+滚动几行: C-u 8 C-v, C-u 8 M-v
+光标所在行 中间-顶端-底端 切换: C-l
+
+上下左右: C-p, C-n, C-b, C-f
+移动单词: M-f, M-b
+行头行尾: C-a, C-e
+句头句尾: M-a, M-e
+首行尾行: M-&lt;, M-&gt;
+重复: C-u 8, M-8
+插入多个字符（插入8个*）: C-u 8 *
+
+C-f 帮助文档: C-h k C-f
+
+删除光标前后(注意&lt;DEL&gt;是Backspace): &lt;DEL&gt;, C-d
+删除前面后面单词: M-&lt;DEL&gt;, M-d
+删除到行尾句尾: C-k（再次按删除换行符）, M-k
+删除到行首: C-u 0 C-k
+
+移除选择文字: C-@（C-&lt;SPC&gt;）移动光标后 C-w
+复制选择文字: C-@ 移动光标后 M-w
+召回yanking: C-y
+召回以前的: M-y
+撤销undo: C-/ 或 C-x u 或 C-_
+
+寻找文件: C-x C-f
+保存: C-x C-s
+
+列出缓冲区: C-x C-b
+选择缓冲区: C-x b
+保存当前缓冲区: C-x C-s
+保存多个缓冲区: C-x s
+在列表中删除缓冲区: 标记为删除 d, 标记为保留 m, 删除 x
+
+替换: M-% 或 M-x replace-string
+
+恢复: M-x recover-file
+
+切换模式: M-x text-mode, M-x fundamental-mode
+查看主模式文档: C-h m
+自动折行 auto fill 辅模式: M-x auto-fill-mode
+设置行边界: C-x f
+手动折行: M-q
+
+向上向下搜索: C-r, C-s
+
+关闭当前窗口: C-x 0
+关闭其他窗格（只保留当前窗格）: C-x 1 
+上下两个窗格: C-x 2
+左右两个窗格: C-x 3
+在其他窗格打开文件: C-x 4 C-f
+其他窗格滚动: C-M-v, C-M-S-v
+移到其他窗格: C-x o
+创建关闭窗口: M-x make-frame, M-x delete-frame
+
+递归编辑: 替换时又进行搜索
+离开递归编辑: 3次ESC
+
+帮助: C-h C-h 或 C-h ? 或 F1 F1 或 M-x help
+命令名称: C-h c C-p
+命令帮助: C-h k C-p
+函数: C-h f previous-line
+变量: C-h v
+相关命令搜索（Command Apropos）: C-h a
+手册: C-h i emacs使用手册 m emacs
+emacs使用手册: C-h r
+
+剪切矩形块: C-@ 选择后 C-x r k
+粘贴矩形块: C-x r y
+插入空格矩形块(向右移): C-x r o
+清除矩形块（变成空格）: C-x r c
+插入文字（相当于vim的ctrl+v+大写i）: C-x r t
+
+高亮: M-x highlight-regexp
+取消高亮: M-x unhighlight-regexp
+
+跳到指定行: M-g g
+
+键盘宏: 
+    开始录制: C-x (
+    结束录制: C-x )
+    重复:     C-u 8 C-x e
+
+折叠: M-x 然后 hs-hide-all, hs-show-all, hs-hide-block, hs-show-block, hs-toggle-hidding
+
+寻找括号的另一边（注意: 开始的括号要在光标里，结束的括号要在光标前）: C-M-n, C-M-p
+
+查看buffer所在目录: C-x C-d
+
+补全: M-/
+
+redo: C-g 后 再 C-/
+
+模式: M-x c-mode, M-x fundamental-mode
+
+折叠缩进(配合outline-minor-mode): M-x c-mode, M-x evil-mode
+
+复制到 clipboard: C-@ 选择后 M-x copy-rectange-to-register 选择寄存器值（如8），然后在一个新的空的窗格 M-x insert-register 选择寄存器值（如8），然后再全选复制到 clipboard （M-w）
+
+evil 配置: M-x customize-group RET evil RET， 参考: https://evil.readthedocs.io/en/latest/settings.html</code></pre>
+<p>待确认的功能: 1. 临时切换成 tab键 插入空格，以及空格个数: 暂时通过复制上一行的方式来实现</p>
+<h1 id="cscope"><span class="header-section-number">3</span> cscope</h1>
+<p>现在我使用的代码浏览插件是gtags，但很早以前用过cscope，这里也记录一下。</p>
+<p>安装cscope: <code>sudo apt install cscope -y</code>，但有很多bug，建议使用<a href="https://sourceforge.net/p/cscope/cscope/ci/master/tree/">源码</a>安装，可以使用<a href="https://sourceforge.net/p/cscope/cscope/ci/configure/tree/"><code>configure</code></a>分支，然后merge <a href="https://sourceforge.net/p/cscope/cscope/ci/master/tree/"><code>master(eaea31cb93ec)</code></a>和<a href="https://sourceforge.net/p/cscope/cscope/ci/no_generated_files_in_repo/tree/">`no_generated_files_in_repo(9c49a74d7ac1)</a>分支，再合入<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/0001-cscope-emacs-change-cscope-select-entry-other-window.patch">更改cscope快捷键的补丁</a>。</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="co"># ubuntu/raspberry-pi build environment</span></a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="fu">sudo</span> apt-get install autoconf -y</a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="fu">sudo</span> apt install libncurses5-dev -y</a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="fu">sudo</span> apt-get install flex bison -y</a>
+<a class="sourceLine" id="cb13-5" title="5"></a>
+<a class="sourceLine" id="cb13-6" title="6"><span class="co"># fedora build environment</span></a>
+<a class="sourceLine" id="cb13-7" title="7"><span class="fu">sudo</span> dnf install ncurses-devel ncurses -y</a>
+<a class="sourceLine" id="cb13-8" title="8"></a>
+<a class="sourceLine" id="cb13-9" title="9"><span class="co"># build</span></a>
+<a class="sourceLine" id="cb13-10" title="10"><span class="ex">autoreconf</span> -f -i</a>
+<a class="sourceLine" id="cb13-11" title="11"><span class="fu">mkdir</span> build</a>
+<a class="sourceLine" id="cb13-12" title="12"><span class="bu">cd</span> build</a>
+<a class="sourceLine" id="cb13-13" title="13"><span class="ex">../configure</span> --prefix=/path/to/install</a>
+<a class="sourceLine" id="cb13-14" title="14"><span class="fu">make</span></a></code></pre></div>
+<p>将脚本文件<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/cscope_maps.vim">cscope_maps.vim</a>放到<code>~/.vim/plugin/</code>路径下，即可使用快捷键（快捷键种类查看 <code>:cs help</code>），如<code>:cs find s word</code>查找word引用可使用快捷键<code>ctrl加\加s</code>（按顺序依次按3个键）。</p>
+<p>使用<code>cscope -Rqbk</code>（当需要包含<code>/usr/include</code>头文件时，不使用<code>-k</code>选项）编译代码生成<code>cscope.out</code>文件，在<code>cscope.out</code>文件所在目录打开<code>vim</code>即可加载<code>cscope.out</code>文件。Linux内核代码使用<code>make cscope</code>命令生成索引文件。</p>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>openEuler的nfs+报错not responding的问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">openEuler的nfs+报错not responding的问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">2</span> 代码分析</a></li>
+<li><a href="#解决方案"><span class="toc-section-number">3</span> 解决方案</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>按以下步骤操作，报错<code>nfs: server 192.168.53.210 not responding, timed out</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">mount</span> -t nfs -o vers=3,localaddrs=192.168.53.209~192.168.53.46,remoteaddrs=192.168.53.210~192.168.53.47 192.168.53.210:/tmp/s_test /mnt/</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="ex">modprobe</span> -r enfs</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="ex">modprobe</span> enfs</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co"># nfs: server 10.42.43.92 not responding, timed out</span></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="co"># ...</span></a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.209} remoteip{10.42.43.93} path state change from {1} to {2}.</span></a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.46} remoteip{10.42.43.92} path state change from {1} to {2}.</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.209} remoteip{10.42.43.92} path state change from {1} to {2}.</span></a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="co"># enfs:[pm_set_path_state]The xprt localip{192.168.53.46} remoteip{10.42.43.93} path state change from {1} to {2}.</span></a></code></pre></div>
+<p>在<code>e96d124d2a24 (HEAD) !16573  Backport 6.6.64-6.6.72 LTS</code>（我的第一个提交之前）不只有以上错误，还会不断打印以下错误:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="bu">[</span>   33.459480] enfs:[query_and_update_shard]update lsId err:-22.</a>
+<a class="sourceLine" id="cb2-2" title="2">[   34.475287] nfs: server 10.42.43.92 not responding, timed out</a>
+<a class="sourceLine" id="cb2-3" title="3">[   34.482117] ENFS: get fsInfo failed -22.</a></code></pre></div>
+<p>创建配置文件<code>/etc/enfs/config.ini</code>设置<code>path_detect_timeout=10</code>后不报错。</p>
+<h1 id="代码分析"><span class="header-section-number">2</span> 代码分析</h1>
+<p>client端的null包的发送流程如下:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb3-1" title="1">enfs_multipath_init</a>
+<a class="sourceLine" id="cb3-2" title="2">  pm_ping_init</a>
+<a class="sourceLine" id="cb3-3" title="3">    pm_ping_start</a>
+<a class="sourceLine" id="cb3-4" title="4">      pm_ping_routine <span class="co">// kthread_run(pm_ping_routine,</span></a>
+<a class="sourceLine" id="cb3-5" title="5">        enfs_get_config_path_detect_interval <span class="co">// 获取间隔时长</span></a>
+<a class="sourceLine" id="cb3-6" title="6">        pm_ping_loop_sunrpc_net</a>
+<a class="sourceLine" id="cb3-7" title="7">          pm_ping_loop_rpclnt</a>
+<a class="sourceLine" id="cb3-8" title="8">            rpc_clnt_iterate_for_each_xprt</a>
+<a class="sourceLine" id="cb3-9" title="9">              pm_ping_execute_xprt_test <span class="co">// fn</span></a>
+<a class="sourceLine" id="cb3-10" title="10">                pm_ping_add_work</a>
+<a class="sourceLine" id="cb3-11" title="11">                  pm_ping_execute_work <span class="co">// INIT_WORK(&amp;work_info-&gt;ping_work,</span></a>
+<a class="sourceLine" id="cb3-12" title="12">                    rpc_clnt_test_xprt(..., &amp;pm_ping_set_status_ops, ..., RPC_TASK_ASYNC...) <span class="co">// 异步</span></a>
+<a class="sourceLine" id="cb3-13" title="13">                      rpc_call_null_helper(..., RPC_TASK_SOFT...) <span class="co">// rpc请求不会一直尝试</span></a>
+<a class="sourceLine" id="cb3-14" title="14">                        <span class="co">// 调试时可以判断task-&gt;tk_msg.rpc_proc-&gt;p_proc</span></a>
+<a class="sourceLine" id="cb3-15" title="15">                        .rpc_proc = &amp;rpcproc_null, <span class="co">// rpcproc_null.p_proc不赋值默认为NFS3PROC_NULL</span></a>
+<a class="sourceLine" id="cb3-16" title="16">                        .callback_ops = &amp;pm_ping_set_status_ops</a>
+<a class="sourceLine" id="cb3-17" title="17">                        rpc_run_task</a>
+<a class="sourceLine" id="cb3-18" title="18">                          rpc_new_task</a>
+<a class="sourceLine" id="cb3-19" title="19">                            rpc_init_task</a>
+<a class="sourceLine" id="cb3-20" title="20">                              task-&gt;tk_ops = task_setup_data-&gt;callback_ops = pm_ping_set_status_ops</a>
+<a class="sourceLine" id="cb3-21" title="21">                              <span class="cf">if</span> (task-&gt;tk_ops-&gt;rpc_call_prepare != NULL) <span class="co">// 条件不满足</span></a>
+<a class="sourceLine" id="cb3-22" title="22">                              task-&gt;tk_action == NULL</a>
+<a class="sourceLine" id="cb3-23" title="23">                          rpc_call_start</a>
+<a class="sourceLine" id="cb3-24" title="24">                            task-&gt;tk_action = call_start</a>
+<a class="sourceLine" id="cb3-25" title="25"></a>
+<a class="sourceLine" id="cb3-26" title="26">xprt_create_transport</a>
+<a class="sourceLine" id="cb3-27" title="27">  rpc_multipath_ops_create_xprt</a>
+<a class="sourceLine" id="cb3-28" title="28">    enfs_create_xprt_ctx <span class="co">// create_xprt</span></a>
+<a class="sourceLine" id="cb3-29" title="29">      enfs_alloc_xprt_ctx</a>
+<a class="sourceLine" id="cb3-30" title="30">        xprt_set_reserve_context</a>
+<a class="sourceLine" id="cb3-31" title="31">          buf-&gt;reserve_context</a>
+<a class="sourceLine" id="cb3-32" title="32"></a>
+<a class="sourceLine" id="cb3-33" title="33">mount</a>
+<a class="sourceLine" id="cb3-34" title="34">  path_mount</a>
+<a class="sourceLine" id="cb3-35" title="35">    do_new_mount</a>
+<a class="sourceLine" id="cb3-36" title="36">      vfs_get_tree</a>
+<a class="sourceLine" id="cb3-37" title="37">        nfs_get_tree</a>
+<a class="sourceLine" id="cb3-38" title="38">          nfs_try_get_tree</a>
+<a class="sourceLine" id="cb3-39" title="39">            nfs_try_mount_request</a>
+<a class="sourceLine" id="cb3-40" title="40">              nfs<span class="dv">3</span><span class="er">_create_server</span></a>
+<a class="sourceLine" id="cb3-41" title="41">                nfs_create_server</a>
+<a class="sourceLine" id="cb3-42" title="42">                  nfs_init_server</a>
+<a class="sourceLine" id="cb3-43" title="43">                    nfs_get_client</a>
+<a class="sourceLine" id="cb3-44" title="44">                      nfs_init_client</a>
+<a class="sourceLine" id="cb3-45" title="45">                        nfs_create_rpc_client</a>
+<a class="sourceLine" id="cb3-46" title="46">                          rpc_create</a>
+<a class="sourceLine" id="cb3-47" title="47">                            rpc_create_xprt</a>
+<a class="sourceLine" id="cb3-48" title="48">                              rpc_multipath_ops_create_clnt</a>
+<a class="sourceLine" id="cb3-49" title="49">                                enfs_create_multi_xprt</a>
+<a class="sourceLine" id="cb3-50" title="50">                                  enfs_multipath_create_thread</a>
+<a class="sourceLine" id="cb3-51" title="51">                                    enfs_fill_empty_iplist</a>
+<a class="sourceLine" id="cb3-52" title="52">                                    enfs_xprt_ippair_create</a>
+<a class="sourceLine" id="cb3-53" title="53">                                      enfs_combine_addr</a>
+<a class="sourceLine" id="cb3-54" title="54">                                        enfs_configure_xprt_to_clnt</a>
+<a class="sourceLine" id="cb3-55" title="55">                                          print_enfs_multipath_addr</a>
+<a class="sourceLine" id="cb3-56" title="56">                                          rpc_clnt_add_xprt</a>
+<a class="sourceLine" id="cb3-57" title="57">                                            enfs_add_xprt_setup <span class="co">// setup</span></a>
+<a class="sourceLine" id="cb3-58" title="58">                                              xprt_get_reserve_context</a></code></pre></div>
+<p>在<code>call_status()</code>中超时打印:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb4-1" title="1">call_start</a>
+<a class="sourceLine" id="cb4-2" title="2">call_reserve</a>
+<a class="sourceLine" id="cb4-3" title="3">call_reserveresult</a>
+<a class="sourceLine" id="cb4-4" title="4">call_refresh</a>
+<a class="sourceLine" id="cb4-5" title="5">call_refreshresult</a>
+<a class="sourceLine" id="cb4-6" title="6">call_allocate</a>
+<a class="sourceLine" id="cb4-7" title="7">call_encode</a>
+<a class="sourceLine" id="cb4-8" title="8">call_transmit</a>
+<a class="sourceLine" id="cb4-9" title="9">call_transmit_status</a>
+<a class="sourceLine" id="cb4-10" title="10">call_status</a>
+<a class="sourceLine" id="cb4-11" title="11">  status = task-&gt;tk_status == -ETIMEDOUT</a>
+<a class="sourceLine" id="cb4-12" title="12">  rpc_check_timeout</a>
+<a class="sourceLine" id="cb4-13" title="13">    <span class="st">&quot;%s: server %s not responding, timed out</span><span class="sc">\n</span><span class="st">&quot;</span>,</a></code></pre></div>
+<p>在nfs server中打印xid，发现没有执行到<code>svc_process()</code>中。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb5-1" title="1">nfsd</a>
+<a class="sourceLine" id="cb5-2" title="2">  svc_recv</a>
+<a class="sourceLine" id="cb5-3" title="3">    <span class="co">// 打印 rqstp-&gt;rq_xid</span></a>
+<a class="sourceLine" id="cb5-4" title="4">    svc_process</a>
+<a class="sourceLine" id="cb5-5" title="5">      rqstp-&gt;rq_xid = *p++;</a>
+<a class="sourceLine" id="cb5-6" title="6">      svc_process_common</a>
+<a class="sourceLine" id="cb5-7" title="7">        nfsd_init_request <span class="co">// progp-&gt;pg_init_request</span></a>
+<a class="sourceLine" id="cb5-8" title="8">          svc_generic_init_request <span class="co">// 不确定，后面再调试看看</span></a>
+<a class="sourceLine" id="cb5-9" title="9">            ret-&gt;dispatch = versp-&gt;vs_dispatch</a>
+<a class="sourceLine" id="cb5-10" title="10">        nfsd_dispatch <span class="co">// process.dispatch()</span></a>
+<a class="sourceLine" id="cb5-11" title="11">          nfssvc_decode_voidarg <span class="co">// proc-&gt;pc_decode</span></a>
+<a class="sourceLine" id="cb5-12" title="12">          nfsd3_proc_null <span class="co">// proc-&gt;pc_func</span></a>
+<a class="sourceLine" id="cb5-13" title="13">          nfssvc_encode_voidres <span class="co">// proc-&gt;pc_encode</span></a>
+<a class="sourceLine" id="cb5-14" title="14">      svc_send</a>
+<a class="sourceLine" id="cb5-15" title="15">        svc_tcp_sendto <span class="co">// xprt-&gt;xpt_ops-&gt;xpo_sendto</span></a></code></pre></div>
+<h1 id="解决方案"><span class="header-section-number">3</span> 解决方案</h1>
+<p><a href="https://gitee.com/openeuler/kernel/pulls/17973/commits">请查看pr</a>。</p>
+</body>
+</html>

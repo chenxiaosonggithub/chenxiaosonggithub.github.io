@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>smb未分类的内容</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">smb未分类的内容</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#client流程"><span class="toc-section-number">1</span> client流程</a></li>
+<li><a href="#lock"><span class="toc-section-number">2</span> lock</a></li>
+<li><a href="#ksmbd代码流程"><span class="toc-section-number">3</span> ksmbd代码流程</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/smb/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
+<h1 id="client流程"><span class="header-section-number">1</span> client流程</h1>
+<p>正在更新的内容都放到这篇文章中，等到有些知识点达到一定量时，会把这些知识点整理成专门的一章。</p>
+<p>请求处理过程:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb1-1" title="1"><span class="co">// 请求是struct smb_rqst *rqst-&gt;rq_iov, 回复是struct kvec *resp_iov</span></a>
+<a class="sourceLine" id="cb1-2" title="2">compound_send_recv</a>
+<a class="sourceLine" id="cb1-3" title="3">  smb2_setup_request <span class="co">// ses-&gt;server-&gt;ops-&gt;setup_request</span></a>
+<a class="sourceLine" id="cb1-4" title="4">    smb<span class="dv">2</span><span class="er">_get_mid_entry</span></a>
+<a class="sourceLine" id="cb1-5" title="5">      smb<span class="dv">2</span><span class="er">_mid_entry_alloc</span></a>
+<a class="sourceLine" id="cb1-6" title="6">      <span class="co">// 加到队列中</span></a>
+<a class="sourceLine" id="cb1-7" title="7">      list_add_tail(&amp;(*mid)-&gt;qhead, &amp;server-&gt;pending_mid_q);</a>
+<a class="sourceLine" id="cb1-8" title="8">    <span class="co">// 状态设置成已提交</span></a>
+<a class="sourceLine" id="cb1-9" title="9">    midQ[i]-&gt;mid_state = MID_REQUEST_SUBMITTED</a>
+<a class="sourceLine" id="cb1-10" title="10">    smb_send_rqst</a>
+<a class="sourceLine" id="cb1-11" title="11">      __smb_send_rqst</a>
+<a class="sourceLine" id="cb1-12" title="12">        smb_send_kvec</a>
+<a class="sourceLine" id="cb1-13" title="13">    wait_for_response</a>
+<a class="sourceLine" id="cb1-14" title="14">      <span class="co">// 状态要为已接收，在dequeue_mid()中设置</span></a>
+<a class="sourceLine" id="cb1-15" title="15">      midQ-&gt;mid_state != MID_RESPONSE_RECEIVED</a>
+<a class="sourceLine" id="cb1-16" title="16">    <span class="co">// 回复的内容</span></a>
+<a class="sourceLine" id="cb1-17" title="17">    buf = (<span class="dt">char</span> *)midQ[i]-&gt;resp_buf</a></code></pre></div>
+<p>回复处理过程:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb2-1" title="1">kthread</a>
+<a class="sourceLine" id="cb2-2" title="2">  cifs_demultiplex_thread</a>
+<a class="sourceLine" id="cb2-3" title="3">    smb2_find_mid <span class="co">// server-&gt;ops-&gt;find_mid</span></a>
+<a class="sourceLine" id="cb2-4" title="4">      __smb<span class="dv">2</span><span class="er">_find_mid</span></a>
+<a class="sourceLine" id="cb2-5" title="5">        <span class="co">// 从pending_mid_q链表中找</span></a>
+<a class="sourceLine" id="cb2-6" title="6">        list_for_each_entry</a>
+<a class="sourceLine" id="cb2-7" title="7">    standard_receive<span class="dv">3</span></a>
+<a class="sourceLine" id="cb2-8" title="8">      cifs_handle_standard</a>
+<a class="sourceLine" id="cb2-9" title="9">        handle_mid</a>
+<a class="sourceLine" id="cb2-10" title="10">          dequeue_mid</a>
+<a class="sourceLine" id="cb2-11" title="11">            <span class="co">// 状态设置成已接收</span></a>
+<a class="sourceLine" id="cb2-12" title="12">            mid-&gt;mid_state = MID_RESPONSE_RECEIVED</a>
+<a class="sourceLine" id="cb2-13" title="13">            <span class="co">// 在锁的保护下从链表中删除（可能是pending_mid_q链表也可能是retry_list链表）</span></a>
+<a class="sourceLine" id="cb2-14" title="14">            list_del_init(&amp;mid-&gt;qhead)</a></code></pre></div>
+<p>打开文件处理过程:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb3-1" title="1"><span class="co">// vfs的流程</span></a>
+<a class="sourceLine" id="cb3-2" title="2">openat</a>
+<a class="sourceLine" id="cb3-3" title="3">  do_sys_open</a>
+<a class="sourceLine" id="cb3-4" title="4">    do_sys_openat<span class="dv">2</span></a>
+<a class="sourceLine" id="cb3-5" title="5">      do_filp_open</a>
+<a class="sourceLine" id="cb3-6" title="6">        path_openat</a>
+<a class="sourceLine" id="cb3-7" title="7">          open_last_lookups</a>
+<a class="sourceLine" id="cb3-8" title="8">            lookup_open</a>
+<a class="sourceLine" id="cb3-9" title="9">              atomic_open</a>
+<a class="sourceLine" id="cb3-10" title="10"></a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="co">// smb流程</span></a>
+<a class="sourceLine" id="cb3-12" title="12">atomic_open</a>
+<a class="sourceLine" id="cb3-13" title="13">  cifs_atomic_open</a>
+<a class="sourceLine" id="cb3-14" title="14">    cifs_lookup</a>
+<a class="sourceLine" id="cb3-15" title="15">      cifs_get_inode_info</a>
+<a class="sourceLine" id="cb3-16" title="16">        cifs_get_fattr</a>
+<a class="sourceLine" id="cb3-17" title="17">          smb<span class="dv">2</span><span class="er">_query_path_info</span></a>
+<a class="sourceLine" id="cb3-18" title="18">            smb<span class="dv">2</span><span class="er">_compound_op</span></a>
+<a class="sourceLine" id="cb3-19" title="19">    cifs_do_create</a>
+<a class="sourceLine" id="cb3-20" title="20">      smb<span class="dv">2</span><span class="er">_open_file</span></a>
+<a class="sourceLine" id="cb3-21" title="21">        SMB<span class="dv">2</span><span class="er">_open</span></a>
+<a class="sourceLine" id="cb3-22" title="22">          cifs_send_recv</a></code></pre></div>
+<p>读文件处理过程:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb4-1" title="1">read_pages</a>
+<a class="sourceLine" id="cb4-2" title="2">  netfs_readahead</a>
+<a class="sourceLine" id="cb4-3" title="3">    netfs_begin_read</a>
+<a class="sourceLine" id="cb4-4" title="4">      netfs_rreq_submit_slice</a>
+<a class="sourceLine" id="cb4-5" title="5">        netfs_read_from_server</a>
+<a class="sourceLine" id="cb4-6" title="6">          cifs_req_issue_read</a>
+<a class="sourceLine" id="cb4-7" title="7">            smb<span class="dv">2</span><span class="er">_async_readv</span></a>
+<a class="sourceLine" id="cb4-8" title="8">              cifs_call_async</a>
+<a class="sourceLine" id="cb4-9" title="9">                mid-&gt;receive = receive</a>
+<a class="sourceLine" id="cb4-10" title="10">                mid-&gt;callback = callback</a>
+<a class="sourceLine" id="cb4-11" title="11"></a>
+<a class="sourceLine" id="cb4-12" title="12">kthread</a>
+<a class="sourceLine" id="cb4-13" title="13">  cifs_demultiplex_thread</a>
+<a class="sourceLine" id="cb4-14" title="14">    cifs_readv_receive <span class="co">// mids[0]-&gt;receive</span></a>
+<a class="sourceLine" id="cb4-15" title="15">    smb2_readv_callback <span class="co">// mids[i]-&gt;callback</span></a></code></pre></div>
+<p>写文件处理过程:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb5-1" title="1">do_writepages</a>
+<a class="sourceLine" id="cb5-2" title="2">  netfs_writepages</a>
+<a class="sourceLine" id="cb5-3" title="3">    netfs_write_folio</a>
+<a class="sourceLine" id="cb5-4" title="4">      netfs_advance_write</a>
+<a class="sourceLine" id="cb5-5" title="5">        netfs_issue_write</a>
+<a class="sourceLine" id="cb5-6" title="6">          netfs_do_issue_write</a>
+<a class="sourceLine" id="cb5-7" title="7">            cifs_issue_write</a>
+<a class="sourceLine" id="cb5-8" title="8">              smb<span class="dv">2</span><span class="er">_async_writev</span></a>
+<a class="sourceLine" id="cb5-9" title="9">                cifs_call_async</a>
+<a class="sourceLine" id="cb5-10" title="10"></a>
+<a class="sourceLine" id="cb5-11" title="11">kthread</a>
+<a class="sourceLine" id="cb5-12" title="12">  cifs_demultiplex_thread</a>
+<a class="sourceLine" id="cb5-13" title="13">    smb2_writev_callback <span class="co">// mids[i]-&gt;callback</span></a></code></pre></div>
+<p>挂载:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb6-1" title="1">mount</a>
+<a class="sourceLine" id="cb6-2" title="2">  do_mount</a>
+<a class="sourceLine" id="cb6-3" title="3">    path_mount</a>
+<a class="sourceLine" id="cb6-4" title="4">      do_new_mount</a>
+<a class="sourceLine" id="cb6-5" title="5">        vfs_parse_fs_string</a>
+<a class="sourceLine" id="cb6-6" title="6">          vfs_parse_fs_param</a>
+<a class="sourceLine" id="cb6-7" title="7">            smb<span class="dv">3</span><span class="er">_fs_context_parse_param</span></a>
+<a class="sourceLine" id="cb6-8" title="8">        parse_monolithic_mount_data</a>
+<a class="sourceLine" id="cb6-9" title="9">          smb<span class="dv">3</span><span class="er">_fs_context_parse_monolithic</span></a>
+<a class="sourceLine" id="cb6-10" title="10">            <span class="cf">while</span> ((key = strsep(&amp;options, <span class="st">&quot;,&quot;</span>)) != NULL) {</a>
+<a class="sourceLine" id="cb6-11" title="11">            vfs_parse_fs_string</a>
+<a class="sourceLine" id="cb6-12" title="12">              vfs_parse_fs_param</a>
+<a class="sourceLine" id="cb6-13" title="13">                smb<span class="dv">3</span><span class="er">_fs_context_parse_param</span></a></code></pre></div>
+<h1 id="lock"><span class="header-section-number">2</span> lock</h1>
+<p><code>lock.c</code>文件如下:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb7-1" title="1"><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></a>
+<a class="sourceLine" id="cb7-4" title="4"></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="dt">int</span> main() {</a>
+<a class="sourceLine" id="cb7-6" title="6">    <span class="dt">int</span> fd = open(<span class="st">&quot;/mnt/file&quot;</span>, O_RDWR);</a>
+<a class="sourceLine" id="cb7-7" title="7">    <span class="cf">if</span> (fd == -<span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb7-8" title="8">        perror(<span class="st">&quot;Failed to open file&quot;</span>);</a>
+<a class="sourceLine" id="cb7-9" title="9">        <span class="cf">return</span> <span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb7-10" title="10">    }</a>
+<a class="sourceLine" id="cb7-11" title="11"></a>
+<a class="sourceLine" id="cb7-12" title="12">    <span class="kw">struct</span> flock fl;</a>
+<a class="sourceLine" id="cb7-13" title="13">    fl.l_type = F_WRLCK;  <span class="co">// 写锁</span></a>
+<a class="sourceLine" id="cb7-14" title="14">    fl.l_whence = SEEK_SET;</a>
+<a class="sourceLine" id="cb7-15" title="15">    fl.l_start = <span class="dv">0</span>;</a>
+<a class="sourceLine" id="cb7-16" title="16">    fl.l_len = <span class="dv">0</span>;  <span class="co">// 锁定整个文件</span></a>
+<a class="sourceLine" id="cb7-17" title="17"></a>
+<a class="sourceLine" id="cb7-18" title="18">    <span class="cf">if</span> (fcntl(fd, F_SETLK, &amp;fl) == -<span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb7-19" title="19">        perror(<span class="st">&quot;Failed to lock file&quot;</span>);</a>
+<a class="sourceLine" id="cb7-20" title="20">        close(fd);</a>
+<a class="sourceLine" id="cb7-21" title="21">        <span class="cf">return</span> <span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb7-22" title="22">    }</a>
+<a class="sourceLine" id="cb7-23" title="23"></a>
+<a class="sourceLine" id="cb7-24" title="24">    printf(<span class="st">&quot;File locked. Press Enter to unlock...&quot;</span>);</a>
+<a class="sourceLine" id="cb7-25" title="25">    getchar();</a>
+<a class="sourceLine" id="cb7-26" title="26"></a>
+<a class="sourceLine" id="cb7-27" title="27">    fl.l_type = F_UNLCK;  <span class="co">// 解锁</span></a>
+<a class="sourceLine" id="cb7-28" title="28">    <span class="cf">if</span> (fcntl(fd, F_SETLK, &amp;fl) == -<span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb7-29" title="29">        perror(<span class="st">&quot;Failed to unlock file&quot;</span>);</a>
+<a class="sourceLine" id="cb7-30" title="30">    }</a>
+<a class="sourceLine" id="cb7-31" title="31"></a>
+<a class="sourceLine" id="cb7-32" title="32">    close(fd);</a>
+<a class="sourceLine" id="cb7-33" title="33">    <span class="cf">return</span> <span class="dv">0</span>;</a>
+<a class="sourceLine" id="cb7-34" title="34">}</a></code></pre></div>
+<p><code>lock.c</code>文件还可以用<code>flock()</code>函数:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb8-1" title="1"><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="pp">#include </span><span class="im">&lt;sys/file.h&gt;</span></a>
+<a class="sourceLine" id="cb8-6" title="6"></a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">char</span> *argv[]) {</a>
+<a class="sourceLine" id="cb8-8" title="8">    <span class="dt">const</span> <span class="dt">char</span> file_path = <span class="st">&quot;/mnt/file&quot;</span>;</a>
+<a class="sourceLine" id="cb8-9" title="9">    <span class="dt">int</span> fd = open(file_path, O_RDWR);</a>
+<a class="sourceLine" id="cb8-10" title="10">    <span class="cf">if</span> (fd == -<span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb8-11" title="11">        printf(<span class="st">&quot;Error: open %s</span><span class="sc">\n</span><span class="st">&quot;</span>, file_path);</a>
+<a class="sourceLine" id="cb8-12" title="12">        exit(EXIT_FAILURE);</a>
+<a class="sourceLine" id="cb8-13" title="13">    }</a>
+<a class="sourceLine" id="cb8-14" title="14">    printf(<span class="st">&quot;open succ %s</span><span class="sc">\n</span><span class="st">&quot;</span>, file_path);</a>
+<a class="sourceLine" id="cb8-15" title="15"></a>
+<a class="sourceLine" id="cb8-16" title="16">    <span class="dt">int</span> res = flock(fd, LOCK_SH);</a>
+<a class="sourceLine" id="cb8-17" title="17">    <span class="cf">if</span> (res == -<span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb8-18" title="18">        printf(<span class="st">&quot;Error: flock %s</span><span class="sc">\n</span><span class="st">&quot;</span>, file_path);</a>
+<a class="sourceLine" id="cb8-19" title="19">        close(fd);</a>
+<a class="sourceLine" id="cb8-20" title="20">        exit(EXIT_FAILURE);</a>
+<a class="sourceLine" id="cb8-21" title="21">    }</a>
+<a class="sourceLine" id="cb8-22" title="22">    printf(<span class="st">&quot;lock succ %s</span><span class="sc">\n</span><span class="st">&quot;</span>, file_path);</a>
+<a class="sourceLine" id="cb8-23" title="23"></a>
+<a class="sourceLine" id="cb8-24" title="24">    printf(<span class="st">&quot;File locked. Press Enter to unlock...&quot;</span>);</a>
+<a class="sourceLine" id="cb8-25" title="25">    getchar();</a>
+<a class="sourceLine" id="cb8-26" title="26"></a>
+<a class="sourceLine" id="cb8-27" title="27">    <span class="co">// Unlock and close the file</span></a>
+<a class="sourceLine" id="cb8-28" title="28">    flock(fd, LOCK_UN);</a>
+<a class="sourceLine" id="cb8-29" title="29">    close(fd);</a>
+<a class="sourceLine" id="cb8-30" title="30"></a>
+<a class="sourceLine" id="cb8-31" title="31">    <span class="cf">return</span> <span class="dv">0</span>;</a>
+<a class="sourceLine" id="cb8-32" title="32">}</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="fu">gcc</span> -o lock lock.c</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="ex">./lock</span> <span class="co"># client 1</span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="ex">./lock</span> <span class="co"># client 2，这时会调用 SMB2_lock， server会调用 smb2_lock</span></a></code></pre></div>
+<h1 id="ksmbd代码流程"><span class="header-section-number">3</span> ksmbd代码流程</h1>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb10-1" title="1">kthread</a>
+<a class="sourceLine" id="cb10-2" title="2">  worker_thread</a>
+<a class="sourceLine" id="cb10-3" title="3">    process_scheduled_works</a>
+<a class="sourceLine" id="cb10-4" title="4">      process_one_work</a>
+<a class="sourceLine" id="cb10-5" title="5">        handle_ksmbd_work</a>
+<a class="sourceLine" id="cb10-6" title="6">          __handle_ksmbd_work</a>
+<a class="sourceLine" id="cb10-7" title="7">            __process_request</a>
+<a class="sourceLine" id="cb10-8" title="8">              smb<span class="dv">2</span><span class="er">_open</span></a>
+<a class="sourceLine" id="cb10-9" title="9">                dentry_open</a>
+<a class="sourceLine" id="cb10-10" title="10">                  vfs_open</a>
+<a class="sourceLine" id="cb10-11" title="11">                    do_dentry_open</a>
+<a class="sourceLine" id="cb10-12" title="12">                      ext<span class="dv">2</span><span class="er">_file_open</span></a></code></pre></div>
+</body>
+</html>

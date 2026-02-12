@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>LTP Network Tests README</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">LTP Network Tests README</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#ltp网络测试"><span class="toc-section-number">1</span> LTP网络测试</a><ul>
+<li><a href="#单主机配置"><span class="toc-section-number">1.1</span> 单主机配置</a></li>
+<li><a href="#两个主机配置"><span class="toc-section-number">1.2</span> 两个主机配置</a></li>
+<li><a href="#服务器服务配置"><span class="toc-section-number">1.3</span> 服务器服务配置</a><ul>
+<li><a href="#ftp和telnet设置"><span class="toc-section-number">1.3.1</span> FTP和telnet设置</a></li>
+<li><a href="#http设置"><span class="toc-section-number">1.3.2</span> HTTP设置</a></li>
+<li><a href="#nfs设置"><span class="toc-section-number">1.3.3</span> NFS设置</a></li>
+<li><a href="#ti-rpc-sun-rpc设置"><span class="toc-section-number">1.3.4</span> TI-RPC / Sun RPC设置</a></li>
+</ul></li>
+<li><a href="#ltp设置"><span class="toc-section-number">1.4</span> LTP设置</a></li>
+<li><a href="#运行测试"><span class="toc-section-number">1.5</span> 运行测试</a></li>
+<li><a href="#调试"><span class="toc-section-number">1.6</span> 调试</a></li>
+</ul></li>
+</ul>
+</nav>
+<p>本文档翻译自<a href="https://github.com/linux-test-project/ltp/blob/master/testcases/network/README.md">LTP Network Tests 的 README 文件</a>，翻译时文件的最新提交是<code>bc904b3ed net: tst_netload_compare(): Ignore performance failures</code>，大部分借助于ChatGPT。仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<h1 id="ltp网络测试"><span class="header-section-number">1</span> LTP网络测试</h1>
+<h2 id="单主机配置"><span class="header-section-number">1.1</span> 单主机配置</h2>
+<p>这是默认配置（如果未定义 <code>RHOST</code> 环境变量）。LTP会添加 <code>ltp_ns</code> 网络命名空间，并根据LTP网络环境变量自动配置 <code>veth</code> 对。</p>
+<h2 id="两个主机配置"><span class="header-section-number">1.2</span> 两个主机配置</h2>
+<p>此设置需要正确设置 <code>RHOST</code> 环境变量并配置SSH访问远程主机。</p>
+<p><code>RHOST</code> 变量必须设置为服务器的主机名（测试管理链接），并且需要设置公钥或无密码登录。</p>
+<p>SSH服务器需要配置为允许root登录和使用公钥认证（在 <code>/etc/ssh/sshd_config</code> 中设置 <code>PermitRootLogin yes</code> 和 <code>PubkeyAuthentication yes</code>）。</p>
+<p>一些尚未移植到网络API的网络压力测试被设计为通过 <code>LTP_RSH</code> 环境变量通过 <code>rsh</code> 进行测试。现在默认使用 <code>ssh</code>，详情请参阅 <a href="https://github.com/linux-test-project/ltp/blob/master/testcases/network/stress/README"><code>testcases/network/stress/README</code></a>。</p>
+<h2 id="服务器服务配置"><span class="header-section-number">1.3</span> 服务器服务配置</h2>
+<p>测试具有各种外部依赖项，如果未安装则以 <code>TCONF</code> 退出。某些测试需要额外的设置。</p>
+<h3 id="ftp和telnet设置"><span class="header-section-number">1.3.1</span> FTP和telnet设置</h3>
+<p>FTP压力测试和telnet服务器测试需要设置环境变量 <code>RHOST</code>（远程机器）、<code>RUSER</code>（远程用户）和 <code>PASSWD</code>（远程密码）。注意: 对于其他测试，<code>RHOST</code> 将意味着两个主机配置。</p>
+<p>如果 <code>RUSER</code> 设置为 <code>root</code>，则需要执行以下步骤之一:</p>
+<ul>
+<li>在 <code>/etc/ftpusers</code>（或 <code>/etc/vsftpd.ftpusers</code>）中，注释包含 “root” 字符串的行。此文件列出了所有不能在当前系统上进行ftp访问的用户。</li>
+<li>如果不想执行前一步骤，则在 <code>/root/.netrc</code> 中添加以下条目:</li>
+</ul>
+<pre><code>machine &lt;remote_server_name&gt;
+login root
+password &lt;remote_root_password&gt;</code></pre>
+<h3 id="http设置"><span class="header-section-number">1.3.2</span> HTTP设置</h3>
+<p>HTTP压力测试需要配置并运行Web服务器（Apache2、Nginx等）。</p>
+<h3 id="nfs设置"><span class="header-section-number">1.3.3</span> NFS设置</h3>
+<p>NFS测试需要运行NFS服务器，请启用并启动 <code>nfs-server.service</code>（Debian/Ubuntu和openSUSE/SLES: <code>nfs-kernel-server</code> 包，其他发行版: <code>nfs-server</code> 包）。</p>
+<p>没有检测服务是否正在运行，测试将在没有警告的情况下简单失败。</p>
+<h3 id="ti-rpc-sun-rpc设置"><span class="header-section-number">1.3.4</span> TI-RPC / Sun RPC设置</h3>
+<p>TI-RPC（或glibc旧版Sun RPC）测试需要运行rpcbind（或旧版发行版上的portmap），请启用并启动 <code>rpcbind.service</code>。</p>
+<h2 id="ltp设置"><span class="header-section-number">1.4</span> LTP设置</h2>
+<p>安装LTP测试套件（请参阅INSTALL）。在两个主机配置的情况下，LTP需要安装在完全相同的位置，并且在<em>两个</em>客户端和服务器机器上设置 <code>LTPROOT</code> 和 <code>PATH</code> 环境变量。这是必需的，因为某些测试期望在特定位置找到服务器文件。</p>
+<p>例如，默认前缀 <code>/opt/ltp</code> 的示例:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="bu">export</span> <span class="va">LTPROOT=</span><span class="st">&quot;/opt/ltp&quot;</span>; <span class="bu">export</span> <span class="va">PATH=</span><span class="st">&quot;</span><span class="va">$LTPROOT</span><span class="st">/testcases/bin:</span><span class="va">$PATH</span><span class="st">&quot;</span></a></code></pre></div>
+<h2 id="运行测试"><span class="header-section-number">1.5</span> 运行测试</h2>
+<p>网络测试通过运行 network.sh 脚本执行:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">TEST_VARS</span> ./network.sh OPTIONS</a></code></pre></div>
+<p>其中</p>
+<ul>
+<li><code>TEST_VARS</code> - 非默认的网络参数</li>
+<li><code>OPTIONS</code> - 测试组(s)，使用 -h 查看可用选项。</li>
+</ul>
+<p>所有 LTP 网络参数的默认值都在 <code>testcases/lib/tst_net.sh</code> 中设置。网络压力参数在 <code>testcases/network/stress/README</code> 中有文档。</p>
+<p>使用 <code>tst_netload_compare()</code> 测试的测试还会测试性能。它们可能在过载的系统上失败。为了忽略性能失败并仅测试网络功能，请设置 <code>LTP_NET_FEATURES_IGNORE_PERFORMANCE_FAILURE=1</code> 环境变量。</p>
+<h2 id="调试"><span class="header-section-number">1.6</span> 调试</h2>
+<p>单主机和双主机配置都支持通过 <code>TST_NET_RHOST_RUN_DEBUG=1</code> 环境变量进行调试。</p>
+</body>
+</html>

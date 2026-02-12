@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>c1ccfcf1a9bf NFSD: Reschedule CB operations when backchannel rpc_clnt is shut down</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">c1ccfcf1a9bf NFSD: Reschedule CB operations when backchannel rpc_clnt is shut down</h1>
+</header>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p><a href="https://lore.kernel.org/all/170629112969.20612.8526400738389878628.stgit@manet.1015granger.net/"><code>c1ccfcf1a9bf NFSD: Reschedule CB operations when backchannel rpc_clnt is shut down</code></a>:</p>
+<pre><code>在管理客户端断开连接时，NFSD会关闭并替换backchannel的rpc_clnt。
+
+如果在关闭backchannel的rpc_clnt时有回调操作挂起，目前nfsd4_run_cb_work()会直接丢弃该回调。但这里有多种情况需要处理:
+- 客户端的租约正在销毁。抛弃该回调。
+- 客户端断开连接。它可能会强制重新传输CB操作，或者由于其他原因断开连接。当客户端重新连接时，重新安排CB进行重新传输。
+
+由于现在可以重新安排回调操作，请确保cb_ops-&gt;prepare只能被调用一次，将cb_ops-&gt;prepare段落移动到rpc_call_async()调用之前。</code></pre>
+<p>主线又做了回退<a href="https://lore.kernel.org/all/171391800174.101038.3614787261244381619.stgit@klimt.1015granger.net/"><code>Revert "NFSD: Reschedule CB operations when backchannel rpc_clnt is shut down"</code></a>:</p>
+<pre><code>还原的提交尝试使NFSD在NFS客户端断开连接时重新传输挂起的回调操作，但如果客户端在回调操作仍在挂起时永久不可达，这会无意中引入危险的行为回归。
+
+断开连接可能是由于网络分区，或者是NFS服务器需要强制NFS客户端重新传输（例如，如果发生GSS窗口不足）。
+
+还原提交后，NFSD的行为将恢复到v6.8及之前的版本。如果在客户端收到回调操作之前连接被终止，挂起的回调操作将永久丢失。
+
+对于某些回调操作，这种丢失是无害的。
+
+然而，对于CB_RECALL，这种丢失意味着可能不必要地撤销委托。对于CB_OFFLOAD，挂起的COPY操作将永远无法完成，除非NFS客户端随后发送OFFLOAD_STATUS操作，而Linux NFS客户端目前并未实现此操作。
+
+这些问题仍需以某种方式解决。</code></pre>
+</body>
+</html>

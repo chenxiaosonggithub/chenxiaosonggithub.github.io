@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>e28ce90083f0 xprtrdma: kmalloc rpcrdma_ep separate from rpcrdma_xprt</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">e28ce90083f0 xprtrdma: kmalloc rpcrdma_ep separate from rpcrdma_xprt</h1>
+</header>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p><code>e28ce90083f0 xprtrdma: kmalloc rpcrdma_ep separate from rpcrdma_xprt</code>，解决: 存储端口故障后，ip切换要2分钟，2分钟内均归零。</p>
+<pre><code>修改rpcrdma_xprt_disconnect()函数，使其不再等待DISCONNECTED事件。这可以防止在远程无响应时阻塞。
+
+在rpcrdma_xprt_disconnect()中，传输的rpcrdma_ep被分离。返回rpcrdma_xprt_disconnect()后，传输（r_xprt）立即准备好进行新的连接。
+
+现在，RDMA_CM_DEVICE_REMOVAL和RDMA_CM_DISCONNECTED事件几乎以相同的方式处理。
+
+然而，由于rpcrdma_xprt结构和rpcrdma_ep结构的生命周期现在是独立的，创建一个rpcrdma_ep需要增加一个模块引用计数。rpcrdma_ep现在拥有传输的大部分硬件资源。
+
+此外，需要一个kref来确保rpcrdma_ep在cm_event_handler完成之前能够保留足够长的时间。</code></pre>
+</body>
+</html>

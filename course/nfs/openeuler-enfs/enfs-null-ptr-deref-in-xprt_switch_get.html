@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>openEuler的nfs+ xprt_switch_get()空指针解引用问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">openEuler的nfs+ xprt_switch_get()空指针解引用问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#复现步骤"><span class="toc-section-number">2</span> 复现步骤</a></li>
+<li><a href="#vmcore解析"><span class="toc-section-number">3</span> vmcore解析</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">4</span> 代码分析</a></li>
+<li><a href="#代码修改"><span class="toc-section-number">5</span> 代码修改</a></li>
+<li><a href="#解决方案"><span class="toc-section-number">6</span> 解决方案</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>测试复现时所用的代码版本是<code>4467208a8b55 !17003  net_sched: red: fix a race in __red_change()</code>。</p>
+<p>环境信息:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> sys</a>
+<a class="sourceLine" id="cb1-2" title="2">      <span class="ex">KERNEL</span>: x86_64-build/vmlinux  [TAINTED]</a>
+<a class="sourceLine" id="cb1-3" title="3">    <span class="ex">DUMPFILE</span>: ../../../chenxiaosong/zvmcore  [PARTIAL DUMP]</a>
+<a class="sourceLine" id="cb1-4" title="4">        <span class="ex">CPUS</span>: 16 [OFFLINE: 15]</a>
+<a class="sourceLine" id="cb1-5" title="5">        <span class="ex">DATE</span>: Wed Jul  9 17:01:31 CST 2025</a>
+<a class="sourceLine" id="cb1-6" title="6">      <span class="ex">UPTIME</span>: 00:03:46</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="ex">LOAD</span> AVERAGE: 0.06, 0.03, 0.01</a>
+<a class="sourceLine" id="cb1-8" title="8">       <span class="ex">TASKS</span>: 250</a>
+<a class="sourceLine" id="cb1-9" title="9">    <span class="ex">NODENAME</span>: syzkaller</a>
+<a class="sourceLine" id="cb1-10" title="10">     <span class="ex">RELEASE</span>: 6.6.0+</a>
+<a class="sourceLine" id="cb1-11" title="11">     <span class="ex">VERSION</span>: <span class="co">#25 SMP PREEMPT_DYNAMIC Wed Jul  9 16:27:17 CST 2025</span></a>
+<a class="sourceLine" id="cb1-12" title="12">     <span class="ex">MACHINE</span>: x86_64  (3700 Mhz)</a>
+<a class="sourceLine" id="cb1-13" title="13">      <span class="ex">MEMORY</span>: 4 GB</a>
+<a class="sourceLine" id="cb1-14" title="14">       <span class="ex">PANIC</span>: <span class="st">&quot;Kernel panic - not syncing: Fatal exception&quot;</span></a></code></pre></div>
+<p>日志如下:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="bu">[</span>  226.610543] BUG: kernel NULL pointer dereference, address: 0000000000000104</a>
+<a class="sourceLine" id="cb2-2" title="2">...</a>
+<a class="sourceLine" id="cb2-3" title="3">[  226.621932] RIP: 0010:xprt_switch_get+0x1a/0x60</a>
+<a class="sourceLine" id="cb2-4" title="4">...</a>
+<a class="sourceLine" id="cb2-5" title="5">[  226.644646] Call Trace:</a>
+<a class="sourceLine" id="cb2-6" title="6">[  226.645323]  &lt;TASK&gt;</a>
+<a class="sourceLine" id="cb2-7" title="7">[  226.645918]  shard_update_work.constprop.0+0x71/0x220 [enfs]</a>
+<a class="sourceLine" id="cb2-8" title="8">[  226.647443]  shard_update_loop+0x219/0x290 [enfs]</a>
+<a class="sourceLine" id="cb2-9" title="9">[  226.650128]  kthread+0xfb/0x130</a>
+<a class="sourceLine" id="cb2-10" title="10">[  226.652008]  ret_from_fork+0x40/0x60</a>
+<a class="sourceLine" id="cb2-11" title="11">[  226.653997]  ret_from_fork_asm+0x1b/0x30</a>
+<a class="sourceLine" id="cb2-12" title="12">...</a>
+<a class="sourceLine" id="cb2-13" title="13">[  226.680809] ---[ end Kernel panic - not syncing: Fatal exception ]---</a></code></pre></div>
+<h1 id="复现步骤"><span class="header-section-number">2</span> 复现步骤</h1>
+<p>nfs+的使用请查看<a href="https://chenxiaosong.com/course/nfs/openeuler-enfs.html">《openEuler的nfs+》</a>。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">mount</span> -t nfs -o vers=3,localaddrs=192.168.53.57~192.168.53.214,remoteaddrs=192.168.53.68~192.168.53.225 192.168.53.225:/tmp/s_test /mnt/</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="ex">modprobe</span> -r enfs</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="fu">umount</span> /mnt</a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="fu">mount</span> -t nfs -o vers=3,localaddrs=192.168.53.57~192.168.53.214,remoteaddrs=192.168.53.68~192.168.53.225 192.168.53.225:/tmp/s_test /mnt/</a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co"># 再过60秒就会panic，必现的哦</span></a></code></pre></div>
+<h1 id="vmcore解析"><span class="header-section-number">3</span> vmcore解析</h1>
+<p><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/openeuler-enfs-null-ptr-deref-in-xprt_switch_get-vmcore.md">更详细的输出请点击这里查看</a>。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> dis -l xprt_switch_get</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="ex">/home/sonvhi/chenxiaosong/code/openeuler-kernel/x86_64-build/../net/sunrpc</span>/xprtmultipath.c: <span class="ex">187</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="ex">0xffffffff81fa3170</span> <span class="op">&lt;</span>xprt_switch_get<span class="op">&gt;</span>:   endbr64 </a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="ex">0xffffffff81fa3174</span> <span class="op">&lt;</span>xprt_switch_get+<span class="op">4&gt;</span>: nopl   0x0(%rax,%rax,1)</a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="ex">/home/sonvhi/chenxiaosong/code/openeuler-kernel/x86_64-build/../net/sunrpc</span>/xprtmultipath.c: <span class="ex">188</span></a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="ex">0xffffffff81fa3179</span> <span class="op">&lt;</span>xprt_switch_get+<span class="op">9&gt;</span>: test   %rdi,%rdi</a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="ex">0xffffffff81fa317c</span> <span class="op">&lt;</span>xprt_switch_get+<span class="op">12&gt;</span>:        je     0xffffffff81fa31c6 <span class="op">&lt;</span>xprt_switch_get+<span class="op">86&gt;</span></a>
+<a class="sourceLine" id="cb4-8" title="8"><span class="ex">/home/sonvhi/chenxiaosong/code/openeuler-kernel/x86_64-build/../net/sunrpc</span>/xprtmultipath.c: <span class="ex">187</span></a>
+<a class="sourceLine" id="cb4-9" title="9"><span class="ex">0xffffffff81fa317e</span> <span class="op">&lt;</span>xprt_switch_get+<span class="op">14&gt;</span>:        push   %rbp</a>
+<a class="sourceLine" id="cb4-10" title="10"><span class="ex">0xffffffff81fa317f</span> <span class="op">&lt;</span>xprt_switch_get+<span class="op">15&gt;</span>:        mov    %rsp,%rbp</a>
+<a class="sourceLine" id="cb4-11" title="11"><span class="ex">0xffffffff81fa3182</span> <span class="op">&lt;</span>xprt_switch_get+<span class="op">18&gt;</span>:        push   %rbx</a>
+<a class="sourceLine" id="cb4-12" title="12"><span class="ex">0xffffffff81fa3183</span> <span class="op">&lt;</span>xprt_switch_get+<span class="op">19&gt;</span>:        mov    %rdi,%rbx <span class="co"># 将寄存器 %rdi 中的值复制到寄存器 %rbx 中</span></a>
+<a class="sourceLine" id="cb4-13" title="13"><span class="ex">/home/sonvhi/chenxiaosong/code/openeuler-kernel/x86_64-build/../include/linux</span>/kref.h: <span class="ex">111</span></a>
+<a class="sourceLine" id="cb4-14" title="14"><span class="ex">0xffffffff81fa3186</span> <span class="op">&lt;</span>xprt_switch_get+<span class="op">22&gt;</span>:        lea    0x4(%rdi),<span class="ex">%rdi</span> <span class="co"># 将寄存器 %rdi 的值增加 4（通过地址计算实现，不访问内存）</span></a>
+<a class="sourceLine" id="cb4-15" title="15"><span class="ex">/home/sonvhi/chenxiaosong/code/openeuler-kernel/x86_64-build/../arch/x86/include/asm</span>/atomic.h: <span class="ex">23</span></a>
+<a class="sourceLine" id="cb4-16" title="16"><span class="ex">0xffffffff81fa318a</span> <span class="op">&lt;</span>xprt_switch_get+<span class="op">26&gt;</span>:        mov    0x4(%rbx),<span class="ex">%edx</span> <span class="co"># 将内存地址 %rbx + 4 处的 32 位值加载到寄存器 %edx 中</span></a></code></pre></div>
+<p>x86_64下整数参数使用的寄存器依次为: RDI，RSI，RDX，RCX，R8，R9，所以<code>xprt_switch_get()</code>的第一个参数是<code>%rdi</code>， 通过<code>mov %rdi,%rbx</code>把值赋给<code>%rbx</code>，而从<code>bt</code>输出中可以看到<code>RBX: 0000000000000100</code>，再结合<code>xps_kref</code>的偏移:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_xprt_switch -o</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="ex">struct</span> rpc_xprt_switch {</a>
+<a class="sourceLine" id="cb5-3" title="3">   [<span class="ex">0</span>] spinlock_t xps_lock<span class="kw">;</span></a>
+<a class="sourceLine" id="cb5-4" title="4">   [<span class="ex">4</span>] struct kref xps_kref<span class="kw">;</span></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb5-6" title="6">}</a></code></pre></div>
+<p>所以空指针解引用发生在<code>xps-&gt;xps_kref</code>。</p>
+<h1 id="代码分析"><span class="header-section-number">4</span> 代码分析</h1>
+<p>第一次挂载后，创建的<code>clnt_uuid_info</code>放到链表中，这时如果把<code>enfs</code>模块给移除了，再进行卸载nfs时就不会执行到<code>enfs_release_rpc_clnt()</code>， <code>clnt_uuid_info</code>就不会从链表中删除。</p>
+<p>第二次挂载后，内核线程<code>shard_update_loop()</code>就会遍历到第一次挂载时创建的<code>clnt_uuid_info</code>，就会发生use-after-free了。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb6-1" title="1"><span class="co">// 挂载时</span></a>
+<a class="sourceLine" id="cb6-2" title="2">nfs<span class="dv">3</span><span class="er">_create_server</span></a>
+<a class="sourceLine" id="cb6-3" title="3">  nfs_create_server</a>
+<a class="sourceLine" id="cb6-4" title="4">    nfs_init_server</a>
+<a class="sourceLine" id="cb6-5" title="5">      nfs_get_client</a>
+<a class="sourceLine" id="cb6-6" title="6">        nfs_init_client</a>
+<a class="sourceLine" id="cb6-7" title="7">          nfs_create_multi_path_client</a>
+<a class="sourceLine" id="cb6-8" title="8">            <span class="co">// 应该和nfs_alloc_client()一样，在client初始化后调用try_module_get()持有模块引用计数</span></a>
+<a class="sourceLine" id="cb6-9" title="9">            nfs_multipath_router_get <span class="co">// 执行完这里后模块引用计数为1</span></a>
+<a class="sourceLine" id="cb6-10" title="10">              <span class="co">// 应该在这里加载模块，参考get_nfs_version()</span></a>
+<a class="sourceLine" id="cb6-11" title="11">            nfs_multipath_client_info_init <span class="co">// ops-&gt;client_info_init</span></a>
+<a class="sourceLine" id="cb6-12" title="12">              nfs_multipath_client_mount_info_init</a>
+<a class="sourceLine" id="cb6-13" title="13">            nfs_multipath_router_put <span class="co">// 执行完这里后模块引用计数又变为0了</span></a>
+<a class="sourceLine" id="cb6-14" title="14">    nfs_probe_fsinfo</a>
+<a class="sourceLine" id="cb6-15" title="15">      nfs<span class="dv">3</span><span class="er">_proc_fsinfo</span></a>
+<a class="sourceLine" id="cb6-16" title="16">        do_proc_fsinfo</a>
+<a class="sourceLine" id="cb6-17" title="17">          nfs<span class="dv">3</span><span class="er">_rpc_wrapper</span></a>
+<a class="sourceLine" id="cb6-18" title="18">            rpc_call_sync</a>
+<a class="sourceLine" id="cb6-19" title="19">              rpc_run_task</a>
+<a class="sourceLine" id="cb6-20" title="20">                rpc_execute</a>
+<a class="sourceLine" id="cb6-21" title="21">                  __rpc_execute</a>
+<a class="sourceLine" id="cb6-22" title="22">                    call_start</a>
+<a class="sourceLine" id="cb6-23" title="23">                      rpc_task_set_transport</a>
+<a class="sourceLine" id="cb6-24" title="24">                        rpc_multipath_ops_set_transport</a>
+<a class="sourceLine" id="cb6-25" title="25">                          enfs_set_transport</a>
+<a class="sourceLine" id="cb6-26" title="26">                            shard_set_transport</a>
+<a class="sourceLine" id="cb6-27" title="27">                              get_uuid_from_task</a>
+<a class="sourceLine" id="cb6-28" title="28">                                enfs_insert_clnt_root</a>
+<a class="sourceLine" id="cb6-29" title="29">                                  <span class="co">// 加入到链表中</span></a>
+<a class="sourceLine" id="cb6-30" title="30">                                  list_add_tail(&amp;info-&gt;next,</a>
+<a class="sourceLine" id="cb6-31" title="31"></a>
+<a class="sourceLine" id="cb6-32" title="32"><span class="co">// 卸载时</span></a>
+<a class="sourceLine" id="cb6-33" title="33">nfs_free_server</a>
+<a class="sourceLine" id="cb6-34" title="34">  rpc_shutdown_client</a>
+<a class="sourceLine" id="cb6-35" title="35">    rpc_multipath_ops_releas_clnt</a>
+<a class="sourceLine" id="cb6-36" title="36">      <span class="co">/*</span></a>
+<a class="sourceLine" id="cb6-37" title="37"><span class="co">       * 如果已经执行了modprobe -r enfs</span></a>
+<a class="sourceLine" id="cb6-38" title="38"><span class="co">       * 就不会调用enfs_release_rpc_clnt()</span></a>
+<a class="sourceLine" id="cb6-39" title="39"><span class="co">       * clnt_uuid_info还在链表中</span></a>
+<a class="sourceLine" id="cb6-40" title="40"><span class="co">       */</span></a>
+<a class="sourceLine" id="cb6-41" title="41">      rpc_multipath_ops_get</a>
+<a class="sourceLine" id="cb6-42" title="42">      enfs_release_rpc_clnt</a>
+<a class="sourceLine" id="cb6-43" title="43">        enfs_delete_clnt_shard_cache</a>
+<a class="sourceLine" id="cb6-44" title="44">          list_del(&amp;info-&gt;next)</a>
+<a class="sourceLine" id="cb6-45" title="45">  nfs_put_client</a>
+<a class="sourceLine" id="cb6-46" title="46">    nfs_free_client</a>
+<a class="sourceLine" id="cb6-47" title="47">      nfs_free_multi_path_client</a>
+<a class="sourceLine" id="cb6-48" title="48">        nfs_multipath_client_info_free <span class="co">// ops-&gt;client_info_free</span></a>
+<a class="sourceLine" id="cb6-49" title="49">        <span class="co">// 应该在这里释放模块引用计数</span></a>
+<a class="sourceLine" id="cb6-50" title="50"></a>
+<a class="sourceLine" id="cb6-51" title="51"><span class="co">// 再次挂载后60s</span></a>
+<a class="sourceLine" id="cb6-52" title="52">shard_update_loop <span class="co">// 在enfs_shard_init创建线程</span></a>
+<a class="sourceLine" id="cb6-53" title="53">  enfs_timeout_ms(..., interval_ms == <span class="dv">60</span><span class="er">s</span>)</a>
+<a class="sourceLine" id="cb6-54" title="54">  query_update_all_clnt</a>
+<a class="sourceLine" id="cb6-55" title="55">    <span class="co">/*</span></a>
+<a class="sourceLine" id="cb6-56" title="56"><span class="co">     * 这里会遍历到上次挂载创建的clnt_uuid_info</span></a>
+<a class="sourceLine" id="cb6-57" title="57"><span class="co">     * 发生use-after-free</span></a>
+<a class="sourceLine" id="cb6-58" title="58"><span class="co">     */</span></a>
+<a class="sourceLine" id="cb6-59" title="59">    list_for_each_entry(info,</a>
+<a class="sourceLine" id="cb6-60" title="60">    shard_update_work</a>
+<a class="sourceLine" id="cb6-61" title="61">      xprt_switch_get</a>
+<a class="sourceLine" id="cb6-62" title="62">        kref_get_unless_zero</a>
+<a class="sourceLine" id="cb6-63" title="63">          refcount_inc_not_zero</a>
+<a class="sourceLine" id="cb6-64" title="64">            atomic_read</a>
+<a class="sourceLine" id="cb6-65" title="65">              raw_atomic_read</a>
+<a class="sourceLine" id="cb6-66" title="66">                arch_atomic_read <span class="co">// panic的栈跑到这里</span></a></code></pre></div>
+<h1 id="代码修改"><span class="header-section-number">5</span> 代码修改</h1>
+<p><code>fs/nfs/enfs/shard_route.c</code>只有以下函数在其他文件中有调用:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb7-1" title="1"><span class="dt">int</span> enfs_shard_init(<span class="dt">void</span>)</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="dt">void</span> enfs_shard_exit(<span class="dt">void</span>)</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="dt">int</span> enfs_delete_clnt_shard_cache(<span class="kw">struct</span> rpc_clnt *clnt)</a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="dt">void</span> enfs_print_uuid(<span class="kw">struct</span> enfs_file_uuid *file_uuid)</a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="dt">void</span> shard_set_transport(<span class="kw">struct</span> rpc_task *task, <span class="kw">struct</span> rpc_clnt *clnt)</a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="dt">int</span> enfs_debug_match_cmd(<span class="dt">char</span> *str, <span class="dt">size_t</span> len)</a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="dt">void</span> enfs_query_xprt_shard(<span class="kw">struct</span> rpc_clnt *clnt, <span class="kw">struct</span> rpc_xprt *xprt)</a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="kw">struct</span> shard_view_ctrl *enfs_shard_ctrl_init(<span class="dt">void</span>)</a></code></pre></div>
+<h1 id="解决方案"><span class="header-section-number">6</span> 解决方案</h1>
+<p><a href="https://gitee.com/openeuler/kernel/pulls/17205/commits">请查看pr</a>。</p>
+</body>
+</html>

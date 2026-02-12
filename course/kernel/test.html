@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>内核测试工具</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">内核测试工具</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#syzkaller"><span class="toc-section-number">1</span> syzkaller</a><ul>
+<li><a href="#软件环境"><span class="toc-section-number">1.1</span> 软件环境</a></li>
+<li><a href="#生成qcow2镜像"><span class="toc-section-number">1.2</span> 生成<code>qcow2</code>镜像</a></li>
+<li><a href="#运行"><span class="toc-section-number">1.3</span> 运行</a></li>
+<li><a href="#构造一个简单的bug"><span class="toc-section-number">1.4</span> 构造一个简单的bug</a></li>
+<li><a href="#复现"><span class="toc-section-number">1.5</span> 复现</a></li>
+</ul></li>
+<li><a href="#xfstests"><span class="toc-section-number">2</span> xfstests</a><ul>
+<li><a href="#安装"><span class="toc-section-number">2.1</span> 安装</a></li>
+<li><a href="#测试前准备"><span class="toc-section-number">2.2</span> 测试前准备</a></li>
+<li><a href="#测试"><span class="toc-section-number">2.3</span> 测试</a><ul>
+<li><a href="#check---help"><span class="toc-section-number">2.3.1</span> <code>./check --help</code></a></li>
+<li><a href="#ext4"><span class="toc-section-number">2.3.2</span> ext4</a></li>
+<li><a href="#nfs"><span class="toc-section-number">2.3.3</span> nfs</a></li>
+</ul></li>
+<li><a href="#调试脚本"><span class="toc-section-number">2.4</span> 调试脚本</a></li>
+</ul></li>
+<li><a href="#ltp"><span class="toc-section-number">3</span> ltp</a><ul>
+<li><a href="#环境"><span class="toc-section-number">3.1</span> 环境</a></li>
+<li><a href="#ltp-network-tests"><span class="toc-section-number">3.2</span> LTP Network Tests</a></li>
+</ul></li>
+<li><a href="#kunit"><span class="toc-section-number">4</span> KUnit</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<p>下面介绍一些Linux内核的测试工具。</p>
+<h1 id="syzkaller"><span class="header-section-number">1</span> syzkaller</h1>
+<p>参考:</p>
+<ul>
+<li><a href="https://github.com/google/syzkaller">syzkaller源码</a></li>
+<li><a href="https://chenxiaosong.com/src/translation/tests/syzkaller.html">syzkaller文档翻译</a></li>
+</ul>
+<h2 id="软件环境"><span class="header-section-number">1.1</span> 软件环境</h2>
+<p>打开<a href="https://go.dev/dl/">All releases - The Go Programming Language</a>，下载最新版本，如<code>go1.22.5.linux-amd64.tar.gz</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">wget</span> https://go.dev/dl/go1.22.5.linux-amd64.tar.gz</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="fu">tar</span> xvf go1.22.5.linux-amd64.tar.gz</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="bu">export</span> <span class="va">GOROOT=</span><span class="kw">`</span><span class="bu">pwd</span><span class="kw">`</span>/go</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="bu">export</span> <span class="va">PATH=$GOROOT</span>/bin:<span class="va">$PATH</span></a></code></pre></div>
+<p>编译<code>syzkaller</code>源码:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">git</span> clone https://github.com/google/syzkaller</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="bu">cd</span> syzkaller</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="fu">make</span> <span class="co"># 编译结果在 bin/</span></a></code></pre></div>
+<p>安装软件:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">sudo</span> apt update</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="fu">sudo</span> apt install make gcc flex bison libncurses-dev libelf-dev libssl-dev -y</a></code></pre></div>
+<p>内核<a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/kernel-config/x86_64-config">x86_64-config</a>文件还要打开以下配置:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># Debug info for symbolization.</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="va">CONFIG_DEBUG_INFO_DWARF4=</span>y</a>
+<a class="sourceLine" id="cb4-3" title="3"></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="co"># Memory bug detector，这玩意儿会导致运行很慢，所以如果不是测试的不要打开</span></a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="va">CONFIG_KASAN=</span>y</a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="va">CONFIG_KASAN_INLINE=</span>y</a></code></pre></div>
+<h2 id="生成qcow2镜像"><span class="header-section-number">1.2</span> 生成<code>qcow2</code>镜像</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">sudo</span> apt install debootstrap -y</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="fu">mkdir</span> syzkaller-image</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="bu">cd</span> syzkaller-image</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="fu">wget</span> https://raw.githubusercontent.com/google/syzkaller/master/tools/create-image.sh -O create-image.sh</a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="fu">chmod</span> +x create-image.sh</a></code></pre></div>
+<p>为了加快下载速度，然后将<code>create-image.sh</code>中的<code>DEBOOTSTRAP_PARAMS="--keyring /usr/share/keyrings/debian-archive-removed-keys.gpg $DEBOOTSTRAP_PARAMS</code>后面的链接修改成<code>https://repo.huaweicloud.com/debian/</code>。但有些网络下也不会加快太多，可以想办法访问国外网络进行下载。</p>
+<p>再运行脚本生成<code>bullseye.img</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="ex">./create-image.sh</span></a></code></pre></div>
+<p>生成<code>bullseye.img</code>后，用以下脚本启动测试一下:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">qemu-system-x86_64</span> \</a>
+<a class="sourceLine" id="cb8-2" title="2">    -m 2G \</a>
+<a class="sourceLine" id="cb8-3" title="3">    -smp 16 \</a>
+<a class="sourceLine" id="cb8-4" title="4">    -kernel /home/sonvhi/chenxiaosong/code/x86_64-linux/build/arch/x86/boot/bzImage \</a>
+<a class="sourceLine" id="cb8-5" title="5">    -append <span class="st">&quot;console=ttyS0 root=/dev/sda earlyprintk=serial net.ifnames=0&quot;</span> \</a>
+<a class="sourceLine" id="cb8-6" title="6">    -drive file=bullseye.img,format=raw \</a>
+<a class="sourceLine" id="cb8-7" title="7">    -net user,host=10.0.2.10,hostfwd=tcp:127.0.0.1:10021-:22 \</a>
+<a class="sourceLine" id="cb8-8" title="8">    -net nic,model=e1000 \</a>
+<a class="sourceLine" id="cb8-9" title="9">    -enable-kvm \</a>
+<a class="sourceLine" id="cb8-10" title="10">    -nographic \</a></code></pre></div>
+<p>确保能远程登录:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="fu">ssh</span> -i bullseye.id_rsa -p 10021 -o <span class="st">&quot;StrictHostKeyChecking no&quot;</span> root@localhost</a></code></pre></div>
+<p>测试完后，要把虚拟机关机，因为syzkaller会自己启动虚拟机。如果你已经用上面的脚本启动了虚拟机，再启动syzkaller就会启动失败，而且<code>qcow2</code>镜像也会损坏。</p>
+<h2 id="运行"><span class="header-section-number">1.3</span> 运行</h2>
+<p>到syzkaller源码目录下，创建<code>my.cfg</code>文件如下:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">{</span></a>
+<a class="sourceLine" id="cb10-2" title="2">    <span class="st">&quot;target&quot;</span>: <span class="st">&quot;linux/amd64&quot;</span>,</a>
+<a class="sourceLine" id="cb10-3" title="3">    <span class="st">&quot;http&quot;</span>: <span class="st">&quot;0.0.0.0:56741&quot;</span>,</a>
+<a class="sourceLine" id="cb10-4" title="4">    <span class="st">&quot;workdir&quot;</span>: <span class="st">&quot;workdir&quot;</span>,</a>
+<a class="sourceLine" id="cb10-5" title="5">    <span class="co"># 这个应该是vmlinux的路径</span></a>
+<a class="sourceLine" id="cb10-6" title="6">    <span class="st">&quot;kernel_obj&quot;</span>: <span class="st">&quot;/home/sonvhi/chenxiaosong/code/x86_64-linux/build/&quot;</span>,</a>
+<a class="sourceLine" id="cb10-7" title="7">    <span class="st">&quot;image&quot;</span>: <span class="st">&quot;/home/sonvhi/chenxiaosong/syzkaller-image/bullseye.img&quot;</span>,</a>
+<a class="sourceLine" id="cb10-8" title="8">    <span class="st">&quot;sshkey&quot;</span>: <span class="st">&quot;/home/sonvhi/chenxiaosong/syzkaller-image/bullseye.id_rsa&quot;</span>,</a>
+<a class="sourceLine" id="cb10-9" title="9">    <span class="st">&quot;syzkaller&quot;</span>: <span class="st">&quot;.&quot;</span>,</a>
+<a class="sourceLine" id="cb10-10" title="10">    <span class="co"># 只测 chmod 系统调用</span></a>
+<a class="sourceLine" id="cb10-11" title="11">    <span class="co"># &quot;enable_syscalls&quot;: [&quot;chmod&quot;],</span></a>
+<a class="sourceLine" id="cb10-12" title="12">    <span class="st">&quot;procs&quot;</span>: <span class="ex">8</span>,</a>
+<a class="sourceLine" id="cb10-13" title="13">    <span class="st">&quot;type&quot;</span>: <span class="st">&quot;qemu&quot;</span>,</a>
+<a class="sourceLine" id="cb10-14" title="14">    <span class="st">&quot;vm&quot;</span>: <span class="kw">{</span></a>
+<a class="sourceLine" id="cb10-15" title="15">        <span class="st">&quot;count&quot;</span>: <span class="ex">4</span>,</a>
+<a class="sourceLine" id="cb10-16" title="16">        <span class="st">&quot;kernel&quot;</span>: <span class="st">&quot;/home/sonvhi/chenxiaosong/code/x86_64-linux/build/arch/x86/boot/bzImage&quot;</span>,</a>
+<a class="sourceLine" id="cb10-17" title="17">        <span class="st">&quot;cpu&quot;</span>: <span class="ex">2</span>,</a>
+<a class="sourceLine" id="cb10-18" title="18">        <span class="st">&quot;mem&quot;</span>: <span class="ex">2048</span></a>
+<a class="sourceLine" id="cb10-19" title="19">    <span class="kw">}</span></a>
+<a class="sourceLine" id="cb10-20" title="20"><span class="kw">}</span></a></code></pre></div>
+<p>运行:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="fu">mkdir</span> workdir</a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="ex">./bin/syz-manager</span> -config=my.cfg</a></code></pre></div>
+<p>这时就能通过网页查看测试结果。如果你是在docker中运行syzkaller，想在加一台电脑上访问网页，可以在宿主机中安装nginx，并在nginx配置文件<code>/etc/nginx/sites-enabled/default</code>中添加以下内容，<code>172.17.0.3</code>是docker的ip:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="ex">server</span> {</a>
+<a class="sourceLine" id="cb12-2" title="2">        <span class="ex">listen</span> 56741<span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-3" title="3"></a>
+<a class="sourceLine" id="cb12-4" title="4">        <span class="ex">location</span> / {</a>
+<a class="sourceLine" id="cb12-5" title="5">                <span class="ex">proxy_pass</span> http://172.17.0.3:56741/<span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-6" title="6">        }</a>
+<a class="sourceLine" id="cb12-7" title="7">}</a></code></pre></div>
+<p>这时就可以在其他电脑上访问<code>http://192.168.3.224:56741/</code>（<code>192.168.3.224</code>是宿主机的ip）。</p>
+<h2 id="构造一个简单的bug"><span class="header-section-number">1.4</span> 构造一个简单的bug</h2>
+<p>连续两次<code>chmod</code>调用的mode入参为0时，产生空指针解引用的bug，这个函数的执行路径是<code>chmod() -&gt; do_fchmodat() -&gt; chmod_common()</code>。</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="fu">diff</span> --git a/fs/open.c b/fs/open.c</a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="ex">index</span> 50e45bc7c4d8..ee7962ca777d 100644</a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="ex">---</span> a/fs/open.c</a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="ex">+++</span> b/fs/open.c</a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="ex">@@</span> -637,6 +637,12 @@ int chmod_common(const struct path *path, umode_t mode)</a>
+<a class="sourceLine" id="cb13-6" title="6">        <span class="ex">struct</span> iattr newattrs<span class="kw">;</span></a>
+<a class="sourceLine" id="cb13-7" title="7">        <span class="ex">int</span> error<span class="kw">;</span></a>
+<a class="sourceLine" id="cb13-8" title="8"></a>
+<a class="sourceLine" id="cb13-9" title="9"><span class="ex">+</span>        static umode_t old_mode = 0xffff<span class="kw">;</span></a>
+<a class="sourceLine" id="cb13-10" title="10"><span class="ex">+</span>        if (old_mode == 0 <span class="kw">&amp;&amp;</span> <span class="ex">mode</span> == 0) <span class="kw">{</span></a>
+<a class="sourceLine" id="cb13-11" title="11"><span class="ex">+</span>                path = NULL<span class="kw">;</span></a>
+<a class="sourceLine" id="cb13-12" title="12"><span class="ex">+</span>        <span class="kw">}</span></a>
+<a class="sourceLine" id="cb13-13" title="13"><span class="ex">+</span>        old_mode = mode<span class="kw">;</span></a>
+<a class="sourceLine" id="cb13-14" title="14"><span class="ex">+</span></a>
+<a class="sourceLine" id="cb13-15" title="15">        <span class="ex">error</span> = mnt_want_write(path-<span class="op">&gt;</span>mnt);</a>
+<a class="sourceLine" id="cb13-16" title="16">        <span class="kw">if</span> <span class="kw">(</span><span class="ex">error</span><span class="kw">)</span></a>
+<a class="sourceLine" id="cb13-17" title="17">                <span class="bu">return</span> error<span class="kw">;</span></a></code></pre></div>
+<p>到syzkaller源码目录下，<code>my.cfg</code>文件修改成如下，增加<code>enable_syscalls</code>，只测试<code>chmod</code>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">{</span></a>
+<a class="sourceLine" id="cb14-2" title="2">    <span class="st">&quot;target&quot;</span>: <span class="st">&quot;linux/amd64&quot;</span>,</a>
+<a class="sourceLine" id="cb14-3" title="3">    <span class="st">&quot;http&quot;</span>: <span class="st">&quot;0.0.0.0:56741&quot;</span>,</a>
+<a class="sourceLine" id="cb14-4" title="4">    <span class="st">&quot;workdir&quot;</span>: <span class="st">&quot;workdir&quot;</span>,</a>
+<a class="sourceLine" id="cb14-5" title="5">    <span class="co"># 这个应该是vmlinux的路径</span></a>
+<a class="sourceLine" id="cb14-6" title="6">    <span class="st">&quot;kernel_obj&quot;</span>: <span class="st">&quot;/home/sonvhi/chenxiaosong/code/x86_64-linux/build/&quot;</span>,</a>
+<a class="sourceLine" id="cb14-7" title="7">    <span class="st">&quot;image&quot;</span>: <span class="st">&quot;/home/sonvhi/chenxiaosong/syzkaller-image/bullseye.img&quot;</span>,</a>
+<a class="sourceLine" id="cb14-8" title="8">    <span class="st">&quot;sshkey&quot;</span>: <span class="st">&quot;/home/sonvhi/chenxiaosong/syzkaller-image/bullseye.id_rsa&quot;</span>,</a>
+<a class="sourceLine" id="cb14-9" title="9">    <span class="st">&quot;syzkaller&quot;</span>: <span class="st">&quot;.&quot;</span>,</a>
+<a class="sourceLine" id="cb14-10" title="10">    <span class="co"># 只测 chmod 系统调用</span></a>
+<a class="sourceLine" id="cb14-11" title="11">    <span class="st">&quot;enable_syscalls&quot;</span>: [<span class="st">&quot;chmod&quot;</span>],</a>
+<a class="sourceLine" id="cb14-12" title="12">    <span class="st">&quot;procs&quot;</span>: <span class="ex">8</span>,</a>
+<a class="sourceLine" id="cb14-13" title="13">    <span class="st">&quot;type&quot;</span>: <span class="st">&quot;qemu&quot;</span>,</a>
+<a class="sourceLine" id="cb14-14" title="14">    <span class="st">&quot;vm&quot;</span>: <span class="kw">{</span></a>
+<a class="sourceLine" id="cb14-15" title="15">        <span class="st">&quot;count&quot;</span>: <span class="ex">4</span>,</a>
+<a class="sourceLine" id="cb14-16" title="16">        <span class="st">&quot;kernel&quot;</span>: <span class="st">&quot;/home/sonvhi/chenxiaosong/code/x86_64-linux/build/arch/x86/boot/bzImage&quot;</span>,</a>
+<a class="sourceLine" id="cb14-17" title="17">        <span class="st">&quot;cpu&quot;</span>: <span class="ex">2</span>,</a>
+<a class="sourceLine" id="cb14-18" title="18">        <span class="st">&quot;mem&quot;</span>: <span class="ex">2048</span></a>
+<a class="sourceLine" id="cb14-19" title="19">    <span class="kw">}</span></a>
+<a class="sourceLine" id="cb14-20" title="20"><span class="kw">}</span></a></code></pre></div>
+<p>运行:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="fu">mkdir</span> workdir</a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="ex">./bin/syz-manager</span> -config=my.cfg</a></code></pre></div>
+<h2 id="复现"><span class="header-section-number">1.5</span> 复现</h2>
+<p>可以在<a href="https://syzkaller.appspot.com/upstream">syzbot</a>中找发现的bug，有crash的日志和复现程序（syz和C），把<code>bin/linux_amd64/</code>复制到要测试的虚拟机中，按以下步骤复现。</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="bu">echo</span> 1 <span class="op">&gt;</span> /proc/sys/kernel/panic_on_oops <span class="co"># 注意不能用 vim 编辑</span></a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="fu">cat</span> /proc/sys/kernel/panic_on_oops <span class="co"># 确认是否生效</span></a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="ex">./linux_amd64/syz-execprog</span> -executor=./linux_amd64/syz-executor -repeat=0 -procs=16 -cover=0 crash-log</a>
+<a class="sourceLine" id="cb16-4" title="4"><span class="ex">./linux_amd64/syz-execprog</span> -executor=./linux_amd64/syz-executor -repeat=0 -procs=16 -cover=0 file-with-a-single-program</a></code></pre></div>
+<h1 id="xfstests"><span class="header-section-number">2</span> xfstests</h1>
+<ul>
+<li><a href="https://chenxiaosong.com/src/translation/tests/xfstests-readme.html">xfstests README中文翻译</a>。</li>
+<li><a href="https://chenxiaosong.com/src/translation/tests/xfstests-readme.config-sections.html">xfstests README.config-sections中文翻译</a></li>
+</ul>
+<h2 id="安装"><span class="header-section-number">2.1</span> 安装</h2>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" title="1"><span class="fu">sudo</span> yum install acl attr automake bc dbench dump e2fsprogs fio gawk gcc \</a>
+<a class="sourceLine" id="cb17-2" title="2">        gdbm-devel git indent kernel-devel libacl-devel libaio-devel \</a>
+<a class="sourceLine" id="cb17-3" title="3">        libcap-devel libtool liburing-devel libuuid-devel lvm2 make psmisc \</a>
+<a class="sourceLine" id="cb17-4" title="4">        python3 quota sed sqlite udftools  xfsprogs -y</a>
+<a class="sourceLine" id="cb17-5" title="5"><span class="co"># 安装用于正在测试的文件系统的软件包，或者其他软件包</span></a>
+<a class="sourceLine" id="cb17-6" title="6"><span class="fu">sudo</span> yum install btrfs-progs exfatprogs f2fs-tools ocfs2-tools xfsdump \</a>
+<a class="sourceLine" id="cb17-7" title="7">        xfsprogs-devel</a></code></pre></div>
+<p>源码编译安装:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1"><span class="fu">git</span> clone https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git</a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="bu">cd</span> xfstests-dev</a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="fu">make</span> -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="fu">sudo</span> make install</a></code></pre></div>
+<h2 id="测试前准备"><span class="header-section-number">2.2</span> 测试前准备</h2>
+<p>qemu的启动脚本添加两个设备:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1"><span class="ex">-drive</span> file=1,if=none,format=raw,cache=writeback,file.locking=off,id=dd_1 \</a>
+<a class="sourceLine" id="cb19-2" title="2">-device scsi-hd,drive=dd_1,id=disk_1,logical_block_size=512,physical_block_size=512 \</a>
+<a class="sourceLine" id="cb19-3" title="3">-drive file=2,if=none,format=raw,cache=writeback,file.locking=off,id=dd_2 \</a>
+<a class="sourceLine" id="cb19-4" title="4">-device scsi-hd,drive=dd_2,id=disk_2,logical_block_size=512,physical_block_size=512 \</a></code></pre></div>
+<p>创建两个10G的文件:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1"><span class="ex">fallocate</span> -l 10G 1</a>
+<a class="sourceLine" id="cb20-2" title="2"><span class="ex">fallocate</span> -l 10G 2</a></code></pre></div>
+<p>然后启动虚拟机，进入虚拟机。</p>
+<p>(可选) 创建 fsgqa 测试用户和组:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1"><span class="fu">sudo</span> useradd -m fsgqa</a>
+<a class="sourceLine" id="cb21-2" title="2"><span class="fu">sudo</span> useradd 123456-fsgqa</a>
+<a class="sourceLine" id="cb21-3" title="3"><span class="fu">sudo</span> useradd fsgqa2</a>
+<a class="sourceLine" id="cb21-4" title="4"><span class="fu">sudo</span> groupadd fsgqa</a></code></pre></div>
+<h2 id="测试"><span class="header-section-number">2.3</span> 测试</h2>
+<h3 id="check---help"><span class="header-section-number">2.3.1</span> <code>./check --help</code></h3>
+<p>翻译如下:</p>
+<pre><code>用法: ./check [选项] [测试列表]
+
+check 选项
+    -nfs       测试 NFS
+    -afs       测试 AFS
+    -glusterfs 测试 GlusterFS
+    -cifs      测试 CIFS
+    -9p        测试 9p
+    -fuse      测试 fuse
+    -virtiofs  测试 virtiofs
+    -overlay   测试 overlay
+    -pvfs2     测试 PVFS2
+    -tmpfs     测试 TMPFS
+    -ubifs     测试 ubifs
+    -l         行模式 diff
+    -udiff     显示统一 diff（默认）
+    -n         只显示，不运行测试
+    -T         输出时间戳
+    -r         随机化测试顺序
+    --exact-order  按指定的准确顺序运行测试
+    -i &lt;n&gt;     重复测试列表 &lt;n&gt; 次
+    -I &lt;n&gt;     重复测试列表 &lt;n&gt; 次，但在任何测试失败时停止继续迭代
+    -d         将测试输出转储到标准输出
+    -b         简要测试总结
+    -R fmt[,fmt]  以指定的格式生成报告。支持的格式：xunit, xunit-quiet
+    --large-fs   优化大文件系统的临时设备
+    -s section   仅运行配置文件中指定的部分
+    -S section   排除配置文件中指定的部分
+    -L &lt;n&gt;       测试失败后循环测试 &lt;n&gt; 次，测量通过/失败的总体指标
+
+测试列表选项
+    -g group[,group...]   包含这些组中的测试
+    -x group[,group...]   排除这些组中的测试
+    -X exclude_file       排除单个测试
+    -e testlist           排除特定的测试列表
+    -E external_file      排除单个测试
+    [testlist]            包含匹配名称的测试
+
+testlist 参数是以 &lt;test dir&gt;/&lt;test name&gt; 形式的测试列表。
+
+&lt;test dir&gt; 是 tests 下的一个目录，包含一个组文件，该文件列出了该目录下测试的名称。
+
+&lt;test name&gt; 可以是一个特定的测试文件名（例如 xfs/001）或一个测试文件名匹配模式（例如 xfs/*）。
+
+group 参数是测试组的名称，可以从所有测试目录中收集（例如 quick）或从特定测试目录中的组收集，形式为 &lt;test dir&gt;/&lt;group name&gt;（例如 xfs/quick）。
+如果要运行测试套件中的所有测试，可以使用 &quot;-g all&quot; 来指定所有组。
+
+exclude_file 参数是每个测试目录下的一个文件名。在该文件所在的每个测试目录中，列出的测试名称将从该目录的测试列表中排除。
+
+external_file 参数是一个路径，指向一个包含要排除的测试列表的单个文件，格式为 &lt;test dir&gt;/&lt;test name&gt;。
+
+示例：
+ check xfs/001
+ check -g quick
+ check -g xfs/quick
+ check -x stress xfs/*
+ check -X .exclude -g auto
+ check -E ~/.xfstests.exclude</code></pre>
+<h3 id="ext4"><span class="header-section-number">2.3.2</span> ext4</h3>
+<p>创建<code>local.config</code>配置文件:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb23-1" title="1"><span class="bu">export</span> <span class="va">TEST_DEV=</span>/dev/sda</a>
+<a class="sourceLine" id="cb23-2" title="2"><span class="bu">export</span> <span class="va">TEST_DIR=</span>/tmp/test</a>
+<a class="sourceLine" id="cb23-3" title="3"><span class="bu">export</span> <span class="va">SCRATCH_DEV=</span>/dev/sdb</a>
+<a class="sourceLine" id="cb23-4" title="4"><span class="bu">export</span> <span class="va">SCRATCH_MNT=</span>/tmp/scratch</a>
+<a class="sourceLine" id="cb23-5" title="5"><span class="bu">export</span> <span class="va">FSTYP=</span>ext4</a>
+<a class="sourceLine" id="cb23-6" title="6"><span class="bu">export</span> <span class="va">MKFS_OPTIONS=</span><span class="st">&quot;-b 4096&quot;</span></a>
+<a class="sourceLine" id="cb23-7" title="7"><span class="bu">export</span> <span class="va">MOUNT_OPTIONS=</span><span class="st">&quot;-o acl,user_xattr&quot;</span></a></code></pre></div>
+<p>测试命令:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1"><span class="ex">./check</span> generic/001</a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="ex">./check</span> ext4/001</a>
+<a class="sourceLine" id="cb24-3" title="3"><span class="ex">./check</span> -g generic/dir <span class="co"># 组查看tests/generic/group.list</span></a></code></pre></div>
+<h3 id="nfs"><span class="header-section-number">2.3.3</span> nfs</h3>
+<p>先执行<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/nfs-svr-setup.sh"><code>bash nfs-svr-setup.sh</code></a>启动nfs server。</p>
+<p>创建<code>local.config</code>配置文件:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1"><span class="bu">export</span> <span class="va">TEST_DEV=</span>localhost:/s_test</a>
+<a class="sourceLine" id="cb25-2" title="2"><span class="bu">export</span> <span class="va">TEST_DIR=</span>/tmp/test</a>
+<a class="sourceLine" id="cb25-3" title="3"><span class="bu">export</span> <span class="va">SCRATCH_DEV=</span>localhost:/s_scratch</a>
+<a class="sourceLine" id="cb25-4" title="4"><span class="bu">export</span> <span class="va">SCRATCH_MNT=</span>/tmp/scratch</a>
+<a class="sourceLine" id="cb25-5" title="5"><span class="bu">export</span> <span class="va">FSTYP=</span>nfs</a>
+<a class="sourceLine" id="cb25-6" title="6"><span class="bu">export</span> <span class="va">MOUNT_OPTIONS=</span><span class="st">&quot;-o vers=4.2&quot;</span></a></code></pre></div>
+<p>测试命令:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb26-1" title="1"><span class="ex">./check</span> generic/001</a>
+<a class="sourceLine" id="cb26-2" title="2"><span class="ex">./check</span> nfs/001</a>
+<a class="sourceLine" id="cb26-3" title="3"><span class="ex">./check</span> -g generic/dir <span class="co"># 组查看tests/generic/group.list</span></a></code></pre></div>
+<h2 id="调试脚本"><span class="header-section-number">2.4</span> 调试脚本</h2>
+<p>在脚本前面加上“set -x”。</p>
+<h1 id="ltp"><span class="header-section-number">3</span> ltp</h1>
+<h2 id="环境"><span class="header-section-number">3.1</span> 环境</h2>
+<p>github源码: <a href="https://github.com/linux-test-project/ltp">linux-test-project/ltp</a>，参考<a href="https://github.com/linux-test-project/ltp/blob/master/INSTALL">INSTALL</a>安装需要的依赖软件。其中<code>linux-headers</code>相关的在debian上可以使用以下命令安装:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb27-1" title="1"><span class="ex">apt</span> search linux-headers <span class="kw">|</span> <span class="fu">less</span> <span class="co"># 搜索对应的软件包名</span></a>
+<a class="sourceLine" id="cb27-2" title="2"><span class="ex">apt</span> install -y linux-headers-amd64 linux-headers-5.10.0-28-common</a></code></pre></div>
+<p>编译安装参考<a href="https://chenxiaosong.com/src/translation/tests/ltp-readme.html">README中文翻译</a>，默认安装在<code>/opt/ltp</code>中。</p>
+<h2 id="ltp-network-tests"><span class="header-section-number">3.2</span> LTP Network Tests</h2>
+<p><a href="https://chenxiaosong.com/src/translation/tests/ltp-network-tests-readme.html">LTP Network Tests README中文翻译</a>。</p>
+<p>打开配置<code>CONFIG_VETH=m</code>、<code>CONFIG_NFS_FS=m</code>。</p>
+<p>在debian发行版下，启动nfs server服务后，执行命令<code>cd /opt/ltp/testscripts; ./network.sh -n</code>后报错，换成手动执行第一个用例<code>cd /opt/ltp/testcases/bin; PATH=$PATH:$PWD ./nfs01.sh -v 3 -t udp</code>，报错<code>nfs01 1 TCONF: rpc.statd not running</code>，修改<code>/opt/ltp/testcases/bin/nfs_lib.sh</code>:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb28-1" title="1"><span class="fu">diff</span> --git a/testcases/network/nfs/nfs_stress/nfs_lib.sh b/testcases/network/nfs/nfs_stress/nfs_lib.sh</a>
+<a class="sourceLine" id="cb28-2" title="2"><span class="ex">index</span> d3de3b7f1..4be0bcc6f 100644</a>
+<a class="sourceLine" id="cb28-3" title="3"><span class="ex">---</span> a/testcases/network/nfs/nfs_stress/nfs_lib.sh</a>
+<a class="sourceLine" id="cb28-4" title="4"><span class="ex">+++</span> b/testcases/network/nfs/nfs_stress/nfs_lib.sh</a>
+<a class="sourceLine" id="cb28-5" title="5"><span class="ex">@@</span> -174,7 +174,7 @@ nfs_setup()</a>
+<a class="sourceLine" id="cb28-6" title="6">        <span class="kw">fi</span></a>
+<a class="sourceLine" id="cb28-7" title="7"></a>
+<a class="sourceLine" id="cb28-8" title="8">        <span class="kw">if</span> <span class="ex">tst_cmd_available</span> pgrep<span class="kw">;</span> <span class="kw">then</span></a>
+<a class="sourceLine" id="cb28-9" title="9"><span class="ex">-</span>               for i in rpc.mountd rpc.statd<span class="kw">;</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb28-10" title="10"><span class="ex">+</span>               for i in rpc.mountd<span class="kw">;</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb28-11" title="11">                        <span class="ex">pgrep</span> <span class="va">$i</span> <span class="op">&gt;</span> /dev/null <span class="kw">||</span> <span class="ex">tst_brk</span> TCONF <span class="st">&quot;</span><span class="va">$i</span><span class="st"> not running&quot;</span></a>
+<a class="sourceLine" id="cb28-12" title="12">                <span class="kw">done</span></a>
+<a class="sourceLine" id="cb28-13" title="13">        <span class="kw">fi</span></a></code></pre></div>
+<h1 id="kunit"><span class="header-section-number">4</span> KUnit</h1>
+<ul>
+<li><a href="https://www.kernel.org/doc/html/latest/dev-tools/kunit/index.html">KUnit - Linux Kernel Unit Testing</a></li>
+</ul>
+</body>
+</html>

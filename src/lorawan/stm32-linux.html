@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>STM32 Linux开发环境</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">STM32 Linux开发环境</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#软件安装"><span class="toc-section-number">1</span> 软件安装</a></li>
+<li><a href="#编译代码"><span class="toc-section-number">2</span> 编译代码</a></li>
+<li><a href="#烧录固件和调试代码"><span class="toc-section-number">3</span> 烧录固件和调试代码</a></li>
+</ul>
+</nav>
+<p>单片机STM32开发，大多数人都是在Windows下的Keil软件上进行的。Keil软件不仅要付费，编译还非常非常慢（据说优化做得好）。</p>
+<p>在Linux的开发环境下，使用gcc编译、gdb调试，不仅软件是自由开源免费，编译速度还非常非常快。</p>
+<p>就以我曾经做过的一个项目为例，同样的代码在同样配置的电脑上，在Windows系统的<strong>Keil下全部编译要8分钟左右</strong>，而在Linux的<strong>gcc下全部编译只需要几秒</strong>，编译时间是几十倍的关系。</p>
+<p>以Semtech公司开源的LoRa节点代码为例，说明STM32 的Linux开发环境的搭建和使用，github项目链接为<a href="https://github.com/Lora-net/LoRaMac-node">LoRaMac-node</a>。</p>
+<p>开发环境以<strong><code>Ubuntu18.04</code></strong>为例，以默认的NucleoL073板子（STM32L073）进行演示。</p>
+<h1 id="软件安装"><span class="header-section-number">1</span> 软件安装</h1>
+<p>参考文件<a href="https://github.com/Lora-net/LoRaMac-node/blob/master/doc/development-environment.md">development-environment.md</a>。</p>
+<p>先安装开发必备软件:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">sudo</span> apt install build-essential -y</a></code></pre></div>
+<p>安装GNU ARM-Toolchain，或源码安装（参考<a href="https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm">网站</a>）:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">sudo</span> apt install gcc-arm-none-eabi -y</a></code></pre></div>
+<p>安装OpenOCD，或源码安装（参考<a href="http://openocd.org/getting-openocd/">网站</a>）:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">sudo</span> apt-get install openocd -y</a></code></pre></div>
+<h1 id="编译代码"><span class="header-section-number">2</span> 编译代码</h1>
+<p>参考文件<a href="https://github.com/Lora-net/LoRaMac-node/blob/master/doc/development-environment.md">development-environment.md</a>。</p>
+<p>在项目的顶层目录下，创建build文件夹并进入:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">mkdir</span> build</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="bu">cd</span> build</a></code></pre></div>
+<p>生成makefile文件:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">cmake</span> -DCMAKE_TOOLCHAIN_FILE=<span class="st">&quot;cmake/toolchain-arm-none-eabi.cmake&quot;</span> ..</a></code></pre></div>
+<p>编译的结果为<code>src/apps/LoRaMac/LoRaMac-classA*</code></p>
+<p>STM32L073的cmake文件为<a href="https://github.com/Lora-net/LoRaMac-node/blob/master/cmake/stm32l0.cmake">cmake/stm32l0.cmake</a>，编译工具链的cmake文件为<a href="https://github.com/Lora-net/LoRaMac-node/blob/master/cmake/toolchain-arm-none-eabi.cmake">cmake/toolchain-arm-none-eabi.cmake</a>。如果是其他芯片平台，可以参考这些文件修改。</p>
+<h1 id="烧录固件和调试代码"><span class="header-section-number">3</span> 烧录固件和调试代码</h1>
+<p>参考文件<a href="https://github.com/Lora-net/LoRaMac-node/blob/master/doc/development-environment.md">development-environment.md</a>。</p>
+<p>运行openocd软件（注意这个窗口不能关闭）:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">openocd</span> -f interface/stlink-v2-1.cfg  -f target/stm32l0.cfg</a></code></pre></div>
+<p><code>interface/stlink-v2-1.cfg</code>（stlink配置文件）和<code>target/stm32l0.cfg</code>（芯片平台配置文件）都位于<code>/usr/share/openocd/scripts</code>目录下。</p>
+<p>运行gdb:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="ex">arm-none-eabi-gdb</span> src/apps/LoRaMac/LoRaMac-classA</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="co">#此时已经进入gdb，以下命令前的(gdb)表示处于gdb程序中</span></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">target</span> extended-remote localhost:3333 <span class="co">#让gdb和openocd连接</span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">monitor</span> reset halt <span class="co">#重置</span></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">load</span>  <span class="co">#下载固件到板子</span></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="ex">thbreak</span> main  <span class="co">#在main函数中打断点</span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="bu">continue</span>  <span class="co">#这时候将会停在断点处</span></a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="kw">(</span><span class="fu">gdb</span><span class="kw">)</span> <span class="bu">continue</span>  <span class="co">#这时候将会继续运行</span></a></code></pre></div>
+<p>运行gdb之后，可以打断点，单步调试，查看变量值 等等等等，比Windows下的Keil好用多了。</p>
+</body>
+</html>

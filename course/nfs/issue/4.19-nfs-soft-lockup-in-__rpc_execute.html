@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>4.19 __rpc_execute() soft lockup的问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">4.19 __rpc_execute() soft lockup的问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#vmcore分析"><span class="toc-section-number">2</span> vmcore分析</a><ul>
+<li><a href="#准备"><span class="toc-section-number">2.1</span> 准备</a></li>
+<li><a href="#找到触发rpc任务的进程"><span class="toc-section-number">2.2</span> 找到触发rpc任务的进程</a></li>
+<li><a href="#找到rpc请求的类型"><span class="toc-section-number">2.3</span> 找到rpc请求的类型</a></li>
+</ul></li>
+<li><a href="#调试"><span class="toc-section-number">3</span> 调试</a><ul>
+<li><a href="#操作步骤"><span class="toc-section-number">3.1</span> 操作步骤</a></li>
+<li><a href="#抓包数据分析"><span class="toc-section-number">3.2</span> 抓包数据分析</a></li>
+<li><a href="#nfs-server正常回复的抓包数据分析"><span class="toc-section-number">3.3</span> nfs server正常回复的抓包数据分析</a></li>
+</ul></li>
+<li><a href="#代码分析"><span class="toc-section-number">4</span> 代码分析</a></li>
+<li><a href="#抓包数据分析-1"><span class="toc-section-number">5</span> 抓包数据分析</a></li>
+<li><a href="#补丁"><span class="toc-section-number">6</span> 补丁</a></li>
+<li><a href="#下一步计划"><span class="toc-section-number">7</span> 下一步计划</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>nfs client挂载选项如下:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">rw</span>,relatime,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,moutaddr=xx.xx.xx.xx,mountvers=3,mountport=2050,mountproto=udp,local_lock=none,addr=xx.xx.xx.xx,_netdev</a></code></pre></div>
+<p>在某个CPU#110上出现大量的软锁报错:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb2-2" title="2">[<span class="ex">4158131.484488</span>] watchdog: BUG: soft lockup - CPU#110 stuck for 22s! [kworker/u257:2:236027]</a>
+<a class="sourceLine" id="cb2-3" title="3">[<span class="ex">4158171.485473</span>] watchdog: BUG: soft lockup - CPU#110 stuck for 22s! [kworker/u257:2:236027]</a>
+<a class="sourceLine" id="cb2-4" title="4">[<span class="ex">4158199.486164</span>] watchdog: BUG: soft lockup - CPU#110 stuck for 23s! [kworker/u257:2:236027]</a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="ex">...</span></a></code></pre></div>
+<p>日志中的其中一个堆栈信息如下:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">[<span class="ex">4158171.485473</span>] watchdog: BUG: soft lockup - CPU#110 stuck for 22s! [kworker/u257:2:236027]</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb3-3" title="3">[<span class="ex">4158171.485532</span>] Workqueue: xprtiod rpc_async_schedule [sunrpc]</a>
+<a class="sourceLine" id="cb3-4" title="4">[<span class="ex">4158171.485540</span>] RIP: 0010:kfree+0xb1/0x160</a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb3-6" title="6">[<span class="ex">4158171.485553</span>] Call Trace:</a>
+<a class="sourceLine" id="cb3-7" title="7">[<span class="ex">4158171.485559</span>]  __kfree_skb+0xe/0x20</a>
+<a class="sourceLine" id="cb3-8" title="8">[<span class="ex">4158171.485562</span>]  sk_stream_alloc_skb+0x106/0x1e0</a>
+<a class="sourceLine" id="cb3-9" title="9">[<span class="ex">4158171.485565</span>]  tcp_sendmsg_locked+0x515/0xd30</a>
+<a class="sourceLine" id="cb3-10" title="10">[<span class="ex">4158171.485573</span>]  tcp_sendmsg+0x27/0x40</a>
+<a class="sourceLine" id="cb3-11" title="11">[<span class="ex">4158171.485576</span>]  sock_sendmsg+0x36/0x40</a>
+<a class="sourceLine" id="cb3-12" title="12">[<span class="ex">4158171.485586</span>]  xs_send_kvec+0xb7/0xc0 [sunrpc]</a>
+<a class="sourceLine" id="cb3-13" title="13">[<span class="ex">4158171.485597</span>]  xs_sendpages+0x5d/0x200 [sunrpc]</a>
+<a class="sourceLine" id="cb3-14" title="14">[<span class="ex">4158171.485615</span>]  xs_tcp_send_request+0xa7/0x240 [sunrpc]</a>
+<a class="sourceLine" id="cb3-15" title="15">[<span class="ex">4158171.485646</span>]  xprt_transmit+0x68/0x360 [sunrpc]</a>
+<a class="sourceLine" id="cb3-16" title="16">[<span class="ex">4158171.485673</span>]  call_transmit+0x1cb/0x2a0 [sunrpc]</a>
+<a class="sourceLine" id="cb3-17" title="17">[<span class="ex">4158171.485683</span>]  __rpc_execute+0x7f/0x3e0 [sunrpc]</a>
+<a class="sourceLine" id="cb3-18" title="18">[<span class="ex">4158171.485687</span>]  process_one_work+0x195/0x3d0</a>
+<a class="sourceLine" id="cb3-19" title="19">[<span class="ex">4158171.485689</span>]  worker_thread+0x30/0x390</a>
+<a class="sourceLine" id="cb3-20" title="20">[<span class="ex">4158171.485693</span>]  kthread+0x113/0x130</a>
+<a class="sourceLine" id="cb3-21" title="21">[<span class="ex">4158171.485697</span>]  ret_from_fork+0x22/0x40</a></code></pre></div>
+<p>整理了日志中堆栈的代码流程，可以看出是在<code>__rpc_execute()</code>中不断循环。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb4-1" title="1">__rpc_execute</a>
+<a class="sourceLine" id="cb4-2" title="2">  call_transmit</a>
+<a class="sourceLine" id="cb4-3" title="3">    xprt_transmit</a>
+<a class="sourceLine" id="cb4-4" title="4">      xs_tcp_send_request</a>
+<a class="sourceLine" id="cb4-5" title="5">        xs_sendpages</a>
+<a class="sourceLine" id="cb4-6" title="6">          xs_send_kvec</a>
+<a class="sourceLine" id="cb4-7" title="7">            sock_sendmsg</a>
+<a class="sourceLine" id="cb4-8" title="8">              tcp_sendmsg</a>
+<a class="sourceLine" id="cb4-9" title="9">                tcp_sendmsg_locked</a>
+<a class="sourceLine" id="cb4-10" title="10">                  sk_stream_alloc_skb</a>
+<a class="sourceLine" id="cb4-11" title="11">                    __kfree_skb</a>
+<a class="sourceLine" id="cb4-12" title="12">                      kfree</a>
+<a class="sourceLine" id="cb4-13" title="13">                release_sock</a>
+<a class="sourceLine" id="cb4-14" title="14">                  tcp_release_cb</a>
+<a class="sourceLine" id="cb4-15" title="15">        xs_nospace</a>
+<a class="sourceLine" id="cb4-16" title="16">          spin_unlock_bh</a>
+<a class="sourceLine" id="cb4-17" title="17">            raw_spin_unlock_bh</a>
+<a class="sourceLine" id="cb4-18" title="18">              _raw_spin_unlock_bh</a>
+<a class="sourceLine" id="cb4-19" title="19">                __raw_spin_unlock_bh</a>
+<a class="sourceLine" id="cb4-20" title="20">                  __local_bh_enable_ip</a>
+<a class="sourceLine" id="cb4-21" title="21">                    do_softirq</a>
+<a class="sourceLine" id="cb4-22" title="22">          xs_tcp_write_space</a>
+<a class="sourceLine" id="cb4-23" title="23">    xprt_prepare_transmit</a>
+<a class="sourceLine" id="cb4-24" title="24">      spin_unlock_bh</a>
+<a class="sourceLine" id="cb4-25" title="25">        raw_spin_unlock_bh</a>
+<a class="sourceLine" id="cb4-26" title="26">          _raw_spin_unlock_bh</a>
+<a class="sourceLine" id="cb4-27" title="27">            __raw_spin_unlock_bh</a>
+<a class="sourceLine" id="cb4-28" title="28">              __local_bh_enable_ip</a>
+<a class="sourceLine" id="cb4-29" title="29">                do_softirq</a>
+<a class="sourceLine" id="cb4-30" title="30">  __x86_indirect_thunk_r15+<span class="bn">0x3</span>/<span class="bn">0x11</span></a>
+<a class="sourceLine" id="cb4-31" title="31">  __x86_indirect_thunk_rax+<span class="bn">0x3</span>/<span class="bn">0x20</span></a>
+<a class="sourceLine" id="cb4-32" title="32">  __x86_indirect_thunk_rcx+<span class="bn">0x3</span>/<span class="bn">0x20</span></a>
+<a class="sourceLine" id="cb4-33" title="33">  __x86_indirect_thunk_r15+<span class="bn">0x0</span>/<span class="bn">0x11</span></a></code></pre></div>
+<h1 id="vmcore分析"><span class="header-section-number">2</span> vmcore分析</h1>
+<h2 id="准备"><span class="header-section-number">2.1</span> 准备</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="kw">|</span> <span class="fu">grep</span> nfs <span class="co"># 可以看出，使用的是nfsv3</span></a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="ex">ffffffffc0397000</span>  nfs_acl                   16384  (not loaded)  [<span class="ex">CONFIG_KALLSYMS</span>]</a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="ex">ffffffffc03ef100</span>  nfsv3                     49152  fs/nfs/nfsv3.ko.debug </a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="ex">ffffffffc066dc80</span>  nfs                      311296  fs/nfs/nfs.ko.debug</a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="co"># 加载调试的ko</span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="ex">crash</span><span class="op">&gt;</span> mod -s sunrpc net/sunrpc/sunrpc.ko.debug</a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfs fs/nfs/nfs.ko.debug</a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfsv3 fs/nfs/nfsv3.ko.debug</a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="co"># crash&gt; mod -s nfsv4 fs/nfs/nfsv4.ko.debug</span></a></code></pre></div>
+<p>注意这个vmcore是执行<code>echo 1 &gt; /proc/sys/kernel/softlockup_panic</code>后导出的。</p>
+<h2 id="找到触发rpc任务的进程"><span class="header-section-number">2.2</span> 找到触发rpc任务的进程</h2>
+<p>查看崩溃时的堆栈:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> bt</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="ex">PID</span>: 236027  TASK: ffff99b651d44680  CPU: 110  COMMAND: <span class="st">&quot;kworker/u257:2&quot;</span></a>
+<a class="sourceLine" id="cb6-3" title="3"> <span class="co">#0 [ffff9ab03eb83d50] machine_kexec at ffffffff8725a70e</span></a>
+<a class="sourceLine" id="cb6-4" title="4"> <span class="co">#1 [ffff9ab03eb83da8] __crash_kexec at ffffffff8735b001</span></a>
+<a class="sourceLine" id="cb6-5" title="5"> <span class="co">#2 [ffff9ab03eb83e68] panic at ffffffff872b310e</span></a>
+<a class="sourceLine" id="cb6-6" title="6"> <span class="co">#3 [ffff9ab03eb83ef0] watchdog_timer_fn at ffffffff8738f21b</span></a>
+<a class="sourceLine" id="cb6-7" title="7"> <span class="co">#4 [ffff9ab03eb83f20] __hrtimer_run_queues at ffffffff8733ae98</span></a>
+<a class="sourceLine" id="cb6-8" title="8"> <span class="co">#5 [ffff9ab03eb83f80] hrtimer_interrupt at ffffffff8733b615</span></a>
+<a class="sourceLine" id="cb6-9" title="9"> <span class="co">#6 [ffff9ab03eb83fd8] smp_apic_timer_interrupt at ffffffff87c025ba</span></a>
+<a class="sourceLine" id="cb6-10" title="10"> <span class="co">#7 [ffff9ab03eb83ff0] apic_timer_interrupt at ffffffff87c01b1f</span></a>
+<a class="sourceLine" id="cb6-11" title="11"><span class="ex">---</span> <span class="op">&lt;</span>IRQ stack<span class="op">&gt;</span> ---</a>
+<a class="sourceLine" id="cb6-12" title="12"> <span class="co">#8 [ffffaa3eedaebd98] apic_timer_interrupt at ffffffff87c01b1f</span></a>
+<a class="sourceLine" id="cb6-13" title="13">    [<span class="ex">exception</span> RIP: __x86_indirect_thunk_r15+3]</a>
+<a class="sourceLine" id="cb6-14" title="14">    <span class="ex">RIP</span>: ffffffff87e031c3  RSP: ffffaa3eedaebe40  RFLAGS: 00000286</a>
+<a class="sourceLine" id="cb6-15" title="15">    <span class="ex">RAX</span>: 0000000000000005  RBX: ffff9a3319bd4a18  RCX: 0000000000000006</a>
+<a class="sourceLine" id="cb6-16" title="16">    <span class="ex">RDX</span>: 0000000000000000  RSI: 0000000000000000  RDI: ffff9a3319bd4a18</a>
+<a class="sourceLine" id="cb6-17" title="17">    <span class="ex">RBP</span>: ffff9ab0343e0400   R8: ffff9a7c2c187a40   R9: ffff9ab035efba60</a>
+<a class="sourceLine" id="cb6-18" title="18">    <span class="ex">R10</span>: ffffe1aa188d9600  R11: ffff9a89fa993440  R12: 0000000000000000</a>
+<a class="sourceLine" id="cb6-19" title="19">    <span class="ex">R13</span>: 0000000000000001  R14: ffffffffc1063860  R15: ffffffffc10597a0</a>
+<a class="sourceLine" id="cb6-20" title="20">    <span class="ex">ORIG_RAX</span>: ffffffffffffff13  CS: 0010  SS: 0018</a>
+<a class="sourceLine" id="cb6-21" title="21"> <span class="co">#9 [ffffaa3eedaebe40] __rpc_execute at ffffffffc1063f6f [sunrpc]</span></a>
+<a class="sourceLine" id="cb6-22" title="22"><span class="co">#10 [ffffaa3eedaebe98] process_one_work at ffffffff872d0915</span></a>
+<a class="sourceLine" id="cb6-23" title="23"><span class="co">#11 [ffffaa3eedaebed8] worker_thread at ffffffff872d0b80</span></a>
+<a class="sourceLine" id="cb6-24" title="24"><span class="co">#12 [ffffaa3eedaebf10] kthread at ffffffff872d72f3</span></a>
+<a class="sourceLine" id="cb6-25" title="25"><span class="co">#13 [ffffaa3eedaebf50] ret_from_fork at ffffffff87c00202</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> dis -rl ffffffffc1063f6f</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc</span>/sched.c: <span class="ex">783</span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="ex">0xffffffffc1063f67</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">119&gt;</span>: mov    %rbx,%rdi</a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="ex">0xffffffffc1063f6a</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">122&gt;</span>: callq  0xffffffff87e031c0 <span class="op">&lt;</span>__x86_indirect_thunk_r15<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm</span>/bitops.h: <span class="ex">318</span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="ex">0xffffffffc1063f6f</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">127&gt;</span>: mov    0x30(%rbx),<span class="ex">%rax</span></a></code></pre></div>
+<p>可以看出<code>__x86_indirect_thunk_r15+3</code>是执行到<code>__rpc_execute()</code>的<code>do_action(task)</code>。</p>
+<p>反汇编<code>__rpc_execute()</code>，重点看<code>%rdi</code>寄存器相关的内容:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> dis -l __rpc_execute</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc</span>/sched.c: <span class="ex">753</span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="ex">0xffffffffc1063efe</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">14&gt;</span>:  push   %rbx</a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="ex">0xffffffffc1063eff</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">15&gt;</span>:  mov    %rdi,%rbx <span class="co"># 将寄存器 rdi 中的值复制到寄存器 rbx </span></a>
+<a class="sourceLine" id="cb8-6" title="6"><span class="ex">0xffffffffc1063f02</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">18&gt;</span>:  sub    <span class="va">$0</span>x20,%rsp</a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc</span>/sched.c: <span class="ex">755</span></a>
+<a class="sourceLine" id="cb8-8" title="8"><span class="ex">0xffffffffc1063f06</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">22&gt;</span>:  movzwl 0xdc(%rdi),<span class="ex">%r13d</span></a>
+<a class="sourceLine" id="cb8-9" title="9"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb8-10" title="10"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm</span>/bitops.h: <span class="ex">318</span></a>
+<a class="sourceLine" id="cb8-11" title="11"><span class="ex">0xffffffffc1063f2b</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">59&gt;</span>:  mov    0x30(%rbx),<span class="ex">%rax</span></a>
+<a class="sourceLine" id="cb8-12" title="12"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc</span>/sched.c: <span class="ex">761</span></a>
+<a class="sourceLine" id="cb8-13" title="13"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb8-14" title="14"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm</span>/bitops.h: <span class="ex">318</span></a>
+<a class="sourceLine" id="cb8-15" title="15"><span class="ex">0xffffffffc1063f37</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">71&gt;</span>:  mov    0x30(%rbx),<span class="ex">%rax</span></a>
+<a class="sourceLine" id="cb8-16" title="16"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc</span>/sched.c: <span class="ex">756</span></a>
+<a class="sourceLine" id="cb8-17" title="17"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb8-18" title="18"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc</span>/sched.c: <span class="ex">776</span></a>
+<a class="sourceLine" id="cb8-19" title="19"><span class="ex">0xffffffffc1063f4d</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">93&gt;</span>:  mov    0x18(%rbx),<span class="ex">%r15</span></a>
+<a class="sourceLine" id="cb8-20" title="20"><span class="ex">0xffffffffc1063f51</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">97&gt;</span>:  test   %r15,%r15</a>
+<a class="sourceLine" id="cb8-21" title="21"><span class="ex">0xffffffffc1063f54</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">100&gt;</span>: je     0xffffffffc106400b <span class="op">&lt;</span>__rpc_execute+<span class="op">283&gt;</span></a>
+<a class="sourceLine" id="cb8-22" title="22"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc</span>/sched.c: <span class="ex">778</span></a>
+<a class="sourceLine" id="cb8-23" title="23"><span class="ex">0xffffffffc1063f5a</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">106&gt;</span>: movq   <span class="va">$0</span>x0,0x18(%rbx) <span class="co"># 不会改变 %rbx 的值</span></a>
+<a class="sourceLine" id="cb8-24" title="24"><span class="ex">0xffffffffc1063f62</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">114&gt;</span>: nopl   0x0(%rax,%rax,1)</a>
+<a class="sourceLine" id="cb8-25" title="25"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc</span>/sched.c: <span class="ex">783</span></a>
+<a class="sourceLine" id="cb8-26" title="26"><span class="ex">0xffffffffc1063f67</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">119&gt;</span>: mov    %rbx,%rdi</a>
+<a class="sourceLine" id="cb8-27" title="27"><span class="ex">0xffffffffc1063f6a</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">122&gt;</span>: callq  0xffffffff87e031c0 <span class="op">&lt;</span>__x86_indirect_thunk_r15<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb8-28" title="28"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/./arch/x86/include/asm</span>/bitops.h: <span class="ex">318</span></a>
+<a class="sourceLine" id="cb8-29" title="29"><span class="ex">0xffffffffc1063f6f</span> <span class="op">&lt;</span>__rpc_execute+<span class="op">127&gt;</span>: mov    0x30(%rbx),<span class="ex">%rax</span></a>
+<a class="sourceLine" id="cb8-30" title="30"><span class="ex">/usr/src/debug/kernel-4.19.90/linux-4.19.90-23.15.v2101.ky10.x86_64/net/sunrpc</span>/sched.c: <span class="ex">788</span></a></code></pre></div>
+<p>x86_64下整数参数使用的寄存器依次为: <code>RDI，RSI，RDX，RCX，R8，R9</code>，所以<code>%rdi</code>（也赋值到了<code>%rbx</code>）的值就是<code>__rpc_execute(struct rpc_task *task)</code>第一个参数的值。</p>
+<p>我们再尝试找到触发rpc任务的进程:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_task ffff9a3319bd4a18 <span class="co"># RDI: ffff9a3319bd4a18</span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="ex">struct</span> rpc_task {</a>
+<a class="sourceLine" id="cb9-3" title="3">  <span class="ex">...</span></a>
+<a class="sourceLine" id="cb9-4" title="4">  <span class="ex">tk_owner</span> = 227403, <span class="co"># 线程组中主线程的pid</span></a>
+<a class="sourceLine" id="cb9-5" title="5">  <span class="ex">...</span></a>
+<a class="sourceLine" id="cb9-6" title="6">}</a></code></pre></div>
+<p>查看这个线程组中所有的线程:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> ps -g 227403</a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="ex">crash</span><span class="op">&gt;</span> bt -g 227403 <span class="co"># 打印出所有的栈</span></a></code></pre></div>
+<p><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfs-soft-lockup-in-__rpc_execute-crash-vmcore-bt-g-227403.txt">点击这里查看<code>bt -g 227403</code>的输出</a>。</p>
+<h2 id="找到rpc请求的类型"><span class="header-section-number">2.3</span> 找到rpc请求的类型</h2>
+<p>解析rpc任务结构体:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_task ffff9a3319bd4a18 <span class="co"># RDI: ffff9a3319bd4a18</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="ex">struct</span> rpc_task {</a>
+<a class="sourceLine" id="cb11-3" title="3">  <span class="ex">tk_msg</span> = {</a>
+<a class="sourceLine" id="cb11-4" title="4">    <span class="ex">rpc_proc</span> = 0xffffffffc03eb8a0 <span class="op">&lt;</span>nfs3_procedures+<span class="op">288&gt;</span>, </a>
+<a class="sourceLine" id="cb11-5" title="5">    <span class="ex">rpc_argp</span> = 0xffff9a3319bd4bd8, </a>
+<a class="sourceLine" id="cb11-6" title="6">    <span class="ex">rpc_resp</span> = 0xffff9a3319bd4c40, </a>
+<a class="sourceLine" id="cb11-7" title="7">    <span class="ex">rpc_cred</span> = 0xffff9ab0283d2e00</a>
+<a class="sourceLine" id="cb11-8" title="8">  }, </a></code></pre></div>
+<p><code>nfs3_procedures[]</code>是<code>struct rpc_procinfo</code>类型的数组，<code>struct rpc_procinfo</code>结构体的大小如下:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> struct rpc_procinfo</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="ex">struct</span> rpc_procinfo {</a>
+<a class="sourceLine" id="cb12-3" title="3">  <span class="ex">...</span></a>
+<a class="sourceLine" id="cb12-4" title="4">}</a>
+<a class="sourceLine" id="cb12-5" title="5"><span class="ex">SIZE</span>: 48</a></code></pre></div>
+<p>从<code>&lt;nfs3_procedures+288&gt;</code>中的偏移量<code>288</code>计算出<code>288/48=6</code>，所以rpc请求类型是<code>NFS3PROC_READ</code>。当然也可以直接读<code>struct rpc_procinfo</code>中的<code>p_proc</code>。</p>
+<h1 id="调试"><span class="header-section-number">3</span> 调试</h1>
+<h2 id="操作步骤"><span class="header-section-number">3.1</span> 操作步骤</h2>
+<p>修改nfs server内核代码:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="ex">---</span> a/fs/nfsd/nfs3proc.c</a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="ex">+++</span> b/fs/nfsd/nfs3proc.c</a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="ex">@@</span> -14,6 +14,7 @@</a>
+<a class="sourceLine" id="cb13-4" title="4"> <span class="co">#include &quot;xdr3.h&quot;</span></a>
+<a class="sourceLine" id="cb13-5" title="5"> <span class="co">#include &quot;vfs.h&quot;</span></a>
+<a class="sourceLine" id="cb13-6" title="6"> <span class="co">#include &quot;filecache.h&quot;</span></a>
+<a class="sourceLine" id="cb13-7" title="7"><span class="ex">+</span>#include <span class="op">&lt;</span>linux/delay.h<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb13-8" title="8"> </a>
+<a class="sourceLine" id="cb13-9" title="9"> <span class="co">#define NFSDDBG_FACILITY               NFSDDBG_PROC</span></a>
+<a class="sourceLine" id="cb13-10" title="10"> </a>
+<a class="sourceLine" id="cb13-11" title="11"><span class="ex">@@</span> -182,6 +183,10 @@ nfsd3_proc_read(struct svc_rqst *rqstp)</a>
+<a class="sourceLine" id="cb13-12" title="12">        <span class="ex">struct</span> nfsd3_readargs *argp = rqstp-<span class="op">&gt;</span>rq_argp<span class="kw">;</span></a>
+<a class="sourceLine" id="cb13-13" title="13">        <span class="ex">struct</span> nfsd3_readres *resp = rqstp-<span class="op">&gt;</span>rq_resp<span class="kw">;</span></a>
+<a class="sourceLine" id="cb13-14" title="14"> </a>
+<a class="sourceLine" id="cb13-15" title="15"><span class="ex">+</span>       printk(<span class="st">&quot;%s:%d, begin delay\n&quot;</span>, __func__, __LINE__);</a>
+<a class="sourceLine" id="cb13-16" title="16"><span class="ex">+</span>       msleep(36000 * 1000);</a>
+<a class="sourceLine" id="cb13-17" title="17">        <span class="ex">dprintk</span>(<span class="st">&quot;nfsd: READ(3) %s %lu bytes at %Lu\n&quot;</span>,</a>
+<a class="sourceLine" id="cb13-18" title="18">                                <span class="ex">SVCFH_fmt</span>(<span class="kw">&amp;</span><span class="ex">argp-</span><span class="op">&gt;</span>fh),</a>
+<a class="sourceLine" id="cb13-19" title="19">                                <span class="kw">(</span><span class="ex">unsigned</span> long<span class="kw">)</span> <span class="ex">argp-</span><span class="op">&gt;</span>count,</a></code></pre></div>
+<p>nfs client命令:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="ex">tcpdump</span> --interface=any --buffer-size=20480 -w out.cap</a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="fu">mount</span> -t nfs -o rw,relatime,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountvers=3,mountproto=udp,local_lock=none,_netdev 192.168.53.209:/tmp/s_test /mnt <span class="co"># mountport=2050</span></a>
+<a class="sourceLine" id="cb14-3" title="3"><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file</a>
+<a class="sourceLine" id="cb14-4" title="4"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb14-5" title="5"><span class="fu">cat</span> /mnt/file</a></code></pre></div>
+<h2 id="抓包数据分析"><span class="header-section-number">3.2</span> 抓包数据分析</h2>
+<p>nfs read请求数据包:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="ex">94</span>  24.719361   192.168.53.215  192.168.53.209  NFS 184 V3 READ Call, FH: 0x633aa4f4 Offset: 0 Len: 10</a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="ex">Transmission</span> Control Protocol, Src Port: 958, Dst Port: 2049, Seq: 1313, Ack: 1717, Len: 112</a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="ex">Remote</span> Procedure Call, Type:Call XID:0x6be6919a</a>
+<a class="sourceLine" id="cb15-4" title="4"><span class="ex">Network</span> File System, READ Call FH: 0x633aa4f4 Offset: 0 Len: 10</a></code></pre></div>
+<p>tcp回复:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="ex">95</span>  24.760076   192.168.53.209  192.168.53.215  TCP 72  2049 → 958 [ACK] Seq=1717 Ack=1425 Win=64896 Len=0 TSval=167216215 TSecr=1557071350</a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 958, Seq: 1717, Ack: 1425, Len: 0</a></code></pre></div>
+<h2 id="nfs-server正常回复的抓包数据分析"><span class="header-section-number">3.3</span> nfs server正常回复的抓包数据分析</h2>
+<p>nfs read请求包:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" title="1"><span class="ex">80</span>  15.970150   127.0.0.1   127.0.0.1   NFS 178 V3 READ Call (Reply In 81), <span class="ex">FH</span>: 0x61f66583 Offset: 0 Len: 8</a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="ex">Transmission</span> Control Protocol, Src Port: 820, Dst Port: 2049, Seq: 1321, Ack: 1697, Len: 112</a>
+<a class="sourceLine" id="cb17-3" title="3"><span class="ex">Remote</span> Procedure Call, Type:Call XID:0x3542f9f0</a>
+<a class="sourceLine" id="cb17-4" title="4"><span class="ex">Network</span> File System, READ Call FH: 0x61f66583 Offset: 0 Len: 8</a></code></pre></div>
+<p>nfs read回复包:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1"><span class="ex">81</span>  15.970387   127.0.0.1   127.0.0.1   NFS 206 V3 READ Reply (Call In 80) <span class="ex">Len</span>: 8</a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 820, Seq: 1697, Ack: 1433, Len: 140</a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="ex">Remote</span> Procedure Call, Type:Reply XID:0x3542f9f0</a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="ex">Network</span> File System, READ Reply Len: 8</a></code></pre></div>
+<h1 id="代码分析"><span class="header-section-number">4</span> 代码分析</h1>
+<p>由vmcore解析可知rpc请求类型是<code>NFS3PROC_READ</code>，只有<code>nfs3_proc_read_setup()</code>函数中引用这个宏定义。</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb19-1" title="1">read</a>
+<a class="sourceLine" id="cb19-2" title="2">  ksys_read</a>
+<a class="sourceLine" id="cb19-3" title="3">    vfs_read</a>
+<a class="sourceLine" id="cb19-4" title="4">      __vfs_read</a>
+<a class="sourceLine" id="cb19-5" title="5">        new_sync_read</a>
+<a class="sourceLine" id="cb19-6" title="6">          nfs_file_read</a>
+<a class="sourceLine" id="cb19-7" title="7">            generic_file_read_iter</a>
+<a class="sourceLine" id="cb19-8" title="8">              generic_file_buffered_read</a>
+<a class="sourceLine" id="cb19-9" title="9">                page_cache_sync_readahead</a>
+<a class="sourceLine" id="cb19-10" title="10">                  ondemand_readahead</a>
+<a class="sourceLine" id="cb19-11" title="11">                    __do_page_cache_readahead</a>
+<a class="sourceLine" id="cb19-12" title="12">                      read_pages</a>
+<a class="sourceLine" id="cb19-13" title="13">                        nfs_readpages</a>
+<a class="sourceLine" id="cb19-14" title="14">                          nfs_pageio_complete</a>
+<a class="sourceLine" id="cb19-15" title="15">                            nfs_pageio_doio</a>
+<a class="sourceLine" id="cb19-16" title="16">                              nfs_generic_pg_pgios</a>
+<a class="sourceLine" id="cb19-17" title="17">                                nfs_initiate_pgio</a>
+<a class="sourceLine" id="cb19-18" title="18">                                  nfs_initiate_read</a>
+<a class="sourceLine" id="cb19-19" title="19">                                    nfs<span class="dv">3</span><span class="er">_proc_read_setup</span></a>
+<a class="sourceLine" id="cb19-20" title="20">                                      <span class="co">// 设置请求类型</span></a>
+<a class="sourceLine" id="cb19-21" title="21">                                      &amp;nfs3_procedures[NFS3PROC_READ]</a>
+<a class="sourceLine" id="cb19-22" title="22">                wait_on_page_locked_killable</a>
+<a class="sourceLine" id="cb19-23" title="23">                  wait_on_page_bit_killable <span class="co">// rpc读任务返回时通过unlock_page()唤醒</span></a>
+<a class="sourceLine" id="cb19-24" title="24">                    wait_on_page_bit_common</a></code></pre></div>
+<p><a href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/nfs/nfs-soft-lockup-in-__rpc_execute-crash-vmcore-bt-g-227403.txt">从vmcore的解析<code>bt -g 227403</code>的输出</a>可以看到进程组里没有一个进程在等待异步rpc读的回复。</p>
+<h1 id="抓包数据分析-1"><span class="header-section-number">5</span> 抓包数据分析</h1>
+<p>nfs read请求包:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1"><span class="ex">17786</span>   0.494431937 22.14.23.3  22.14.64.15 NFS 238 V3 READ Call, FH: 0x0b6bfcf8 Offset: 1376075776 Len: 1048576</a>
+<a class="sourceLine" id="cb20-2" title="2"><span class="ex">Transmission</span> Control Protocol, Src Port: 766, Dst Port: 2049, Seq: 13417, Ack: 20317249, Len: 160</a>
+<a class="sourceLine" id="cb20-3" title="3"><span class="ex">Remote</span> Procedure Call, Type:Call XID:0xccbc20c7</a>
+<a class="sourceLine" id="cb20-4" title="4"><span class="ex">Network</span> File System, READ Call FH: 0x0b6bfcf8 Offset: 1376075776 Len: 1048576</a></code></pre></div>
+<p>tcp回复:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1"><span class="ex">17787</span>   0.494499755 22.14.64.15 22.14.23.3  TCP 78  2049 → 766 [ACK] Seq=20323137 Ack=13577 Win=5623 Len=0 TSval=4228514640 TSecr=255410915</a>
+<a class="sourceLine" id="cb21-2" title="2"><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20323137, Ack: 13577, Len: 0</a>
+<a class="sourceLine" id="cb21-3" title="3"></a>
+<a class="sourceLine" id="cb21-4" title="4"><span class="co"># 用 tcp.seq == 20323041 找到序号一样的包，但用 tcp.ack == 20323041 找不到客户端发的请求包</span></a>
+<a class="sourceLine" id="cb21-5" title="5"><span class="ex">17788</span>   0.503423525 22.14.64.15 22.14.23.3  TCP 174 [TCP Retransmission] 2049 → 766 [ACK] Seq=20323041 Ack=13577 Win=5623 Len=96 TSval=4228514649 TSecr=255410915</a>
+<a class="sourceLine" id="cb21-6" title="6"><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20323041, Ack: 13577, Len: 96</a>
+<a class="sourceLine" id="cb21-7" title="7"></a>
+<a class="sourceLine" id="cb21-8" title="8"><span class="ex">17789</span>   0.711405976 22.14.64.15 22.14.23.3  TCP 1526    [TCP Retransmission] 2049 → 766 [ACK] Seq=20317249 Ack=13577 Win=5623 Len=1448 TSval=4228514857 TSecr=255410915</a>
+<a class="sourceLine" id="cb21-9" title="9"><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20317249, Ack: 13577, Len: 1448</a>
+<a class="sourceLine" id="cb21-10" title="10"></a>
+<a class="sourceLine" id="cb21-11" title="11"><span class="ex">17790</span>   1.139363629 22.14.64.15 22.14.23.3  TCP 1526    [TCP Retransmission] 2049 → 766 [ACK] Seq=20317249 Ack=13577 Win=5623 Len=1448 TSval=4228515285 TSecr=255410915</a>
+<a class="sourceLine" id="cb21-12" title="12"><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20317249, Ack: 13577, Len: 1448</a>
+<a class="sourceLine" id="cb21-13" title="13"></a>
+<a class="sourceLine" id="cb21-14" title="14"><span class="ex">17791</span>   1.971276412 22.14.64.15 22.14.23.3  TCP 1526    [TCP Retransmission] 2049 → 766 [ACK] Seq=20317249 Ack=13577 Win=5623 Len=1448 TSval=4228516117 TSecr=255410915</a>
+<a class="sourceLine" id="cb21-15" title="15"><span class="ex">Transmission</span> Control Protocol, Src Port: 2049, Dst Port: 766, Seq: 20317249, Ack: 13577, Len: 1448</a></code></pre></div>
+<h1 id="补丁"><span class="header-section-number">6</span> 补丁</h1>
+<ul>
+<li><p><code>ed0172af5d6f SUNRPC: Fix a race to wake a sync task</code> （修复的是同步rpc任务相关的问题，与此问题无关）</p></li>
+<li><p><code>6258cf25d5e3 SUNRPC: avoid soft lockup when transmitting UDP to reachable server.</code></p></li>
+</ul>
+<h1 id="下一步计划"><span class="header-section-number">7</span> 下一步计划</h1>
+<p>使用以下脚本，下次再复现出soft lockup后，打开调试开头收集更多的nfs和rpc的日志:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb22-1" title="1"><span class="co">#!/bin/bash</span></a>
+<a class="sourceLine" id="cb22-2" title="2"></a>
+<a class="sourceLine" id="cb22-3" title="3"><span class="va">WAIT_TIME=</span>60</a>
+<a class="sourceLine" id="cb22-4" title="4"></a>
+<a class="sourceLine" id="cb22-5" title="5"><span class="fu">execute_command()</span> <span class="kw">{</span></a>
+<a class="sourceLine" id="cb22-6" title="6">    <span class="fu">mkdir</span> dmesg-log/</a>
+<a class="sourceLine" id="cb22-7" title="7">    <span class="bu">echo</span> <span class="st">&quot;打开nfs日志开头&quot;</span></a>
+<a class="sourceLine" id="cb22-8" title="8">    <span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_ALL</span></a>
+<a class="sourceLine" id="cb22-9" title="9">    <span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_ALL</span></a>
+<a class="sourceLine" id="cb22-10" title="10">    <span class="bu">echo</span> <span class="st">&quot;等一段时间以产生足够多的日志&quot;</span></a>
+<a class="sourceLine" id="cb22-11" title="11">    <span class="fu">sleep</span> <span class="va">${WAIT_TIME}</span>s</a>
+<a class="sourceLine" id="cb22-12" title="12">    <span class="fu">cp</span> /var/log/messages* dmesg-log/</a>
+<a class="sourceLine" id="cb22-13" title="13">    <span class="bu">echo</span> <span class="st">&quot;日志已保存到 </span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/dmesg-log/ 目录下&quot;</span></a>
+<a class="sourceLine" id="cb22-14" title="14">    <span class="bu">exit</span></a>
+<a class="sourceLine" id="cb22-15" title="15"><span class="kw">}</span></a>
+<a class="sourceLine" id="cb22-16" title="16"></a>
+<a class="sourceLine" id="cb22-17" title="17"><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/kernel/softlockup_panic <span class="co"># 发生soft lockup时不发生panic</span></a>
+<a class="sourceLine" id="cb22-18" title="18"><span class="fu">dmesg</span> -w <span class="kw">|</span> <span class="kw">while</span> <span class="bu">read</span> -r <span class="va">line</span>; <span class="kw">do</span></a>
+<a class="sourceLine" id="cb22-19" title="19">    <span class="kw">if</span> <span class="bu">echo</span> <span class="st">&quot;</span><span class="va">$line</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="fu">grep</span> -q <span class="st">&quot;watchdog: BUG: soft lockup&quot;</span><span class="kw">;</span> <span class="kw">then</span></a>
+<a class="sourceLine" id="cb22-20" title="20">        <span class="bu">echo</span> <span class="st">&quot;检测到软锁&quot;</span></a>
+<a class="sourceLine" id="cb22-21" title="21">        <span class="ex">execute_command</span></a>
+<a class="sourceLine" id="cb22-22" title="22">    <span class="kw">fi</span></a>
+<a class="sourceLine" id="cb22-23" title="23"><span class="kw">done</span></a></code></pre></div>
+</body>
+</html>

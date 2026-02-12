@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>xfstests README.config-sections</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">xfstests README.config-sections</h1>
+</header>
+<p>本文档翻译自<a href="https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git/tree/README">kernel.org xfs/xfstests-dev.git 的 README 文件</a>（<a href="https://github.com/kdave/xfstests/blob/master/README">或github</a>），翻译时文件的最新提交是<code>5f6b9e575f1b6c68e7b1f5ce4b5b9149201ffc76 fstests: Doc changes for afs</code>，大部分借助于ChatGPT。仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<pre><code>带有section的配置文件
+====================
+
+带有section的配置文件对于在单次运行中对多个文件系统或多个文件系统设置进行 xfstests 测试非常有用，而无需使用外部脚本。
+
+语法
+----
+
+定义部分的语法如下：
+
+    [section_name]
+
+部分名称应由字母数字字符和下划线组成。其他任何字符都是禁止的，且该部分将无法识别。
+
+配置文件中的每个部分应包含格式为
+
+    OPTION=value
+
+的选项。
+
+&#39;OPTION&#39; 不能包含任何空格字符。&#39;value&#39; 可以包含任何字符，唯一的限制是 - 字符 &#39; 和 &quot; 只能出现在 &#39;value&#39; 的开始和结束处，但这是可选的。
+
+注意，选项会在各部分之间传递，因此相同的选项不必在每个部分中都指定。然而需要小心，避免从之前的部分中留下不必要的选项。
+
+结果
+----
+
+对于每个部分，xfstests 将使用指定的选项运行并在 &#39;$RESULT_BASE/$section_name&#39; 目录中生成单独的结果。
+
+不同的挂载选项
+-----------------
+
+在不同的配置部分中指定不同的挂载选项是允许的。当 TEST_FS_MOUNT_OPTS 在下一个部分中有所不同时，TEST_DEV 会自动重新挂载并使用新的 TEST_FS_MOUNT_OPTS 选项。
+
+多个文件系统
+-------------
+
+在不同的配置部分中使用不同的文件系统是允许的。当 FSTYP 在下一个部分中有所不同时，FSTYP 文件系统将在运行测试之前自动创建。
+
+注意，如果没有在该部分中直接指定 TEST_FS_MOUNT_OPTS、MOUNT_OPTIONS、MKFS_OPTIONS 或 FSCK_OPTIONS，它们将重置为给定文件系统的默认值。
+
+您还可以通过指定 RECREATE_TEST_DEV 强制重新创建文件系统。
+
+仅运行指定的部分
+------------------
+
+指定 &#39;-s&#39; 参数并附上部分名称将只运行指定的部分。&#39;-s&#39; 参数可以多次指定，以允许运行多个部分。
+
+选项仍然会在部分之间传递，包括那些不打算运行的部分。因此，您可以执行如下操作：
+
+[ext4]
+TEST_DEV=/dev/sda1
+TEST_DIR=/mnt/test
+SCRATCH_DEV=/dev/sdb1
+SCRATCH_MNT=/mnt/test1
+FSTYP=ext4
+
+[xfs]
+FSTYP=xfs
+
+[btrfs]
+FSTYP=btrfs
+
+并运行
+
+./check -s xfs -s btrfs
+
+以仅检查 xfs 和 btrfs。所有设备和挂载仍然会从部分 [ext4] 中解析。
+
+示例
+-----
+
+以下是一个带有section的配置文件示例：
+
+[ext4_4k_block_size]
+TEST_DEV=/dev/sda
+TEST_DIR=/mnt/test
+SCRATCH_DEV=/dev/sdb
+SCRATCH_MNT=/mnt/test1
+MKFS_OPTIONS=&quot;-q -F -b4096&quot;
+FSTYP=ext4
+RESULT_BASE=&quot;`pwd`/results/`date +%d%m%y_%H%M%S`&quot;
+
+[ext4_1k_block_size]
+MKFS_OPTIONS=&quot;-q -F -b1024&quot;
+
+[ext4_nojournal]
+MKFS_OPTIONS=&quot;-q -F -b4096 -O ^has_journal&quot;
+
+[xfs_filesystem]
+MKFS_OPTIONS=&quot;-f&quot;
+FSTYP=xfs
+
+[ext3_filesystem]
+FSTYP=ext3
+MOUNT_OPTIONS=&quot;-o noatime&quot;
+
+[cephfs]
+TEST_DIR=/mnt/test
+TEST_DEV=192.168.14.1:6789:/
+TEST_FS_MOUNT_OPTS=&quot;-o name=admin,secret=AQDuEBtYKEYRINGSECRETriSC8YJGDZsQHcr7g==&quot;
+FSTYP=&quot;ceph&quot;
+
+[glusterfs]
+FSTYP=glusterfs
+TEST_DIR=/mnt/gluster/test
+TEST_DEV=192.168.1.1:testvol
+SCRATCH_MNT=/mnt/gluster/scratch
+SCRATCH_DEV=192.168.1.1:scratchvol
+
+[afs]
+FSTYP=afs
+TEST_DEV=%example.com:xfstest.test
+TEST_DIR=/mnt/xfstest.test
+SCRATCH_DEV=%example.com:xfstest.scratch
+SCRATCH_MNT=/mnt/xfstest.scratch</code></pre>
+</body>
+</html>

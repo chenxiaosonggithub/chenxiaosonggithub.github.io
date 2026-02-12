@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>openEuler的nfs+</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">openEuler的nfs+</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#我的贡献"><span class="toc-section-number">1</span> 我的贡献</a></li>
+<li><a href="#issue"><span class="toc-section-number">2</span> 问题分析</a></li>
+<li><a href="#多个网卡环境"><span class="toc-section-number">3</span> 多个网卡环境</a></li>
+<li><a href="#openeuler-nfs的使用"><span class="toc-section-number">4</span> openeuler nfs+的使用</a></li>
+<li><a href="#测试"><span class="toc-section-number">5</span> 测试</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="我的贡献"><span class="header-section-number">1</span> 我的贡献</h1>
+<p><a href="https://chenxiaosong.com/enfs-contribution.html">点击这里查看我的openEuler nfs+贡献</a>。</p>
+<h1 id="issue"><span class="header-section-number">2</span> 问题分析</h1>
+<ul>
+<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/enfs-null-ptr-deref-in-xprt_switch_get.html">openEuler的nfs+ xprt_switch_get()空指针解引用问题</a></li>
+<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/enfs-double-free-of-multipath_client_info.html">openEuler的nfs+ multipath_client_info double free的问题</a></li>
+<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/enfs-create-client-fail.html">openEuler的nfs+初始化enfs client失败的问题</a></li>
+<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/enfs-server-not-responding.html">openEuler的nfs+报错not responding的问题</a></li>
+<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/enfs-refactor.html">openEuler的nfs+代码重构</a></li>
+<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/enfs-recreate-shard-info.html">openEuler的nfs+重新插入enfs模块时生成shard信息的功能</a></li>
+<li><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs/enfs-unstable-path-state.html">openEuler的nfs+增加亚健康连接状态</a></li>
+</ul>
+<h1 id="多个网卡环境"><span class="header-section-number">3</span> 多个网卡环境</h1>
+<p>请查看<a href="https://chenxiaosong.com/course/kernel/environment.html#qemu-multi-nic">《内核开发环境》</a></p>
+<h1 id="openeuler-nfs的使用"><span class="header-section-number">4</span> openeuler nfs+的使用</h1>
+<ul>
+<li><a href="https://docs.openeuler.org/zh/docs/20.03_LTS_SP4/docs/eNFS/enfs%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.html">eNFS 使用指南</a>（<a href="https://gitee.com/openeuler/docs-centralized/blob/stable2-20.03_LTS_SP4/docs/en/docs/eNFS/enfs-user-guide.md">英文</a>）</li>
+<li><a href="https://docs.openeuler.org/zh/docs/23.03/docs/NfsMultipath/NFS%E5%A4%9A%E8%B7%AF%E5%BE%84.html">openeuler23.03 NFS多路径用户指南</a>（<a href="https://gitee.com/openeuler/docs/tree/stable2-23.03/docs/zh/docs/NfsMultipath">文档源码</a>），瞎搞的，这个版本根本没有多路径功能</li>
+<li><a href="https://gitee.com/src-openeuler/kernel/pulls?assignee_id=&amp;author_id=&amp;label_ids=&amp;label_text=&amp;milestone_id=&amp;priority=&amp;project_id=src-openeuler%2Fkernel&amp;project_type=&amp;scope=&amp;search=enfs&amp;single_label_id=&amp;single_label_text=&amp;sort=closed_at+desc&amp;status=merged&amp;target_project=&amp;tester_id=">src-openeuler仓库的pull request</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/pulls?assignee_id=&amp;author_id=&amp;label_ids=&amp;label_text=&amp;milestone_id=&amp;priority=&amp;project_id=openeuler%2Fkernel&amp;project_type=&amp;scope=&amp;search=enfs&amp;single_label_id=&amp;single_label_text=&amp;sort=closed_at+desc&amp;status=merged&amp;target_project=&amp;tester_id=">openeuler仓库的pull request</a></li>
+<li><a href="https://gitee.com/src-openeuler/kernel/tree/openEuler-20.03-LTS-SP4">补丁文件</a></li>
+<li><a href="https://support.huawei.com/supportindex/index">support.huawei.com</a>选择“企业技术支持”</li>
+</ul>
+<p>6.6内核可直接切换到<a href="https://gitee.com/openeuler/kernel/tree/OLK-6.6/"><code>OLK-6.6</code>分支</a>。</p>
+<p>4.19内核切换到<code>openEuler-1.0-LTS</code>分支，可以使用脚本<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/create-enfs-patchset.sh"><code>create-enfs-patchset.sh</code></a>生成完整的补丁文件， <a href="https://gitee.com/chenxiaosonggitee/tmp/tree/master/gnu-linux/nfs/enfs-4.19-patch">再打上我修改的补丁</a>， 也可以直接用<a href="https://gitee.com/chenxiaosonggitee/kernel-enfs/tree/openEuler-1.0-LTS/">我的仓库kernel-enfs</a>。 编译前打开配置<code>CONFIG_ENFS</code>，可能还要关闭配置<code>CONFIG_NET_VENDOR_NETRONOME</code>。</p>
+<p>挂载:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">modprobe</span> enfs</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="fu">mount</span> -t nfs -o localaddrs=192.168.53.40~192.168.53.53,remoteaddrs=192.168.53.215~192.168.53.216 192.168.53.216:/s_test /mnt/</a></code></pre></div>
+<p>如果没有创建<code>/etc/enfs/config.ini</code>，会报错<code>failed to open file:/etc/enfs/config.ini err:-2</code>，配置文件请参考<a href="https://docs.openeuler.org/zh/docs/20.03_LTS_SP4/docs/eNFS/enfs%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.html">eNFS 使用指南</a>。只需要在nfs client端支持enfs就可以，<code>/etc/enfs/config.ini</code>默认配置如下:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="va">path_detect_interval=</span>10 <span class="co"># 路径连通探测周期，单位 ： 秒</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="va">path_detect_timeout=</span>10 <span class="co"># 路径连通探测消息超时时间，单位 ： 秒</span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="va">multipath_timeout=</span>0 <span class="co"># 选择其他路径达到的文件操作的超时阈值，0表示使用 mount 命令指定的 timeo 参数，不使用 eNFS 模块的配置，单位 ： 秒。</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="va">multipath_disable=</span>0 <span class="co"># 启用 eNFS 特性</span></a></code></pre></div>
+<p>除了<code>mount</code>命令查看之外，还可以用以下方式:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">cat</span> /proc/enfs/192.168.53.216_0/path</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="fu">cat</span> /proc/enfs/192.168.53.216_0/stat</a></code></pre></div>
+<h1 id="测试"><span class="header-section-number">5</span> 测试</h1>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">dnf</span> install -y java-latest-openjdk</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="co"># dnf install -y java-1.8.0-openjdk # jdk 8</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="ex">apt</span> install -y openjdk-25-jdk-headless <span class="co"># ubuntu24.04最新的jdk版本，headless代表无图形界面版本</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="co"># apt install -y openjdk-8-jdk-headless # jdk 8</span></a></code></pre></div>
+<p><a href="https://www.oracle.com/downloads/server-storage/vdbench-downloads.html">下载Vdbench</a>。</p>
+<p><code>vdbench_8k_io</code>配置文件:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="va">create_anchors=</span>yes</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="co"># 最新的jdk版本不支持这个参数</span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="co"># messsagescan=no</span></a>
+<a class="sourceLine" id="cb5-4" title="4"></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="va">fsd=</span>fsd1,anchor=<span class="ex">/mnt</span>/,<span class="va">depth=</span>2,width=<span class="ex">2</span>,files=20,size=1m</a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="va">fwd=</span>fwd1,fsd=<span class="ex">fsd*</span>,fileio=random,fileselect=random,openflags=o_direct</a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="co"># rd=rd1,fwd=fwd*,fwdrate=max,xfersize=8k,format=yes,operation=(write,read,getattr),elapsed=120000,interval=1,threads=64</span></a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="va">rd=</span>rd1,fwd=<span class="ex">fwd*</span>,fwdrate=max,xfersize=128k,format=restart,operation=(write),<span class="va">elapsed=</span>120000,interval=<span class="ex">1</span>,threads=64</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">./vdbench</span> -f vdbench_8k_io</a></code></pre></div>
+</body>
+</html>

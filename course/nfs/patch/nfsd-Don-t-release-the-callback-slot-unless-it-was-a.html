@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>e6abc8caa6de nfsd: Don't release the callback slot unless it was actually held</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">e6abc8caa6de nfsd: Don't release the callback slot unless it was actually held</h1>
+</header>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p><a href="https://lore.kernel.org/all/20190405155437.5545-1-trond.myklebust@hammerspace.com/"><code>e6abc8caa6de nfsd: Don't release the callback slot unless it was actually held</code></a>:</p>
+<pre><code>nfsd: 只有在实际持有回调槽时才释放它
+
+如果在回调槽关闭时有多个回调排队等待回调槽，那么它们目前都会像持有该槽一样，调用 nfsd4_cb_sequence_done()，从而导致有趣的副作用。
+
+此外，nfsd4_cb_sequence_done() 中的 &#39;retry_nowait&#39; 路径会在不先释放槽的情况下返回 nfsd4_cb_prepare()，这会在第二次调用 nfsd41_cb_get_slot() 时导致死锁。
+
+因此，该补丁添加了一个布尔值来跟踪回调是否实际获取了槽，以便在这两种情况下做出正确的处理。</code></pre>
+</body>
+</html>

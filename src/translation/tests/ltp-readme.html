@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Linux Test Project README</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">Linux Test Project README</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#linux-test-project"><span class="toc-section-number">1</span> Linux Test Project</a></li>
+<li><a href="#warning"><span class="toc-section-number">2</span> Warning!</a></li>
+<li><a href="#quick-guide-to-running-the-tests"><span class="toc-section-number">3</span> Quick guide to running the tests</a><ul>
+<li><a href="#shortcut-to-running-a-single-test"><span class="toc-section-number">3.1</span> Shortcut to running a single test</a></li>
+<li><a href="#compiling-and-installing-all-testcases"><span class="toc-section-number">3.2</span> Compiling and installing all testcases</a></li>
+<li><a href="#running-tests"><span class="toc-section-number">3.3</span> Running tests</a></li>
+<li><a href="#network-tests"><span class="toc-section-number">3.4</span> Network tests</a></li>
+<li><a href="#containers"><span class="toc-section-number">3.5</span> Containers</a></li>
+</ul></li>
+<li><a href="#debugging-with-gdb-and-strace"><span class="toc-section-number">4</span> Debugging with gdb and strace</a></li>
+<li><a href="#developers-corner"><span class="toc-section-number">5</span> Developers corner</a></li>
+</ul>
+</nav>
+<p>本文档翻译自<a href="https://github.com/linux-test-project/ltp/blob/master/README.md">linux-test-project/ltp 的 README 文件</a>，翻译时文件的最新提交是<code>2a50d18cc README: Mention -f param for strace</code>，大部分借助于ChatGPT。仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<h1 id="linux-test-project"><span class="header-section-number">1</span> Linux Test Project</h1>
+<p>Linux测试项目（Linux Test Project，简称LTP）是由SGI、OSDL和Bull共同发起的联合项目，由IBM、思科、富士通、SUSE、红帽、Oracle等公司共同开发和维护。该项目旨在向开源社区提供测试套件，验证Linux系统的可靠性、健壮性和稳定性。</p>
+<p>LTP测试套件包含一系列用于测试Linux内核和相关功能的工具集。我们的目标是通过引入测试自动化技术，改进Linux内核和系统库的质量测试工作。欢迎有兴趣的开源贡献者加入我们。</p>
+<p>项目页面位于: http://linux-test-project.github.io/</p>
+<p>最新的镜像始终可在以下位置获取: https://github.com/linux-test-project/ltp/releases</p>
+<p>关于项目的讨论请访问LTP邮件列表: http://lists.linux.it/listinfo/ltp</p>
+<p>LTP邮件列表的存档位于: https://lore.kernel.org/ltp/</p>
+<p>IRC频道 #ltp: irc.libera.chat</p>
+<p>Git仓库位于GitHub: https://github.com/linux-test-project/ltp</p>
+<p>Patchwork实例位于: https://patchwork.ozlabs.org/project/ltp/list/</p>
+<h1 id="warning"><span class="header-section-number">2</span> Warning!</h1>
+<p>请谨慎使用这些测试！</p>
+<p>不要在生产系统上运行它们。特别是Growfiles、doio和iogen这些测试会对系统的I/O能力造成压力，虽然它们不应该在正常运行的系统上造成问题，但它们旨在发现（或引起）问题。</p>
+<h1 id="quick-guide-to-running-the-tests"><span class="header-section-number">3</span> Quick guide to running the tests</h1>
+<p>如果你已经安装了git、autoconf、automake、m4、pkgconf/pkg-config、libc头文件、Linux内核头文件以及其他常见的开发包（请参阅INSTALL和ci/*.sh），那么以下步骤很可能会成功:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="fu">git</span> clone https://github.com/linux-test-project/ltp.git</a>
+<a class="sourceLine" id="cb1-2" title="2">$ <span class="bu">cd</span> ltp</a>
+<a class="sourceLine" id="cb1-3" title="3">$ <span class="fu">make</span> autotools</a>
+<a class="sourceLine" id="cb1-4" title="4">$ <span class="ex">./configure</span></a></code></pre></div>
+<p>现在，你可以选择继续编译和运行单个测试，或者编译和安装整个测试套件。</p>
+<p>对于可选的库依赖关系，请查看ci/目录中适用于主要发行版的脚本。你还可以使用<code>./build.sh</code>脚本来构建整个LTP。</p>
+<h2 id="shortcut-to-running-a-single-test"><span class="header-section-number">3.1</span> Shortcut to running a single test</h2>
+<p>如果你只需要执行单个测试，实际上无需编译整个LTP。如果你想运行一个系统调用的测试用例，以下步骤应该可以正常工作:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$ <span class="bu">cd</span> testcases/kernel/syscalls/foo</a>
+<a class="sourceLine" id="cb2-2" title="2">$ <span class="fu">make</span></a>
+<a class="sourceLine" id="cb2-3" title="3">$ <span class="va">PATH=$PATH</span>:<span class="va">$PWD</span> <span class="ex">./foo01</span></a></code></pre></div>
+<p>Shell测试用例稍微复杂一些，因为它们需要一个shell库的路径以及已编译的二进制助手的路径，但一般来说以下步骤应该可以正常工作:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$ <span class="bu">cd</span> testcases/lib</a>
+<a class="sourceLine" id="cb3-2" title="2">$ <span class="fu">make</span></a>
+<a class="sourceLine" id="cb3-3" title="3">$ <span class="bu">cd</span> ../commands/foo</a>
+<a class="sourceLine" id="cb3-4" title="4">$ <span class="va">PATH=$PATH</span>:<span class="va">$PWD</span>:<span class="va">$PWD</span>/../../lib/ <span class="ex">./foo01.sh</span></a></code></pre></div>
+<p>Open Posix Testsuite有自己的构建系统，需要先生成Makefile，然后在子目录中进行编译也应该可以工作:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$ <span class="bu">cd</span> testcases/open_posix_testsuite/</a>
+<a class="sourceLine" id="cb4-2" title="2">$ <span class="fu">make</span> generate-makefiles</a>
+<a class="sourceLine" id="cb4-3" title="3">$ <span class="bu">cd</span> conformance/interfaces/foo</a>
+<a class="sourceLine" id="cb4-4" title="4">$ <span class="fu">make</span></a>
+<a class="sourceLine" id="cb4-5" title="5">$ <span class="ex">./foo_1-1.run-test</span></a></code></pre></div>
+<p>请注意，在运行测试之前，确保已经安装了所需的依赖项，并且环境变量已经设置正确以便找到所需的文件和库。</p>
+<h2 id="compiling-and-installing-all-testcases"><span class="header-section-number">3.2</span> Compiling and installing all testcases</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="fu">make</span></a>
+<a class="sourceLine" id="cb5-2" title="2">$ <span class="fu">make</span> install</a></code></pre></div>
+<p>这将把LTP安装到/opt/ltp目录下。</p>
+<ul>
+<li>如果遇到问题，请参阅<code>INSTALL</code>文件和<code>./configure --help</code>的帮助信息。</li>
+<li>如果以上方法都无法解决问题，请在邮件列表或Github上寻求帮助。</li>
+</ul>
+<p>如果configure脚本无法找到构建依赖项，则可能会禁用一些测试。</p>
+<ul>
+<li>如果一个测试由于缺少组件而返回TCONF，请检查<code>./configure</code>的输出。</li>
+<li>如果一个测试由于缺少用户或组而失败，请参阅INSTALL的快速入门部分。</li>
+</ul>
+<h2 id="running-tests"><span class="header-section-number">3.3</span> Running tests</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="bu">cd</span> /opt/ltp</a>
+<a class="sourceLine" id="cb6-2" title="2">$ <span class="ex">./runltp</span></a></code></pre></div>
+<p>请注意，许多测试用例需要以root用户身份执行。</p>
+<p>要运行特定的测试套件:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="ex">./runltp</span> -f syscalls</a></code></pre></div>
+<p>要运行所有名称中带有madvise的测试:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$ <span class="ex">./runltp</span> -f syscalls -s madvise</a></code></pre></div>
+<p>另请参阅:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1">$ <span class="ex">./runltp</span> --help</a></code></pre></div>
+<p>测试套件（例如syscalls）在runtest目录中定义。每个文件包含一个简单格式的测试用例列表，详见doc/ltp-run-files.txt。</p>
+<p>每个测试用例都有自己的可执行文件或脚本，可以直接执行:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$ <span class="ex">testcases/bin/abort01</span></a></code></pre></div>
+<p>有些测试用例需要参数:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$ <span class="ex">testcases/bin/mesgq_nstest</span> -m none</a></code></pre></div>
+<p>绝大多数测试用例都支持-h（帮助）选项:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1">$ <span class="ex">testcases/bin/ioctl01</span> -h</a></code></pre></div>
+<p>许多测试需要设置特定的环境变量:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1">$ <span class="va">LTPROOT=</span>/opt/ltp <span class="va">PATH=</span><span class="st">&quot;</span><span class="va">$PATH</span><span class="st">:</span><span class="va">$LTPROOT</span><span class="st">/testcases/bin&quot;</span> <span class="ex">testcases/bin/wc01.sh</span></a></code></pre></div>
+<p>大多数情况下，需要设置路径变量（PATH）和LTPROOT变量，但还有一些其他变量，runltp通常会为您设置这些变量。</p>
+<p>请注意，所有shell脚本都需要设置PATH变量。然而，并不限于shell脚本，许多基于C语言的测试也需要设置环境变量。</p>
+<p>更多信息请参阅doc/User-Guidelines.asciidoc文件或在线查看 https://github.com/linux-test-project/ltp/wiki/User-Guidelines。</p>
+<h2 id="network-tests"><span class="header-section-number">3.4</span> Network tests</h2>
+<p>网络测试需要特定的设置，详见testcases/network/README.md（在线查看地址: https://github.com/linux-test-project/ltp/tree/master/testcases/network）。</p>
+<h2 id="containers"><span class="header-section-number">3.5</span> Containers</h2>
+<p>当前在容器内运行LTP并不是一个捷径。这将使事情变得更加困难。</p>
+<p>有一个可以与Docker或Podman一起使用的Containerfile。目前它可以构建Alpine和OpenSUSE镜像。</p>
+<p>可以使用类似以下命令构建容器:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1">$ <span class="ex">podman</span> build -t tumbleweed/ltp \</a>
+<a class="sourceLine" id="cb14-2" title="2">       --build-arg PREFIX=registry.opensuse.org/opensuse/ \</a>
+<a class="sourceLine" id="cb14-3" title="3">       --build-arg DISTRO_NAME=tumbleweed \</a>
+<a class="sourceLine" id="cb14-4" title="4">       --build-arg DISTRO_RELEASE=20230925 .</a></code></pre></div>
+<p>或者只需执行 <code>podman build .</code>，它将创建一个Alpine容器。</p>
+<p>容器中包含了Kirk在 <code>/opt/kirk</code> 中。因此，以下命令将运行一些测试:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1">$ <span class="ex">podman</span> run -it --rm tumbleweed/ltp:latest</a>
+<a class="sourceLine" id="cb15-2" title="2">$ <span class="bu">cd</span> /opt/kirk <span class="kw">&amp;&amp;</span> <span class="ex">./kirk</span> -f ltp -r syscalls</a></code></pre></div>
+<p>SUSE还发布了一个较小的LTP容器，不基于Containerfile。</p>
+<h1 id="debugging-with-gdb-and-strace"><span class="header-section-number">4</span> Debugging with gdb and strace</h1>
+<p>新的测试库在一个分支进程中运行实际的测试，即test()函数。要在gdb中获取崩溃测试的堆栈跟踪，需要设置 follow-fork-mode child。要使用strace跟踪测试，使用带有 -f 选项的strace来启用对分叉进程的跟踪。</p>
+<h1 id="developers-corner"><span class="header-section-number">5</span> Developers corner</h1>
+<p>在开始之前，你应该阅读以下文档:</p>
+<ul>
+<li>doc/Test-Writing-Guidelines.asciidoc</li>
+<li>doc/Build-System.asciidoc</li>
+<li>doc/LTP-Library-API-Writing-Guidelines.asciidoc</li>
+</ul>
+<p>还有一个逐步教程:</p>
+<ul>
+<li>doc/C-Test-Case-Tutorial.asciidoc</li>
+</ul>
+<p>如果有任何未涵盖的内容，请不要犹豫在LTP邮件列表上提问。还请注意这些文档可以在线访问:</p>
+<ul>
+<li>https://github.com/linux-test-project/ltp/wiki/Test-Writing-Guidelines</li>
+<li>https://github.com/linux-test-project/ltp/wiki/LTP-Library-API-Writing-Guidelines</li>
+<li>https://github.com/linux-test-project/ltp/wiki/Build-System</li>
+<li>https://github.com/linux-test-project/ltp/wiki/C-Test-Case-Tutorial</li>
+</ul>
+<p>虽然我们接受GitHub的拉取请求，但首选方式是将补丁发送到我们的邮件列表。</p>
+<p>在发布到邮件列表之前，在GitHub Actions上测试补丁是个好主意。我们的GitHub Actions设置涵盖了各种架构和发行版，以确保LTP在大多数常见配置上能够编译成功。为了测试，你只需将更改推送到你在GitHub上的LTP分支。</p>
+</body>
+</html>

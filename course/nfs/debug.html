@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>nfs调试方法</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">nfs调试方法</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#log"><span class="toc-section-number">1</span> 日志</a><ul>
+<li><a href="#mydebug模块打印"><span class="toc-section-number">1.0.1</span> <code>mydebug</code>模块打印</a></li>
+</ul></li>
+<li><a href="#tracepoint"><span class="toc-section-number">2</span> tracepoint</a></li>
+<li><a href="#tcpdump"><span class="toc-section-number">3</span> tcpdump抓包</a></li>
+<li><a href="#重新挂载"><span class="toc-section-number">4</span> 重新挂载</a></li>
+<li><a href="#crash-vmcore"><span class="toc-section-number">5</span> crash分析vmcore</a></li>
+<li><a href="#非特权源端口挂载"><span class="toc-section-number">6</span> 非特权源端口挂载</a></li>
+<li><a href="#step"><span class="toc-section-number">7</span> 问题定位步骤</a></li>
+<li><a href="#script"><span class="toc-section-number">8</span> 调试脚本</a><ul>
+<li><a href="#client-script"><span class="toc-section-number">8.1</span> nfs client调试脚本</a></li>
+<li><a href="#server-script"><span class="toc-section-number">8.2</span> nfs server调试脚本</a></li>
+<li><a href="#get-all_stack"><span class="toc-section-number">8.3</span> 获取所有线程的栈</a></li>
+</ul></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p>本文介绍一下我尝试过的nfs定位问题的常用方法，非权威，欢迎指正。</p>
+<h1 id="log"><span class="header-section-number">1</span> 日志</h1>
+<p>发生问题时，报错日志肯定是很有用的信息，大部分发行版都会把日志放在<code>/var/log/messages*</code>文件中，默认情况下，nfs只会打印错误信息。 但有些时候，我们需要一些调试日志信息，这时就要打开nfs和rpc的调试开关。注意要使用调试开关的功能，编译时需要打开配置<code>CONFIG_SUNRPC_DEBUG</code>。</p>
+<p>几个打印相关的宏定义是<code>dprintk()</code>、<code>dprintk_cont()</code>、<code>dprintk_rcu()</code>、<code>dprintk_rcu_cont</code>，下面以<code>dprintk()</code>为例讲一下这个宏定义的展开:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb1-1" title="1"><span class="co">// include/linux/sunrpc/debug.h</span></a>
+<a class="sourceLine" id="cb1-2" title="2">dprintk(fmt, ...)</a>
+<a class="sourceLine" id="cb1-3" title="3">  dfprintk(FACILITY, fmt, ##__VA_ARGS__)</a>
+<a class="sourceLine" id="cb1-4" title="4">    ifdebug(fac)</a>
+<a class="sourceLine" id="cb1-5" title="5">      <span class="co">// include/linux/sunrpc/debug.h</span></a>
+<a class="sourceLine" id="cb1-6" title="6">      <span class="cf">if</span> (unlikely(rpc_debug &amp; RPCDBG_FACILITY))</a>
+<a class="sourceLine" id="cb1-7" title="7">      <span class="co">// include/linux/nfs_fs.h</span></a>
+<a class="sourceLine" id="cb1-8" title="8">      <span class="cf">if</span> (unlikely(nfs_debug &amp; NFSDBG_FACILITY))</a>
+<a class="sourceLine" id="cb1-9" title="9">      <span class="co">// fs/nfsd/nfsd.h</span></a>
+<a class="sourceLine" id="cb1-10" title="10">      <span class="cf">if</span> (nfsd_debug &amp; NFSDDBG_FACILITY)</a>
+<a class="sourceLine" id="cb1-11" title="11">      <span class="co">// include/linux/lockd/debug.h</span></a>
+<a class="sourceLine" id="cb1-12" title="12">      <span class="cf">if</span> (unlikely(nlm_debug &amp; NLMDBG_FACILITY))</a>
+<a class="sourceLine" id="cb1-13" title="13">    printk(KERN_DEFAULT fmt, ##__VA_ARGS__);</a></code></pre></div>
+<p>当然也可直接调用<code>dfprintk()</code>、<code>dfprintk_cont()</code>、<code>dfprintk_rcu()</code>、<code>dfprintk_rcu_cont()</code>。</p>
+<p>以下是打开全部日志的命令，注意这将会打印大量日志，请先把<code>/var/log/messages*</code>复制保存到其他位置，避免错误日志被覆盖:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_ALL</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_ALL</span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="bu">echo</span> 0x7FFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># NFSDDBG_ALL</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/nlm_debug <span class="co"># NLMDBG_ALL</span></a></code></pre></div>
+<p>如果你缩小了定位的范围，可以只打开某些日志:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="bu">echo</span> 0x0008 <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_PAGECACHE</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="bu">echo</span> 0x0040 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_SCHED</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="bu">echo</span> 0x0400 <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># NFSDDBG_PNFS</span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="bu">echo</span> 0x0008 <span class="op">&gt;</span> /proc/sys/sunrpc/nlm_debug <span class="co"># NLMDBG_SVCLOCK</span></a></code></pre></div>
+<p>写<code>/proc/sys/sunrpc/rpc_debug</code>文件时会打印出很多rpc任务:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">-pid-</span> flgs status -client- --rqstp- -timeout ---ops--</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="ex">57533</span> 4201      0 159b39a4   (null)        <span class="ex">0</span> 43ff7b9f nfsv4 WRITE a:rpc_prepare_task [sunrpc] q:ForeChannel Slot table</a></code></pre></div>
+<p>相关代码流程如下:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb5-1" title="1">proc_dodebug</a>
+<a class="sourceLine" id="cb5-2" title="2">  <span class="co">// 只有写 rpc_debug 文件才会打印rpc任务</span></a>
+<a class="sourceLine" id="cb5-3" title="3">  <span class="cf">if</span> (strcmp(table-&gt;procname, <span class="st">&quot;rpc_debug&quot;</span>) == <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb5-4" title="4">  rpc_show_tasks</a>
+<a class="sourceLine" id="cb5-5" title="5">    list_for_each_entry(clnt, &amp;sn-&gt;all_clients,</a>
+<a class="sourceLine" id="cb5-6" title="6">    list_for_each_entry(task, &amp;clnt-&gt;cl_tasks, <span class="co">// 存在任务才会打印</span></a>
+<a class="sourceLine" id="cb5-7" title="7">    rpc_show_header</a>
+<a class="sourceLine" id="cb5-8" title="8">    rpc_show_task</a></code></pre></div>
+<h3 id="mydebug模块打印"><span class="header-section-number">1.0.1</span> <code>mydebug</code>模块打印</h3>
+<p>请查看<a href="https://chenxiaosong.com/course/kernel/debug.html#mydebug">《内核调试方法》</a>。</p>
+<h1 id="tracepoint"><span class="header-section-number">2</span> tracepoint</h1>
+<p>除了日志，还可以打开tracepoint，尤其是最新主线代码的sunrpc中的<code>dprintk()</code>很多都移除了，有些sunrpc相关信息也只能通过tracepoint查看了。tracepoint的使用请查看<a href="https://chenxiaosong.com/course/kernel/debug.html#tracepoint">《内核调试方法》</a>。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="bu">cd</span> /sys/kernel/debug/tracing/</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="bu">echo</span> nop <span class="op">&gt;</span> current_tracer</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="bu">echo</span> 1 <span class="op">&gt;</span> tracing_on</a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="fu">cat</span> available_events  <span class="kw">|</span> <span class="fu">grep</span> nfs <span class="co"># nfs nfsd nfs_localio</span></a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="fu">cat</span> available_events  <span class="kw">|</span> <span class="fu">grep</span> rpc <span class="co"># rpcgss sunrpc</span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="fu">ls</span> events/*nfs* -d</a>
+<a class="sourceLine" id="cb6-7" title="7">  <span class="co"># events/nfs  events/nfsd  events/nfs_localio</span></a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="fu">ls</span> events/*rpc* -d</a>
+<a class="sourceLine" id="cb6-9" title="9">  <span class="co"># events/rpcgss  events/sunrpc</span></a>
+<a class="sourceLine" id="cb6-10" title="10"><span class="bu">echo</span> nfsd:nfsd_cb_recall_done <span class="op">&gt;</span> set_event <span class="co"># 打开某个tracepoint</span></a>
+<a class="sourceLine" id="cb6-11" title="11"><span class="bu">echo</span> rpcgss:* <span class="op">&gt;</span> set_event <span class="co"># 打开所有的rpcgss跟踪点</span></a>
+<a class="sourceLine" id="cb6-12" title="12"><span class="co"># echo 1 &gt; events/nfsd/nfsd_cb_recall_done/enable # 打开某个tracepoint</span></a>
+<a class="sourceLine" id="cb6-13" title="13"><span class="co"># echo 1 &gt; events/rpcgss/enable # 打开所有的rpcgss跟踪点</span></a>
+<a class="sourceLine" id="cb6-14" title="14"><span class="bu">echo</span> 0 <span class="op">&gt;</span> trace <span class="co"># 清除trace信息</span></a>
+<a class="sourceLine" id="cb6-15" title="15"><span class="fu">cat</span> trace_pipe</a></code></pre></div>
+<h1 id="tcpdump"><span class="header-section-number">3</span> tcpdump抓包</h1>
+<p>既然nfs涉及到网络，定位问题肯定也少不了网络抓包，甚至在绝大多数情况下，网络抓包能够比日志提供更有用更直观的信息，使用<code>tcpdump</code>工具抓包:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="co"># --interface: 指定要监听的网络接口，any表示所有的网络接口</span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="co"># --buffer-size: 默认4KB, 单位 KB, 20480 代表 20MB。buffer大一点可以防止抓包数据丢失</span></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="ex">tcpdump</span> --interface=<span class="op">&lt;</span>网络接口<span class="op">&gt;</span> --buffer-size=20480 -w out.cap</a></code></pre></div>
+<p>当数据量比较大时，有时会发生抓包数据丢失。配置网络参数，把参数调大可以防止抓包数据丢失:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">sysctl</span> -a <span class="kw">|</span> <span class="fu">grep</span> net.core.rmem <span class="co"># 查看配置</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">sysctl</span> net.core.rmem_default=xxx</a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="ex">sysctl</span> net.core.rmem_max=xxx</a></code></pre></div>
+<p><code>tcpdump</code>抓包的文件，可以使用<a href="https://www.wireshark.org/"><code>wireshark</code></a>分析。如果要查看端口，需要在<code>preferences -&gt; appearance -&gt; columns</code>中添加<code>Src port (unresolved)</code>和<code>Dest port (unresolved)</code>。</p>
+<h1 id="重新挂载"><span class="header-section-number">4</span> 重新挂载</h1>
+<p>在生产环境下，如果出现问题，很多时候可能没有很多时间可以保留现场，可能需要重新挂载快速恢复。</p>
+<p>请注意，在<code>umount</code>之前，务必收集好需要的调试信息，因为很多问题可能一年半载也只会出现那么一次。</p>
+<p><code>umount &lt;挂载点&gt;</code>命令如果报错<code>device is busy</code>之类的信息，说明挂载点正在使用，可以使用以下命令查看使用挂载点的进程:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># +D：递归地列出指定目录下所有打开的文件</span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="ex">lsof</span> +D <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="co"># -m：表示查询挂载点（而不仅仅是某个文件）</span></a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="fu">fuser</span> -m <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></a></code></pre></div>
+<p>可能的原因请查看<a href="https://chenxiaosong.com/course/nfs/issue/nfs-umount-device-is-busy.html">《umount nfs报错device is busy的问题》</a>。</p>
+<p>如果找到的使用挂载点的进程非常重要，kill这些进程会导致重大问题，可以使用以下命令延迟卸载，会导致挂载点在后台被卸载，而不会强制终止进程:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="fu">umount</span> --lazy <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></a></code></pre></div>
+<p>如果找到的使用挂载点的进程没有那么重要，建议还是kill掉这些进程再卸载，这样才能更彻底的恢复环境:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="bu">kill</span> -SIGKILL <span class="op">&lt;</span>进程号<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="fu">umount</span> <span class="op">&lt;</span>挂载点<span class="op">&gt;</span></a></code></pre></div>
+<h1 id="crash-vmcore"><span class="header-section-number">5</span> crash分析vmcore</h1>
+<p>vmcore中的信息有时对分析问题很有帮助。</p>
+<p>如果能保留问题环境，先尝试在线调试vmcore:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="ex">crash</span> vmlinux <span class="co"># 在线调试，vmcore是/proc/kcore</span></a></code></pre></div>
+<p>在生产环境下，如果必须要快速恢复环境，且这个环境是可以接受重启系统，就可以尝试手动导出vmcore:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="bu">echo</span> 1 <span class="op">&gt;</span> /proc/sys/kernel/sysrq</a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="bu">echo</span> c <span class="op">&gt;</span> /proc/sysrq-trigger</a></code></pre></div>
+<p>关于vmcore的更详细内容，请查看<a href="https://chenxiaosong.com/course/kernel/debug.html#kdump-crash">内核调试方法</a>。</p>
+<p>如果要让内核在hungtask或softlockup等情况触发panic，可以执行以下操作:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="ex">sysctl</span> -w kernel.softlockup_panic=1 <span class="co"># -w：表示“写”操作，用来修改内核参数</span></a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="ex">sysctl</span> -w kernel.hung_task_panic=0</a>
+<a class="sourceLine" id="cb14-3" title="3"><span class="ex">sysctl</span> kernel.softlockup_panic <span class="co"># 查看</span></a>
+<a class="sourceLine" id="cb14-4" title="4"><span class="co"># 或者用以下命令</span></a>
+<a class="sourceLine" id="cb14-5" title="5"><span class="bu">echo</span> 1 <span class="op">&gt;</span> /proc/sys/kernel/softlockup_panic <span class="co"># 和sysctl命令效果一样</span></a>
+<a class="sourceLine" id="cb14-6" title="6"><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/kernel/hung_task_panic</a>
+<a class="sourceLine" id="cb14-7" title="7"><span class="fu">cat</span> /proc/sys/kernel/softlockup_panic <span class="co"># 查看</span></a></code></pre></div>
+<h1 id="非特权源端口挂载"><span class="header-section-number">6</span> 非特权源端口挂载</h1>
+<p>默认情况下，nfs client挂载使用的源端口是小于1024的特权端口（Privileged Ports），需要root权限。</p>
+<p>但在某些情况下，无法挂载时，可以尝试使用大于1024的非特权端口挂载，这对排查问题很有帮助。</p>
+<p>首先，server端的<code>/etc/exports</code>文件中对导出路径增加<code>insecure</code>选项，如:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="ex">/tmp/</span> *(rw,no_root_squash,fsid=0,insecure)</a></code></pre></div>
+<p>重启server端服务:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="ex">systemctl</span> restart nfs-server.service</a></code></pre></div>
+<p>这时client端可以使用所有范围的端口挂载，默认情况下还是使用小于1024的端口，而大于1024的端口要指定挂载选项<code>noresvport</code>:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" title="1"><span class="fu">mount</span> -t nfs -o noresvport <span class="va">${server_ip}</span>:/ /mnt</a></code></pre></div>
+<p>请注意，使用非特权源端口挂载在一些场景下是不安全的（从server端的配置选项的字面意思<code>insecure</code>就能看出），尽量只在调试场景下使用。</p>
+<p>在我曾经定位过的nfs问题中，有碰到过路由器或交换机出于产品的某些原因，把小于1024的端口的数据包都给过滤了，当时就是使用非特权源端口挂载的方法排除其他可能性，最终定位出问题。</p>
+<h1 id="step"><span class="header-section-number">7</span> 问题定位步骤</h1>
+<ul>
+<li>查询挂载参数: <code>mount | grep nfs</code>，用于分析代码或复现</li>
+<li>tcpdump抓包: <code>tcpdump --interface=&lt;网络接口&gt; --buffer-size=20480 -w out.cap</code>，如果不确定<code>&lt;网络接口&gt;</code>可填<code>any</code></li>
+<li>nfs client打开日志开关:
+<ul>
+<li><code>echo 0xFFFF &gt; /proc/sys/sunrpc/nfs_debug # NFSDBG_ALL</code></li>
+<li><code>echo 0x7fff &gt; /proc/sys/sunrpc/rpc_debug # RPCDBG_ALL</code></li>
+<li><code>echo 0x7fff &gt; /proc/sys/sunrpc/nlm_debug # NLMDBG_ALL, 如果需要定位nfsv3的NLM（网络锁管理协议），还要打开这个，但一般不涉及</code></li>
+</ul></li>
+<li>nfs server打开日志开关:
+<ul>
+<li><code>echo 0x7fff &gt; /proc/sys/sunrpc/rpc_debug # RPCDBG_ALL</code></li>
+<li><code>echo 0x7FFF &gt; /proc/sys/sunrpc/nfsd_debug # NFSDDBG_ALL</code></li>
+<li><code>echo 0x7fff &gt; /proc/sys/sunrpc/nlm_debug # NLMDBG_ALL, 如果需要定位nfsv3的NLM（网络锁管理协议），还要打开这个，但一般不涉及</code></li>
+</ul></li>
+<li>跟踪系统调用: <code>strace -o strace.txt -f -v -s 4096 -tt -T &lt;这里填上要测试的命令&gt;</code></li>
+<li>以上步骤可用<a href="https://chenxiaosong.com/course/nfs/debug.html#script">下面章节的“调试脚本”</a>自动完成</li>
+<li>如果可以接受重启系统，就可以尝试手动导出vmcore，具体方法查看<a href="https://chenxiaosong.com/course/nfs/debug.html#crash-vmcore">上面的“crash分析vmcore“</a></li>
+</ul>
+<h1 id="script"><span class="header-section-number">8</span> 调试脚本</h1>
+<h2 id="client-script"><span class="header-section-number">8.1</span> nfs client调试脚本</h2>
+<p>client脚本要和server脚本同时执行（如果server也要调试的话）。</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1"><span class="va">mnt_point=</span>/mnt/ <span class="co"># 修改为nfs挂载点</span></a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="va">test_cmd=</span><span class="st">&quot;df </span><span class="va">${mnt_point}</span><span class="st">&quot;</span> <span class="co"># 测试命令</span></a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="va">net_interface=</span>any <span class="co"># 网络接口（比如eth0或enp2s0之类的），如果不确定就填any</span></a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="va">log_time=</span>60s <span class="co"># 日志收集时长</span></a>
+<a class="sourceLine" id="cb18-5" title="5"><span class="va">log_dir=$(</span><span class="bu">pwd</span><span class="va">)</span>/dmesg-log/ <span class="co"># 日志保存目录</span></a>
+<a class="sourceLine" id="cb18-6" title="6"><span class="va">strace_file=$(</span><span class="bu">pwd</span><span class="va">)</span>/strace.txt</a>
+<a class="sourceLine" id="cb18-7" title="7"><span class="va">strace_cmd=</span><span class="st">&quot;strace -o </span><span class="va">${strace_file}</span><span class="st"> -f -v -s 4096 -tt -T </span><span class="va">${test_cmd}</span><span class="st">&quot;</span> <span class="co"># 用strace跟踪系统调用</span></a>
+<a class="sourceLine" id="cb18-8" title="8"></a>
+<a class="sourceLine" id="cb18-9" title="9"><span class="va">cap_file=$(</span><span class="bu">pwd</span><span class="va">)</span>/nfs_client.cap</a>
+<a class="sourceLine" id="cb18-10" title="10"><span class="va">tcpdump_cmd=</span><span class="st">&quot;tcpdump --interface=</span><span class="va">${net_interface}</span><span class="st"> --buffer-size=20480 -w </span><span class="va">${cap_file}</span><span class="st">&quot;</span></a>
+<a class="sourceLine" id="cb18-11" title="11"></a>
+<a class="sourceLine" id="cb18-12" title="12"><span class="bu">echo</span> <span class="st">&quot;打开nfs日志开头&quot;</span></a>
+<a class="sourceLine" id="cb18-13" title="13"><span class="va">${tcpdump_cmd}</span> <span class="kw">&amp;</span></a>
+<a class="sourceLine" id="cb18-14" title="14"><span class="va">tcpdump_pid=$!</span> <span class="co"># 记录pid</span></a>
+<a class="sourceLine" id="cb18-15" title="15"><span class="bu">echo</span> <span class="st">&quot;&lt;1&gt; nfs debug log begin: </span><span class="va">$(</span><span class="fu">date</span><span class="va">)</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/kmsg <span class="co"># 内核日志记录当前时间</span></a>
+<a class="sourceLine" id="cb18-16" title="16"><span class="fu">sync</span></a>
+<a class="sourceLine" id="cb18-17" title="17"><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># 打开nfs日志</span></a>
+<a class="sourceLine" id="cb18-18" title="18"><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># 打开rpc日志</span></a>
+<a class="sourceLine" id="cb18-19" title="19"><span class="co"># echo 0x7fff &gt; /proc/sys/sunrpc/nlm_debug # 如果需要定位nfsv3的NLM（网络锁管理协议），还要打开这个，但一般不涉及</span></a>
+<a class="sourceLine" id="cb18-20" title="20"><span class="fu">sleep</span> 1s</a>
+<a class="sourceLine" id="cb18-21" title="21"><span class="va">${strace_cmd}</span> <span class="kw">&amp;</span> <span class="co"># 后台执行</span></a>
+<a class="sourceLine" id="cb18-22" title="22"><span class="bu">echo</span> <span class="st">&quot;等一段时间以产生足够多的日志&quot;</span></a>
+<a class="sourceLine" id="cb18-23" title="23"><span class="fu">sleep</span> <span class="va">${log_time}</span></a>
+<a class="sourceLine" id="cb18-24" title="24"><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># 关闭</span></a>
+<a class="sourceLine" id="cb18-25" title="25"><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># 关闭</span></a>
+<a class="sourceLine" id="cb18-26" title="26"><span class="co"># echo 0 &gt; /proc/sys/sunrpc/nlm_debug # 如果需要定位nfsv3的NLM（网络锁管理协议），还要打开这个，但一般不涉及</span></a>
+<a class="sourceLine" id="cb18-27" title="27"><span class="fu">sync</span></a>
+<a class="sourceLine" id="cb18-28" title="28"><span class="bu">echo</span> <span class="st">&quot;&lt;1&gt; nfs debug log end: </span><span class="va">$(</span><span class="fu">date</span><span class="va">)</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/kmsg <span class="co"># 内核日志记录当前时间</span></a>
+<a class="sourceLine" id="cb18-29" title="29"><span class="bu">kill</span> -SIGINT <span class="va">${tcpdump_pid}</span> <span class="co"># 退出tcpdump</span></a>
+<a class="sourceLine" id="cb18-30" title="30"><span class="fu">sync</span></a>
+<a class="sourceLine" id="cb18-31" title="31"><span class="fu">sleep</span> 5</a>
+<a class="sourceLine" id="cb18-32" title="32"><span class="fu">rm</span> <span class="va">${log_dir}</span> -rf</a>
+<a class="sourceLine" id="cb18-33" title="33"><span class="fu">mkdir</span> <span class="va">${log_dir}</span></a>
+<a class="sourceLine" id="cb18-34" title="34"><span class="fu">cp</span> /var/log/messages* <span class="va">${log_dir}</span></a>
+<a class="sourceLine" id="cb18-35" title="35"><span class="fu">cp</span> /var/log/dmesg* <span class="va">${log_dir}</span></a>
+<a class="sourceLine" id="cb18-36" title="36"><span class="fu">mv</span> <span class="va">${cap_file}</span> <span class="va">${log_dir}</span></a>
+<a class="sourceLine" id="cb18-37" title="37"><span class="fu">mv</span> <span class="va">${strace_file}</span> <span class="va">${log_dir}</span></a>
+<a class="sourceLine" id="cb18-38" title="38"><span class="bu">echo</span> <span class="st">&quot;日志已保存到 </span><span class="va">${log_dir}</span><span class="st">/ 目录下&quot;</span></a></code></pre></div>
+<h2 id="server-script"><span class="header-section-number">8.2</span> nfs server调试脚本</h2>
+<p>server的脚本和client脚本同时执行。</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1"><span class="va">log_time=</span>60s <span class="co"># 日志收集时长</span></a>
+<a class="sourceLine" id="cb19-2" title="2"><span class="va">log_dir=$(</span><span class="bu">pwd</span><span class="va">)</span>/dmesg-log/ <span class="co"># 日志保存目录</span></a>
+<a class="sourceLine" id="cb19-3" title="3"><span class="va">net_interface=</span>any <span class="co"># 网络接口，如果不确定就填any</span></a>
+<a class="sourceLine" id="cb19-4" title="4"></a>
+<a class="sourceLine" id="cb19-5" title="5"><span class="va">cap_file=$(</span><span class="bu">pwd</span><span class="va">)</span>/nfs_server.cap</a>
+<a class="sourceLine" id="cb19-6" title="6"><span class="va">tcpdump_cmd=</span><span class="st">&quot;tcpdump --interface=</span><span class="va">${net_interface}</span><span class="st"> --buffer-size=20480 -w </span><span class="va">${cap_file}</span><span class="st">&quot;</span></a>
+<a class="sourceLine" id="cb19-7" title="7"></a>
+<a class="sourceLine" id="cb19-8" title="8"><span class="bu">echo</span> <span class="st">&quot;打开nfs日志开头&quot;</span></a>
+<a class="sourceLine" id="cb19-9" title="9"><span class="va">${tcpdump_cmd}</span> <span class="kw">&amp;</span></a>
+<a class="sourceLine" id="cb19-10" title="10"><span class="va">tcpdump_pid=$!</span> <span class="co"># 记录pid</span></a>
+<a class="sourceLine" id="cb19-11" title="11"><span class="bu">echo</span> <span class="st">&quot;&lt;1&gt; nfsd debug log begin: </span><span class="va">$(</span><span class="fu">date</span><span class="va">)</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/kmsg <span class="co"># 内核日志记录当前时间</span></a>
+<a class="sourceLine" id="cb19-12" title="12"><span class="fu">sync</span></a>
+<a class="sourceLine" id="cb19-13" title="13"><span class="bu">echo</span> 0x7FFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># 打开nfsd日志</span></a>
+<a class="sourceLine" id="cb19-14" title="14"><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># 打开rpc日志</span></a>
+<a class="sourceLine" id="cb19-15" title="15"><span class="co"># echo 0x7fff &gt; /proc/sys/sunrpc/nlm_debug # 如果需要定位nfsv3的NLM（网络锁管理协议），还要打开这个，但一般不涉及</span></a>
+<a class="sourceLine" id="cb19-16" title="16"><span class="bu">echo</span> <span class="st">&quot;等一段时间以产生足够多的日志&quot;</span></a>
+<a class="sourceLine" id="cb19-17" title="17"><span class="fu">sleep</span> <span class="va">${log_time}</span></a>
+<a class="sourceLine" id="cb19-18" title="18"><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># 关闭</span></a>
+<a class="sourceLine" id="cb19-19" title="19"><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># 关闭</span></a>
+<a class="sourceLine" id="cb19-20" title="20"><span class="co"># echo 0x7fff &gt; /proc/sys/sunrpc/nlm_debug # 如果需要定位nfsv3的NLM（网络锁管理协议），还要打开这个，但一般不涉及</span></a>
+<a class="sourceLine" id="cb19-21" title="21"><span class="fu">sync</span></a>
+<a class="sourceLine" id="cb19-22" title="22"><span class="bu">echo</span> <span class="st">&quot;&lt;1&gt; nfsd debug log end: </span><span class="va">$(</span><span class="fu">date</span><span class="va">)</span><span class="st">&quot;</span> <span class="op">&gt;</span> /dev/kmsg <span class="co"># 内核日志记录当前时间</span></a>
+<a class="sourceLine" id="cb19-23" title="23"><span class="bu">kill</span> -SIGINT <span class="va">${tcpdump_pid}</span> <span class="co"># 退出tcpdump</span></a>
+<a class="sourceLine" id="cb19-24" title="24"><span class="fu">sync</span></a>
+<a class="sourceLine" id="cb19-25" title="25"><span class="fu">sleep</span> 5</a>
+<a class="sourceLine" id="cb19-26" title="26"><span class="fu">rm</span> <span class="va">${log_dir}</span> -rf</a>
+<a class="sourceLine" id="cb19-27" title="27"><span class="fu">mkdir</span> <span class="va">${log_dir}</span></a>
+<a class="sourceLine" id="cb19-28" title="28"><span class="fu">cp</span> /var/log/messages* <span class="va">${log_dir}</span></a>
+<a class="sourceLine" id="cb19-29" title="29"><span class="fu">cp</span> /var/log/dmesg* <span class="va">${log_dir}</span></a>
+<a class="sourceLine" id="cb19-30" title="30"><span class="fu">mv</span> <span class="va">${cap_file}</span> <span class="va">${log_dir}</span></a>
+<a class="sourceLine" id="cb19-31" title="31"><span class="bu">echo</span> <span class="st">&quot;日志已保存到 </span><span class="va">${log_dir}</span><span class="st">/ 目录下&quot;</span></a></code></pre></div>
+<h2 id="get-all_stack"><span class="header-section-number">8.3</span> 获取所有线程的栈</h2>
+<p>用以下脚本保存所有线程的栈:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1"><span class="va">output_file=</span>stacks.txt</a>
+<a class="sourceLine" id="cb20-2" title="2"><span class="co"># grep_string=&quot;mount&quot; # 进程关键字</span></a>
+<a class="sourceLine" id="cb20-3" title="3"><span class="co"># full_cmd_result=$(ps aux | grep &quot;${grep_string}&quot; | grep -v &quot;grep ${grep_string}&quot;) # 过滤关键字</span></a>
+<a class="sourceLine" id="cb20-4" title="4"><span class="va">full_cmd_result=$(</span><span class="fu">ps</span> aux <span class="kw">|</span> <span class="fu">sed</span> <span class="st">&#39;1d&#39;</span><span class="va">)</span> <span class="co"># 所有进程，输出要删除第一行标题行</span></a>
+<a class="sourceLine" id="cb20-5" title="5"><span class="va">pids=$(</span><span class="bu">echo</span> <span class="st">&quot;</span><span class="va">${full_cmd_result}</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $2}&#39;</span><span class="va">)</span></a>
+<a class="sourceLine" id="cb20-6" title="6"><span class="op">&gt;</span> <span class="va">${output_file}</span> <span class="co"># 清空</span></a>
+<a class="sourceLine" id="cb20-7" title="7"></a>
+<a class="sourceLine" id="cb20-8" title="8"><span class="kw">if</span><span class="bu"> [</span> <span class="ot">-z</span> <span class="st">&quot;</span><span class="va">$pids</span><span class="st">&quot;</span><span class="bu"> ]</span>; <span class="kw">then</span></a>
+<a class="sourceLine" id="cb20-9" title="9">    <span class="bu">echo</span> <span class="st">&quot;没有找到进程&quot;</span></a>
+<a class="sourceLine" id="cb20-10" title="10">    <span class="bu">exit</span> 0</a>
+<a class="sourceLine" id="cb20-11" title="11"><span class="kw">fi</span></a>
+<a class="sourceLine" id="cb20-12" title="12"></a>
+<a class="sourceLine" id="cb20-13" title="13"><span class="bu">echo</span> <span class="st">&quot;找到以下进程：&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></a>
+<a class="sourceLine" id="cb20-14" title="14"><span class="bu">echo</span> <span class="st">&quot;</span><span class="va">${full_cmd_result}</span><span class="st">&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></a>
+<a class="sourceLine" id="cb20-15" title="15"></a>
+<a class="sourceLine" id="cb20-16" title="16"><span class="bu">echo</span> -e <span class="st">&quot;\n获取进程栈信息：&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></a>
+<a class="sourceLine" id="cb20-17" title="17"><span class="kw">for</span> <span class="ex">pid</span> in <span class="va">$pids</span><span class="kw">;</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb20-18" title="18">    <span class="kw">if</span><span class="bu"> [</span> <span class="ot">-d</span> <span class="st">&quot;/proc/</span><span class="va">$pid</span><span class="st">&quot;</span><span class="bu"> ]</span>; <span class="kw">then</span></a>
+<a class="sourceLine" id="cb20-19" title="19">        <span class="co"># 遍历该进程的所有线程</span></a>
+<a class="sourceLine" id="cb20-20" title="20">        <span class="kw">for</span> <span class="ex">task</span> in /proc/<span class="va">$pid</span>/task/*<span class="kw">;</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb20-21" title="21">            <span class="va">tid=$(</span><span class="fu">basename</span> <span class="st">&quot;</span><span class="va">$task</span><span class="st">&quot;</span><span class="va">)</span>  <span class="co"># 提取线程ID</span></a>
+<a class="sourceLine" id="cb20-22" title="22">            <span class="bu">echo</span> -e <span class="st">&quot;\n=============== 进程 </span><span class="va">$pid</span><span class="st"> 线程 </span><span class="va">$tid</span><span class="st"> </span><span class="va">$(</span><span class="bu">echo</span> -n <span class="st">&quot;</span><span class="op">$(&lt;</span>/proc/<span class="va">$pid</span>/task/<span class="va">$tid</span>/comm<span class="op">)</span><span class="st">&quot;</span><span class="va">)</span><span class="st"> 栈信息 ===============&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></a>
+<a class="sourceLine" id="cb20-23" title="23">            <span class="fu">sudo</span> cat /proc/<span class="va">$pid</span>/task/<span class="va">$tid</span>/stack <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></a>
+<a class="sourceLine" id="cb20-24" title="24">            <span class="bu">echo</span> <span class="st">&quot;=======================================================&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></a>
+<a class="sourceLine" id="cb20-25" title="25">        <span class="kw">done</span></a>
+<a class="sourceLine" id="cb20-26" title="26">    <span class="kw">else</span></a>
+<a class="sourceLine" id="cb20-27" title="27">        <span class="bu">echo</span> <span class="st">&quot;进程 </span><span class="va">$pid</span><span class="st"> 已退出&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">${output_file}</span></a>
+<a class="sourceLine" id="cb20-28" title="28">    <span class="kw">fi</span></a>
+<a class="sourceLine" id="cb20-29" title="29"><span class="kw">done</span></a></code></pre></div>
+</body>
+</html>

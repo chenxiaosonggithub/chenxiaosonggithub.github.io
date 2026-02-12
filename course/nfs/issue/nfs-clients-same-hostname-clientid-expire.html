@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>多个NFS客户端使用相同的hostname导致clientid过期</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">多个NFS客户端使用相同的hostname导致clientid过期</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#补丁分析"><span class="toc-section-number">2</span> 补丁分析</a></li>
+<li><a href="#调试"><span class="toc-section-number">3</span> 调试</a><ul>
+<li><a href="#测试步骤"><span class="toc-section-number">3.1</span> 测试步骤</a></li>
+<li><a href="#日志收集"><span class="toc-section-number">3.2</span> 日志收集</a></li>
+<li><a href="#kprobe"><span class="toc-section-number">3.3</span> kprobe</a></li>
+</ul></li>
+<li><a href="#抓包数据分析"><span class="toc-section-number">4</span> 抓包数据分析</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">5</span> 代码分析</a></li>
+<li><a href="#结论"><span class="toc-section-number">6</span> 结论</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>NFS客户端采用NFSv4.2(vers=4.2)挂载时，tcpdump抓包发现，NFS服务端经常SEQUENCE 返回 NFS4ERR_BADSESSION错误导致 客户端主动DESTROY_SESSION和CREATE_SESSION， 客户端创建会话时，服务端返回NFS4ERR_STATLE_CLIENTID错误，客户端需要重新EXCHANGE_ID后CREATE_SESSION才成功，因为反复出现这种现象，导致客户端读写文件会出现偶尔错误，系统errno 会返回5。</p>
+<p>client日志中打印了<code>NFS: nfs4_reclaim_open_state: Lock reclaim failed!</code>，server日志中打印了<code>NFSD: client xx.xx.xx.xx testing state ID with incorrect client ID</code>。</p>
+<p>挂载参数:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">(</span><span class="ex">ro</span>,noexec,relatime,vers=4.1,rsize=1048576,wsize=1048576,namlen=255,soft,proto=tcp,timeo=10,retrans=2,sec=sys,clientaddr=xx.xx.xx.xx,local_lock=none,addr=xx.xx.xx.xx<span class="kw">)</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="kw">(</span><span class="ex">ro</span>,noexec,relatime,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,soft,proto=tcp,timeo=10,retrans=2,sec=sys,clientaddr=xx.xx.xx.xx,local_lock=none,addr=xx.xx.xx.xx<span class="kw">)</span></a></code></pre></div>
+<h1 id="补丁分析"><span class="header-section-number">2</span> 补丁分析</h1>
+<p>关于打印日志<code>NFS: nfs4_reclaim_open_state: Lock reclaim failed!</code>，请查看<a href="https://chenxiaosong.com/course/nfs/patch/NFS-Improve-warning-message-when-locks-are-lost.html"><code>3e2910c7e23b NFS: Improve warning message when locks are lost.</code></a>，注意nfs4.0、4.1和4.2都会有这个打印。</p>
+<p>关于打印<code>NFSD: client xx.xx.xx.xx testing state ID with incorrect client ID</code>已经被补丁<code>663e36f07666 nfsd4: kill warnings on testing stateids with mismatched clientids</code>移除。</p>
+<h1 id="调试"><span class="header-section-number">3</span> 调试</h1>
+<h2 id="测试步骤"><span class="header-section-number">3.1</span> 测试步骤</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="bu">echo</span> something <span class="op">&gt;</span> /tmp/s_test/file <span class="co"># server</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches <span class="co"># server</span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="ex">tcpdump</span> --interface=ens2 --buffer-size=20480 -w client1.cap <span class="kw">&amp;</span> <span class="co"># client1</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="ex">tcpdump</span> --interface=ens2 --buffer-size=20480 -w client2.cap <span class="kw">&amp;</span> <span class="co"># client2</span></a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="fu">mount</span> -t nfs -o ro,noexec,relatime,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,soft,proto=tcp,timeo=10,retrans=2,sec=sys,local_lock=none 192.168.53.209:s_test /mnt <span class="co"># client1, client2</span></a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="fu">cat</span> /mnt/file <span class="co"># client1, client2</span></a></code></pre></div>
+<h2 id="日志收集"><span class="header-section-number">3.2</span> 日志收集</h2>
+<p>打开server端的打印开关:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="bu">echo</span> 0x7FFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfsd_debug <span class="co"># NFSDDBG_ALL</span></a></code></pre></div>
+<p>有以下打印:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">__find_in_sessionid_hashtbl</span>: session not found</a></code></pre></div>
+<h2 id="kprobe"><span class="header-section-number">3.3</span> kprobe</h2>
+<p>kprobe跟踪函数:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="bu">cd</span> /sys/kernel/debug/tracing/</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> __find_in_sessionid_hashtbl <span class="co"># 找不到</span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> find_in_sessionid_hashtbl</a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> init_session</a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> unhash_session <span class="co"># 找不到</span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> nfsd4_destroy_session</a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="fu">cat</span> available_filter_functions <span class="kw">|</span> <span class="fu">grep</span> unhash_client_locked</a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="bu">echo</span> 1 <span class="op">&gt;</span> tracing_on</a>
+<a class="sourceLine" id="cb5-9" title="9"></a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="bu">echo</span> <span class="st">&#39;p:p_find_in_sessionid_hashtbl find_in_sessionid_hashtbl&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/enable</a>
+<a class="sourceLine" id="cb5-12" title="12"><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/trigger</a>
+<a class="sourceLine" id="cb5-13" title="13"><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/trigger</a>
+<a class="sourceLine" id="cb5-14" title="14"><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_find_in_sessionid_hashtbl/enable</a>
+<a class="sourceLine" id="cb5-15" title="15"><span class="bu">echo</span> <span class="st">&#39;-:p_find_in_sessionid_hashtbl&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</a>
+<a class="sourceLine" id="cb5-16" title="16"></a>
+<a class="sourceLine" id="cb5-17" title="17"><span class="bu">echo</span> <span class="st">&#39;p:p_init_session init_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</a>
+<a class="sourceLine" id="cb5-18" title="18"><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_init_session/enable</a>
+<a class="sourceLine" id="cb5-19" title="19"><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_init_session/trigger</a>
+<a class="sourceLine" id="cb5-20" title="20"><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_init_session/trigger</a>
+<a class="sourceLine" id="cb5-21" title="21"><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_init_session/enable</a>
+<a class="sourceLine" id="cb5-22" title="22"><span class="bu">echo</span> <span class="st">&#39;-:p_init_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</a>
+<a class="sourceLine" id="cb5-23" title="23"></a>
+<a class="sourceLine" id="cb5-24" title="24"><span class="bu">echo</span> <span class="st">&#39;p:p_nfsd4_destroy_session nfsd4_destroy_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</a>
+<a class="sourceLine" id="cb5-25" title="25"><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/enable</a>
+<a class="sourceLine" id="cb5-26" title="26"><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/trigger</a>
+<a class="sourceLine" id="cb5-27" title="27"><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/trigger</a>
+<a class="sourceLine" id="cb5-28" title="28"><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_nfsd4_destroy_session/enable</a>
+<a class="sourceLine" id="cb5-29" title="29"><span class="bu">echo</span> <span class="st">&#39;-:p_nfsd4_destroy_session&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</a>
+<a class="sourceLine" id="cb5-30" title="30"></a>
+<a class="sourceLine" id="cb5-31" title="31"><span class="bu">echo</span> <span class="st">&#39;p:p_unhash_client_locked unhash_client_locked&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</a>
+<a class="sourceLine" id="cb5-32" title="32"><span class="bu">echo</span> 1 <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/enable</a>
+<a class="sourceLine" id="cb5-33" title="33"><span class="bu">echo</span> stacktrace <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/trigger</a>
+<a class="sourceLine" id="cb5-34" title="34"><span class="bu">echo</span> <span class="st">&#39;!stacktrace&#39;</span> <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/trigger</a>
+<a class="sourceLine" id="cb5-35" title="35"><span class="bu">echo</span> 0 <span class="op">&gt;</span> events/kprobes/p_unhash_client_locked/enable</a>
+<a class="sourceLine" id="cb5-36" title="36"><span class="bu">echo</span> <span class="st">&#39;-:p_unhash_client_locked&#39;</span> <span class="op">&gt;&gt;</span> kprobe_events</a>
+<a class="sourceLine" id="cb5-37" title="37"></a>
+<a class="sourceLine" id="cb5-38" title="38"><span class="bu">echo</span> 0 <span class="op">&gt;</span> trace <span class="co"># 清除trace信息</span></a>
+<a class="sourceLine" id="cb5-39" title="39"><span class="fu">cat</span> trace_pipe</a></code></pre></div>
+<h1 id="抓包数据分析"><span class="header-section-number">4</span> 抓包数据分析</h1>
+<p>第一个执行<code>cat</code>命令的client端的抓包数据显示一切顺利:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">No.</span>     Time            Source          Destination   Protocol  Length  Info</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="ex">44</span>      8.519424        192.168.53.211  192.168.53.209  NFS     242     V4 Call (Reply In 45) <span class="ex">ACCESS</span> FH: 0xda686b37, [Check: RD LU MD XT DL XAR XAW XAL]</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="ex">45</span>      8.520129        192.168.53.209  192.168.53.211  NFS     238     V4 Reply (Call In 44) <span class="ex">ACCESS</span>, [Allowed: RD LU MD XT DL XAR XAW XAL]</a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="ex">47</span>      8.520438        192.168.53.211  192.168.53.209  NFS     318     V4 Call (Reply In 48) <span class="ex">OPEN</span> DH: 0xda686b37/file</a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="ex">48</span>      8.521172        192.168.53.209  192.168.53.211  NFS     450     V4 Reply (Call In 47) <span class="ex">OPEN</span> StateID: 0xafa9</a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="ex">49</span>      8.521476        192.168.53.211  192.168.53.209  NFS     258     V4 Call (Reply In 50) <span class="ex">READ_PLUS</span> StateID: 0x07c6 Offset: 0 Len: 4096</a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="ex">50</span>      8.522020        192.168.53.209  192.168.53.211  NFS     202     V4 Reply (Call In 49) <span class="ex">READ_PLUS</span></a></code></pre></div>
+<p>后执行<code>cat</code>命令的client端的抓包数据就有点问题:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="ex">No.</span>     Time            Source          Destination   Protocol  Length  Info</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="ex">58</span>      40.222102       192.168.53.210  192.168.53.209  NFS     242     V4 Call (Reply In 59) <span class="ex">ACCESS</span> FH: 0xda686b37, [Check: RD LU MD XT DL XAR XAW XAL]</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="ex">59</span>      40.222821       192.168.53.209  192.168.53.210  NFS     114     V4 Reply (Call In 58) <span class="ex">SEQUENCE</span> Status: NFS4ERR_BADSESSION</a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="ex">61</span>      40.223325       192.168.53.210  192.168.53.209  NFS     186     V4 Call (Reply In 62) <span class="ex">DESTROY_SESSION</span></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="ex">62</span>      40.223764       192.168.53.209  192.168.53.210  NFS     114     V4 Reply (Call In 61) <span class="ex">DESTROY_SESSION</span> Status: NFS4ERR_BADSESSION</a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="ex">63</span>      40.223910       192.168.53.210  192.168.53.209  NFS     298     V4 Call (Reply In 64) <span class="ex">CREATE_SESSION</span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="ex">64</span>      40.224568       192.168.53.209  192.168.53.210  NFS     114     V4 Reply (Call In 63) <span class="ex">CREATE_SESSION</span> Status: NFS4ERR_STALE_CLIENTID</a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="ex">65</span>      40.224749       192.168.53.210  192.168.53.209  NFS     342     V4 Call (Reply In 66) <span class="ex">EXCHANGE_ID</span></a>
+<a class="sourceLine" id="cb7-9" title="9"><span class="ex">66</span>      40.225228       192.168.53.209  192.168.53.210  NFS     314     V4 Reply (Call In 65) <span class="ex">EXCHANGE_ID</span></a>
+<a class="sourceLine" id="cb7-10" title="10"><span class="ex">67</span>      40.225378       192.168.53.210  192.168.53.209  NFS     298     V4 Call (Reply In 68) <span class="ex">CREATE_SESSION</span></a>
+<a class="sourceLine" id="cb7-11" title="11"><span class="ex">68</span>      40.245588       192.168.53.209  192.168.53.210  NFS     194     V4 Reply (Call In 67) <span class="ex">CREATE_SESSION</span></a>
+<a class="sourceLine" id="cb7-12" title="12"><span class="ex">69</span>      40.245793       192.168.53.210  192.168.53.209  NFS     218     V4 Call (Reply In 70) <span class="ex">PUTROOTFH</span> <span class="kw">|</span> <span class="ex">GETATTR</span></a>
+<a class="sourceLine" id="cb7-13" title="13"><span class="ex">70</span>      40.246160       192.168.53.209  192.168.53.210  NFS     182     V4 Reply (Call In 69) <span class="ex">PUTROOTFH</span> <span class="kw">|</span> <span class="ex">GETATTR</span></a>
+<a class="sourceLine" id="cb7-14" title="14"><span class="ex">71</span>      40.246314       192.168.53.210  192.168.53.209  NFS     210     V4 Call (Reply In 72) <span class="ex">RECLAIM_COMPLETE</span></a>
+<a class="sourceLine" id="cb7-15" title="15"><span class="ex">72</span>      40.255843       192.168.53.209  192.168.53.210  NFS     158     V4 Reply (Call In 71) <span class="ex">RECLAIM_COMPLETE</span></a>
+<a class="sourceLine" id="cb7-16" title="16"><span class="ex">73</span>      40.256049       192.168.53.210  192.168.53.209  NFS     242     V4 Call (Reply In 74) <span class="ex">ACCESS</span> FH: 0xda686b37, [Check: RD LU MD XT DL XAR XAW XAL]</a>
+<a class="sourceLine" id="cb7-17" title="17"><span class="ex">74</span>      40.256467       192.168.53.209  192.168.53.210  NFS     238     V4 Reply (Call In 73) <span class="ex">ACCESS</span>, [Allowed: RD LU MD XT DL XAR XAW XAL]</a>
+<a class="sourceLine" id="cb7-18" title="18"><span class="ex">75</span>      40.256710       192.168.53.210  192.168.53.209  NFS     318     V4 Call (Reply In 76) <span class="ex">OPEN</span> DH: 0xda686b37/file</a>
+<a class="sourceLine" id="cb7-19" title="19"><span class="ex">76</span>      40.257300       192.168.53.209  192.168.53.210  NFS     450     V4 Reply (Call In 75) <span class="ex">OPEN</span> StateID: 0xafa9</a>
+<a class="sourceLine" id="cb7-20" title="20"><span class="ex">77</span>      40.257721       192.168.53.210  192.168.53.209  NFS     258     V4 Call (Reply In 78) <span class="ex">READ_PLUS</span> StateID: 0x9bc8 Offset: 0 Len: 4096</a>
+<a class="sourceLine" id="cb7-21" title="21"><span class="ex">78</span>      40.258192       192.168.53.209  192.168.53.210  NFS     202     V4 Reply (Call In 77) <span class="ex">READ_PLUS</span></a></code></pre></div>
+<p>后执行<code>cat</code>命令的client端，OPEN前先执行ACCESS，但却返回NFS4ERR_BADSESSION错误，接着重新建立连接，然后再执行和第一个client端一样的过程。</p>
+<h1 id="代码分析"><span class="header-section-number">5</span> 代码分析</h1>
+<p>client端的clientid里含有hostname，如果加载nfs模块时没有指定模块参数<code>nfs4_unique_id</code>，也没有设置<code>/sys/fs/nfs/net/nfs_client/identifier</code>的值，那么clientid的值就只取决于hostname，如果多个client的hostname一样，那么这些client的clientid也都一样。</p>
+<p>如果多个client的clientid一样，那么在第二个client执行挂载时，server端代码执行到<code>nfsd4_create_session()</code>时，就会因为与前一个client的clientid一样，而执行<code>unhash_client_locked()</code>销毁所有的sessionid，然后再生成新的sessionid。</p>
+<p>接着，第一个client再执行任何请求时，server端代码<code>find_in_sessionid_hashtbl()</code>找不到sessionid，就会重新建立连接。</p>
+<p>client组装clientid的过程:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb8-1" title="1">nfs<span class="dv">4</span><span class="er">_proc_setclientid</span></a>
+<a class="sourceLine" id="cb8-2" title="2">  nfs4_init_uniform_client_string / nfs<span class="dv">4</span><span class="er">_init_nonuniform_client_string</span></a>
+<a class="sourceLine" id="cb8-3" title="3">    nfs<span class="dv">4</span><span class="er">_get_uniquifier</span></a>
+<a class="sourceLine" id="cb8-4" title="4">      <span class="co">// 先查看是否有设置 /sys/fs/nfs/net/nfs_client/identifier</span></a>
+<a class="sourceLine" id="cb8-5" title="5">      rcu_dereference(nn_clp-&gt;identifier);</a>
+<a class="sourceLine" id="cb8-6" title="6">      <span class="co">// 再查看是否有设置模块参数nfs4_unique_id</span></a>
+<a class="sourceLine" id="cb8-7" title="7">      strscpy(buf, nfs4_client_id_uniquifier, buflen);</a>
+<a class="sourceLine" id="cb8-8" title="8">    <span class="co">// 和hostname组成唯一字符串</span></a>
+<a class="sourceLine" id="cb8-9" title="9">    scnprintf(str, len, <span class="st">&quot;Linux NFSv%u.%u %s/%s&quot;</span>, ..., clp-&gt;cl_rpcclient-&gt;cl_nodename</a>
+<a class="sourceLine" id="cb8-10" title="10"></a>
+<a class="sourceLine" id="cb8-11" title="11"><span class="co">// hostname的设置</span></a>
+<a class="sourceLine" id="cb8-12" title="12">rpc_create_xprt</a>
+<a class="sourceLine" id="cb8-13" title="13">  rpc_new_client</a>
+<a class="sourceLine" id="cb8-14" title="14">    rpc_clnt_set_nodename <span class="co">// nodename 就是 hostname</span></a>
+<a class="sourceLine" id="cb8-15" title="15"></a>
+<a class="sourceLine" id="cb8-16" title="16"><span class="co">// /sys/fs/nfs/net/nfs_client/identifier 的设置</span></a>
+<a class="sourceLine" id="cb8-17" title="17"><span class="co">// fs/nfs/sysfs.c</span></a>
+<a class="sourceLine" id="cb8-18" title="18"><span class="kw">struct</span> kobj_attribute nfs_netns_client_id = __ATTR(identifier,</a></code></pre></div>
+<p>server端查找和生成sessionid的过程:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb9-1" title="1"><span class="co">// 查找sessionid</span></a>
+<a class="sourceLine" id="cb9-2" title="2">nfsd</a>
+<a class="sourceLine" id="cb9-3" title="3">  svc_process</a>
+<a class="sourceLine" id="cb9-4" title="4">    svc_process_common</a>
+<a class="sourceLine" id="cb9-5" title="5">      nfsd_dispatch</a>
+<a class="sourceLine" id="cb9-6" title="6">        nfsd4_proc_compound <span class="co">// proc-&gt;pc_func</span></a>
+<a class="sourceLine" id="cb9-7" title="7">          nfsd4_sequence <span class="co">// op-&gt;opdesc-&gt;op_func</span></a>
+<a class="sourceLine" id="cb9-8" title="8">            find_in_sessionid_hashtbl</a>
+<a class="sourceLine" id="cb9-9" title="9">              __find_in_sessionid_hashtbl</a>
+<a class="sourceLine" id="cb9-10" title="10">                idx = hash_sessionid</a>
+<a class="sourceLine" id="cb9-11" title="11"></a>
+<a class="sourceLine" id="cb9-12" title="12"><span class="co">// 生成sessionid</span></a>
+<a class="sourceLine" id="cb9-13" title="13">nfsd<span class="dv">4</span><span class="er">_proc_compound</span></a>
+<a class="sourceLine" id="cb9-14" title="14">  nfsd<span class="dv">4</span><span class="er">_create_session</span></a>
+<a class="sourceLine" id="cb9-15" title="15">    find_unconfirmed_client / find_confirmed_client</a>
+<a class="sourceLine" id="cb9-16" title="16">      find_client_in_id_table</a>
+<a class="sourceLine" id="cb9-17" title="17">    find_confirmed_client_by_name <span class="co">// name-&gt;data的值是clientid</span></a>
+<a class="sourceLine" id="cb9-18" title="18">    mark_client_expired_locked</a>
+<a class="sourceLine" id="cb9-19" title="19">      unhash_client_locked</a>
+<a class="sourceLine" id="cb9-20" title="20">        list_del_init(&amp;ses-&gt;se_hash)</a>
+<a class="sourceLine" id="cb9-21" title="21">    init_session</a>
+<a class="sourceLine" id="cb9-22" title="22">      gen_sessionid</a>
+<a class="sourceLine" id="cb9-23" title="23">        sid-&gt;clientid = clp-&gt;cl_clientid</a>
+<a class="sourceLine" id="cb9-24" title="24">      idx = hash_sessionid</a>
+<a class="sourceLine" id="cb9-25" title="25">      list_add(&amp;new-&gt;se_hash, &amp;nn-&gt;sessionid_hashtbl[idx])</a></code></pre></div>
+<p>server端销毁sessionid的过程:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb10-1" title="1"><span class="co">// 销毁sessionid</span></a>
+<a class="sourceLine" id="cb10-2" title="2">nfsd<span class="dv">4</span><span class="er">_proc_compound</span></a>
+<a class="sourceLine" id="cb10-3" title="3">  <span class="co">// 执行umount命令时，先执行到这里，再执行到unhash_client_locked</span></a>
+<a class="sourceLine" id="cb10-4" title="4">  nfsd<span class="dv">4</span><span class="er">_destroy_session</span></a>
+<a class="sourceLine" id="cb10-5" title="5">    unhash_session</a>
+<a class="sourceLine" id="cb10-6" title="6">      list_del(&amp;ses-&gt;se_hash)</a>
+<a class="sourceLine" id="cb10-7" title="7"></a>
+<a class="sourceLine" id="cb10-8" title="8">nfsd<span class="dv">4</span><span class="er">_proc_compound</span></a>
+<a class="sourceLine" id="cb10-9" title="9">  nfsd<span class="dv">4</span><span class="er">_destroy_clientid</span></a>
+<a class="sourceLine" id="cb10-10" title="10">    unhash_client</a>
+<a class="sourceLine" id="cb10-11" title="11">      unhash_client_locked</a>
+<a class="sourceLine" id="cb10-12" title="12">        list_del_init(&amp;ses-&gt;se_hash)</a></code></pre></div>
+<h1 id="结论"><span class="header-section-number">6</span> 结论</h1>
+<p>当多个 NFS 客户端使用相同的主机名时，默认的统一客户端字符串可能不够唯一，导致 NFS 服务器无法区分不同的客户端。NFS 服务器会将第二个客户端视为第一个客户端重启后的结果，从而使第一个客户端的 clientid 失效/过期，阻止第一个客户端进行通信。具体查看<a href="https://access.redhat.com/solutions/6395261">NFSv4 clientid was expired suddenly due to use same hostname on several NFS clients</a>。</p>
+</body>
+</html>

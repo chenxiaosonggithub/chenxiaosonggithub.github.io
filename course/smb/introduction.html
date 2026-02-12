@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>smb简介</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">smb简介</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#smb和netbios"><span class="toc-section-number">1</span> SMB和NetBIOS</a></li>
+<li><a href="#smb各版本比较"><span class="toc-section-number">2</span> SMB各版本比较</a></li>
+<li><a href="#其他协议"><span class="toc-section-number">3</span> 其他协议</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/smb/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/baidunetdisk">pdf文档翻译请查看百度网盘</a>。</p>
+<h1 id="smb和netbios"><span class="header-section-number">1</span> SMB和NetBIOS</h1>
+<p>NFS只能在Unix-Like系统间使用，CIFS（Common Internet File System）只能在Windows系统间使用，SMB（Server Message Block，中文翻译: 服务器信息块）能够在Windows与Unix-Like之间使用。</p>
+<ul>
+<li>1996年，微软提出将SMB改称为Common Internet File System。</li>
+<li>2006年，Microsoft 随着 Windows Vista 的发布 引入了新的SMB版本 (SMB 2.0 or SMB2)。</li>
+<li>SMB 2.1, 随 Windows 7 和 Server 2008 R2 引入, 主要是通过引入新的机会锁机制来提升性能。</li>
+<li>SMB 3.0 (前称 SMB 2.2)在Windows 8 和 Windows Server 2012 中引入。</li>
+</ul>
+<p>SMB基于NetBIOS（Network Basic Input/Output System），最初IBM提出的NetBIOS是无法跨路由的，使用NetBIOS over TCP/IP技术就可以跨路由使用SMB。</p>
+<p>NetBIOS协议如下:</p>
+<ul>
+<li><a href="https://www.rfc-editor.org/rfc/rfc1001">RFC1001, CONCEPTS AND METHODS</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc1002">RFC1002, DETAILED SPECIFICATIONS</a></li>
+</ul>
+<h1 id="smb各版本比较"><span class="header-section-number">2</span> SMB各版本比较</h1>
+<p>smb的协议文档有以下几个版本:</p>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-cifs">10/1/2020, [MS-CIFS]: Common Internet File System (CIFS) Protocol</a></li>
+<li><a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb">6/25/2021, [MS-SMB]: Server Message Block (SMB) Protocol</a></li>
+<li><a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb2">9/20/2023, [MS-SMB2]: Server Message Block (SMB) Protocol Versions 2 and 3</a></li>
+</ul>
+<h1 id="其他协议"><span class="header-section-number">3</span> 其他协议</h1>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc">[MS-FSCC]: File System Control Codes</a></li>
+<li><a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref">[MS-ERREF]: Windows Error Codes</a></li>
+<li><a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smbd">[MS-SMBD]: SMB2 Remote Direct Memory Access (RDMA) Transport Protocol</a></li>
+<li><a href="https://gitlab.com/samba-team/smb3-posix-spec">SMB3 POSIX Extensions Specification的gitlab仓库</a>（gitlab比samba.org上的更新: <a href="https://git.samba.org/?p=slow/smb3_posix_spec.git;a=shortlog"><code>https://git.samba.org/slow/smb3_posix_spec.git</code></a>），以下是我自己编译的html和pdf:
+<ul>
+<li>smb3_posix_extensions: <a href="https://chenxiaosong.com/tmp/gnu-linux/smb/smb3-posix-spec/smb3_posix_extensions.html">html</a>, <a href="https://gitee.com/chenxiaosonggitee/tmp/raw/master/gnu-linux/smb/smb3-posix-spec/smb3_posix_extensions.pdf">pdf</a></li>
+<li>fsa_posix_extensions: <a href="https://chenxiaosong.com/tmp/gnu-linux/smb/smb3-posix-spec/fsa_posix_extensions.html">html</a>, <a href="https://gitee.com/chenxiaosonggitee/tmp/raw/master/gnu-linux/smb/smb3-posix-spec/fsa_posix_extensions.pdf">pdf</a></li>
+<li>fscc_posix_extensions: <a href="https://chenxiaosong.com/tmp/gnu-linux/smb/smb3-posix-spec/fscc_posix_extensions.html">html</a>, <a href="https://gitee.com/chenxiaosonggitee/tmp/raw/master/gnu-linux/smb/smb3-posix-spec/fscc_posix_extensions.pdf">pdf</a></li>
+</ul></li>
+</ul>
+</body>
+</html>

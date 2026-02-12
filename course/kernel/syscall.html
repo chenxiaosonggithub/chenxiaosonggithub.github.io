@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>系统调用</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">系统调用</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#简介"><span class="toc-section-number">1</span> 简介</a></li>
+<li><a href="#系统调用处理程序"><span class="toc-section-number">2</span> 系统调用处理程序</a></li>
+<li><a href="#系统调用的实现"><span class="toc-section-number">3</span> 系统调用的实现</a><ul>
+<li><a href="#接口"><span class="toc-section-number">3.1</span> 接口</a></li>
+<li><a href="#实现"><span class="toc-section-number">3.2</span> 实现</a></li>
+</ul></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<h1 id="简介"><span class="header-section-number">1</span> 简介</h1>
+<p>系统调用是用户进程和内核交互的接口，在用户空间进程和硬件设备之间添加一个中间层，系统调用为用户空间提供硬件的抽象接口，以及保证系统的稳定和安全，实现多任务和虚拟内存。</p>
+<p>unix接口设计有一句格言“提供机制而不是策略”，系统调用就是提供机制，抽象出了用于完成某种确定目的的函数，至于怎么用这些函数（也就是策略）就不是内核该考虑的了。c库就是负责策略，提供了posix的绝大部分api。</p>
+<p>一般情况下，系统调用返回<code>0</code>表示成功，负的返回值表示错误，c库会把错误码写入<code>errno</code>全局变量，<code>perror()</code>会打印出<code>error</code>错误的字符串，如以下程序会打印出<code>Error: No such file or directory</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb1-1" title="1"><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="dt">int</span> main ()</a>
+<a class="sourceLine" id="cb1-4" title="4">{</a>
+<a class="sourceLine" id="cb1-5" title="5">    <span class="dt">FILE</span> *fp;</a>
+<a class="sourceLine" id="cb1-6" title="6"></a>
+<a class="sourceLine" id="cb1-7" title="7">    fp = fopen(<span class="st">&quot;file_not_exist.txt&quot;</span>, <span class="st">&quot;r&quot;</span>);</a>
+<a class="sourceLine" id="cb1-8" title="8">    <span class="cf">if</span> (fp == NULL) {</a>
+<a class="sourceLine" id="cb1-9" title="9">        perror(<span class="st">&quot;Error&quot;</span>); <span class="co">// 会追加字符串 &quot;: No such file or directory&quot;</span></a>
+<a class="sourceLine" id="cb1-10" title="10">        <span class="cf">return</span>(-<span class="dv">1</span>);</a>
+<a class="sourceLine" id="cb1-11" title="11">    }</a>
+<a class="sourceLine" id="cb1-12" title="12">    fclose(fp);</a>
+<a class="sourceLine" id="cb1-13" title="13"></a>
+<a class="sourceLine" id="cb1-14" title="14">    <span class="cf">return</span>(<span class="dv">0</span>);</a>
+<a class="sourceLine" id="cb1-15" title="15">}</a></code></pre></div>
+<p>系统调用声明为<code>asmlinkage long sys_close(unsigned int fd)</code>的形式，其中<code>asmlinkage</code>限定词是编译指令，通知编译器仅从栈中提取函数参数。 每个系统调用对应一个独一无二的系统调用号，定义在<code>include/uapi/asm-generic/unistd.h</code>文件中，存在<code>sys_call_table[]</code>数组中， 另外有些体系结构如x86还要在<code>arch/x86/entry/syscalls/syscall_32.tbl</code>和<code>arch/x86/entry/syscalls/syscall_64.tbl</code>文件中指定。 如果一个系统调用被删除，这个系统调用号也不会回收，而是用以下函数取代:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb2-1" title="1">SYSCALL_DEFINE0(ni_syscall)</a>
+<a class="sourceLine" id="cb2-2" title="2">{</a>
+<a class="sourceLine" id="cb2-3" title="3">        <span class="cf">return</span> -ENOSYS;</a>
+<a class="sourceLine" id="cb2-4" title="4">}</a></code></pre></div>
+<h1 id="系统调用处理程序"><span class="header-section-number">2</span> 系统调用处理程序</h1>
+<p>出于系统安全性和稳定性的考虑，用户空间进程无法在内核地址空间上读写。应用程序需要以某种机制通知内核，让内核代表自己执行一个系统调用，这种机制是通过软件中断（又叫编程异常）来实现， 触发异常让系统切换到内核态执行异常处理程序，也就是系统调用处理程序。x86体系结构触发系统调用的软件中断的中断号是<code>0x80</code>（10进制<code>128</code>），指令是<code>int $0x80</code>（或<code>sysenter</code>指令）。 x86体系结构下，<code>arch/x86/kernel/idt.c</code>文件中的<code>def_idts[]</code>数组定义了 Interrupt Descriptor Table（中断描述符表），系统调用的中断号是<code>IA32_SYSCALL_VECTOR</code>（<code>0x80</code>）。</p>
+<p>x86_64体系结构下，代码流程如下:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb3-1" title="1">entry_SYSCALL_64 <span class="co">// arch/x86/entry/entry_64.S</span></a>
+<a class="sourceLine" id="cb3-2" title="2">  call    do_syscall_64 <span class="co">// %eax作为第二个参数传入</span></a>
+<a class="sourceLine" id="cb3-3" title="3">    do_syscall_x<span class="dv">64</span></a>
+<a class="sourceLine" id="cb3-4" title="4">      <span class="cf">if</span> (unr &lt; NR_syscalls)</a>
+<a class="sourceLine" id="cb3-5" title="5">      regs-&gt;ax = x64_sys_call <span class="co">// 系统调用返回值放在%eax</span></a></code></pre></div>
+<p>通过<code>man syscall</code>命令查看到常用的体系结构系统调用传参使用的寄存器如下:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">Arch/ABI</span>      arg1  arg2  arg3  arg4  arg5  arg6  arg7  Notes</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="ex">-------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="ex">arm64</span>         x0    x1    x2    x3    x4    x5    -</a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="ex">i386</span>          ebx   ecx   edx   esi   edi   ebp   -</a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="ex">riscv</span>         a0    a1    a2    a3    a4    a5    -</a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="ex">x86-64</span>        rdi   rsi   rdx   r10   r8    r9    -</a></code></pre></div>
+<h1 id="系统调用的实现"><span class="header-section-number">3</span> 系统调用的实现</h1>
+<p>我们通过增加一个新的系统调用的方式来看一下系统调用的代码细节。</p>
+<h2 id="接口"><span class="header-section-number">3.1</span> 接口</h2>
+<p>内核打上补丁 <a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/kernel/src/0001-add-new-syscall-openat_test.patch"><code>src/0001-add-new-syscall-openat_test.patch</code></a> ，用户态程序如下:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb5-1" title="1"><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="pp">#include </span><span class="im">&lt;sys/syscall.h&gt;</span></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="pp">#include </span><span class="im">&lt;errno.h&gt;</span></a>
+<a class="sourceLine" id="cb5-5" title="5"></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="pp">#ifndef __NR_openat_test</span></a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="pp">#define __NR_openat_test        463</span></a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="pp">#endif</span></a>
+<a class="sourceLine" id="cb5-9" title="9"></a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="dt">int</span> main()</a>
+<a class="sourceLine" id="cb5-11" title="11">{</a>
+<a class="sourceLine" id="cb5-12" title="12">        <span class="dt">int</span> res = syscall(__NR_openat_test, <span class="dv">55</span>);</a>
+<a class="sourceLine" id="cb5-13" title="13">        printf(<span class="st">&quot;result: %d</span><span class="sc">\n</span><span class="st">&quot;</span>, res);</a>
+<a class="sourceLine" id="cb5-14" title="14"></a>
+<a class="sourceLine" id="cb5-15" title="15">        <span class="cf">return</span> <span class="dv">0</span>;</a>
+<a class="sourceLine" id="cb5-16" title="16">}</a></code></pre></div>
+<h2 id="实现"><span class="header-section-number">3.2</span> 实现</h2>
+<p>用户空间与内核空间数据copy用以下函数:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb6-1" title="1"><span class="co">// 从用户空间读取数据，成功返回0，失败返回未完成copy的数据的字节数</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="dt">unsigned</span> <span class="dt">long</span> copy_from_user(<span class="dt">void</span> *to, <span class="dt">const</span> <span class="dt">void</span> __user *from, <span class="dt">unsigned</span> <span class="dt">long</span> n)</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="co">// 向用户空间写入数据，成功返回0，失败返回未完成copy的数据的字节数</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="dt">unsigned</span> <span class="dt">long</span> copy_to_user(<span class="dt">void</span> __user *to, <span class="dt">const</span> <span class="dt">void</span> *from, <span class="dt">unsigned</span> <span class="dt">long</span> n)</a></code></pre></div>
+<p>检查权限用函数<code>capable()</code>，参数传入<code>CAP_CHOWN</code>等宏定义。</p>
+<p>内核执行系统调用时，处于进程上下文，<code>current</code>指针指向触发系统调用的用户态进程。在进程上下文中，可以休眠，可以被其他进程抢占。</p>
+</body>
+</html>

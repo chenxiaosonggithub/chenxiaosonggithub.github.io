@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>smb client数据结构</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">smb client数据结构</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#超级块"><span class="toc-section-number">1</span> 超级块</a></li>
+<li><a href="#超级块操作"><span class="toc-section-number">2</span> 超级块操作</a></li>
+<li><a href="#索引节点"><span class="toc-section-number">3</span> 索引节点</a></li>
+<li><a href="#索引节点操作"><span class="toc-section-number">4</span> 索引节点操作</a><ul>
+<li><a href="#常规文件"><span class="toc-section-number">4.1</span> 常规文件</a></li>
+<li><a href="#目录"><span class="toc-section-number">4.2</span> 目录</a></li>
+<li><a href="#符号链接"><span class="toc-section-number">4.3</span> 符号链接</a></li>
+<li><a href="#其他"><span class="toc-section-number">4.4</span> 其他</a></li>
+</ul></li>
+<li><a href="#dentry操作"><span class="toc-section-number">5</span> <code>dentry</code>操作</a></li>
+<li><a href="#file操作"><span class="toc-section-number">6</span> <code>file</code>操作</a><ul>
+<li><a href="#常规文件-1"><span class="toc-section-number">6.1</span> 常规文件</a></li>
+<li><a href="#目录-1"><span class="toc-section-number">6.2</span> 目录</a></li>
+</ul></li>
+<li><a href="#address_space操作"><span class="toc-section-number">7</span> <code>address_space</code>操作</a><ul>
+<li><a href="#常规文件-2"><span class="toc-section-number">7.1</span> 常规文件</a></li>
+</ul></li>
+<li><a href="#文件系统类型"><span class="toc-section-number">8</span> 文件系统类型</a></li>
+<li><a href="#模块加载卸载方法"><span class="toc-section-number">9</span> 模块加载卸载方法</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/smb/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/smb/smb.html">点击跳转到smb课程所有目录</a>。</p>
+<p>我们通过开发一个新操作系统需要的步骤，来切入学习smb client。</p>
+<ol type="1">
+<li>定义磁盘和内存的超级块结构。</li>
+<li>实现超级块操作方法。</li>
+<li>定义磁盘和内存的索引节点结构。</li>
+<li>实现各种类型文件的索引节点操作方法，常规文件、目录、快速符号链接、普通符号链接、其他类型。</li>
+<li>实现<code>dentry</code>操作方法。</li>
+<li>实现各种类型文件的<code>file</code>操作方法，常规文件、目录、快速符号链接、普通符号链接、其他类型。</li>
+<li>实现各种类型文件的<code>address_space</code>操作方法，常规文件、其他类型。</li>
+<li>定义文件系统类型。</li>
+<li>模块加载卸载方法。</li>
+</ol>
+<p>注意，我只会列出结构体的代码，会在结构的成员加些中文注释（也可能以后再加），不会贴整段的函数代码，因为函数的实现要自己去看，看具体问题时再看函数实现才有意义。</p>
+<h1 id="超级块"><span class="header-section-number">1</span> 超级块</h1>
+<p>由于smb client没有磁盘超级块，所以只有内存超级块结构体，在<code>cifs_set_super()</code>函数中赋值<code>sb-&gt;s_fs_info = mnt_data-&gt;cifs_sb</code>。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">struct</span> cifs_sb_info {                                                </a>
+<a class="sourceLine" id="cb1-2" title="2">        <span class="kw">struct</span> rb_root tlink_tree;               <span class="co">// tlink 树</span></a>
+<a class="sourceLine" id="cb1-3" title="3">        spinlock_t tlink_tree_lock;              <span class="co">// tlink 树锁</span></a>
+<a class="sourceLine" id="cb1-4" title="4">        <span class="kw">struct</span> tcon_link *master_tlink;          <span class="co">// 主 tlink</span></a>
+<a class="sourceLine" id="cb1-5" title="5">        <span class="kw">struct</span> nls_table *local_nls;             <span class="co">// 本地 nls 表</span></a>
+<a class="sourceLine" id="cb1-6" title="6">        <span class="kw">struct</span> smb3_fs_context *ctx;             <span class="co">// smb3 文件系统上下文</span></a>
+<a class="sourceLine" id="cb1-7" title="7">        atomic_t active;                         <span class="co">// 活跃计数</span></a>
+<a class="sourceLine" id="cb1-8" title="8">        <span class="dt">unsigned</span> <span class="dt">int</span> mnt_cifs_flags;             <span class="co">// 挂载标志</span></a>
+<a class="sourceLine" id="cb1-9" title="9">        <span class="kw">struct</span> delayed_work prune_tlinks;        <span class="co">// 延迟清理 tlinks</span></a>
+<a class="sourceLine" id="cb1-10" title="10">        <span class="kw">struct</span> rcu_head rcu;                     <span class="co">// RCU 头</span></a>
+<a class="sourceLine" id="cb1-11" title="11">                                                                     </a>
+<a class="sourceLine" id="cb1-12" title="12">        <span class="co">/* 只有当 CIFS_MOUNT_USE_PREFIX_PATH 被设置时使用 */</span>       </a>
+<a class="sourceLine" id="cb1-13" title="13">        <span class="dt">char</span> *prepath;                           <span class="co">// 预路径</span></a>
+<a class="sourceLine" id="cb1-14" title="14">                                                                     </a>
+<a class="sourceLine" id="cb1-15" title="15">        <span class="co">/*                                                           </span></a>
+<a class="sourceLine" id="cb1-16" title="16"><span class="co">         * 指示是否在以后关闭了 serverino 选项</span></a>
+<a class="sourceLine" id="cb1-17" title="17"><span class="co">         * (cifs_autodisable_serverino) 以匹配新挂载点。</span></a>
+<a class="sourceLine" id="cb1-18" title="18"><span class="co">         */</span>                                                          </a>
+<a class="sourceLine" id="cb1-19" title="19">        <span class="dt">bool</span> mnt_cifs_serverino_autodisabled;    <span class="co">// serverino 自动禁用标志</span></a>
+<a class="sourceLine" id="cb1-20" title="20">        <span class="co">/*                                                           </span></a>
+<a class="sourceLine" id="cb1-21" title="21"><span class="co">         * 挂载完成后可用。                   </span></a>
+<a class="sourceLine" id="cb1-22" title="22"><span class="co">         */</span>                                                          </a>
+<a class="sourceLine" id="cb1-23" title="23">        <span class="kw">struct</span> dentry *root;                     <span class="co">// 根目录 dentry</span></a>
+<a class="sourceLine" id="cb1-24" title="24">}; </a></code></pre></div>
+<h1 id="超级块操作"><span class="header-section-number">2</span> 超级块操作</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb2-1" title="1"><span class="dt">static</span> <span class="dt">const</span> <span class="kw">struct</span> super_operations cifs_super_ops = {                         </a>
+<a class="sourceLine" id="cb2-2" title="2">        .statfs = cifs_statfs,                                                  </a>
+<a class="sourceLine" id="cb2-3" title="3">        .alloc_inode = cifs_alloc_inode,                                        </a>
+<a class="sourceLine" id="cb2-4" title="4">        .write_inode    = cifs_write_inode,                                     </a>
+<a class="sourceLine" id="cb2-5" title="5">        .free_inode = cifs_free_inode,                                          </a>
+<a class="sourceLine" id="cb2-6" title="6">        .drop_inode     = cifs_drop_inode,                                      </a>
+<a class="sourceLine" id="cb2-7" title="7">        .evict_inode    = cifs_evict_inode,  </a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="co">/*      .show_path      = cifs_show_path, */</span> <span class="co">/* 我们是否需要显示路径？ */</span></a>
+<a class="sourceLine" id="cb2-9" title="9">        .show_devname   = cifs_show_devname,                                    </a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="co">/*      .delete_inode   = cifs_delete_inode,  */</span>  <span class="co">/* 除非以后我们添加惰性关闭</span></a>
+<a class="sourceLine" id="cb2-11" title="11"><span class="co">        索引节点的功能，或者内核忘记在关闭时调用我们与打开次数相同的</span></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="co">        释放次数，否则不需要上述函数 */</span></a>
+<a class="sourceLine" id="cb2-13" title="13">        .show_options = cifs_show_options,                                      </a>
+<a class="sourceLine" id="cb2-14" title="14">        .umount_begin   = cifs_umount_begin,                                    </a>
+<a class="sourceLine" id="cb2-15" title="15">        .freeze_fs      = cifs_freeze,                                          </a>
+<a class="sourceLine" id="cb2-16" title="16"><span class="pp">#ifdef CONFIG_CIFS_STATS2                                                       </span></a>
+<a class="sourceLine" id="cb2-17" title="17">        .show_stats = cifs_show_stats,                                          </a>
+<a class="sourceLine" id="cb2-18" title="18"><span class="pp">#endif                                                                          </span></a>
+<a class="sourceLine" id="cb2-19" title="19">};                                                                              </a></code></pre></div>
+<h1 id="索引节点"><span class="header-section-number">3</span> 索引节点</h1>
+<p>smb没有磁盘索引节点，只有内存索引节点。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb3-1" title="1"><span class="co">/*                                 </span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="co"> * 每个文件 inode 的结构体</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="co"> */</span>                                </a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="kw">struct</span> cifsInodeInfo {                                                                          </a>
+<a class="sourceLine" id="cb3-5" title="5">        <span class="kw">struct</span> netfs_inode netfs;       <span class="co">/* Netfslib 上下文和 vfs inode */</span>                          </a>
+<a class="sourceLine" id="cb3-6" title="6">        <span class="dt">bool</span> can_cache_brlcks;          <span class="co">// 是否可以缓存字节范围锁</span></a>
+<a class="sourceLine" id="cb3-7" title="7">        <span class="kw">struct</span> list_head llist;         <span class="co">/* 该 inode 持有的锁列表 */</span>                                  </a>
+<a class="sourceLine" id="cb3-8" title="8">        <span class="co">/*                                                                                      </span></a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="co">         * 注意: 有些代码路径会两次调用 down_read(lock_sem)，所以                             </span></a>
+<a class="sourceLine" id="cb3-10" title="10"><span class="co">         * 我们必须始终使用 cifs_down_write() 而不是 down_write()                         </span></a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="co">         * 来避免此信号量的死锁。                                               </span></a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="co">         */</span>                                                                                     </a>
+<a class="sourceLine" id="cb3-13" title="13">        <span class="kw">struct</span> rw_semaphore lock_sem;   <span class="co">/* 保护上面的字段 */</span>                          </a>
+<a class="sourceLine" id="cb3-14" title="14">        <span class="co">/* BB 添加用于脏页列表，即 oplock 的写缓存信息 */</span>                </a>
+<a class="sourceLine" id="cb3-15" title="15">        <span class="kw">struct</span> list_head openFileList;  <span class="co">// 打开文件列表</span></a>
+<a class="sourceLine" id="cb3-16" title="16">        spinlock_t      open_file_lock; <span class="co">/* 保护 openFileList */</span>                             </a>
+<a class="sourceLine" id="cb3-17" title="17">        __u32 cifsAttrs;                <span class="co">/* 例如 DOS 归档位、稀疏、压缩、系统等属性 */</span>                 </a>
+<a class="sourceLine" id="cb3-18" title="18">        <span class="dt">unsigned</span> <span class="dt">int</span> oplock;            <span class="co">/* 我们拥有的 oplock/lease 级别 */</span>                        </a>
+<a class="sourceLine" id="cb3-19" title="19">        <span class="dt">unsigned</span> <span class="dt">int</span> epoch;             <span class="co">/* 用于跟踪租约状态变化 */</span>                 </a>
+<a class="sourceLine" id="cb3-20" title="20"><span class="pp">#define CIFS_INODE_PENDING_OPLOCK_BREAK   (0) </span><span class="co">/* 正在进行 oplock 断裂 */</span><span class="pp">                    </span></a>
+<a class="sourceLine" id="cb3-21" title="21"><span class="pp">#define CIFS_INODE_PENDING_WRITERS        (1) </span><span class="co">/* 正在进行写操作 */</span><span class="pp">                          </span></a>
+<a class="sourceLine" id="cb3-22" title="22"><span class="pp">#define CIFS_INODE_FLAG_UNUSED            (2) </span><span class="co">/* 未使用的标志 */</span><span class="pp">                                 </span></a>
+<a class="sourceLine" id="cb3-23" title="23"><span class="pp">#define CIFS_INO_DELETE_PENDING           (3) </span><span class="co">/* 服务器上待删除 */</span><span class="pp">                    </span></a>
+<a class="sourceLine" id="cb3-24" title="24"><span class="pp">#define CIFS_INO_INVALID_MAPPING          (4) </span><span class="co">/* pagecache 无效 */</span><span class="pp">                        </span></a>
+<a class="sourceLine" id="cb3-25" title="25"><span class="pp">#define CIFS_INO_LOCK                     (5) </span><span class="co">/* 同步锁位 */</span><span class="pp">                </span></a>
+<a class="sourceLine" id="cb3-26" title="26"><span class="pp">#define CIFS_INO_MODIFIED_ATTR            (6) </span><span class="co">/* 指示 mtime/ctime 的变化 */</span><span class="pp">              </span></a>
+<a class="sourceLine" id="cb3-27" title="27"><span class="pp">#define CIFS_INO_CLOSE_ON_LOCK            (7) </span><span class="co">/* 不要在设置锁时延迟关闭 */</span><span class="pp">     </span></a>
+<a class="sourceLine" id="cb3-28" title="28">        <span class="dt">unsigned</span> <span class="dt">long</span> flags;             <span class="co">// 标志字段</span></a>
+<a class="sourceLine" id="cb3-29" title="29">        spinlock_t writers_lock;          <span class="co">// 写入锁</span></a>
+<a class="sourceLine" id="cb3-30" title="30">        <span class="dt">unsigned</span> <span class="dt">int</span> writers;             <span class="co">/* 此 inode 的写入者数量 */</span>                   </a>
+<a class="sourceLine" id="cb3-31" title="31">        <span class="dt">unsigned</span> <span class="dt">long</span> time;               <span class="co">/* inode 最后更新的 jiffies */</span>                   </a>
+<a class="sourceLine" id="cb3-32" title="32">        u64  server_eof;                  <span class="co">/* 服务器上的当前文件大小 - 由 i_lock 保护 */</span></a>
+<a class="sourceLine" id="cb3-33" title="33">        u64  uniqueid;                    <span class="co">/* 服务器 inode 编号 */</span>                               </a>
+<a class="sourceLine" id="cb3-34" title="34">        u64  createtime;                  <span class="co">/* 服务器上的创建时间 */</span>                           </a>
+<a class="sourceLine" id="cb3-35" title="35">        __u8 lease_key[SMB2_LEASE_KEY_SIZE];    <span class="co">/* 此 inode 的租约密钥 */</span>                  </a>
+<a class="sourceLine" id="cb3-36" title="36">        <span class="kw">struct</span> list_head deferred_closes; <span class="co">/* 延迟关闭列表 */</span>                         </a>
+<a class="sourceLine" id="cb3-37" title="37">        spinlock_t deferred_lock;         <span class="co">/* 保护延迟列表 */</span>                             </a>
+<a class="sourceLine" id="cb3-38" title="38">        <span class="dt">bool</span> lease_granted;               <span class="co">/* 标志指示是否授予租约或 oplock。 */</span>          </a>
+<a class="sourceLine" id="cb3-39" title="39">        <span class="dt">char</span> *symlink_target;             <span class="co">// 符号链接目标</span></a>
+<a class="sourceLine" id="cb3-40" title="40">}; </a></code></pre></div>
+<h1 id="索引节点操作"><span class="header-section-number">4</span> 索引节点操作</h1>
+<h2 id="常规文件"><span class="header-section-number">4.1</span> 常规文件</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb4-1" title="1"><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_file_inode_ops = {</a>
+<a class="sourceLine" id="cb4-2" title="2">        .setattr = cifs_setattr,                     </a>
+<a class="sourceLine" id="cb4-3" title="3">        .getattr = cifs_getattr,                     </a>
+<a class="sourceLine" id="cb4-4" title="4">        .permission = cifs_permission,               </a>
+<a class="sourceLine" id="cb4-5" title="5">        .listxattr = cifs_listxattr,                 </a>
+<a class="sourceLine" id="cb4-6" title="6">        .fiemap = cifs_fiemap,                       </a>
+<a class="sourceLine" id="cb4-7" title="7">        .get_acl = cifs_get_acl,                     </a>
+<a class="sourceLine" id="cb4-8" title="8">        .set_acl = cifs_set_acl,                     </a>
+<a class="sourceLine" id="cb4-9" title="9">};                                                   </a></code></pre></div>
+<h2 id="目录"><span class="header-section-number">4.2</span> 目录</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb5-1" title="1"><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_dir_inode_ops = {</a>
+<a class="sourceLine" id="cb5-2" title="2">        .create = cifs_create,                      </a>
+<a class="sourceLine" id="cb5-3" title="3">        .atomic_open = cifs_atomic_open,            </a>
+<a class="sourceLine" id="cb5-4" title="4">        .lookup = cifs_lookup,                      </a>
+<a class="sourceLine" id="cb5-5" title="5">        .getattr = cifs_getattr,                    </a>
+<a class="sourceLine" id="cb5-6" title="6">        .unlink = cifs_unlink,                      </a>
+<a class="sourceLine" id="cb5-7" title="7">        .link = cifs_hardlink,                      </a>
+<a class="sourceLine" id="cb5-8" title="8">        .mkdir = cifs_mkdir,                        </a>
+<a class="sourceLine" id="cb5-9" title="9">        .rmdir = cifs_rmdir,                        </a>
+<a class="sourceLine" id="cb5-10" title="10">        .rename = cifs_rename2,                     </a>
+<a class="sourceLine" id="cb5-11" title="11">        .permission = cifs_permission,              </a>
+<a class="sourceLine" id="cb5-12" title="12">        .setattr = cifs_setattr,                    </a>
+<a class="sourceLine" id="cb5-13" title="13">        .symlink = cifs_symlink,                    </a>
+<a class="sourceLine" id="cb5-14" title="14">        .mknod   = cifs_mknod,                      </a>
+<a class="sourceLine" id="cb5-15" title="15">        .listxattr = cifs_listxattr,                </a>
+<a class="sourceLine" id="cb5-16" title="16">        .get_acl = cifs_get_acl,                    </a>
+<a class="sourceLine" id="cb5-17" title="17">        .set_acl = cifs_set_acl,                    </a>
+<a class="sourceLine" id="cb5-18" title="18">};                                                  </a></code></pre></div>
+<h2 id="符号链接"><span class="header-section-number">4.3</span> 符号链接</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb6-1" title="1"><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_symlink_inode_ops = {</a>
+<a class="sourceLine" id="cb6-2" title="2">        .get_link = cifs_get_link,                      </a>
+<a class="sourceLine" id="cb6-3" title="3">        .permission = cifs_permission,                  </a>
+<a class="sourceLine" id="cb6-4" title="4">        .listxattr = cifs_listxattr,                    </a>
+<a class="sourceLine" id="cb6-5" title="5">};                                                      </a></code></pre></div>
+<h2 id="其他"><span class="header-section-number">4.4</span> 其他</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb7-1" title="1"><span class="dt">static</span> <span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_ipc_inode_ops = {</a>
+<a class="sourceLine" id="cb7-2" title="2">        .lookup = cifs_lookup,                             </a>
+<a class="sourceLine" id="cb7-3" title="3">};                                                         </a>
+<a class="sourceLine" id="cb7-4" title="4"></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="dt">const</span> <span class="kw">struct</span> inode_operations cifs_namespace_inode_operations = {</a>
+<a class="sourceLine" id="cb7-6" title="6">};                                                               </a></code></pre></div>
+<h1 id="dentry操作"><span class="header-section-number">5</span> <code>dentry</code>操作</h1>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb8-1" title="1"><span class="dt">const</span> <span class="kw">struct</span> dentry_operations cifs_dentry_ops = {                             </a>
+<a class="sourceLine" id="cb8-2" title="2">        .d_revalidate = cifs_d_revalidate,                                     </a>
+<a class="sourceLine" id="cb8-3" title="3">        .d_automount = cifs_d_automount,                                       </a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="co">/* d_delete:       cifs_d_delete,      */</span> <span class="co">/* 除了调试之外不需要 */</span></a>
+<a class="sourceLine" id="cb8-5" title="5">};                                                                             </a>
+<a class="sourceLine" id="cb8-6" title="6"></a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="dt">const</span> <span class="kw">struct</span> dentry_operations cifs_ci_dentry_ops = {</a>
+<a class="sourceLine" id="cb8-8" title="8">        .d_revalidate = cifs_d_revalidate,           </a>
+<a class="sourceLine" id="cb8-9" title="9">        .d_hash = cifs_ci_hash,                      </a>
+<a class="sourceLine" id="cb8-10" title="10">        .d_compare = cifs_ci_compare,                </a>
+<a class="sourceLine" id="cb8-11" title="11">        .d_automount = cifs_d_automount,             </a>
+<a class="sourceLine" id="cb8-12" title="12">};                                                   </a></code></pre></div>
+<h1 id="file操作"><span class="header-section-number">6</span> <code>file</code>操作</h1>
+<h2 id="常规文件-1"><span class="header-section-number">6.1</span> 常规文件</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb9-1" title="1"><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_ops = {    </a>
+<a class="sourceLine" id="cb9-2" title="2">        .read_iter = cifs_loose_read_iter,        </a>
+<a class="sourceLine" id="cb9-3" title="3">        .write_iter = cifs_file_write_iter,       </a>
+<a class="sourceLine" id="cb9-4" title="4">        .open = cifs_open,                        </a>
+<a class="sourceLine" id="cb9-5" title="5">        .release = cifs_close,                    </a>
+<a class="sourceLine" id="cb9-6" title="6">        .lock = cifs_lock,                        </a>
+<a class="sourceLine" id="cb9-7" title="7">        .flock = cifs_flock,                      </a>
+<a class="sourceLine" id="cb9-8" title="8">        .fsync = cifs_fsync,                      </a>
+<a class="sourceLine" id="cb9-9" title="9">        .flush = cifs_flush,                      </a>
+<a class="sourceLine" id="cb9-10" title="10">        .mmap  = cifs_file_mmap,                  </a>
+<a class="sourceLine" id="cb9-11" title="11">        .splice_read = filemap_splice_read,       </a>
+<a class="sourceLine" id="cb9-12" title="12">        .splice_write = iter_file_splice_write,   </a>
+<a class="sourceLine" id="cb9-13" title="13">        .llseek = cifs_llseek,                    </a>
+<a class="sourceLine" id="cb9-14" title="14">        .unlocked_ioctl = cifs_ioctl,             </a>
+<a class="sourceLine" id="cb9-15" title="15">        .copy_file_range = cifs_copy_file_range,  </a>
+<a class="sourceLine" id="cb9-16" title="16">        .remap_file_range = cifs_remap_file_range,</a>
+<a class="sourceLine" id="cb9-17" title="17">        .setlease = cifs_setlease,                </a>
+<a class="sourceLine" id="cb9-18" title="18">        .fallocate = cifs_fallocate,              </a>
+<a class="sourceLine" id="cb9-19" title="19">};                                                </a>
+<a class="sourceLine" id="cb9-20" title="20"></a>
+<a class="sourceLine" id="cb9-21" title="21"><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_strict_ops = {</a>
+<a class="sourceLine" id="cb9-22" title="22">        .read_iter = cifs_strict_readv,              </a>
+<a class="sourceLine" id="cb9-23" title="23">        .write_iter = cifs_strict_writev,            </a>
+<a class="sourceLine" id="cb9-24" title="24">        .open = cifs_open,                           </a>
+<a class="sourceLine" id="cb9-25" title="25">        .release = cifs_close,                       </a>
+<a class="sourceLine" id="cb9-26" title="26">        .lock = cifs_lock,                           </a>
+<a class="sourceLine" id="cb9-27" title="27">        .flock = cifs_flock,                         </a>
+<a class="sourceLine" id="cb9-28" title="28">        .fsync = cifs_strict_fsync,                  </a>
+<a class="sourceLine" id="cb9-29" title="29">        .flush = cifs_flush,                         </a>
+<a class="sourceLine" id="cb9-30" title="30">        .mmap = cifs_file_strict_mmap,               </a>
+<a class="sourceLine" id="cb9-31" title="31">        .splice_read = filemap_splice_read,          </a>
+<a class="sourceLine" id="cb9-32" title="32">        .splice_write = iter_file_splice_write,      </a>
+<a class="sourceLine" id="cb9-33" title="33">        .llseek = cifs_llseek,                       </a>
+<a class="sourceLine" id="cb9-34" title="34">        .unlocked_ioctl = cifs_ioctl,                </a>
+<a class="sourceLine" id="cb9-35" title="35">        .copy_file_range = cifs_copy_file_range,     </a>
+<a class="sourceLine" id="cb9-36" title="36">        .remap_file_range = cifs_remap_file_range,   </a>
+<a class="sourceLine" id="cb9-37" title="37">        .setlease = cifs_setlease,                   </a>
+<a class="sourceLine" id="cb9-38" title="38">        .fallocate = cifs_fallocate,                 </a>
+<a class="sourceLine" id="cb9-39" title="39">};                                                   </a>
+<a class="sourceLine" id="cb9-40" title="40"></a>
+<a class="sourceLine" id="cb9-41" title="41"><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_direct_ops = {</a>
+<a class="sourceLine" id="cb9-42" title="42">        .read_iter = cifs_direct_readv,              </a>
+<a class="sourceLine" id="cb9-43" title="43">        .write_iter = cifs_direct_writev,            </a>
+<a class="sourceLine" id="cb9-44" title="44">        .open = cifs_open,                           </a>
+<a class="sourceLine" id="cb9-45" title="45">        .release = cifs_close,                       </a>
+<a class="sourceLine" id="cb9-46" title="46">        .lock = cifs_lock,                           </a>
+<a class="sourceLine" id="cb9-47" title="47">        .flock = cifs_flock,                         </a>
+<a class="sourceLine" id="cb9-48" title="48">        .fsync = cifs_fsync,                         </a>
+<a class="sourceLine" id="cb9-49" title="49">        .flush = cifs_flush,                         </a>
+<a class="sourceLine" id="cb9-50" title="50">        .mmap = cifs_file_mmap,                      </a>
+<a class="sourceLine" id="cb9-51" title="51">        .splice_read = copy_splice_read,             </a>
+<a class="sourceLine" id="cb9-52" title="52">        .splice_write = iter_file_splice_write,      </a>
+<a class="sourceLine" id="cb9-53" title="53">        .unlocked_ioctl  = cifs_ioctl,               </a>
+<a class="sourceLine" id="cb9-54" title="54">        .copy_file_range = cifs_copy_file_range,     </a>
+<a class="sourceLine" id="cb9-55" title="55">        .remap_file_range = cifs_remap_file_range,   </a>
+<a class="sourceLine" id="cb9-56" title="56">        .llseek = cifs_llseek,                       </a>
+<a class="sourceLine" id="cb9-57" title="57">        .setlease = cifs_setlease,                   </a>
+<a class="sourceLine" id="cb9-58" title="58">        .fallocate = cifs_fallocate,                 </a>
+<a class="sourceLine" id="cb9-59" title="59">};                                                   </a>
+<a class="sourceLine" id="cb9-60" title="60"></a>
+<a class="sourceLine" id="cb9-61" title="61"><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_nobrl_ops = { </a>
+<a class="sourceLine" id="cb9-62" title="62">        .read_iter = cifs_loose_read_iter,           </a>
+<a class="sourceLine" id="cb9-63" title="63">        .write_iter = cifs_file_write_iter,          </a>
+<a class="sourceLine" id="cb9-64" title="64">        .open = cifs_open,                           </a>
+<a class="sourceLine" id="cb9-65" title="65">        .release = cifs_close,                       </a>
+<a class="sourceLine" id="cb9-66" title="66">        .fsync = cifs_fsync,                         </a>
+<a class="sourceLine" id="cb9-67" title="67">        .flush = cifs_flush,                         </a>
+<a class="sourceLine" id="cb9-68" title="68">        .mmap  = cifs_file_mmap,                     </a>
+<a class="sourceLine" id="cb9-69" title="69">        .splice_read = filemap_splice_read,          </a>
+<a class="sourceLine" id="cb9-70" title="70">        .splice_write = iter_file_splice_write,      </a>
+<a class="sourceLine" id="cb9-71" title="71">        .llseek = cifs_llseek,                       </a>
+<a class="sourceLine" id="cb9-72" title="72">        .unlocked_ioctl = cifs_ioctl,                </a>
+<a class="sourceLine" id="cb9-73" title="73">        .copy_file_range = cifs_copy_file_range,     </a>
+<a class="sourceLine" id="cb9-74" title="74">        .remap_file_range = cifs_remap_file_range,   </a>
+<a class="sourceLine" id="cb9-75" title="75">        .setlease = cifs_setlease,                   </a>
+<a class="sourceLine" id="cb9-76" title="76">        .fallocate = cifs_fallocate,                 </a>
+<a class="sourceLine" id="cb9-77" title="77">};                                                   </a>
+<a class="sourceLine" id="cb9-78" title="78"></a>
+<a class="sourceLine" id="cb9-79" title="79"><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_strict_nobrl_ops = {</a>
+<a class="sourceLine" id="cb9-80" title="80">        .read_iter = cifs_strict_readv,                    </a>
+<a class="sourceLine" id="cb9-81" title="81">        .write_iter = cifs_strict_writev,                  </a>
+<a class="sourceLine" id="cb9-82" title="82">        .open = cifs_open,                                 </a>
+<a class="sourceLine" id="cb9-83" title="83">        .release = cifs_close,                             </a>
+<a class="sourceLine" id="cb9-84" title="84">        .fsync = cifs_strict_fsync,                        </a>
+<a class="sourceLine" id="cb9-85" title="85">        .flush = cifs_flush,                               </a>
+<a class="sourceLine" id="cb9-86" title="86">        .mmap = cifs_file_strict_mmap,                     </a>
+<a class="sourceLine" id="cb9-87" title="87">        .splice_read = filemap_splice_read,                </a>
+<a class="sourceLine" id="cb9-88" title="88">        .splice_write = iter_file_splice_write,            </a>
+<a class="sourceLine" id="cb9-89" title="89">        .llseek = cifs_llseek,                             </a>
+<a class="sourceLine" id="cb9-90" title="90">        .unlocked_ioctl = cifs_ioctl,                      </a>
+<a class="sourceLine" id="cb9-91" title="91">        .copy_file_range = cifs_copy_file_range,           </a>
+<a class="sourceLine" id="cb9-92" title="92">        .remap_file_range = cifs_remap_file_range,         </a>
+<a class="sourceLine" id="cb9-93" title="93">        .setlease = cifs_setlease,                         </a>
+<a class="sourceLine" id="cb9-94" title="94">        .fallocate = cifs_fallocate,                       </a>
+<a class="sourceLine" id="cb9-95" title="95">};                                                         </a>
+<a class="sourceLine" id="cb9-96" title="96"></a>
+<a class="sourceLine" id="cb9-97" title="97"><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_file_direct_nobrl_ops = { </a>
+<a class="sourceLine" id="cb9-98" title="98">        .read_iter = cifs_direct_readv,                     </a>
+<a class="sourceLine" id="cb9-99" title="99">        .write_iter = cifs_direct_writev,                   </a>
+<a class="sourceLine" id="cb9-100" title="100">        .open = cifs_open,                                  </a>
+<a class="sourceLine" id="cb9-101" title="101">        .release = cifs_close,                              </a>
+<a class="sourceLine" id="cb9-102" title="102">        .fsync = cifs_fsync,                                </a>
+<a class="sourceLine" id="cb9-103" title="103">        .flush = cifs_flush,                                </a>
+<a class="sourceLine" id="cb9-104" title="104">        .mmap = cifs_file_mmap,                             </a>
+<a class="sourceLine" id="cb9-105" title="105">        .splice_read = copy_splice_read,                    </a>
+<a class="sourceLine" id="cb9-106" title="106">        .splice_write = iter_file_splice_write,             </a>
+<a class="sourceLine" id="cb9-107" title="107">        .unlocked_ioctl  = cifs_ioctl,                      </a>
+<a class="sourceLine" id="cb9-108" title="108">        .copy_file_range = cifs_copy_file_range,            </a>
+<a class="sourceLine" id="cb9-109" title="109">        .remap_file_range = cifs_remap_file_range,          </a>
+<a class="sourceLine" id="cb9-110" title="110">        .llseek = cifs_llseek,                              </a>
+<a class="sourceLine" id="cb9-111" title="111">        .setlease = cifs_setlease,                          </a>
+<a class="sourceLine" id="cb9-112" title="112">        .fallocate = cifs_fallocate,                        </a>
+<a class="sourceLine" id="cb9-113" title="113">};                                                          </a></code></pre></div>
+<h2 id="目录-1"><span class="header-section-number">6.2</span> 目录</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb10-1" title="1"><span class="dt">const</span> <span class="kw">struct</span> file_operations cifs_dir_ops = {     </a>
+<a class="sourceLine" id="cb10-2" title="2">        .iterate_shared = cifs_readdir,           </a>
+<a class="sourceLine" id="cb10-3" title="3">        .release = cifs_closedir,                 </a>
+<a class="sourceLine" id="cb10-4" title="4">        .read    = generic_read_dir,              </a>
+<a class="sourceLine" id="cb10-5" title="5">        .unlocked_ioctl  = cifs_ioctl,            </a>
+<a class="sourceLine" id="cb10-6" title="6">        .copy_file_range = cifs_copy_file_range,  </a>
+<a class="sourceLine" id="cb10-7" title="7">        .remap_file_range = cifs_remap_file_range,</a>
+<a class="sourceLine" id="cb10-8" title="8">        .llseek = generic_file_llseek,            </a>
+<a class="sourceLine" id="cb10-9" title="9">        .fsync = cifs_dir_fsync,                  </a>
+<a class="sourceLine" id="cb10-10" title="10">};                                                </a></code></pre></div>
+<h1 id="address_space操作"><span class="header-section-number">7</span> <code>address_space</code>操作</h1>
+<h2 id="常规文件-2"><span class="header-section-number">7.1</span> 常规文件</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb11-1" title="1"><span class="dt">const</span> <span class="kw">struct</span> address_space_operations cifs_addr_ops = {                      </a>
+<a class="sourceLine" id="cb11-2" title="2">        .read_folio = cifs_read_folio,                                       </a>
+<a class="sourceLine" id="cb11-3" title="3">        .readahead = cifs_readahead,                                         </a>
+<a class="sourceLine" id="cb11-4" title="4">        .writepages = cifs_writepages,                                       </a>
+<a class="sourceLine" id="cb11-5" title="5">        .write_begin = cifs_write_begin,                                     </a>
+<a class="sourceLine" id="cb11-6" title="6">        .write_end = cifs_write_end,                                         </a>
+<a class="sourceLine" id="cb11-7" title="7">        .dirty_folio = cifs_dirty_folio,                                     </a>
+<a class="sourceLine" id="cb11-8" title="8">        .release_folio = cifs_release_folio,                                 </a>
+<a class="sourceLine" id="cb11-9" title="9">        .direct_IO = cifs_direct_io,                                         </a>
+<a class="sourceLine" id="cb11-10" title="10">        .invalidate_folio = cifs_invalidate_folio,                           </a>
+<a class="sourceLine" id="cb11-11" title="11">        .launder_folio = cifs_launder_folio,                                 </a>
+<a class="sourceLine" id="cb11-12" title="12">        .migrate_folio = filemap_migrate_folio,       </a>
+<a class="sourceLine" id="cb11-13" title="13">        <span class="co">/*                                                                   </span></a>
+<a class="sourceLine" id="cb11-14" title="14"><span class="co">        * </span><span class="al">TODO</span><span class="co">: 调查一下，如果有用，我们可以添加一个 is_dirty_writeback</span></a>
+<a class="sourceLine" id="cb11-15" title="15"><span class="co">        * 辅助函数（如果需要的话）                                                  </span></a>
+<a class="sourceLine" id="cb11-16" title="16"><span class="co">        */</span>                        </a>
+<a class="sourceLine" id="cb11-17" title="17">        .swap_activate = cifs_swap_activate,                                 </a>
+<a class="sourceLine" id="cb11-18" title="18">        .swap_deactivate = cifs_swap_deactivate,                             </a>
+<a class="sourceLine" id="cb11-19" title="19">};                                                                           </a>
+<a class="sourceLine" id="cb11-20" title="20"></a>
+<a class="sourceLine" id="cb11-21" title="21"><span class="co">/*                                                                       </span></a>
+<a class="sourceLine" id="cb11-22" title="22"><span class="co"> * cifs_readahead 需要服务器支持一个足够大的缓冲区，以容纳</span></a>
+<a class="sourceLine" id="cb11-23" title="23"><span class="co"> * 头部加上一个完整的数据页。否则，我们需要在地址空间操作中</span></a>
+<a class="sourceLine" id="cb11-24" title="24"><span class="co"> * 省略 cifs_readahead 。          </span></a>
+<a class="sourceLine" id="cb11-25" title="25"><span class="co"> */</span>                                                                       </a>
+<a class="sourceLine" id="cb11-26" title="26"><span class="dt">const</span> <span class="kw">struct</span> address_space_operations cifs_addr_ops_smallbuf = {         </a>
+<a class="sourceLine" id="cb11-27" title="27">        .read_folio = cifs_read_folio,                                   </a>
+<a class="sourceLine" id="cb11-28" title="28">        .writepages = cifs_writepages,                                   </a>
+<a class="sourceLine" id="cb11-29" title="29">        .write_begin = cifs_write_begin,                                 </a>
+<a class="sourceLine" id="cb11-30" title="30">        .write_end = cifs_write_end,                                     </a>
+<a class="sourceLine" id="cb11-31" title="31">        .dirty_folio = cifs_dirty_folio,                                 </a>
+<a class="sourceLine" id="cb11-32" title="32">        .release_folio = cifs_release_folio,                             </a>
+<a class="sourceLine" id="cb11-33" title="33">        .invalidate_folio = cifs_invalidate_folio,                       </a>
+<a class="sourceLine" id="cb11-34" title="34">        .launder_folio = cifs_launder_folio,                             </a>
+<a class="sourceLine" id="cb11-35" title="35">        .migrate_folio = filemap_migrate_folio,                          </a>
+<a class="sourceLine" id="cb11-36" title="36">};                                                                       </a></code></pre></div>
+<h1 id="文件系统类型"><span class="header-section-number">8</span> 文件系统类型</h1>
+<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">struct</span> file_system_type cifs_fs_type = {        </a>
+<a class="sourceLine" id="cb12-2" title="2">        .owner = THIS_MODULE,                   </a>
+<a class="sourceLine" id="cb12-3" title="3">        .name = <span class="st">&quot;cifs&quot;</span>,                         </a>
+<a class="sourceLine" id="cb12-4" title="4">        .init_fs_context = smb3_init_fs_context,</a>
+<a class="sourceLine" id="cb12-5" title="5">        .parameters = smb3_fs_parameters,       </a>
+<a class="sourceLine" id="cb12-6" title="6">        .kill_sb = cifs_kill_sb,                </a>
+<a class="sourceLine" id="cb12-7" title="7">        .fs_flags = FS_RENAME_DOES_D_MOVE,      </a>
+<a class="sourceLine" id="cb12-8" title="8">}; </a>
+<a class="sourceLine" id="cb12-9" title="9"></a>
+<a class="sourceLine" id="cb12-10" title="10"><span class="kw">struct</span> file_system_type smb3_fs_type = {        </a>
+<a class="sourceLine" id="cb12-11" title="11">        .owner = THIS_MODULE,                   </a>
+<a class="sourceLine" id="cb12-12" title="12">        .name = <span class="st">&quot;smb3&quot;</span>,                         </a>
+<a class="sourceLine" id="cb12-13" title="13">        .init_fs_context = smb3_init_fs_context,</a>
+<a class="sourceLine" id="cb12-14" title="14">        .parameters = smb3_fs_parameters,       </a>
+<a class="sourceLine" id="cb12-15" title="15">        .kill_sb = cifs_kill_sb,                </a>
+<a class="sourceLine" id="cb12-16" title="16">        .fs_flags = FS_RENAME_DOES_D_MOVE,      </a>
+<a class="sourceLine" id="cb12-17" title="17">};                                              </a></code></pre></div>
+<h1 id="模块加载卸载方法"><span class="header-section-number">9</span> 模块加载卸载方法</h1>
+<p><code>init_cifs()</code>和<code>exit_cifs()</code>。</p>
+</body>
+</html>

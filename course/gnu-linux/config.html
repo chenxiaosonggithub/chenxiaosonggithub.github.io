@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>GNU/Linux配置文件</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">GNU/Linux配置文件</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#脚本"><span class="toc-section-number">1</span> 脚本</a></li>
+<li><a href="#bash_profile"><span class="toc-section-number">2</span> <code>.bash_profile</code></a></li>
+<li><a href="#emacs"><span class="toc-section-number">3</span> <code>.emacs</code></a></li>
+<li><a href="#gitconfig"><span class="toc-section-number">4</span> <code>.gitconfig</code></a></li>
+<li><a href="#origin_xmodmap.txt-和-.xmodmap.txt"><span class="toc-section-number">5</span> <code>.origin_xmodmap.txt</code> 和 <code>.xmodmap.txt</code></a></li>
+<li><a href="#set_proxy.sh"><span class="toc-section-number">6</span> <code>.set_proxy.sh</code></a></li>
+<li><a href="#tmux.conf"><span class="toc-section-number">7</span> <code>.tmux.conf</code></a></li>
+<li><a href="#vimrc"><span class="toc-section-number">8</span> <code>.vimrc</code></a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
+<p>Linux下一切皆文件，所有的配置选项也都是文件。</p>
+<p>这篇文章列出了我所使用的配置，各位朋友如果有更好的配置建议，请务必联系我哦。</p>
+<h1 id="脚本"><span class="header-section-number">1</span> 脚本</h1>
+<p>如果每次重装系统或到一个新的开发环境上都要重新配置一次，我们肯定会不开心的呢，特别是像我这种爱折腾系统的人。</p>
+<p>所以，脚本一键搞定是多么的寂寞，哦不对，是多么的重要。</p>
+<p>把我的<a href="https://gitee.com/chenxiaosonggitee/blog">个人笔记仓库</a>clone到本地， 进入到目录<a href="https://gitee.com/chenxiaosonggitee/blog/tree/master/course/gnu-linux/src/config-file"><code>config-file</code></a>， 执行脚本<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/config-file/cp-to-home.sh"><code>cp-to-home.sh</code></a> 复制配置文件到家目录下。</p>
+<h1 id="bash_profile"><span class="header-section-number">2</span> <code>.bash_profile</code></h1>
+<p>.bash_profile 是一个用于配置用户的 Bash shell 环境的文件。它通常位于用户的主目录（$HOME）下。当用户登录到系统时，Bash shell 会尝试执行 .bash_profile 文件中包含的命令和设置。这使得用户能够自定义其 shell 环境和行为。</p>
+<p>具体请查看<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/config-file/bash_profile"><code>.bash_profile</code></a>。</p>
+<h1 id="emacs"><span class="header-section-number">3</span> <code>.emacs</code></h1>
+<p>配置我最喜欢的编辑器emacs，配合着gtags，然后用hhkb键盘看内核代码，真的没有比这更爽的事情了。</p>
+<p>具体请查看<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/config-file/emacs"><code>.emacs</code></a>。</p>
+<h1 id="gitconfig"><span class="header-section-number">4</span> <code>.gitconfig</code></h1>
+<p>当没有配置时，无法进行git的提交。</p>
+<p>配置名字和邮箱:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">git</span> config --global user.name <span class="st">&quot;ChenXiaoSong&quot;</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="fu">git</span> config --global user.email <span class="st">&quot;chenxiaosongemail@foxmail.com&quot;</span></a></code></pre></div>
+<p>具体请查看<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/config-file/gitconfig"><code>.gitconfig</code></a>。</p>
+<h1 id="origin_xmodmap.txt-和-.xmodmap.txt"><span class="header-section-number">5</span> <code>.origin_xmodmap.txt</code> 和 <code>.xmodmap.txt</code></h1>
+<p>xmodmap是Linux桌面系统用于更改键位分布的软件。</p>
+<p><a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/config-file/origin_xmodmap.txt"><code>.origin_xmodmap.txt</code></a>是用于还原我当年买的xps13笔记本的键位布局，<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/config-file/xmodmap.txt"><code>.xmodmap.txt</code></a>是用于xps13的键位更改，符合我的个人习惯。</p>
+<p>使用的方法是:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">xmodmap</span> .origin_xmodmap.txt <span class="co"># 还原，需要点时间</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="fu">xmodmap</span> .xmodmap.txt</a></code></pre></div>
+<p>帮助命令:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">xmodmap</span> -h</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="fu">xmodmap</span> -pm <span class="co"># 打印修饰键</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="fu">xmodmap</span> -pke <span class="co"># 除修饰键外的其他键</span></a></code></pre></div>
+<h1 id="set_proxy.sh"><span class="header-section-number">6</span> <code>.set_proxy.sh</code></h1>
+<p>用于设置代理或取消代理。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># 注意要用&lt;点号&gt;，而不能用 bash .set_proxy.sh</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="bu">.</span> <span class="ex">.set_proxy.sh</span> 1 <span class="co"># 设置代理</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="bu">.</span> <span class="ex">.set_proxy.sh</span> 0 <span class="co"># 取消代理</span></a></code></pre></div>
+<p>具体请查看<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/config-file/set_proxy.sh"><code>.set_proxy.sh</code></a>。</p>
+<h1 id="tmux.conf"><span class="header-section-number">7</span> <code>.tmux.conf</code></h1>
+<p>Tmux（缩写自“Terminal Multiplexer”）是一个在命令行界面下运行的终端复用工具，我主要是用tmux的会话附加和分离功能，在一个Tmux会话中分离，然后重新附加，这意味着可以从一个终端窗口断开，然后在另一个终端窗口中继续工作，或者甚至在断开后重新连接。</p>
+<p>安装:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">sudo</span> apt update -y</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="fu">sudo</span> apt install tmux -y</a></code></pre></div>
+<p><code>set -g prefix none</code>表示将prefix键设置为空，因此您无需按下任何键即可执行tmux命令。这通常是为了防止键冲突或简化tmux的使用。</p>
+<p><code>unbind C-b</code>将取消绑定 C-b 作为 prefix 键，从而使其不再触发 tmux 命令。</p>
+<p>如果已经运行了tmux，要重新加载配置，在终端中输入<code>tmux source-file ~/.tmux.conf</code>，使新的prefix设置生效。</p>
+<p>具体请查看<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/config-file/tmux.conf"><code>.tmux.conf</code></a>。</p>
+<p>要查看终端的所有输出，可以使用<code>tmux copy-mode</code>。</p>
+<h1 id="vimrc"><span class="header-section-number">8</span> <code>.vimrc</code></h1>
+<p>vim就是方便小巧，是Linux下最常用的编辑器了，以前我挺喜欢用的，现在我更多的是用emacs看代码。</p>
+<p>具体请查看<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/gnu-linux/src/config-file/vimrc"><code>.vimrc</code></a>。</p>
+</body>
+</html>

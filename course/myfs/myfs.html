@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>&quot;我的&quot;文件系统</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">"我的"文件系统</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#参考"><span class="toc-section-number">1</span> 参考</a></li>
+<li><a href="#编译"><span class="toc-section-number">2</span> 编译</a><ul>
+<li><a href="#独立模块编译"><span class="toc-section-number">2.1</span> 独立模块编译</a></li>
+<li><a href="#作为内核一部分编译"><span class="toc-section-number">2.2</span> 作为内核一部分编译</a></li>
+<li><a href="#todo"><span class="toc-section-number">2.3</span> todo</a></li>
+</ul></li>
+<li><a href="#使用"><span class="toc-section-number">3</span> 使用</a><ul>
+<li><a href="#调试日志"><span class="toc-section-number">3.1</span> 调试日志</a></li>
+<li><a href="#挂载"><span class="toc-section-number">3.2</span> 挂载</a></li>
+<li><a href="#文件操作"><span class="toc-section-number">3.3</span> 文件操作</a></li>
+</ul></li>
+<li><a href="#开发过程"><span class="toc-section-number">4</span> 开发过程</a></li>
+</ul>
+</nav>
+<p>由于工作需要，写了一个功能最简单的文件系统，想着再完善一下，当成公开课素材，一来觉得挺好玩，二来觉得可以自己的简历也需要这么一个项目。</p>
+<p>这个“我的”（my）文件系统不是为了生产目的，目前只用于学习目的，欢迎更多的朋友来完善，可以参考其他文件系统的代码（当然不能整段copy），但请标明出处。</p>
+<p><a href="https://gitee.com/chenxiaosonggitee/myfs">点击这里访问代码仓库</a>。</p>
+<h1 id="参考"><span class="header-section-number">1</span> 参考</h1>
+<ul>
+<li><a href="https://chenxiaosong.com/course/kernel/fs.html">《Linux内核文件系统》</a></li>
+<li><a href="https://github.com/namjaejeon/ksmbd/blob/master/README.md"><code>ksmbd/README.md</code></a></li>
+<li><a href="https://github.com/namjaejeon/ksmbd/blob/master/Makefile"><code>ksmbd/Makefile</code></a></li>
+</ul>
+<h1 id="编译"><span class="header-section-number">2</span> 编译</h1>
+<h2 id="独立模块编译"><span class="header-section-number">2.1</span> 独立模块编译</h2>
+<p>修改<a href="https://gitee.com/chenxiaosonggitee/myfs/blob/master/Makefile"><code>Makefile</code></a>文件中的<code>KDIR</code>变量对应Linux内核仓库的路径，然后在<a href="https://gitee.com/chenxiaosonggitee/myfs"><code>myfs</code>代码仓库</a>执行以下命令:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">make</span> <span class="co"># 生成 myfs.ko</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="co"># make clean # 清理编译生成的文件</span></a></code></pre></div>
+<h2 id="作为内核一部分编译"><span class="header-section-number">2.2</span> 作为内核一部分编译</h2>
+<p>把<a href="https://gitee.com/chenxiaosonggitee/myfs">整个代码仓库目录<code>myfs</code></a>复制到Linux内核仓库的<code>fs</code>目录下。然后到内核仓库中执行以下命令:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">git</span> am fs/myfs/0001-add-support-for-myfs.patch</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="fu">mv</span> fs/myfs/Makefile.kernel fs/myfs/Makefile</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="fu">make</span> O=x86_64-build menuconfig</a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="fu">make</span> O=x86_64-build bzImage -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="fu">make</span> O=x86_64-build modules -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></a></code></pre></div>
+<h2 id="todo"><span class="header-section-number">2.3</span> todo</h2>
+<p>本来想和<a href="https://github.com/namjaejeon/ksmbd/blob/master/Makefile"><code>ksmbd/Makefile</code></a>中一样用<code>ifneq ($(KERNELRELEASE),)</code>隔离开独立模块和作为内核一部分，但好像没什么卵用，对makefile熟悉的朋友可以告诉我要怎么写。</p>
+<h1 id="使用"><span class="header-section-number">3</span> 使用</h1>
+<h2 id="调试日志"><span class="header-section-number">3.1</span> 调试日志</h2>
+<p>参考<a href="https://github.com/torvalds/linux/blob/master/fs/smb/server/server.c"><code>fs/smb/server/server.c</code></a>写了一个日志开关功能，使用请参考<a href="https://chenxiaosong.com/course/smb/debug.html">《smb调试方法》</a>。</p>
+<p>控制命令如下:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">cat</span> /sys/class/myfs-ctrl/debug <span class="co"># 查看日志开关，打开的日志类型有中括号</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="bu">echo</span> all <span class="op">&gt;</span> /sys/class/myfs-ctrl/debug <span class="co"># 全部切换</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="bu">echo</span> main <span class="op">&gt;</span> /sys/class/myfs-ctrl/debug <span class="co"># 只切换main</span></a></code></pre></div>
+<h2 id="挂载"><span class="header-section-number">3.2</span> 挂载</h2>
+<p>用以下命令挂载:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">mount</span> -t myfs /dev/sda /mnt</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="fu">mount</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="ex">lsblk</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="fu">df</span></a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="fu">umount</span> /mnt</a></code></pre></div>
+<p>如果编译内核打开了<code>CONFIG_BLK_DEV_LOOP</code>配置，可以挂载文件:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">mount</span> -t myfs -o loop /dev/sda /mnt</a></code></pre></div>
+<h2 id="文件操作"><span class="header-section-number">3.3</span> 文件操作</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb6-1" title="1"><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="pp">#include </span><span class="im">&lt;sys/syscall.h&gt;</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="pp">#include </span><span class="im">&lt;errno.h&gt;</span></a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="pp">#include </span><span class="im">&lt;linux/limits.h&gt;</span></a>
+<a class="sourceLine" id="cb6-7" title="7"></a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="dt">int</span> main()</a>
+<a class="sourceLine" id="cb6-9" title="9">{</a>
+<a class="sourceLine" id="cb6-10" title="10">        <span class="dt">int</span> res = syscall(__NR_openat, AT_FDCWD, <span class="st">&quot;/mnt&quot;</span>, O_RDONLY|O_NONBLOCK|O_CLOEXEC|O_DIRECTORY);</a>
+<a class="sourceLine" id="cb6-11" title="11">        printf(<span class="st">&quot;result: %d</span><span class="sc">\n</span><span class="st">&quot;</span>, res);</a>
+<a class="sourceLine" id="cb6-12" title="12"></a>
+<a class="sourceLine" id="cb6-13" title="13">        <span class="cf">return</span> <span class="dv">0</span>;</a>
+<a class="sourceLine" id="cb6-14" title="14">}</a></code></pre></div>
+<h1 id="开发过程"><span class="header-section-number">4</span> 开发过程</h1>
+<p>文件系统的模块加载函数是<code>init_myfs()</code>，模块卸载函数是<code>exit_myfs()</code>。可作为独立模块编译，也可作为内核一部分编译，内核配置选项是<code>CONFIG_MYFS</code>。</p>
+<p>引入<code>struct file_system_type myfs_fs_type</code>，实现<code>.mount</code>和<code>.kill_sb</code>方法，但测试发现mount时会panic，用<code>scripts/faddr2line</code>脚本解析栈信息，发现在<code>legacy_get_tree()</code>中得到的<code>struct dentry *root</code>为空，所以是还没能得到<code>root</code>的<code>dentry</code>和<code>inode</code>。</p>
+<p>为了方便调试，引入调试日志函数接口<code>myfs_debug()</code>。接着在<code>myfs_fill_super()</code>函数中获取<code>root inode</code>，但mount时却报错: <code>mount: /mnt: mount(2) system call failed: Not a directory.</code>。查看代码发现是<code>root inode</code>不是目录类型，所以将<code>root inode</code>的<code>i_mode</code>设置成目录类型，这时就能挂载成功。</p>
+<p>但这时<code>df -Th</code>命令还不能输出<code>myfs</code>相关的信息，引入<code>struct super_operations myfs_sops</code>且实现<code>.statfs</code>方法，<code>df -Th</code>命令就可输出相关信息。</p>
+<p>引入<code>myfs_dir_operations</code>和<code>myfs_file_operations</code>，但是<code>ls /mnt</code>还是报错<code>ls: cannot open directory '/mnt': Not a directory</code>，具体原因待定位。</p>
+</body>
+</html>

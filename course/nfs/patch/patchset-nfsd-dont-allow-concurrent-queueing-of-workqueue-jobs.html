@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>patchset: nfsd: don't allow concurrent queueing of workqueue jobs</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">patchset: nfsd: don't allow concurrent queueing of workqueue jobs</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#e8ffc5c4-nfsd-prevent-callback-tasks-running-concurrently"><span class="toc-section-number">1</span> <span><code>1054e8ffc5c4 nfsd: prevent callback tasks running concurrently</code></span></a><ul>
+<li><a href="#合补丁"><span class="toc-section-number">1.1</span> 4.19合补丁</a></li>
+</ul></li>
+<li><a href="#dd3df1f99-nfsd-eliminate-cl_ra_cblist-and-nfsd4_client_cb_recall_any"><span class="toc-section-number">2</span> <span><code>424dd3df1f99 nfsd: eliminate cl_ra_cblist and NFSD4_CLIENT_CB_RECALL_ANY</code></span></a></li>
+<li><a href="#bdbdb11f70-nfsd-replace-cb_getattr_busy-with-nfsd4_callback_running"><span class="toc-section-number">3</span> <span><code>49bdbdb11f70 nfsd: replace CB_GETATTR_BUSY with NFSD4_CALLBACK_RUNNING</code></span></a></li>
+<li><a href="#ce62c0f09c-nfsd-move-cb_need_restart-flag-into-cb_flags"><span class="toc-section-number">4</span> <span><code>32ce62c0f09c nfsd: move cb_need_restart flag into cb_flags</code></span></a></li>
+<li><a href="#ff383e8f9440-nfsd-handle-errors-from-rpc_call_async"><span class="toc-section-number">5</span> <span><code>ff383e8f9440 nfsd: handle errors from rpc_call_async()</code></span></a></li>
+<li><a href="#li-lingfeng-lilingfeng3huawei.com-未合入的补丁nfsd-decrease-cl_cb_inflight-if-fail-to-queue-cb_work"><span class="toc-section-number">6</span> Li Lingfeng <span>lilingfeng3@huawei.com</span> 未合入的补丁<span><code>nfsd: decrease cl_cb_inflight if fail to queue cb_work</code></span></a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p><a href="https://lore.kernel.org/all/20250220-nfsd-callback-v2-0-6a57f46e1c3a@kernel.org/">[PATCH v2 0/5] nfsd: don’t allow concurrent queueing of workqueue jobs</a>:</p>
+<pre><code>在审视 Li Lingfeng 报告的 [1] 关于回调排队失败的问题时，我注意到可能存在这样的场景：回调工作队列（workqueue）中的任务会与某个 rpc_task 同时运行。由于它们会修改或读取相同的字段，这在最好的情况下也是不正确的，并且很可能带来危险。
+
+该补丁集增加了一种新的机制，确保同一个 nfsd4_callback 在任何执行阶段都不会与自身并发运行。同时，它也为那些在回调运行期间需要获取并保持对象引用的场合提供了更可靠的处理手段。
+
+这应当也能修复 Li Lingfeng 报告的问题，因为从 nfsd4_cb_release() 排队的工作将不再会失败。注意，在清洁地应用本补丁前，应当先从 nfsd-testing 中移除他们之前的补丁 (fdf5c9413ea)。</code></pre>
+<h1 id="e8ffc5c4-nfsd-prevent-callback-tasks-running-concurrently"><span class="header-section-number">1</span> <a href="https://lore.kernel.org/all/20250220-nfsd-callback-v2-1-6a57f46e1c3a@kernel.org/"><code>1054e8ffc5c4 nfsd: prevent callback tasks running concurrently</code></a></h1>
+<pre><code>nfsd4_callback 工作队列任务的作用是将背道通道（backchannel）的 RPC 排队给 rpciod。由于这些任务运行在不同的工作队列上下文中，一旦 rpc_task 被重新排入队列，就可能与工作队列任务本身并发执行。由于访问 nfsd4_callback 结构体中的字段时没有加锁，这种并发是有问题的。
+
+为此，向 nfsd4_callback 结构体中添加了一个 unsigned long 类型的成员，并声明了一个新的标志位 NFSD4_CALLBACK_RUNNING。在尝试运行工作队列任务时，首先对该标志位执行 test_and_set_bit()，如果该函数返回 true（表示标志已被设置），则不再将任务排入队列；在 nfsd41_destroy_cb() 中清除 NFSD4_CALLBACK_RUNNING 标志。
+
+这也为在必须在自旋锁（spinlock）下获取对象引用的代码路径中处理排队失败提供了更可靠的机制。现在我们可以先对 NFSD4_CALLBACK_RUNNING 执行 test_and_set_bit()，只有当其返回 false 时才对相关对象获取引用。
+
+大多数 nfsd4_run_cb() 的调用方已改用该新标志或封装函数 nfsd4_try_run_cb()。唯一的主要例外是回调通道探测（callback channel probe），它使用自己的同步机制。</code></pre>
+<p>有些地方不是很理解，<a href="https://lore.kernel.org/all/23651194C61FBB9C+e2ddd3f5-f51f-44c0-8800-d2abb08a2447@chenxiaosong.com/">已经发邮件咨询maintainer</a>。</p>
+<h2 id="合补丁"><span class="header-section-number">1.1</span> 4.19合补丁</h2>
+<p>前置补丁:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">12357f1b2c8e</span> nfsd: minor 4.1 callback cleanup</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="ex">2bbfed98a4d8</span> nfsd: Fix races between nfsd4_cb_release() <span class="ex">and</span> nfsd4_shutdown_callback()</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="ex">b95239ca4954</span> nfsd: make nfsd4_run_cb a bool return function: 把nfsd4_run_cb函数改成有返回值</a></code></pre></div>
+<p>4.19可不合的前置补丁:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># 引入 nfs4_cb_getattr</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="ex">c5967721e106</span> NFSD: handle GETATTR conflict with write delegation</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="co"># 引入 deleg_reaper</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="ex">44df6f439a17</span> NFSD: add delegation reaper to react to low memory condition</a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="co"># 引入 nfsd4_send_cb_offload</span></a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="ex">e72f9bc006c0</span> NFSD: Add nfsd4_send_cb_offload()</a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="co"># 引入 nfsd4_do_async_copy （其中的部分代码独立成nfsd4_send_cb_offload）</span></a>
+<a class="sourceLine" id="cb4-8" title="8"><span class="ex">e0639dc5805a</span> NFSD introduce async copy feature</a></code></pre></div>
+<h1 id="dd3df1f99-nfsd-eliminate-cl_ra_cblist-and-nfsd4_client_cb_recall_any"><span class="header-section-number">2</span> <a href="https://lore.kernel.org/all/20250220-nfsd-callback-v2-2-6a57f46e1c3a@kernel.org/"><code>424dd3df1f99 nfsd: eliminate cl_ra_cblist and NFSD4_CLIENT_CB_RECALL_ANY</code></a></h1>
+<pre><code>deleg_reaper() 会遍历 client_lru 列表，并使用 cl_ra_cblist 指针将任何合适的条目放入 “cblist”。然后它在自旋锁 (nn-&gt;client_lock) 之外对这些对象进行遍历，并为它们排队回调。
+
+实际上，deleg_reaper() 在释放 nn-&gt;client_lock 之后所做的任何操作都不是阻塞操作。只需在持有 nn-&gt;client_lock 时将它们的工作队列任务入队即可。
+
+此外，NFSD4_CLIENT_CB_RECALL_ANY 和 NFSD4_CALLBACK_RUNNING 这两个标志现在已完全等价。去掉 NFSD4_CLIENT_CB_RECALL_ANY，只保留回调结构体中的那个标志即可。</code></pre>
+<h1 id="bdbdb11f70-nfsd-replace-cb_getattr_busy-with-nfsd4_callback_running"><span class="header-section-number">3</span> <a href="https://lore.kernel.org/all/20250220-nfsd-callback-v2-3-6a57f46e1c3a@kernel.org/"><code>49bdbdb11f70 nfsd: replace CB_GETATTR_BUSY with NFSD4_CALLBACK_RUNNING</code></a></h1>
+<pre><code>这些标志本质上具有相同的用途，而且在同一时刻被设置和清除。去掉 CB_GETATTR_BUSY，只使用 NFSD4_CALLBACK_RUNNING 即可。
+
+为了实现这一点，我们必须使用 clear_and_wake_up_bit()，但对其他类型的回调执行该操作则显得浪费。于是，在 cb_flags 中声明一个新的 NFSD4_CALLBACK_WAKE 标志，表示需要 wake_up，并且仅在处理 CB_GETATTR 时设置该标志。
+
+此外，将等待改为使用 TASK_UNINTERRUPTIBLE 睡眠。此处是在 nfsd 线程的上下文中进行的，且永远不需要处理信号。</code></pre>
+<h1 id="ce62c0f09c-nfsd-move-cb_need_restart-flag-into-cb_flags"><span class="header-section-number">4</span> <a href="https://lore.kernel.org/all/20250220-nfsd-callback-v2-4-6a57f46e1c3a@kernel.org/"><code>32ce62c0f09c nfsd: move cb_need_restart flag into cb_flags</code></a></h1>
+<pre><code>由于现在已有一个 cb_flags 字段，改用其中的新标志 NFSD4_CALLBACK_REQUEUE，而不再使用单独的布尔变量。</code></pre>
+<h1 id="ff383e8f9440-nfsd-handle-errors-from-rpc_call_async"><span class="header-section-number">5</span> <a href="https://lore.kernel.org/all/20250220-nfsd-callback-v2-5-6a57f46e1c3a@kernel.org/"><code>ff383e8f9440 nfsd: handle errors from rpc_call_async()</code></a></h1>
+<pre><code>rpc_call_async() 可能会失败（主要是由于内存分配失败）。如果发生这种情况，除了将回调重新排队并稍后重试之外，几乎别无他法。</code></pre>
+<h1 id="li-lingfeng-lilingfeng3huawei.com-未合入的补丁nfsd-decrease-cl_cb_inflight-if-fail-to-queue-cb_work"><span class="header-section-number">6</span> Li Lingfeng <a href="mailto:lilingfeng3@huawei.com" class="email">lilingfeng3@huawei.com</a> 未合入的补丁<a href="https://lore.kernel.org/linux-nfs/20250218135423.1487309-1-lilingfeng3@huawei.com/"><code>nfsd: decrease cl_cb_inflight if fail to queue cb_work</code></a></h1>
+<pre><code>在 nfsd4_run_cb 中，cl_cb_inflight 会在尝试将 cb_work 入队到 callback_wq 之前就被递增。这个计数可以在以下三种情况下递减：
+
+- 如果在 nfsd4_run_cb 中排队失败，则会相应地将该计数减一；
+- 当 cb_work 正在运行时，在 nfsd4_run_cb_work 的异常分支中通过调用 nfsd41_destroy_cb 将计数减一；
+- 在 rpc_task 的释放回调中减小计数——要么在 nfsd4_cb_probe_release 中直接调用 nfsd41_cb_inflight_end，要么在 nfsd4_cb_release 中调用 nfsd41_destroy_cb。
+
+然而，在 nfsd4_cb_release 中，如果当前的 cb_work 需要重启，该计数并不会被减小，而是期望在 cb_work 真正运行时再做减少处理。如果此时排队失败，就会造成计数泄漏，最终导致 nfsd 服务无法退出，表现如下：
+
+[root@nfs_test2 ~]# cat /proc/2271/stack
+[&lt;0&gt;] nfsd4_shutdown_callback+0x22b/0x290
+[&lt;0&gt;] __destroy_client+0x3cd/0x5c0
+[&lt;0&gt;] nfs4_state_destroy_net+0xd2/0x330
+[&lt;0&gt;] nfs4_state_shutdown_net+0x2ad/0x410
+[&lt;0&gt;] nfsd_shutdown_net+0xb7/0x250
+[&lt;0&gt;] nfsd_last_thread+0x15f/0x2a0
+[&lt;0&gt;] nfsd_svc+0x388/0x3f0
+[&lt;0&gt;] write_threads+0x17e/0x2b0
+[&lt;0&gt;] nfsctl_transaction_write+0x91/0xf0
+[&lt;0&gt;] vfs_write+0x1c4/0x750
+[&lt;0&gt;] ksys_write+0xcb/0x170
+[&lt;0&gt;] do_syscall_64+0x70/0x120
+[&lt;0&gt;] entry_SYSCALL_64_after_hwframe+0x78/0xe2
+
+通过在重启失败时也将 cl_cb_inflight 计数减一即可修复此问题。</code></pre>
+<p><a href="https://lore.kernel.org/linux-nfs/04ed0c70b85a1e8b66c25b9ad4d0aa4c2fb91198.camel@kernel.org/">Jeff Layton</a>:</p>
+<pre><code>实际上，我认为情况并非如此简单。问题的微妙之处在于，回调的工作队列任务与 RPC 的工作队列任务运行在不同的线程上，因此它们之间可能会发生竞争。
+
+当回调首次被排队时，cl_cb_inflight 会被递增，并且只有在 nfsd41_destroy_cb() 中才会释放。如果排队失败，那一定是因为在此期间，另一个地方已经通过 nfsd4_run_cb() 将该工作队列任务排队了。
+
+这种情况可能发生在两个地方：nfsd4_cb_release() 和 nfsd4_run_cb()。既然问题出现在 nfsd4_cb_release() 中，那么唯一的可能就是有竞争发生，并且该回调已经被 nfsd4_run_cb() 排队了。这也会多次递增 cl_cb_inflight，那么你的补丁在这种情况下就说得通了。
+
+不幸的是，如果之前没有其他地方释放该计数，插槽仍然可能会泄漏。我认为在无法排队时，或许需要调用 nfsd41_destroy_cb()，但这可能又会与实际运行的回调工作队列任务发生竞争。
+
+我觉得我们可能需要考虑添加一个“此回调正在运行”的原子标志：在 nfsd4_run_cb() 中对该标志执行 test_and_set，并且只有当它返回 false 时才将工作队列任务排队。然后，在 nfsd41_destroy_cb() 中清除该标志。
+
+这样就能确保在 nfsd4_cb_release() 中不会因为该标志已设置而无法排队回调任务。
+
+你怎么看？</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb11-1" title="1">nfsd<span class="dv">4</span><span class="er">_run_cb</span></a>
+<a class="sourceLine" id="cb11-2" title="2">  nfsd<span class="dv">41</span><span class="er">_cb_inflight_begin</span></a>
+<a class="sourceLine" id="cb11-3" title="3">    atomic_inc(&amp;clp-&gt;cl_cb_inflight)</a>
+<a class="sourceLine" id="cb11-4" title="4">  nfsd41_cb_inflight_end <span class="co">// 失败时执行</span></a>
+<a class="sourceLine" id="cb11-5" title="5">    atomic_dec_and_wake_up(&amp;clp-&gt;cl_cb_inflight)</a>
+<a class="sourceLine" id="cb11-6" title="6"></a>
+<a class="sourceLine" id="cb11-7" title="7">nfsd<span class="dv">4</span><span class="er">_run_cb_work</span></a>
+<a class="sourceLine" id="cb11-8" title="8">  <span class="cf">if</span> (!clnt || clp-&gt;cl_state == NFSD4_COURTESY) { <span class="co">// 异常</span></a>
+<a class="sourceLine" id="cb11-9" title="9">  <span class="cf">if</span> (!cb-&gt;cb_ops &amp;&amp; clp-&gt;cl_minorversion) { <span class="co">// 或者nfsv4.1之后的版本不需要发送probe</span></a>
+<a class="sourceLine" id="cb11-10" title="10">  nfsd<span class="dv">41</span><span class="er">_destroy_cb</span></a>
+<a class="sourceLine" id="cb11-11" title="11">    nfsd<span class="dv">41</span><span class="er">_cb_inflight_end</span></a>
+<a class="sourceLine" id="cb11-12" title="12"></a>
+<a class="sourceLine" id="cb11-13" title="13">nfsd<span class="dv">4</span><span class="er">_cb_release</span></a>
+<a class="sourceLine" id="cb11-14" title="14">  nfsd4_queue_cb <span class="co">// 这里可能失败</span></a>
+<a class="sourceLine" id="cb11-15" title="15">  nfsd<span class="dv">41</span><span class="er">_destroy_cb</span></a>
+<a class="sourceLine" id="cb11-16" title="16">    nfsd<span class="dv">41</span><span class="er">_cb_inflight_end</span></a>
+<a class="sourceLine" id="cb11-17" title="17"></a>
+<a class="sourceLine" id="cb11-18" title="18">nfsd<span class="dv">4</span><span class="er">_cb_probe_release</span></a>
+<a class="sourceLine" id="cb11-19" title="19">  nfsd<span class="dv">41</span><span class="er">_cb_inflight_end</span></a></code></pre></div>
+</body>
+</html>

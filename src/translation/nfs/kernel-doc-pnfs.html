@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>kernel doc: Reference counting in pnfs</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">kernel doc: Reference counting in pnfs</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#reference-counting-in-pnfs"><span class="toc-section-number">1</span> Reference counting in pnfs</a><ul>
+<li><a href="#struct-pnfs_layout_hdr"><span class="toc-section-number">1.1</span> <code>struct pnfs_layout_hdr</code></a></li>
+<li><a href="#deviceid_cache"><span class="toc-section-number">1.2</span> <code>deviceid_cache</code></a></li>
+<li><a href="#data-server-cache"><span class="toc-section-number">1.3</span> data server cache</a></li>
+<li><a href="#lseg"><span class="toc-section-number">1.4</span> lseg</a></li>
+<li><a href="#layout-drivers"><span class="toc-section-number">1.5</span> layout drivers</a></li>
+<li><a href="#blocks-layout-setup"><span class="toc-section-number">1.6</span> blocks-layout setup</a></li>
+</ul></li>
+</ul>
+</nav>
+<p>本文档翻译自<a href="https://github.com/torvalds/linux/blob/34e75cf4beb1a88a61b7c76b5fdc99c43cff8594/Documentation/filesystems/nfs/pnfs.rst">Reference counting in pnfs</a>，翻译时文件的最新提交是<code>34e75cf4beb1a88a61b7c76b5fdc99c43cff8594 Documentation: nfs: convert pnfs.txt to ReST</code>，大部分借助于ChatGPT。仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<h1 id="reference-counting-in-pnfs"><span class="header-section-number">1</span> Reference counting in pnfs</h1>
+<pre><code>这些缓存相互关联。我们有布局可以引用多个设备，每个设备可以引用多个数据服务器。每个数据服务器可以被多个设备引用。每个设备可以被多个布局引用。为了理清这一切，我们需要引用计数。</code></pre>
+<h2 id="struct-pnfs_layout_hdr"><span class="header-section-number">1.1</span> <code>struct pnfs_layout_hdr</code></h2>
+<pre><code>网络命令 LAYOUTGET 对应 struct pnfs_layout_segment，通常用变量名 lseg 来表示。每个 nfs_inode 可能在 nfsi-&gt;layout 中持有指向这些布局段缓存的指针，其类型为 struct pnfs_layout_hdr。
+
+我们会在每个引用它的未完成 RPC 调用（如 LAYOUTGET、LAYOUTRETURN 和 LAYOUTCOMMIT）中引用指向它的 inode 的头部，以及每个持有的 lseg。
+
+每个头部在非空时也会被放入与 struct nfs_client（cl_layouts）关联的列表中。将其放入该列表不会增加引用计数，因为布局由将其保留在列表中的 lseg 维护。</code></pre>
+<h2 id="deviceid_cache"><span class="header-section-number">1.2</span> <code>deviceid_cache</code></h2>
+<pre><code>LSEG引用设备ID，这些设备ID根据NFS客户端和布局驱动类型进行解析。设备ID保存在RCU缓存（struct nfs4_deviceid_cache）中。缓存本身在每次挂载中被引用。条目（struct nfs4_deviceid）在引用它们的每个LSEG的生命周期内保持存在。
+
+使用RCU是因为设备ID基本上是一种一次写入、多次读取的数据结构。32个桶的哈希表大小需要更好的论证，但考虑到每个文件系统可以有多个设备ID，每个NFS客户端可以有多个文件系统，这似乎是合理的。
+
+哈希代码是从nfsd代码库中复制的。有关哈希和此算法变体的讨论可以在这里找到: http://groups.google.com/group/comp.lang.c/browse_thread/thread/9522965e2b8d3809。</code></pre>
+<h2 id="data-server-cache"><span class="header-section-number">1.3</span> data server cache</h2>
+<pre><code>文件驱动程序设备指的是数据服务器，它们保存在模块级别的缓存中。该引用在指向它的设备 ID 的生命周期内保持有效。</code></pre>
+<h2 id="lseg"><span class="header-section-number">1.4</span> lseg</h2>
+<pre><code>lseg 维护一个额外的引用，该引用对应 NFS_LSEG_VALID 位，并将其保存在 pnfs_layout_hdr 的列表中。当最后一个 lseg 从 pnfs_layout_hdr 的列表中移除时，会设置 NFS_LAYOUT_DESTROYED 位，以防止添加任何新的 lseg。</code></pre>
+<h2 id="layout-drivers"><span class="header-section-number">1.5</span> layout drivers</h2>
+<pre><code>PNFS 使用被称为布局驱动程序的东西。STD 定义了四种基本的布局类型: &quot;文件&quot;、&quot;对象&quot;、&quot;块&quot; 和 &quot;flexfiles&quot;。对于每种类型都有一个布局驱动程序，并带有一个通用的函数向量表，由 nfs 客户端 pnfs 核心调用来实现不同的布局类型。
+
+文件布局驱动程序代码位于: fs/nfs/filelayout/.. 目录
+块布局驱动程序代码位于: fs/nfs/blocklayout/.. 目录
+Flexfiles 布局驱动程序代码位于: fs/nfs/flexfilelayout/.. 目录</code></pre>
+<h2 id="blocks-layout-setup"><span class="header-section-number">1.6</span> blocks-layout setup</h2>
+<pre><code>TODO: 记录块布局驱动程序的设置需求</code></pre>
+</body>
+</html>

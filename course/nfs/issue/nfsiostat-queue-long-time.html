@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>nfsiostat命令queue时间长的问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">nfsiostat命令queue时间长的问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#nfsiostat命令"><span class="toc-section-number">2</span> <code>nfsiostat</code>命令</a><ul>
+<li><a href="#man手册"><span class="toc-section-number">2.1</span> man手册</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">2.2</span> 代码分析</a></li>
+</ul></li>
+<li><a href="#procstat文件"><span class="toc-section-number">3</span> <code>/proc/stat</code>文件</a></li>
+<li><a href="#调试"><span class="toc-section-number">4</span> 调试</a></li>
+<li><a href="#代码分析-1"><span class="toc-section-number">5</span> 代码分析</a><ul>
+<li><a href="#最新主线"><span class="toc-section-number">5.1</span> 最新主线</a></li>
+<li><a href="#内核"><span class="toc-section-number">5.2</span> 4.19内核</a></li>
+</ul></li>
+<li><a href="#nfs-server分析"><span class="toc-section-number">6</span> nfs server分析</a></li>
+<li><a href="#vmcore分析"><span class="toc-section-number">7</span> vmcore分析</a></li>
+<li><a href="#抓包数据分析"><span class="toc-section-number">8</span> 抓包数据分析</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>挂载信息:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">mount</span> <span class="kw">|</span> <span class="fu">grep</span> nfs</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="ex">xx.xx.xx.xx</span>:/server/export on /mnt type nfs (rw,relatime,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=xx.xx.xx.xx,mountvers=3,mountport=20048,mountproto=udp,local_lock=none,addr=xx.xx.xx.xx,_netdev)</a></code></pre></div>
+<p><code>nfsiostat</code>命令输出:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">           <span class="ex">ops/s</span>       rpc bklog</a>
+<a class="sourceLine" id="cb2-2" title="2">           <span class="ex">8.246</span>           0.000</a>
+<a class="sourceLine" id="cb2-3" title="3"></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="ex">read</span>:              ops/s            kB/s           kB/op         retrans    avg RTT (ms)    <span class="ex">avg</span> exe (ms)  <span class="ex">avg</span> queue (ms)</a>
+<a class="sourceLine" id="cb2-5" title="5">                   <span class="ex">0.002</span>           0.143          67.001        0 (0.0%)           <span class="ex">1.618</span>           1.658           0.015</a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="ex">write</span>:             ops/s            kB/s           kB/op         retrans    avg RTT (ms)    <span class="ex">avg</span> exe (ms)  <span class="ex">avg</span> queue (ms)</a>
+<a class="sourceLine" id="cb2-7" title="7">                   <span class="ex">6.549</span>          24.308           3.711        0 (0.0%)           <span class="ex">0.987</span>        4621.857        4620.851</a></code></pre></div>
+<p><code>mpstat</code>和<code>iostat -xm</code>命令输出中的<code>%iowait</code>过高，需要确认是否和nfs有关。</p>
+<h1 id="nfsiostat命令"><span class="header-section-number">2</span> <code>nfsiostat</code>命令</h1>
+<h2 id="man手册"><span class="header-section-number">2.1</span> man手册</h2>
+<p>顺便把<code>man nfsiostat</code>做个翻译，方便查阅:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">NAME</span></a>
+<a class="sourceLine" id="cb3-2" title="2">       <span class="ex">nfsiostat</span> - 使用 /proc/self/mountstats 模拟 NFS 挂载点的 iostat</a>
+<a class="sourceLine" id="cb3-3" title="3"></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="ex">SYNOPSIS</span></a>
+<a class="sourceLine" id="cb3-5" title="5">       <span class="ex">nfsiostat</span> [[<span class="op">&lt;</span>interval<span class="op">&gt;</span>] [<span class="op">&lt;</span>count<span class="op">&gt;</span>]] [<span class="op">&lt;</span>options<span class="op">&gt;</span>] [<span class="op">&lt;</span>mount_point<span class="op">&gt;</span>]</a>
+<a class="sourceLine" id="cb3-6" title="6"></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="ex">DESCRIPTION</span></a>
+<a class="sourceLine" id="cb3-8" title="8">       <span class="ex">nfsiostat</span> 命令显示 NFS 客户端每个挂载点的统计信息。</a>
+<a class="sourceLine" id="cb3-9" title="9"></a>
+<a class="sourceLine" id="cb3-10" title="10">       <span class="op">&lt;</span><span class="ex">interval</span><span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb3-11" title="11">              指定每个报告之间的时间间隔（单位：秒）。第一次报告包含自每个文件系统挂载以来的统计信息。之后的每个报告包含自上一个报告以来的统计信息。</a>
+<a class="sourceLine" id="cb3-12" title="12"></a>
+<a class="sourceLine" id="cb3-13" title="13">       <span class="op">&lt;</span><span class="ex">count</span><span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb3-14" title="14">              如果指定了 <span class="op">&lt;</span><span class="ex">count</span><span class="op">&gt;</span> 参数，则 <span class="op">&lt;</span>count<span class="op">&gt;</span> 的值决定了在 <span class="op">&lt;</span>interval<span class="op">&gt;</span> 秒间隔下生成的报告数量。如果没有指定 <span class="op">&lt;</span>count<span class="op">&gt;</span> 参数，命令将连续生成报告。</a>
+<a class="sourceLine" id="cb3-15" title="15"></a>
+<a class="sourceLine" id="cb3-16" title="16">       <span class="op">&lt;</span><span class="ex">options</span><span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb3-17" title="17">              见下文定义</a>
+<a class="sourceLine" id="cb3-18" title="18"></a>
+<a class="sourceLine" id="cb3-19" title="19">       <span class="op">&lt;</span><span class="ex">mount_point</span><span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb3-20" title="20">              如果指定了一个或多个 <span class="op">&lt;</span><span class="ex">mount_point</span><span class="op">&gt;</span>，则仅显示这些挂载点的统计信息。否则，客户端上所有的 NFS 挂载点的统计信息将会列出。</a>
+<a class="sourceLine" id="cb3-21" title="21"></a>
+<a class="sourceLine" id="cb3-22" title="22">       <span class="ex">nfsiostat</span> 输出的每一列的含义如下：</a>
+<a class="sourceLine" id="cb3-23" title="23">               <span class="ex">-</span> op/s</a>
+<a class="sourceLine" id="cb3-24" title="24">                      每秒操作次数。</a>
+<a class="sourceLine" id="cb3-25" title="25">               <span class="ex">-</span> rpc bklog</a>
+<a class="sourceLine" id="cb3-26" title="26">                      后台队列的长度。</a>
+<a class="sourceLine" id="cb3-27" title="27">               <span class="ex">-</span> kB/s</a>
+<a class="sourceLine" id="cb3-28" title="28">                      每秒读取/写入的千字节数。</a>
+<a class="sourceLine" id="cb3-29" title="29">               <span class="ex">-</span> kB/op</a>
+<a class="sourceLine" id="cb3-30" title="30">                      每次操作读取/写入的千字节数。</a>
+<a class="sourceLine" id="cb3-31" title="31">               <span class="ex">-</span> retrans</a>
+<a class="sourceLine" id="cb3-32" title="32">                      重传的次数。</a>
+<a class="sourceLine" id="cb3-33" title="33">               <span class="ex">-</span> avg RTT (ms)</a>
+<a class="sourceLine" id="cb3-34" title="34">                      从客户端内核发送 <span class="ex">RPC</span> 请求到接收到回复的时间延迟（毫秒）。</a>
+<a class="sourceLine" id="cb3-35" title="35">               <span class="ex">-</span> avg exe (ms)</a>
+<a class="sourceLine" id="cb3-36" title="36">                      从 <span class="ex">NFS</span> 客户端发出 RPC 请求到 RPC 请求完成的时间延迟（毫秒），包括上述 RTT 时间。</a>
+<a class="sourceLine" id="cb3-37" title="37">               <span class="ex">-</span> avg queue (ms)</a>
+<a class="sourceLine" id="cb3-38" title="38">                      从 <span class="ex">NFS</span> 客户端创建 RPC 请求任务到请求被传输的时间延迟（毫秒）。</a>
+<a class="sourceLine" id="cb3-39" title="39">               <span class="ex">-</span> errors</a>
+<a class="sourceLine" id="cb3-40" title="40">                      以错误状态（状态值小于 <span class="ex">0</span>）完成的操作次数。此计数仅在内核支持 RPC iostats 版本 1.1 或更高版本时可用。</a>
+<a class="sourceLine" id="cb3-41" title="41"></a>
+<a class="sourceLine" id="cb3-42" title="42">       注意，如果使用时间间隔作为 <span class="ex">nfsiostat</span> 的参数，则显示的是与上一个时间间隔的差值，否则结果将显示自挂载共享以来的统计信息。</a>
+<a class="sourceLine" id="cb3-43" title="43"></a>
+<a class="sourceLine" id="cb3-44" title="44"><span class="ex">OPTIONS</span></a>
+<a class="sourceLine" id="cb3-45" title="45">       <span class="ex">-a</span>  或  --attr</a>
+<a class="sourceLine" id="cb3-46" title="46">              显示与属性缓存相关的统计信息。</a>
+<a class="sourceLine" id="cb3-47" title="47"></a>
+<a class="sourceLine" id="cb3-48" title="48">       <span class="ex">-d</span>  或  --dir</a>
+<a class="sourceLine" id="cb3-49" title="49">              显示与目录操作相关的统计信息。</a>
+<a class="sourceLine" id="cb3-50" title="50"></a>
+<a class="sourceLine" id="cb3-51" title="51">       <span class="ex">-h</span>  或  --help</a>
+<a class="sourceLine" id="cb3-52" title="52">              显示帮助信息并退出。</a>
+<a class="sourceLine" id="cb3-53" title="53"></a>
+<a class="sourceLine" id="cb3-54" title="54">       <span class="ex">-l</span> LIST 或  --list=LIST</a>
+<a class="sourceLine" id="cb3-55" title="55">              仅打印前 <span class="ex">LIST</span> 个挂载点的统计信息。</a>
+<a class="sourceLine" id="cb3-56" title="56"></a>
+<a class="sourceLine" id="cb3-57" title="57">       <span class="ex">-p</span>  或  --page</a>
+<a class="sourceLine" id="cb3-58" title="58">              显示与页面缓存相关的统计信息。</a>
+<a class="sourceLine" id="cb3-59" title="59"></a>
+<a class="sourceLine" id="cb3-60" title="60">       <span class="ex">-s</span>  或  --sort</a>
+<a class="sourceLine" id="cb3-61" title="61">              按每秒操作次数（<span class="ex">ops</span>/<span class="ex">second</span>）排序 NFS 挂载点。</a>
+<a class="sourceLine" id="cb3-62" title="62"></a>
+<a class="sourceLine" id="cb3-63" title="63">       <span class="ex">--version</span></a>
+<a class="sourceLine" id="cb3-64" title="64">              显示程序的版本号并退出。</a>
+<a class="sourceLine" id="cb3-65" title="65"></a>
+<a class="sourceLine" id="cb3-66" title="66"><span class="ex">FILES</span></a>
+<a class="sourceLine" id="cb3-67" title="67">       <span class="ex">/proc/self/mountstats</span></a>
+<a class="sourceLine" id="cb3-68" title="68"></a>
+<a class="sourceLine" id="cb3-69" title="69"><span class="ex">SEE</span> ALSO</a>
+<a class="sourceLine" id="cb3-70" title="70">       <span class="ex">iostat</span>(8), <span class="ex">mountstats</span>(8), <span class="ex">nfsstat</span>(8)</a>
+<a class="sourceLine" id="cb3-71" title="71"></a>
+<a class="sourceLine" id="cb3-72" title="72"><span class="ex">AUTHOR</span></a>
+<a class="sourceLine" id="cb3-73" title="73">       <span class="ex">Chuck</span> Lever <span class="op">&lt;</span>chuck.lever@oracle.com<span class="op">&gt;</span></a></code></pre></div>
+<h2 id="代码分析"><span class="header-section-number">2.2</span> 代码分析</h2>
+<p><code>/proc/self/mountstats</code>文件内容:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">device</span> localhost:/tmp/s_test mounted on /mnt with fstype nfs statvers=1.1</a>
+<a class="sourceLine" id="cb4-2" title="2">        <span class="ex">opts</span>:   rw,vers=3,rsize=1048576,wsize=1048576,namlen=255,acregmin=3,acregmax=60,acdirmin=30,acdirmax=60,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=127.0.0.1,mountvers=3,mountport=20048,mountproto=udp,local_lock=none</a>
+<a class="sourceLine" id="cb4-3" title="3">        <span class="ex">age</span>:    159</a>
+<a class="sourceLine" id="cb4-4" title="4">        <span class="ex">caps</span>:   caps=0xf,wtmult=4096,dtsize=1048576,bsize=0,namlen=255</a>
+<a class="sourceLine" id="cb4-5" title="5">        <span class="ex">sec</span>:    flavor=1,pseudoflavor=1</a>
+<a class="sourceLine" id="cb4-6" title="6">        <span class="ex">events</span>: 0 0 0 0 2 1 7 1 0 1 0 1 0 0 3 0 0 2 0 0 1 0 0 0 0 0 0 </a>
+<a class="sourceLine" id="cb4-7" title="7">        <span class="ex">bytes</span>:  15 15 0 0 15 15 1 1 </a>
+<a class="sourceLine" id="cb4-8" title="8">        <span class="ex">RPC</span> iostats version: 1.1  p/v: 100003/3 (nfs)</a>
+<a class="sourceLine" id="cb4-9" title="9">        <span class="ex">xprt</span>:   tcp 795 1 2 0 2 15 15 0 15 0 2 0 0</a>
+<a class="sourceLine" id="cb4-10" title="10">        <span class="ex">per-op</span> statistics</a>
+<a class="sourceLine" id="cb4-11" title="11">                <span class="ex">NULL</span>: 1 1 0 44 24 0 0 0 0</a>
+<a class="sourceLine" id="cb4-12" title="12">                <span class="ex">...</span></a>
+<a class="sourceLine" id="cb4-13" title="13">                <span class="ex">READ</span>: 1 1 0 124 144 0 0 0 0</a>
+<a class="sourceLine" id="cb4-14" title="14">               <span class="ex">WRITE</span>: 1 1 0 148 136 0 14 14 0</a>
+<a class="sourceLine" id="cb4-15" title="15">               <span class="ex">...</span></a></code></pre></div>
+<p><code>rpc_init_task_statistics()</code>记录rpc任务开始的时刻，<code>xs_tcp_send_request()</code>记录tcp请求的时刻，<code>xprt_lookup_rqst()</code>计算tcp请求到收到回复的间隔时间，<code>rpc_count_iostats_metrics()</code>计算排队的时间和rpc任务总的时间:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb5-1" title="1">REG(<span class="st">&quot;mountstats&quot;</span>, S_IRUSR, proc_mountstats_operations)</a>
+<a class="sourceLine" id="cb5-2" title="2"></a>
+<a class="sourceLine" id="cb5-3" title="3">mountstats_open</a>
+<a class="sourceLine" id="cb5-4" title="4">  mounts_open_common</a>
+<a class="sourceLine" id="cb5-5" title="5">    p-&gt;show = show_vfsstat</a>
+<a class="sourceLine" id="cb5-6" title="6"></a>
+<a class="sourceLine" id="cb5-7" title="7">show_vfsstat</a>
+<a class="sourceLine" id="cb5-8" title="8">  nfs_show_stats</a>
+<a class="sourceLine" id="cb5-9" title="9">    rpc_clnt_show_stats</a>
+<a class="sourceLine" id="cb5-10" title="10">      _add_rpc_iostats</a>
+<a class="sourceLine" id="cb5-11" title="11">      _print_rpc_iostats</a>
+<a class="sourceLine" id="cb5-12" title="12">        ktime_to_ms(stats-&gt;om_queue)</a>
+<a class="sourceLine" id="cb5-13" title="13"></a>
+<a class="sourceLine" id="cb5-14" title="14">rpc_call_sync</a>
+<a class="sourceLine" id="cb5-15" title="15">  rpc_run_task</a>
+<a class="sourceLine" id="cb5-16" title="16">    rpc_new_task</a>
+<a class="sourceLine" id="cb5-17" title="17">      rpc_init_task</a>
+<a class="sourceLine" id="cb5-18" title="18">        rpc_init_task_statistics</a>
+<a class="sourceLine" id="cb5-19" title="19">          task-&gt;tk_start = ktime_get() <span class="co">// rpc任务开始的时刻</span></a>
+<a class="sourceLine" id="cb5-20" title="20"></a>
+<a class="sourceLine" id="cb5-21" title="21">rpc_execute</a>
+<a class="sourceLine" id="cb5-22" title="22">  __rpc_execute</a>
+<a class="sourceLine" id="cb5-23" title="23">    call_transmit</a>
+<a class="sourceLine" id="cb5-24" title="24">      xprt_transmit</a>
+<a class="sourceLine" id="cb5-25" title="25">        xprt_request_transmit</a>
+<a class="sourceLine" id="cb5-26" title="26">          xs_tcp_send_request</a>
+<a class="sourceLine" id="cb5-27" title="27">            req-&gt;rq_xtime = ktime_get() <span class="co">// 发送tcp请求的时刻</span></a>
+<a class="sourceLine" id="cb5-28" title="28"></a>
+<a class="sourceLine" id="cb5-29" title="29">xprt_lookup_rqst</a>
+<a class="sourceLine" id="cb5-30" title="30">  entry-&gt;rq_rtt = ktime_sub(ktime_get(), entry-&gt;rq_xtime) <span class="co">// tcp请求到收到回复的间隔时间</span></a>
+<a class="sourceLine" id="cb5-31" title="31"></a>
+<a class="sourceLine" id="cb5-32" title="32">rpc_count_iostats_metrics</a>
+<a class="sourceLine" id="cb5-33" title="33">  backlog = ktime_sub(req-&gt;rq_xtime, task-&gt;tk_start) <span class="co">// rpc任务开始到tcp请求的间隔时间，也就是排队的时间</span></a>
+<a class="sourceLine" id="cb5-34" title="34">  execute = ktime_sub(now, task-&gt;tk_start) <span class="co">// 总的时间</span></a></code></pre></div>
+<h1 id="procstat文件"><span class="header-section-number">3</span> <code>/proc/stat</code>文件</h1>
+<p>通过<code>strace -o strace.out -f -v -s 4096 xxxx</code>抓取系统调用可以看出<code>iostat -xm</code> 和<code>mpstat</code>都是解析<code>/proc/stat</code>中的内容。</p>
+<p>代码分析如下:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">struct</span> proc_ops stat_proc_ops</a>
+<a class="sourceLine" id="cb6-2" title="2"></a>
+<a class="sourceLine" id="cb6-3" title="3">stat_open</a>
+<a class="sourceLine" id="cb6-4" title="4">  single_open_size(file, show_stat,</a>
+<a class="sourceLine" id="cb6-5" title="5"></a>
+<a class="sourceLine" id="cb6-6" title="6">show_stat</a>
+<a class="sourceLine" id="cb6-7" title="7">  get_iowait_time</a>
+<a class="sourceLine" id="cb6-8" title="8">    get_cpu_iowait_time_us</a>
+<a class="sourceLine" id="cb6-9" title="9">      get_cpu_sleep_time_us(ts, &amp;ts-&gt;iowait_sleeptime, <span class="co">// 进程设置current-&gt;in_iowait期间统计的时间</span></a></code></pre></div>
+<h1 id="调试"><span class="header-section-number">4</span> 调试</h1>
+<p>挂载:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="fu">mount</span> -t nfs -o rw,relatime,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountvers=3,mountport=20048,mountproto=udp,local_lock=none,_netdev localhost:/tmp/s_test /mnt</a></code></pre></div>
+<p>测试读写一个字节所需时间:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="bu">time</span> dd if=/dev/random of=/mnt/file bs=1 count=1 oflag=direct</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="bu">time</span> dd if=/mnt/file of=/dev/null bs=1 count=1 iflag=direct</a></code></pre></div>
+<p>从结果看，<code>dd</code>命令读写所用的时间正常。</p>
+<p>再打开nfs和sunrpc的日志调试开关:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_ALL</span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_ALL</span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="ex">nfsiostat</span> 1 <span class="op">&gt;</span>  nfsiostat.txt <span class="kw">&amp;</span></a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="va">nfsiostat_pid=$!</span></a>
+<a class="sourceLine" id="cb9-5" title="5"><span class="fu">sleep</span> 10</a>
+<a class="sourceLine" id="cb9-6" title="6"><span class="fu">dmesg</span> <span class="op">&gt;</span> dmesg.txt</a>
+<a class="sourceLine" id="cb9-7" title="7"><span class="co"># 关闭日志调试开关</span></a>
+<a class="sourceLine" id="cb9-8" title="8"><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug</a>
+<a class="sourceLine" id="cb9-9" title="9"><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug</a>
+<a class="sourceLine" id="cb9-10" title="10"><span class="bu">kill</span> -9 <span class="va">${nfsiostat_pid}</span></a></code></pre></div>
+<p>抓包:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="ex">tcpdump</span> --interface=any --buffer-size=20480 -w out.cap</a></code></pre></div>
+<h1 id="代码分析-1"><span class="header-section-number">5</span> 代码分析</h1>
+<h2 id="最新主线"><span class="header-section-number">5.1</span> 最新主线</h2>
+<p>调用<code>io_schedule_prepare()</code>的地方:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb11-1" title="1">io_schedule</a>
+<a class="sourceLine" id="cb11-2" title="2">io_schedule_timeout</a>
+<a class="sourceLine" id="cb11-3" title="3">mutex_lock_io</a>
+<a class="sourceLine" id="cb11-4" title="4">mutex_lock_io_nested</a>
+<a class="sourceLine" id="cb11-5" title="5">blkcg_maybe_throttle_blkg</a></code></pre></div>
+<p>调用<code>io_schedule()</code>地方:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb12-1" title="1">nfs_wb_folio</a>
+<a class="sourceLine" id="cb12-2" title="2">  folio_wait_writeback</a>
+<a class="sourceLine" id="cb12-3" title="3">    folio_wait_bit</a>
+<a class="sourceLine" id="cb12-4" title="4">      folio_wait_bit_common</a>
+<a class="sourceLine" id="cb12-5" title="5">        io_schedule</a></code></pre></div>
+<h2 id="内核"><span class="header-section-number">5.2</span> 4.19内核</h2>
+<p>调用<code>io_schedule()</code>地方:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb13-1" title="1">write</a>
+<a class="sourceLine" id="cb13-2" title="2">  vfs_write</a>
+<a class="sourceLine" id="cb13-3" title="3">    __vfs_write</a>
+<a class="sourceLine" id="cb13-4" title="4">      new_sync_write</a>
+<a class="sourceLine" id="cb13-5" title="5">        nfs_file_write</a>
+<a class="sourceLine" id="cb13-6" title="6">          generic_perform_write</a>
+<a class="sourceLine" id="cb13-7" title="7">            nfs_write_end</a>
+<a class="sourceLine" id="cb13-8" title="8">              nfs_updatepage</a>
+<a class="sourceLine" id="cb13-9" title="9">                nfs_writepage_setup</a>
+<a class="sourceLine" id="cb13-10" title="10">                  nfs_setup_write_request</a>
+<a class="sourceLine" id="cb13-11" title="11">                    nfs_try_to_update_request</a>
+<a class="sourceLine" id="cb13-12" title="12">                      nfs_wb_page</a>
+<a class="sourceLine" id="cb13-13" title="13"></a>
+<a class="sourceLine" id="cb13-14" title="14">nfs_wb_page</a>
+<a class="sourceLine" id="cb13-15" title="15">  nfs_writepage_locked</a>
+<a class="sourceLine" id="cb13-16" title="16">    nfs_do_writepage</a>
+<a class="sourceLine" id="cb13-17" title="17">      nfs_page_async_flush</a>
+<a class="sourceLine" id="cb13-18" title="18">        nfs_set_page_writeback <span class="co">// 设置回写标记</span></a>
+<a class="sourceLine" id="cb13-19" title="19">        nfs_pageio_add_request</a>
+<a class="sourceLine" id="cb13-20" title="20">    nfs_pageio_complete</a>
+<a class="sourceLine" id="cb13-21" title="21">      nfs_pageio_complete_mirror</a>
+<a class="sourceLine" id="cb13-22" title="22">        nfs_pageio_doio</a>
+<a class="sourceLine" id="cb13-23" title="23">          nfs_generic_pg_pgios <span class="co">// .pg_doio</span></a>
+<a class="sourceLine" id="cb13-24" title="24">            nfs_generic_pgio</a>
+<a class="sourceLine" id="cb13-25" title="25">              desc-&gt;pg_rpc_callops = &amp;nfs_pgio_common_ops</a>
+<a class="sourceLine" id="cb13-26" title="26">                .rpc_call_done = nfs_pgio_result,</a>
+<a class="sourceLine" id="cb13-27" title="27">            nfs_initiate_pgio</a>
+<a class="sourceLine" id="cb13-28" title="28">              .flags = RPC_TASK_ASYNC | flags, <span class="co">// 异步</span></a>
+<a class="sourceLine" id="cb13-29" title="29">              rpc_run_task</a>
+<a class="sourceLine" id="cb13-30" title="30">                rpc_execute</a>
+<a class="sourceLine" id="cb13-31" title="31">                  rpc_make_runnable <span class="co">// 异步执行</span></a>
+<a class="sourceLine" id="cb13-32" title="32">  wait_on_page_writeback <span class="co">// 等待异步回写完成</span></a>
+<a class="sourceLine" id="cb13-33" title="33">    wait_on_page_bit_common</a>
+<a class="sourceLine" id="cb13-34" title="34">      io_schedule <span class="co">// 这里会影响`mpstat`和`iostat -xm`命令输出中的`%iowait`</span></a>
+<a class="sourceLine" id="cb13-35" title="35"></a>
+<a class="sourceLine" id="cb13-36" title="36"><span class="co">// rpc请求回复后</span></a>
+<a class="sourceLine" id="cb13-37" title="37">rpc_free_task</a>
+<a class="sourceLine" id="cb13-38" title="38">  rpc_release_calldata</a>
+<a class="sourceLine" id="cb13-39" title="39">    nfs_pgio_release <span class="co">// .rpc_release</span></a>
+<a class="sourceLine" id="cb13-40" title="40">      nfs_write_completion <span class="co">// hdr-&gt;completion_ops-&gt;completion</span></a>
+<a class="sourceLine" id="cb13-41" title="41">        nfs_end_page_writeback</a>
+<a class="sourceLine" id="cb13-42" title="42">          end_page_writeback <span class="co">// 在这里清除回写标记</span></a>
+<a class="sourceLine" id="cb13-43" title="43">            wake_up_page(page, PG_writeback) <span class="co">// 唤醒wait_on_page_writeback</span></a>
+<a class="sourceLine" id="cb13-44" title="44"></a>
+<a class="sourceLine" id="cb13-45" title="45">nfs<span class="dv">3</span><span class="er">_xdr_dec_read3res</span></a>
+<a class="sourceLine" id="cb13-46" title="46">nfs<span class="dv">3</span><span class="er">_xdr_dec_write3res</span></a>
+<a class="sourceLine" id="cb13-47" title="47">  nfs<span class="dv">3</span><span class="er">_stat_to_errno</span></a>
+<a class="sourceLine" id="cb13-48" title="48">    nfs_errtbl</a>
+<a class="sourceLine" id="cb13-49" title="49">      { NFSERR_JUKEBOX,       -EJUKEBOX       } <span class="co">// 接下来我们再找使用 EJUKEBOX 的地方</span></a>
+<a class="sourceLine" id="cb13-50" title="50"></a>
+<a class="sourceLine" id="cb13-51" title="51"><span class="co">// 读写好像没调用sync</span></a>
+<a class="sourceLine" id="cb13-52" title="52">rpc_call_sync</a>
+<a class="sourceLine" id="cb13-53" title="53">  nfs<span class="dv">3</span><span class="er">_rpc_wrapper</span></a>
+<a class="sourceLine" id="cb13-54" title="54">    <span class="cf">if</span> (res != -EJUKEBOX)</a>
+<a class="sourceLine" id="cb13-55" title="55"></a>
+<a class="sourceLine" id="cb13-56" title="56">nfs_pgio_result <span class="co">// .rpc_call_done</span></a>
+<a class="sourceLine" id="cb13-57" title="57">  nfs_readpage_done <span class="co">// .rw_done</span></a>
+<a class="sourceLine" id="cb13-58" title="58">    nfs3_read_done <span class="co">// 还有nfs3_write_done</span></a>
+<a class="sourceLine" id="cb13-59" title="59">      nfs<span class="dv">3</span><span class="er">_async_handle_jukebox</span></a>
+<a class="sourceLine" id="cb13-60" title="60">        <span class="cf">if</span> (task-&gt;tk_status == -EJUKEBOX)</a>
+<a class="sourceLine" id="cb13-61" title="61">        rpc_restart_call <span class="co">// 继续尝试rpc请示</span></a>
+<a class="sourceLine" id="cb13-62" title="62">        rpc_delay(task, NFS_JUKEBOX_RETRY_TIME)</a></code></pre></div>
+<h1 id="nfs-server分析"><span class="header-section-number">6</span> nfs server分析</h1>
+<p>此问题的场景nfs server是个黑盒子，但我们还是分析一下Linux内核中的错误情况。</p>
+<p>以下错误nfs server都会返回<code>nfserr_jukebox</code>给nfs client:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb14-1" title="1">nfserrno</a>
+<a class="sourceLine" id="cb14-2" title="2">  { nfserr_jukebox, -ETIMEDOUT },</a>
+<a class="sourceLine" id="cb14-3" title="3">  { nfserr_jukebox, -ERESTARTSYS },</a>
+<a class="sourceLine" id="cb14-4" title="4">  { nfserr_jukebox, -EAGAIN },</a>
+<a class="sourceLine" id="cb14-5" title="5">  { nfserr_jukebox, -EWOULDBLOCK },</a>
+<a class="sourceLine" id="cb14-6" title="6">  { nfserr_jukebox, -ENOMEM },</a></code></pre></div>
+<h1 id="vmcore分析"><span class="header-section-number">7</span> vmcore分析</h1>
+<p>从以下vmcore的解析结果看，处于<code>D</code>状态（uninterruptible sleep，usually IO）的进程所操作的文件是日志文件，对这个日志文件手动进行读写都正常。</p>
+<p>启动在线调试:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="ex">crash</span> /usr/lib/debug/lib/modules/<span class="kw">`</span><span class="fu">uname</span> -r<span class="kw">`</span>/vmlinux <span class="co"># 在线调试</span></a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="co"># 找到D状态进程</span></a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="fu">ps</span> aux <span class="kw">|</span> <span class="fu">grep</span> D</a></code></pre></div>
+<p>解析进程<code>134743</code>:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="fu">cat</span> /proc/134743/stack</a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="ex">crash</span><span class="op">&gt;</span> bt 134743</a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff800b46525fe8</a>
+<a class="sourceLine" id="cb16-4" title="4">  <span class="ex">FREE</span>/[<span class="ex">ALLOCATED</span>]</a>
+<a class="sourceLine" id="cb16-5" title="5">  [<span class="ex">ffff800b46525c88</span>]</a>
+<a class="sourceLine" id="cb16-6" title="6"><span class="ex">crash</span><span class="op">&gt;</span> struct nfs_inode ffff800b46525c88 -o</a>
+<a class="sourceLine" id="cb16-7" title="7">  [<span class="ex">ffff800b46525e68</span>] struct inode vfs_inode<span class="kw">;</span></a>
+<a class="sourceLine" id="cb16-8" title="8"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff800f9bd00400</a>
+<a class="sourceLine" id="cb16-9" title="9">  <span class="ex">FREE</span>/[<span class="ex">ALLOCATED</span>]</a>
+<a class="sourceLine" id="cb16-10" title="10">  [<span class="ex">ffff800f9bd00400</span>]</a>
+<a class="sourceLine" id="cb16-11" title="11"><span class="ex">crash</span><span class="op">&gt;</span> struct file ffff800f9bd00400</a>
+<a class="sourceLine" id="cb16-12" title="12">  <span class="ex">f_path</span> = {</a>
+<a class="sourceLine" id="cb16-13" title="13">    <span class="ex">dentry</span> = 0xffff800b4838dc38</a>
+<a class="sourceLine" id="cb16-14" title="14">  },</a>
+<a class="sourceLine" id="cb16-15" title="15">  <span class="ex">f_inode</span> = 0xffff800b46525e68 <span class="co"># 和前面的值一样</span></a>
+<a class="sourceLine" id="cb16-16" title="16"><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800b4838dc38 -o</a>
+<a class="sourceLine" id="cb16-17" title="17">  [<span class="ex">ffff800b4838dc58</span>] struct qstr d_name<span class="kw">;</span></a>
+<a class="sourceLine" id="cb16-18" title="18"><span class="ex">crash</span><span class="op">&gt;</span> struct qstr ffff800b4838dc58</a>
+<a class="sourceLine" id="cb16-19" title="19">  <span class="ex">name</span> = ... <span class="st">&quot;stat.log&quot;</span> <span class="co"># 文件名</span></a>
+<a class="sourceLine" id="cb16-20" title="20"><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800b4838dc38</a>
+<a class="sourceLine" id="cb16-21" title="21">  <span class="ex">d_parent</span> = 0xffff800f66abf738 <span class="co"># 获取父目录dentry</span></a>
+<a class="sourceLine" id="cb16-22" title="22"><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800f66abf738 -o</a>
+<a class="sourceLine" id="cb16-23" title="23">  [<span class="ex">ffff800f66abf758</span>] struct qstr d_name<span class="kw">;</span></a>
+<a class="sourceLine" id="cb16-24" title="24"><span class="ex">crash</span><span class="op">&gt;</span> struct qstr ffff800f66abf758</a>
+<a class="sourceLine" id="cb16-25" title="25">  <span class="ex">name</span> = ... <span class="st">&quot;kuas-authorization-rpc&quot;</span> <span class="co"># 父目录名</span></a>
+<a class="sourceLine" id="cb16-26" title="26"><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800f66abf738</a>
+<a class="sourceLine" id="cb16-27" title="27">  <span class="ex">d_parent</span> = 0xffff800f66ba41d0</a>
+<a class="sourceLine" id="cb16-28" title="28"><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800f66ba41d0 -o</a>
+<a class="sourceLine" id="cb16-29" title="29">  [<span class="ex">ffff800f66ba41f0</span>] struct qstr d_name<span class="kw">;</span></a>
+<a class="sourceLine" id="cb16-30" title="30"><span class="ex">crash</span><span class="op">&gt;</span> struct qstr ffff800f66ba41f0</a>
+<a class="sourceLine" id="cb16-31" title="31">  <span class="ex">name</span> = ... <span class="st">&quot;kuas-log&quot;</span> <span class="co"># 再上一级目录名</span></a>
+<a class="sourceLine" id="cb16-32" title="32"><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800f66ba41d0</a>
+<a class="sourceLine" id="cb16-33" title="33">  <span class="ex">d_parent</span> = 0xffff800f667b4da0</a>
+<a class="sourceLine" id="cb16-34" title="34"></a>
+<a class="sourceLine" id="cb16-35" title="35"><span class="co"># 可以了，搜索一下目录名</span></a>
+<a class="sourceLine" id="cb16-36" title="36"><span class="fu">find</span> /opt/glusterfs -name <span class="st">&quot;*kuas-authorization-rpc*&quot;</span></a>
+<a class="sourceLine" id="cb16-37" title="37">  <span class="ex">/opt/glusterfs/data/logs/kuas-log/kuas-authorization-rpc/stat.log</span></a>
+<a class="sourceLine" id="cb16-38" title="38"><span class="co"># 读写测试，看着都正常</span></a>
+<a class="sourceLine" id="cb16-39" title="39"><span class="fu">cat</span> /opt/glusterfs/data/logs/kuas-log/kuas-authorization-rpc/stat.log</a>
+<a class="sourceLine" id="cb16-40" title="40"><span class="bu">echo</span> <span class="st">&quot;test log&quot;</span> <span class="op">&gt;</span> test-log.txt</a>
+<a class="sourceLine" id="cb16-41" title="41"><span class="fu">cat</span> test-log.txt <span class="op">&gt;&gt;</span> /opt/glusterfs/data/logs/kuas-log/kuas-authorization-rpc/stat.log</a></code></pre></div>
+<p>再解析一个进程:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" title="1"><span class="fu">cat</span> /proc/2802473/stack</a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff800f46d36400</a>
+<a class="sourceLine" id="cb17-3" title="3">  [<span class="ex">ffff800f46d36400</span>]</a>
+<a class="sourceLine" id="cb17-4" title="4"><span class="ex">crash</span><span class="op">&gt;</span> struct file ffff800f46d36400</a>
+<a class="sourceLine" id="cb17-5" title="5">  <span class="ex">f_path</span> = {</a>
+<a class="sourceLine" id="cb17-6" title="6">    <span class="ex">dentry</span> = 0xffff800b4589acf8</a>
+<a class="sourceLine" id="cb17-7" title="7">  }</a>
+<a class="sourceLine" id="cb17-8" title="8"><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800b4589acf8 -o</a>
+<a class="sourceLine" id="cb17-9" title="9">  [<span class="ex">ffff800b4589ad18</span>] struct qstr d_name<span class="kw">;</span></a>
+<a class="sourceLine" id="cb17-10" title="10"><span class="ex">crash</span><span class="op">&gt;</span> struct qstr ffff800b4589ad18</a>
+<a class="sourceLine" id="cb17-11" title="11">  <span class="ex">name</span> = ... <span class="st">&quot;stat.log&quot;</span> <span class="co"># 还是日志文件</span></a></code></pre></div>
+<h1 id="抓包数据分析"><span class="header-section-number">8</span> 抓包数据分析</h1>
+<p>从抓包数据中看到有很多nfsv3 write回复<code>NFS3ERR_JUKEBOX</code>错误，从<a href="https://www.rfc-editor.org/rfc/rfc1813">nfsv3的rfc1813协议</a>查阅到此错误的解释:</p>
+<pre><code>NFS3ERR_JUKEBOX
+       The server initiated the request, but was not able to
+       complete it in a timely fashion. The client should wait
+       and then try the request with a new RPC transaction ID.
+       For example, this error should be returned from a server
+       that supports hierarchical storage and receives a request
+       to process a file that has been migrated. In this case,
+       the server should start the immigration process and
+       respond to client with this error.
+
+翻译如下:
+服务器已启动请求，但未能及时完成。客户端应该等待，然后使用新的 RPC 事务 ID 重试请求。例如，如果服务器支持层次化存储，并且接收到请求处理已迁移文件的请求时，应该返回此错误。在这种情况下，服务器应启动文件迁移过程，并向客户端返回此错误。</code></pre>
+</body>
+</html>

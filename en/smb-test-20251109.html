@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>SMB Test Results on 2025-11-09</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<ul>
+<li>Author: 陈孝松 (ChenXiaoSong)</li>
+<li><a href="https://chenxiaosong.com/">Chinese Homepage: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en/">English Homepage: chenxiaosong.com/en</a></li>
+<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+</ul>
+<h1 class="title">SMB Test Results on 2025-11-09</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#patches-to-be-tested"><span class="toc-section-number">1</span> Patches to be tested</a></li>
+<li><a href="#test-results"><span class="toc-section-number">2</span> Test results</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/en/smb-test.html">Please refer to “How to Test SMB”</a>.</p>
+<h1 id="patches-to-be-tested"><span class="header-section-number">1</span> Patches to be tested</h1>
+<p>The following patches were applied to the mainline for testing:</p>
+<ul>
+<li><a href="https://lore.kernel.org/all/20251017104613.3094031-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v2 0/6] smb/server: fix return values of smb2_0_server_cmds proc</a>:
+<ul>
+<li>smb/server: fix return value of smb2_read()</li>
+<li>smb/server: fix return value of smb2_notify()</li>
+<li>smb/server: fix return value of smb2_query_dir()</li>
+<li>smb/server: fix return value of smb2_ioctl()</li>
+<li>smb/server: fix return value of smb2_oplock_break()</li>
+<li>smb/server: update some misguided comment of smb2_0_server_cmds proc</li>
+</ul></li>
+<li>Patches applied to <a href="https://git.samba.org/?p=ksmbd.git;a=shortlog;h=refs/heads/ksmbd-for-next-next">the ksmbd-for-next-next branch</a>, please refer to <a href="https://lore.kernel.org/all/20251102073059.3681026-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v5 00/14] smb: move duplicate definitions to common header file</a>:
+<ul>
+<li>smb: move resume_key_ioctl_rsp to common/smb2pdu.h</li>
+<li>smb: move copychunk definitions to common/smb2pdu.h</li>
+<li>smb: move smb_sockaddr_in and smb_sockaddr_in6 to common/smb2pdu.h</li>
+<li>smb: move SMB1_PROTO_NUMBER to common/smbglob.h</li>
+<li>smb: move get_rfc1002_len() to common/smbglob.h</li>
+<li>smb: move smb_version_values to common/smbglob.h</li>
+<li>smb: rename common/cifsglob.h to common/smbglob.h</li>
+</ul></li>
+<li><a href="https://lore.kernel.org/all/20251102073059.3681026-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v5 00/14] smb: move duplicate definitions to common header file</a>:
+<ul>
+<li>smb/client: fix CAP_BULK_TRANSFER value</li>
+<li>smb: move MAX_CIFS_SMALL_BUFFER_SIZE to common/smbglob.h</li>
+<li>smb: move create_durable_req_v2 to common/smb2pdu.h</li>
+<li>smb: move create_durable_handle_reconnect_v2 to common/smb2pdu.h</li>
+<li>smb: move create_durable_rsp_v2 to common/smb2pdu.h</li>
+<li>smb/server: remove create_durable_reconn_req</li>
+<li>smb: move some duplicate definitions to common/smb2pdu.h</li>
+<li>smb: move SMB_NEGOTIATE_REQ to common/smb2pdu.h</li>
+<li>smb: move list of FileSystemAttributes to common/fscc.h</li>
+<li>smb: move some duplicate struct definitions to common/fscc.h</li>
+<li>smb: move FILE_SYSTEM_SIZE_INFO to common/fscc.h</li>
+<li>smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/fscc.h</li>
+<li>smb: do some cleanups</li>
+<li>smb: fix some warnings reported by scripts/checkpatch.pl</li>
+</ul></li>
+</ul>
+<h1 id="test-results"><span class="header-section-number">2</span> Test results</h1>
+<p>After applying the above patches to mainline, <strong>no additional</strong> failed test cases were observed in the test results.</p>
+<p>The mainline version used for testing is <code>439fc29dfd3b Merge tag 'drm-fixes-2025-11-09' of https://gitlab.freedesktop.org/drm/kernel</code>.</p>
+<p><a href="https://github.com/chenxiaosonggithub/tmp/tree/master/gnu-linux/smb/test/20251109/mainline">Test results of the mainline version</a>:</p>
+<ul>
+<li><a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/test/20251109/mainline/xfstests-result.txt">xfstests test results</a>, detailed <a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/test/20251109/mainline/xfstests-result-log.txt">xfstests test log</a></li>
+<li><a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/test/20251109/mainline/smbtorture-result.txt">smbtorture test results</a>, detailed <a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/test/20251109/mainline/smbtorture-result-log.txt">smbtorture test log</a></li>
+</ul>
+<p><a href="https://github.com/chenxiaosonggithub/tmp/tree/master/gnu-linux/smb/test/20251109/patches_applied">Test results after applying the above patches</a>:</p>
+<ul>
+<li><a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/test/20251109/patches_applied/xfstests-result.txt">xfstests test results</a>, detailed <a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/test/20251109/patches_applied/xfstests-result-log.txt">xfstests test log</a></li>
+<li><a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/test/20251109/patches_applied/smbtorture-result.txt">smbtorture test results</a>, detailed <a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/test/20251109/patches_applied/smbtorture-result-log.txt">smbtorture test log</a></li>
+</ul>
+</body>
+</html>

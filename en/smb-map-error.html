@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>SMB Map Error</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<ul>
+<li>Author: 陈孝松 (ChenXiaoSong)</li>
+<li><a href="https://chenxiaosong.com/">Chinese Homepage: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en/">English Homepage: chenxiaosong.com/en</a></li>
+<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+</ul>
+<h1 class="title">SMB Map Error</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#patches-to-be-tested"><span class="toc-section-number">1</span> Patches to Be Tested</a></li>
+<li><a href="#kunit-test-results"><span class="toc-section-number">2</span> KUnit Test Results</a></li>
+<li><a href="#minor-suggestions"><span class="toc-section-number">3</span> Minor Suggestions</a><ul>
+<li><a href="#patch-12-cifs-label-smb2-statuses-with-errors"><span class="toc-section-number">3.1</span> <span>[PATCH 1/2] cifs: Label SMB2 statuses with errors</span></a></li>
+<li><a href="#patch-22-cifs-autogenerate-smb2-error-mapping-table"><span class="toc-section-number">3.2</span> <span>[PATCH 2/2] cifs: Autogenerate SMB2 error mapping table</span></a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="patches-to-be-tested"><span class="header-section-number">1</span> Patches to Be Tested</h1>
+<ul>
+<li><a href="https://lore.kernel.org/linux-cifs/20251225021035.656639-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v6 0/5] smb: improve search speed of SMB2 maperror</a></li>
+</ul>
+<h1 id="kunit-test-results"><span class="header-section-number">2</span> KUnit Test Results</h1>
+<p>Build the kernel with <code>CONFIG_SMB_KUNIT_TESTS</code> enabled.</p>
+<p>After running <code>modprobe cifs</code>, test results are as follows:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="bu">[</span>   93.361488] Key type cifs.spnego registered</a>
+<a class="sourceLine" id="cb1-2" title="2">[   93.362679] Key type cifs.idmap registered</a>
+<a class="sourceLine" id="cb1-3" title="3">[   93.363845] KTAP version 1</a>
+<a class="sourceLine" id="cb1-4" title="4">[   93.364620] 1..1</a>
+<a class="sourceLine" id="cb1-5" title="5">[   93.365454]     KTAP version 1</a>
+<a class="sourceLine" id="cb1-6" title="6">[   93.366330]     <span class="co"># Subtest: smb2_maperror</span></a>
+<a class="sourceLine" id="cb1-7" title="7">[   93.367404]     <span class="co"># module: cifs</span></a>
+<a class="sourceLine" id="cb1-8" title="8">[   93.367405]     1..1</a>
+<a class="sourceLine" id="cb1-9" title="9">[   93.369173]     ok 1 maperror_test_check_search</a>
+<a class="sourceLine" id="cb1-10" title="10">[   93.369175] ok 1 smb2_maperror</a></code></pre></div>
+<p>All KUnit test cases passed!</p>
+<h1 id="minor-suggestions"><span class="header-section-number">3</span> Minor Suggestions</h1>
+<h2 id="patch-12-cifs-label-smb2-statuses-with-errors"><span class="header-section-number">3.1</span> <a href="https://lore.kernel.org/linux-cifs/782536.1765465397@warthog.procyon.org.uk/">[PATCH 1/2] cifs: Label SMB2 statuses with errors</a></h2>
+<p>Hi David,</p>
+<p>Did you use a script to update these macros? If so, could you put it in the commit message? I’m concerned that manual edits might introduce typos.</p>
+<p>Just like the shell commands I used in this patch: <a href="https://lore.kernel.org/linux-cifs/20251208062100.3268777-7-chenxiaosong.chenxiaosong@linux.dev/">[PATCH 06/30] smb/client: add parentheses to NT error code definitions containing bitwise OR operator</a></p>
+<p>Of course, your changes would require a more complex script.</p>
+<h2 id="patch-22-cifs-autogenerate-smb2-error-mapping-table"><span class="header-section-number">3.2</span> <a href="https://lore.kernel.org/linux-cifs/782578.1765465450@warthog.procyon.org.uk/">[PATCH 2/2] cifs: Autogenerate SMB2 error mapping table</a></h2>
+<p>Hi David,</p>
+<p><code>STATUS_SUCCESS</code> and <code>STATUS_WAIT_0</code> are both zero, and since zero indicates success, they are not needed.</p>
+<p>The following status codes have duplicate values. We should update the status strings to make the log messages more explicit, as done in my patch: <a href="https://lore.kernel.org/linux-cifs/20251206151826.2932970-10-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v4 09/10] smb/client: update some SMB2 status strings</a>.</p>
+<ul>
+<li><code>STATUS_ABANDONED_WAIT_0</code>, <code>STATUS_ABANDONED</code></li>
+<li><code>STATUS_FWP_TOO_MANY_CALLOUTS</code>, <code>STATUS_FWP_TOO_MANY_BOOTTIME_FILTERS</code></li>
+</ul>
+</body>
+</html>

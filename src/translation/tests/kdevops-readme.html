@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>kdevops README</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">kdevops README</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#kdevops"><span class="toc-section-number">1</span> kdevops</a><ul>
+<li><a href="#kdevops-快速演示"><span class="toc-section-number">1.1</span> kdevops 快速演示</a><ul>
+<li><a href="#只需-4-条命令即可开始内核黑客攻击"><span class="toc-section-number">1.1.1</span> 只需 4 条命令即可开始内核黑客攻击</a></li>
+<li><a href="#只需-2-条命令即可开始运行-fstests"><span class="toc-section-number">1.1.2</span> 只需 2 条命令即可开始运行 fstests</a></li>
+<li><a href="#只需-2-条命令即可开始运行-blktests"><span class="toc-section-number">1.1.3</span> 只需 2 条命令即可开始运行 blktests</a></li>
+<li><a href="#只需-2-条命令即可开始测试-nfs"><span class="toc-section-number">1.1.4</span> 只需 2 条命令即可开始测试 NFS</a></li>
+<li><a href="#只需-2-条命令即可开始运行-git-回归套件"><span class="toc-section-number">1.1.5</span> 只需 2 条命令即可开始运行 git 回归套件</a></li>
+<li><a href="#只需-2-条命令即可开始运行-ltp-套件"><span class="toc-section-number">1.1.6</span> 只需 2 条命令即可开始运行 ltp 套件</a></li>
+<li><a href="#只需-2-条命令即可开始运行-nfstest-套件"><span class="toc-section-number">1.1.7</span> 只需 2 条命令即可开始运行 nfstest 套件</a></li>
+<li><a href="#以并行方式运行一些内核自测"><span class="toc-section-number">1.1.8</span> 以并行方式运行一些内核自测</a></li>
+<li><a href="#cxl"><span class="toc-section-number">1.1.9</span> CXL</a></li>
+</ul></li>
+<li><a href="#kdevops-聊天"><span class="toc-section-number">1.2</span> kdevops 聊天</a></li>
+<li><a href="#kdevops-在-discord-上"><span class="toc-section-number">1.3</span> kdevops 在 Discord 上</a><ul>
+<li><a href="#kdevops-irc"><span class="toc-section-number">1.3.1</span> kdevops IRC</a></li>
+</ul></li>
+<li><a href="#kdevops-的组成部分"><span class="toc-section-number">1.4</span> kdevops 的组成部分</a></li>
+</ul></li>
+<li><a href="#kdevops-工作流文档"><span class="toc-section-number">2</span> kdevops 工作流文档</a><ul>
+<li><a href="#kdevops-共享工作流"><span class="toc-section-number">2.1</span> kdevops 共享工作流</a></li>
+<li><a href="#kdevops-可能专用的工作流"><span class="toc-section-number">2.2</span> kdevops 可能专用的工作流</a></li>
+</ul></li>
+<li><a href="#kdevops-一般文档"><span class="toc-section-number">3</span> kdevops 一般文档</a></li>
+<li><a href="#kdevops-kernel-ci-支持"><span class="toc-section-number">4</span> kdevops kernel-ci 支持</a></li>
+<li><a href="#kdevops-组织"><span class="toc-section-number">5</span> kdevops 组织</a></li>
+<li><a href="#kdevops-测试结果"><span class="toc-section-number">6</span> kdevops 测试结果</a></li>
+<li><a href="#关于-kdevops-或相关内容的视频演示"><span class="toc-section-number">7</span> 关于 kdevops 或相关内容的视频演示</a></li>
+<li><a href="#kdevops-的内部机制"><span class="toc-section-number">8</span> kdevops 的内部机制</a></li>
+<li><a href="#许可证"><span class="toc-section-number">9</span> 许可证</a></li>
+</ul>
+</nav>
+<p>本文档翻译自<a href="https://github.com/linux-kdevops/kdevops/blob/main/README.md">linux-kdevops/kdevops 的 README 文件</a>，翻译时文件的最新提交是<code>47f2275ba4da2795d460d8aee5def08702bb3838 linux: generate refs automatically</code>，大部分借助于ChatGPT。仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<h1 id="kdevops"><span class="header-section-number">1</span> kdevops</h1>
+<p>kdevops 的主 git 仓库是:</p>
+<ul>
+<li>https://github.com/linux-kdevops/kdevops</li>
+</ul>
+<p><a href="https://github.com/linux-kdevops/kdevops/tree/main/images/kdevops-trans-bg-edited-individual-with-logo-gausian-blur-1600x1600.png">kdevops logo</a></p>
+<p>kdevops 提供了一个用于优化 Linux 内核开发和测试的自动化框架。它旨在帮助你快速适应任何复杂的 Linux 内核开发环境，并能够迅速为复杂的子系统设置一个完整的测试实验室。</p>
+<p>它利用本地 ansible 角色，并可选地让你使用 <a href="https://libguestfs.org/">libguestfs</a> 与 libvirt 或 terraform 来支持云提供商。kdevops 对 vagrant 的支持已被弃用，建议使用 <a href="https://libguestfs.org/">libguestfs</a>，因为 vagrant 缺乏维护，新的开发应该使用并关注 <a href="https://libguestfs.org/">libguestfs</a>。</p>
+<p>kdevops 通过与 Linux 内核中使用的相同变体语言 kconfig 提供变体。它由 Linux 内核开发人员为 Linux 内核开发人员编写。该项目旨在支持所有 Linux 发行版。</p>
+<p>kdevops 支持 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/libvirt-pcie-passthrough.md">PCIe 直通</a> 当使用虚拟化时，允许你选择将哪个 PCIe 设备传递到哪个客户机。你可以选择将所有设备传递给一个客户机，或者选择将某个设备传递给特定客户机。例如，你甚至可以得到多个客户机，每个客户机都有一个 PCIe 直通设备分配，这一切都通过 kconfig 完成。</p>
+<p>kdevops <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/libvirt-pcie-passthrough.md">PCIe 直通</a> 支持使用 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-dynamic-configuration.md">kdevops 动态 kconfig</a>，提供了一个新目标 ‘make dynconfig’，它让 kdevops 根据你的系统环境动态生成 Kconfig 文件。这一机制将来会扩展，以使 kdevops 更加动态，以支持更多的功能。</p>
+<h2 id="kdevops-快速演示"><span class="header-section-number">1.1</span> kdevops 快速演示</h2>
+<p>为了让你了解 kdevops 的强大功能和目标，我们提供了一些快速演示来展示你可以做什么。随着时间的推移，将添加更多的工作流。详细的文档说明了如何入门以及如何添加新的工作流。</p>
+<h3 id="只需-4-条命令即可开始内核黑客攻击"><span class="header-section-number">1.1.1</span> 只需 4 条命令即可开始内核黑客攻击</h3>
+<p>配置 kdevops 使用裸金属、云或本地 vm 解决方案，选择你喜欢的发行版，启用 Linux 内核工作流，选择目标 git 树，并在仅 4 条命令中运行新编译的 Linux git 树:</p>
+<ul>
+<li><code>make menuconfig</code></li>
+<li><code>make</code></li>
+<li><code>make bringup</code></li>
+<li><code>make linux</code></li>
+<li><code>make linux HOSTS="kdevops-xfs-crc kdevops-xfs-reflink"</code> 例如，如果你只想将上面的命令限制为列出的两个主机</li>
+</ul>
+<p>要卸载所有节点上的 “6.6.0-rc2” 内核:</p>
+<ul>
+<li><code>make linux-uninstall KVER="6.6.0-rc2"</code></li>
+</ul>
+<h3 id="只需-2-条命令即可开始运行-fstests"><span class="header-section-number">1.1.2</span> 只需 2 条命令即可开始运行 fstests</h3>
+<p>要测试内核与 fstests，例如，如果你启用了 fstests 工作流，你可以只运行:</p>
+<ul>
+<li><code>make fstests</code></li>
+<li><code>make fstests-baseline</code></li>
+<li><code>make fstests-results</code></li>
+</ul>
+<p>更多细节请参见 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/fstests.md">kdevops fstests 文档</a></p>
+<h3 id="只需-2-条命令即可开始运行-blktests"><span class="header-section-number">1.1.3</span> 只需 2 条命令即可开始运行 blktests</h3>
+<p>要测试内核与 blktests，例如，如果你启用了 blktests 工作流，你可以只运行:</p>
+<ul>
+<li><code>make blktests</code></li>
+<li><code>make blktests-baseline</code></li>
+<li><code>make blktests-results</code></li>
+</ul>
+<p>更多细节请参见 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/blktests.md">kdevops blktests 文档</a></p>
+<h3 id="只需-2-条命令即可开始测试-nfs"><span class="header-section-number">1.1.4</span> 只需 2 条命令即可开始测试 NFS</h3>
+<p>要测试内核的 nfs 服务器与 pynfs 测试套件，启用 pynfs 工作流，然后运行:</p>
+<ul>
+<li><code>make pynfs</code></li>
+<li><code>make pynfs-baseline</code></li>
+</ul>
+<p>更多细节请参见 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/nfs.md">kdevops nfs 文档</a></p>
+<h3 id="只需-2-条命令即可开始运行-git-回归套件"><span class="header-section-number">1.1.5</span> 只需 2 条命令即可开始运行 git 回归套件</h3>
+<p>要使用 git 回归套件测试内核，启用 gitr 工作流，然后运行:</p>
+<ul>
+<li><code>make gitr</code></li>
+<li><code>make gitr-baseline</code></li>
+</ul>
+<p>更多细节请参见 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/gitr.md">kdevops gitr 文档</a></p>
+<h3 id="只需-2-条命令即可开始运行-ltp-套件"><span class="header-section-number">1.1.6</span> 只需 2 条命令即可开始运行 ltp 套件</h3>
+<p>要使用 ltp 套件测试内核，启用 ltp 工作流，然后运行:</p>
+<ul>
+<li><code>make ltp</code></li>
+<li><code>make ltp-baseline</code></li>
+</ul>
+<p>更多细节请参见 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/ltp.md">kdevops ltp 文档</a></p>
+<h3 id="只需-2-条命令即可开始运行-nfstest-套件"><span class="header-section-number">1.1.7</span> 只需 2 条命令即可开始运行 nfstest 套件</h3>
+<p>要使用 nfstest 套件测试内核，启用 nfstest 工作流，然后运行:</p>
+<ul>
+<li><code>make nfstest</code></li>
+<li><code>make nfstest-baseline</code></li>
+</ul>
+<p>更多细节请参见 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/nfstest.md">kdevops nfstest 文档</a></p>
+<h3 id="以并行方式运行一些内核自测"><span class="header-section-number">1.1.8</span> 以并行方式运行一些内核自测</h3>
+<p>kdevops 支持以并行方式运行 Linux 内核自测，这非常简单:</p>
+<ul>
+<li><code>make selftests</code></li>
+<li><code>make selftests-baseline</code></li>
+</ul>
+<p>你也可以运行特定测试:</p>
+<ul>
+<li><code>make selftests-firmware</code></li>
+<li><code>make selftests-kmod</code></li>
+<li><code>make selftests-sysctl</code></li>
+</ul>
+<p>更多细节请参见 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/selftests.md">kdevops selftests 文档</a></p>
+<h3 id="cxl"><span class="header-section-number">1.1.9</span> CXL</h3>
+<p>有 CXL 支持。你可以使用虚拟化 CXL 设备，也可以使用 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/libvirt-pcie-passthrough.md">PCIe 直通</a> 将设备分配给客户机并创建自定义拓扑。kdevops 还可以为你构建和安装最新的 CXL 启用的 qemu 版本。更多细节请参见 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/cxl.md">kdevops cxl 文档</a></p>
+<h2 id="kdevops-聊天"><span class="header-section-number">1.2</span> kdevops 聊天</h2>
+<p>我们使用 discord 和 IRC。目前我们在 discord 上的用户比在 IRC 上的多。</p>
+<h2 id="kdevops-在-discord-上"><span class="header-section-number">1.3</span> kdevops 在 Discord 上</h2>
+<p>我们有一个公共聊天服务器，目前我们使用 discord:</p>
+<ul>
+<li>https://bit.ly/linux-kdevops-chat</li>
+</ul>
+<h3 id="kdevops-irc"><span class="header-section-number">1.3.1</span> kdevops IRC</h3>
+<p>我们也在 irc.oftc.net 上的 #kdevops</p>
+<h2 id="kdevops-的组成部分"><span class="header-section-number">1.4</span> kdevops 的组成部分</h2>
+<p>最好将 kdevops 视为你的目标工作流的阶段。首先你需要启动系统。你可以使用裸金属主机、云解决方案或生成本地虚拟化客户机。</p>
+<p>kdevops 的使用阶段可以分为:</p>
+<ul>
+<li>启动</li>
+<li>使系统易于访问，并安装通用开发者首选项</li>
+<li>运行定义的工作流</li>
+</ul>
+<p><a href="https://github.com/linux-kdevops/kdevops/tree/main/images/kdevops-diagram.png">kdevops-diagram.png</a></p>
+<hr />
+<h1 id="kdevops-工作流文档"><span class="header-section-number">2</span> kdevops 工作流文档</h1>
+<p>kdevops 工作流是一种目标工作环境，你可以在其中运行不同的工作流。这些工作流对内核、云或 qemu 可能有不同的要求，还可能启用新的 make 目标以构建或测试目标。一些工作流是通用的，可能会被共享，例如用于配置和构建 Linux 的工作流。然而，如果你只想使用 Linux 发行版自带的内核，则构建和安装 Linux 是可选的。</p>
+<h2 id="kdevops-共享工作流"><span class="header-section-number">2.1</span> kdevops 共享工作流</h2>
+<ul>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-make-linux.md">kdevops 示例工作流: 运行 make linux</a></li>
+</ul>
+<h2 id="kdevops-可能专用的工作流"><span class="header-section-number">2.2</span> kdevops 可能专用的工作流</h2>
+<ul>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/fstests.md">kdevops fstests 文档</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/blktets.md">kdevops blktests 文档</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/cxl.md">kdevops CXL 文档</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/nfs.md">kdevops NFS 文档</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/selftests.md">kdevops 自测文档</a></li>
+</ul>
+<h1 id="kdevops-一般文档"><span class="header-section-number">3</span> kdevops 一般文档</h1>
+<p>以下是 kdevops 推荐的阅读文档。</p>
+<ul>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/contributing.md">发送补丁和贡献给 kdevops</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/requirements.md">kdevops 要求</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/evolving-make-help.md">kdevops 不断演变的 make 帮助</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-configuration.md">kdevops 配置</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-mirror.md">kdevops 镜像支持</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-first-run.md">kdevops 初次运行</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/running-make.md">kdevops 运行 make</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/libvirt-storage-pool.md">kdevops libvirt 存储池考虑</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/libvirt-pcie-passthrough.md">kdevops PCIe 直通支持</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/running-make-bringup.md">kdevops 运行 make bringup</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-make-destroy.md">kdevops 运行 make destroy</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-restarting-from-scratch.md">kdevops make mrproper</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/lbs.md">kdevops 大块尺寸 R&amp;D</a></li>
+</ul>
+<h1 id="kdevops-kernel-ci-支持"><span class="header-section-number">4</span> kdevops kernel-ci 支持</h1>
+<p>kdevops 支持其自己的内核持续集成支持，以便让 Linux 开发人员和 Linux 发行版能够跟踪任何支持的 kdevops 工作流中的问题，并能够在检测到新回归时进行识别。但需要注意的是，kdevops 的 kernel-ci 仅在少数工作流中实现，例如 fstests 和 blktests。为了支持 kernel-ci，困难的一部分是确定基线是什么，并且能够以 kdevops 风格轻松地执行 <code>git diff</code> 并以每个回归一行的方式读取回归。这需要一些时间和工作。因此，其他一些工作流还不支持 kernel-ci。</p>
+<p>相关文档如下:</p>
+<ul>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kernel-ci/README.md">kdevops kernel-ci</a></li>
+</ul>
+<h1 id="kdevops-组织"><span class="header-section-number">5</span> kdevops 组织</h1>
+<p>kdevops 被放置在 linux-kdevops 组织下，以便其他开发人员能够无瓶颈地提交/推送更新。</p>
+<h1 id="kdevops-测试结果"><span class="header-section-number">6</span> kdevops 测试结果</h1>
+<p>kdevops 已开始让用户/开发人员推送测试结果。这不仅仅是收集已知失败的基线结果，还旨在<em>内部</em>收集每个失败测试的所有 dmesg/坏日志文件。</p>
+<p>提供了一个任意的命名空间，以便 linux-kdevops 组织的开发人员可以贡献发现。</p>
+<p>请参阅 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/viewing-fstests-results.md">查看 kdevops 存档结果</a> 以查看更多有关如何查看结果的详细信息。我们将来应该为此添加简单的包装器。</p>
+<h1 id="关于-kdevops-或相关内容的视频演示"><span class="header-section-number">7</span> 关于 kdevops 或相关内容的视频演示</h1>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=aC4gb0r9Hho&amp;ab_channel=TheLinuxFoundation">2023 年 5 月 10 日 kdevops: fstests 和 blktests 测试自动化的进展</a>
+<ul>
+<li><a href="https://lwn.net/Articles/937830/">LWN 对此演讲的报道</a></li>
+<li>对请求存储失败的跟进</li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/workflows/fstests/results/">fstests 结果</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/workflows/blktests/results/">blktests 结果</a></li>
+<li>模块支持已确认</li>
+<li>人们如何使用 kdevops，一个例子是 Amir 和 Chandan 使用它来支持不同稳定内核的 XFS 稳定工作，使用不同的技术。Amir 使用三星提供的系统资源的本地虚拟化支持，而 Chandan 使用 Oracle Cloud Linux。有关详细信息，请参阅 <a href="https://www.youtube.com/watch?v=U-f7HlD2Ob4&amp;list=PLbzoR-pLrL6rlmdpJ3-oMgU_zxc1wAhjS&amp;ab_channel=TheLinuxFoundation">LSFMM 2023 Linux 稳定后端</a> 视频</li>
+<li>审查 9p 支持</li>
+<li>Chandan 添加了 OCI 云支持 <a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-terraform.md">kdevops OCI 文档</a></li>
+<li>由于已存在 terraform 提供程序，阿里巴巴云支持是可能的，欢迎补丁</li>
+<li>arm64 问题 - 帮助我们 debian 的朋友们</li>
+<li><a href="https://www.oracle.com/cloud/free/">Oracle 支持我们提供免费试用云</a>，注册吧！</li>
+<li>微软正在评估是否为我们提供信用支持</li>
+<li>SUSE 可以帮助测试，但不能让人们登录</li>
+<li>与 patchwork 的令人兴奋的未来集成，我们可以从 eBPF 社区及其 patchwork 使用和测试中学习！</li>
+</ul></li>
+<li><a href="https://youtu.be/CfGX51a_Fq0">2023 - 日常内核开发 kdevops 修复 bug 的演示</a> 涵盖以下主题:
+<ul>
+<li>设置 kdevops 以使用 Linux git 树的镜像</li>
+<li>在主机 kdevops linux 目录上使用 git 远程</li>
+<li>研究并修复上游的一个真实世界内核问题的示例</li>
+<li>对 reproducers for bugs 的建议和价值，在这种情况下使用了 stress-ng， <a href="https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/commit/?h=20230328-module-alloc-opts&amp;id=f66db2da670853b2386af23552fd941275a13644">更多关于修复此问题的提交的详细信息</a></li>
+<li>使用特定的远程分支进行开发，在此示例中使用了 <a href="https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/log/?h=20230328-module-alloc-opts">20230328-module-alloc-opts</a> 作为示例 PATCH v1 系列</li>
+<li>使用 <code>localversion.*</code> 文件帮助识别 Grub 提示符上的内核名称</li>
+<li>在来宾上使用 9p 的 <code>make modules_install install -j100</code></li>
+<li>使用 virsh 控制台访问来宾控制台</li>
+<li>访问控制台以选择启动时的内核</li>
+<li>对未来 v2 补丁系列的小改动的示例</li>
+</ul></li>
+<li><a href="https://youtu.be/FSY3BMHUyJc">2023 - 实时 kdevops 演示</a> 涵盖以下主题:
+<ul>
+<li>使用 AWS 和支持 <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/storage-twp.html">16k 原子写入</a> 的 ARM64 NVMe 驱动器的示例</li>
+<li>演示如何使用基于 linux-next 的自定义任意新 Linux 内核分支开始测试</li>
+<li>演示如何开始使用 linux-next 测试 btrfs</li>
+<li>演示如何使用 linux-next 测试 XFS</li>
+<li>演示 pynfs 测试初期的 NFS 测试工作</li>
+<li>演示当前的 CXL 工作流/测试</li>
+<li>演示一些稳定的 XFS 维护者如何使用 kdevops 使用本地虚拟化解决方案或云解决方案测试 XFS</li>
+<li>演示动态 Kconfig 生成以支持 PCIe 直通</li>
+</ul></li>
+<li><a href="https://youtu.be/9PYjRYbc-Ms">2022 - LSFMM - 运行 fstests 和 blktests 的挑战</a></li>
+<li><a href="https://youtu.be/-1KnphkTgNg">2020 - SUSE Labs 会议 - kdevops: 将 devops 引入内核开发</a></li>
+</ul>
+<h1 id="kdevops-的内部机制"><span class="header-section-number">8</span> kdevops 的内部机制</h1>
+<p>以下部分深入探讨了 kdevops 的技术细节。</p>
+<ul>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/how-extra-vars-generated.md">如何生成 extra_vars.yaml</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/the-gen-hosts-ansible-role.md">如何生成 ansible hosts 文件</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/the-gen-nodes-ansible-role.md">什么是 kdevops 节点文件及如何生成这些文件</a>
+<ul>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/the-gen-nodes-ansible-role-vagrant.md">如何生成动态 Vagrant 文件</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/the-gen-nodes-ansible-role-terraform.md">如何生成 terraform kdevops_nodes 变量</a></li>
+</ul></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/the-terraform-gen-tfvar-ansible-role.md">如何生成 terraform/terraform.tfvars 变量</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/why-vagrant.md">为何 Vagrant（已弃用）曾用于虚拟化</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/testing-with-loopback.md">支持带有环回块设备的截断文件的案例</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/seeing-more-issues.md">在使用环回/截断文件设置时遇到的更多问题</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/adding-a-new-workflow.md">向 kdevops 添加新的工作流程</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kconfig-integration.md">Kconfig 集成</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-dynamic-configuration.md">kdevops 动态 Kconfig 支持</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-autorefs.md">kdevops Git 参考生成支持</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/motivations.md">kdevops 的动机</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/linux-distro-support.md">Linux 发行版支持</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/ansible-override.md">使用一个文件覆盖所有 Ansible 角色选项</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-vagrant.md">kdevops Vagrant 支持</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/kdevops-terraform.md">kdevops terraform 支持 - 使用 kdevops 的云设置</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/ansible-roles.md">kdevops 本地 Ansible 角色</a></li>
+<li><a href="https://github.com/linux-kdevops/kdevops/tree/main/docs/custom-vagrant-boxes.md">构建自定义 Vagrant box 的教程</a></li>
+</ul>
+<h1 id="许可证"><span class="header-section-number">9</span> 许可证</h1>
+<p>此作品依据 copyleft-next-0.3.1 许可证授权，详情请参阅 <a href="https://github.com/linux-kdevops/kdevops/tree/main/LICENSE">LICENSE</a> 文件。 请坚持在文件中使用 SPDX 注释进行许可证标注。 如果文件中没有 SPDX 注释，则默认使用 copyleft-next-0.3.1 许可证。我们保留带有宽松许可证的 SPDX 注释，以确保我们在宽松许可证下采用的上游项目可以从我们对其相应文件的更改中受益。 同样，GPLv2 文件也是允许的，因为 copyleft-next-0.3.1 与 GPLv2 兼容。</p>
+</body>
+</html>

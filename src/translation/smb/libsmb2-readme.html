@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>libsmb2 README</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">libsmb2 README</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#api"><span class="toc-section-number">1</span> API</a></li>
+<li><a href="#smb-url-格式"><span class="toc-section-number">2</span> SMB URL 格式</a></li>
+<li><a href="#smb-服务器"><span class="toc-section-number">3</span> SMB 服务器</a></li>
+<li><a href="#身份验证"><span class="toc-section-number">4</span> 身份验证</a></li>
+<li><a href="#mit-kerberos"><span class="toc-section-number">5</span> MIT Kerberos</a><ul>
+<li><a href="#ntlm-身份验证"><span class="toc-section-number">5.1</span> NTLM 身份验证</a></li>
+<li><a href="#krb5-身份验证"><span class="toc-section-number">5.2</span> KRB5 身份验证</a></li>
+</ul></li>
+<li><a href="#ntlm-凭据"><span class="toc-section-number">6</span> NTLM 凭据</a></li>
+<li><a href="#smb23-签名"><span class="toc-section-number">7</span> SMB2/3 签名</a></li>
+<li><a href="#smb3-加密"><span class="toc-section-number">8</span> SMB3 加密</a></li>
+<li><a href="#构建-libsmb2"><span class="toc-section-number">9</span> 构建 LIBSMB2</a><ul>
+<li><a href="#esp32"><span class="toc-section-number">9.1</span> ESP32</a></li>
+<li><a href="#raspberry-pi-pico-w-rp2040"><span class="toc-section-number">9.2</span> Raspberry Pi Pico W (RP2040)</a></li>
+<li><a href="#playstation-3"><span class="toc-section-number">9.3</span> PlayStation 3</a></li>
+<li><a href="#playstation-4"><span class="toc-section-number">9.4</span> PlayStation 4</a></li>
+<li><a href="#nintendo-3ds"><span class="toc-section-number">9.5</span> Nintendo 3DS</a></li>
+<li><a href="#nintendo-wii"><span class="toc-section-number">9.6</span> Nintendo Wii</a></li>
+<li><a href="#nintendo-ds"><span class="toc-section-number">9.7</span> Nintendo DS</a></li>
+<li><a href="#amiga-amigaos"><span class="toc-section-number">9.8</span> Amiga (AmigaOS)</a></li>
+<li><a href="#dreamcast-kallistios"><span class="toc-section-number">9.9</span> Dreamcast (KallistiOS)</a></li>
+<li><a href="#xbox-xbox-xdk"><span class="toc-section-number">9.10</span> Xbox (Xbox XDK)</a></li>
+</ul></li>
+</ul>
+</nav>
+<p>本文档翻译自<a href="https://github.com/sahlberg/libsmb2/blob/master/README">sahlberg/libsmb2/README</a>，翻译时文件的最新提交是<code>02783d6f32515375a2a9b13446917770550bdab4 Merge branch 'master' into Cleanups</code>，大部分借助于ChatGPT翻译，仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<p>Libsmb2 是一个用于访问或提供 SMB2/SMB3 共享的用户空间客户端/服务器库。 它具有高性能且完全异步。它支持 SMB 读/写命令的零拷贝以及复合命令。</p>
+<p>Libsmb2 采用 LGPLv2.1 许可证发布。</p>
+<h1 id="api"><span class="header-section-number">1</span> API</h1>
+<p>Libsmb2 实现了三种不同的 API 用于访问远程 SMB 共享：</p>
+<p>1、高级同步 POSIX 风格 API： 这是一个简单的 API，用于访问共享。 此 API 中的函数与相应的 POSIX 函数相似。 此 API 在 libsmb2.h 中描述。</p>
+<p>2、高级异步 POSIX 风格 API： 这是一个高性能、完全非阻塞且异步的 API。 此 API 中的函数与相应的 POSIX 函数相似。 这是推荐的 API。 此 API 在 libsmb2.h 中描述。</p>
+<p>3、低级异步 RAW API： 这是一个低级 API，提供对 SMB2 PDUs 和数据结构的直接访问。 此 API 在 libsmb2-raw.h 中描述。</p>
+<p>Libsmb2 实现了一个同步 API 来运行 SMB 服务器。你可以实现自己的主循环来运行异步服务器。</p>
+<h1 id="smb-url-格式"><span class="header-section-number">2</span> SMB URL 格式</h1>
+<p>目前 SMB URL 格式是 Samba 项目定义/使用的 URL 格式的一个小子集。 目标是最终支持完整的 URL 格式，从而使 URLs 在 Samba 工具和 Libsmb2 之间可互换，但我们还没有达到这个目标。</p>
+<p><a href="smb://">smb://</a>[&lt;domain&gt;;][&lt;user&gt;@]&lt;server&gt;[:&lt;port&gt;]/&lt;share&gt;[/path][?arg=val[&amp;arg=val]*]</p>
+<p>&lt;server&gt; 可以是主机名、IPv4 或 IPv6 地址。</p>
+<dl>
+<dt>libsmb2 支持的参数有：</dt>
+<dd><dl>
+<dt>sec=&lt;mech&gt; : 用于认证到服务器的机制。默认是任何可用的机制，但可以通过以下方式覆盖：</dt>
+<dd><p>krb5: 使用 Kerberos 通过 kinit 获取凭据。 krb5cc: 使用 Kerberos 通过凭据缓存获取凭据。 ntlmssp : 仅使用 NTLMSSP。</p>
+</dd>
+<dt>vers=&lt;version&gt; : 要协商的 SMB 版本：</dt>
+<dd><p>2: 协商任何版本的 SMB2 3: 协商任何版本的 SMB3</p>
+</dd>
+<dt>2.02, 2.10, 3.00, 3.02, 3.1.1 : 协商特定版本。</dt>
+<dd><p>默认是协商任何 SMB2 或 SMB3 版本。</p>
+</dd>
+<dt>seal : 启用 SMB3 加密。</dt>
+<dd><p>sign : 强制 SMB2/3 签名。 timeout : 取消命令的超时时间（秒）。 默认是 0：没有超时。 ndr32 : DCERPC: 仅提供 NDR32 传输语法。（默认） ndr64 : DCERPC: 仅提供 NDR64 传输语法。 ndr3264 : DCERPC: 提供 NDR32 和 NDR64 传输语法。 le : DCERPC: 以小端格式发送 PDU。 be : DCERPC: 以大端格式发送 PDU。</p>
+</dd>
+</dl>
+</dd>
+<dt>注意：</dt>
+<dd><p>使用 krb5cc 模式时，请使用 smb2_set_domain() 和 smb2_set_password() 在示例和应用程序中进行设置。</p>
+</dd>
+</dl>
+<h1 id="smb-服务器"><span class="header-section-number">3</span> SMB 服务器</h1>
+<p>在 examples/smb2-server-sync.c 中有一个示例服务器实现。库的服务器函数将一个函数指针数组传递给服务器，库将调用这些函数以处理每个客户端命令。你需要实现并返回每个命令的回复。示例模拟了一个包含少量文件的磁盘。每次客户端连接时，你的处理程序也将被调用，以便你在协商之前配置上下文。</p>
+<h1 id="身份验证"><span class="header-section-number">4</span> 身份验证</h1>
+<p>Libsmb2 提供对 NTLMSSP 用户名/密码身份验证的内置支持。 它还可以选择性地与 (MIT) Kerberos 身份验证一起构建。</p>
+<p>如果这些库存在，Libsmb2 将尝试与 Kerberos 一起构建。 你可以通过使用 --without-libkrb5 标志来强制构建不包含 Kerberos 支持的版本。在这种情况下，只会提供 NTLMSSP 身份验证。</p>
+<h1 id="mit-kerberos"><span class="header-section-number">5</span> MIT Kerberos</h1>
+<p>身份验证是通过 MIT Kerberos 实现的，它支持 KRB5 用于与 Active Directory 认证以及 NTLMSSP（可选）。</p>
+<p>MIT Kerberos 也可以配置为提供 NTLMSSP 身份验证， 作为与内置 NTLMSSP 实现的替代方案，使用外部机制插件。 要使用这个 Kerberos/NTLMSSP 模块，你需要构建并安装 GSS-NTLMSSP，地址为 [<a href="https://github.com/simo5/gss-ntlmssp">https://github.com/simo5/gss-ntlmssp</a>]。 如果你不确定，可以跳过此模块，只使用 Libsmb2 提供的 NTLMSSP 模块。</p>
+<h2 id="ntlm-身份验证"><span class="header-section-number">5.1</span> NTLM 身份验证</h2>
+<p>NTLM 凭据存储在一个文本文件中，格式如下： DOMAIN:USERNAME:PASSWORD 每个用户名一行。 你需要设置环境变量 NTLM_USER_FILE 来指向此文件。 对于每个本地用户账户，都需要在此文件中添加一条条目。</p>
+<p>默认情况下，NTLM 身份验证将使用当前进程的用户名。 你可以通过在 SMB URL 中指定不同的用户名来覆盖此设置： <a href="smb://guest@server/share?sec=ntlmssp">smb://guest@server/share?sec=ntlmssp</a></p>
+<dl>
+<dt>你也可以通过调用以下函数在应用程序中提供用户名和密码：</dt>
+<dd><p>smb2_set_user(smb2, &lt;username&gt;); smb2_set_password(smb2, &lt;password&gt;);</p>
+</dd>
+</dl>
+<p>（对于服务器，你不需要设置用户，因为客户端将提供。）</p>
+<h2 id="krb5-身份验证"><span class="header-section-number">5.2</span> KRB5 身份验证</h2>
+<p>当 Linux 工作站和文件服务器都属于 Active Directory 时，可以使用 Kerberos 身份验证。</p>
+<dl>
+<dt>你应该能够通过指定 sec=krb5 在 URL 中对文件服务器进行身份验证：</dt>
+<dd><p><a href="smb://server/share?sec=krb5">smb://server/share?sec=krb5</a></p>
+</dd>
+</dl>
+<p>应用程序需要使用 smb2_set_user()、smb2_set_password() 和 smb2_set_domain() 分别设置用户名、密码和域名 FQDN。</p>
+<h1 id="ntlm-凭据"><span class="header-section-number">6</span> NTLM 凭据</h1>
+<p>这适用于内置的 NTLMSSP 实现以及使用 Kerberos 和 NTLMSSP 机制插件时。</p>
+<p>NTLM 凭据存储在一个文本文件中，格式如下： DOMAIN:USERNAME:PASSWORD 每个用户名一行。 你需要设置环境变量 NTLM_USER_FILE 来指向此文件。 对于每个本地用户账户，都需要在此文件中添加一条条目。</p>
+<p>默认情况下，NTLM 身份验证将使用当前进程的用户名。 你可以通过在 SMB URL 中指定不同的用户名来覆盖此设置： <a href="smb://guest@server/share?sec=ntlmssp">smb://guest@server/share?sec=ntlmssp</a></p>
+<dl>
+<dt>你也可以通过调用以下函数在应用程序中提供用户名和密码：</dt>
+<dd><p>smb2_set_user(smb2, &lt;username&gt;); smb2_set_password(smb2, &lt;password&gt;);</p>
+</dd>
+</dl>
+<p>（对于服务器，你不需要设置用户，因为客户端将提供。）</p>
+<h1 id="smb23-签名"><span class="header-section-number">7</span> SMB2/3 签名</h1>
+<p>签名在 KRB5、内置 NTLMSSP 支持以及 gss-ntlmssp 机制插件中得到支持。</p>
+<h1 id="smb3-加密"><span class="header-section-number">8</span> SMB3 加密</h1>
+<p>加密仅在 KRB5 或内置 NTLMSSP 支持下提供。 当使用 gss-ntlmssp 机制插件时，不支持加密。 可以通过 "seal" URL 参数或调用以下函数启用加密： smb3_set_seal(smb2, 1);</p>
+<h1 id="构建-libsmb2"><span class="header-section-number">9</span> 构建 LIBSMB2</h1>
+<blockquote>
+<p>Windows</p>
+</blockquote>
+<p>---------------------------你需要安装 CMake（https://cmake.org/）和 Visual Studio（https://www.visualstudio.com/）来为 Windows 构建 libsmb2（包括 Universal Windows Platform）。</p>
+<p>请按照以下步骤构建共享库：</p>
+<blockquote>
+<p>mkdir build cd build cmake -G "Visual Studio 15 2017" .. cmake --build . --config RelWithDebInfo</p>
+</blockquote>
+<p>静态库：</p>
+<blockquote>
+<p>mkdir build cd build cmake -G "Visual Studio 15 2017" -DBUILD_SHARED_LIBS=0 .. cmake --build . --config RelWithDebInfo</p>
+</blockquote>
+<blockquote>
+<p>macOS, iOS, tvOS, watchOS</p>
+</blockquote>
+<p>---------------------------你可以使用 AMSMB2（https://github.com/amosavian/AMSMB2）通用框架， 它包含了为 Apple 设备编译的 libsmb2。</p>
+<p>它是用 Swift 编写的，但可以在 Swift 和 Objective-C 代码中使用。</p>
+<p>如果你想重新构建 libsmb2，请按照以下步骤操作：</p>
+<blockquote>
+<p>git clone <a href="https://github.com/amosavian/AMSMB2">https://github.com/amosavian/AMSMB2</a> cd AMSMB2/buildtools ./build.sh</p>
+</blockquote>
+<p>预编译的二进制文件默认不包括 Kerberos 支持。 如果你想构建带 Kerberos 支持的库，请执行此脚本：</p>
+<blockquote>
+<p>./build-with-krb5.sh</p>
+</blockquote>
+<h2 id="esp32"><span class="header-section-number">9.1</span> ESP32</h2>
+<p>libsmb2 已经为 ESP32 微控制器预配置，使用 esp-idf 工具链（不支持 Arduino）。只需将此项目克隆到 ESP32 项目的 'components' 目录中，它将自动包含在构建过程中。</p>
+<h2 id="raspberry-pi-pico-w-rp2040"><span class="header-section-number">9.2</span> Raspberry Pi Pico W (RP2040)</h2>
+<p>libsmb2 将在 RP2040 上使用 gcc-arm-none-eabi、pico-sdk 和 FreeRTOS-Kernel 编译。 在 examples/picow 中有一个 CMakeLists.txt 文件，可以编辑以指向 pico-sdk 和 FreeRTOS-Kernel，然后将构建 libsmb2 和示例——这可以作为起点。 在 include/picow 中有一些用于 lwip、FreeRTOS 和任何使用 libsmb2 构建的应用程序的配置文件。这些文件也可以作为起点并根据需要进行调整。</p>
+<p>在 RP2040 上，除了 RP2040 定义（如 PICO_BOARD=pico_w）外，libsmb2 所需的唯一定义是 PICO_PLATFORM。</p>
+<p>Playstation 2 ------------EE，Emotion-Engine，是 PS2 的主 CPU。 要为 PS2 EE 编译 libsmb2，首先安装 PS2 工具链和 PS2 SDK 并进行设置。</p>
+<dl>
+<dt>要构建 libsmb2.a，作为 EE tcpip 堆栈的 libsmb2 版本：</dt>
+<dd><p>$ make -f Makefile.platform clean $ make -f Makefile.platform ps2_ee_install</p>
+</dd>
+</dl>
+<p>EE 使用 IOP 堆栈，这是 EE 版本的不同，当 LWIP 堆栈运行在 IOP 上时（libsmb2_rpc 并链接 -lps2ips）</p>
+<dl>
+<dt>要构建 libsmb2_rpc.a，作为运行在 IOP tcpip 堆栈上的 EE 版本：</dt>
+<dd><p>$ make -f Makefile.platform clean $ make -f Makefile.platform ps2_rpc_install</p>
+</dd>
+</dl>
+<p>IOP，IO-Processor 是 PS2 的辅助 CPU。 该库用于构建 smb2man.irx 模块，但在安装时未包含该库，要为 PS2 IOP 和 smb2man.irx 安装 libsmb2，首先安装 PS2 工具链和 PS2SDK 并进行设置。</p>
+<dl>
+<dt>然后要构建 libsmb2，运行：</dt>
+<dd><p>$ make -f Makefile.platform clean $ make -f Makefile.platform ps2_iop_install $ make -f Makefile.platform clean $ make -f Makefile.platform ps2_irx_install</p>
+</dd>
+</dl>
+<h2 id="playstation-3"><span class="header-section-number">9.3</span> PlayStation 3</h2>
+<p>PPU，PowerPC，是 PS3 的主 CPU。 要为 PS3 PPU 编译 libsmb2，首先安装 PS3 工具链和 PSL1GHT SDK 并进行设置。</p>
+<dl>
+<dt>然后要构建 libsmb2，运行：</dt>
+<dd><p>$ cd lib $ make -f Makefile.PS3_PPU install</p>
+</dd>
+</dl>
+<p>该过程将把生成的 libsmb2.a 和 include/smb2 头文件复制到你的 PSL1GHT SDK portlibs 文件夹中。</p>
+<p>PlayStation Vita -------------ARM® Cortex™ - A9 核心（4 核），是 PSVITA 的主 CPU。 要为 PSVITA 编译 libsmb2，首先使用 vdpm 安装 VitaSDK。</p>
+<dl>
+<dt>然后要构建 libsmb2，运行：</dt>
+<dd><p>$ make vita_install -f Makefile.platform</p>
+</dd>
+</dl>
+<p>该过程将把生成的 libsmb2.a 和 include/smb2 头文件复制到你的 VitaSDK libs 文件夹中。</p>
+<h2 id="playstation-4"><span class="header-section-number">9.4</span> PlayStation 4</h2>
+<p>x86_64 是 PS4 的主 CPU。 要为 PS4 PPU 编译 libsmb2，首先安装 PS4 工具链和 OpenOrbis SDK 并进行设置。</p>
+<dl>
+<dt>然后要构建 libsmb2，运行：</dt>
+<dd><p>$ make -f Makefile.platform ps4_install</p>
+</dd>
+</dl>
+<p>该过程将把生成的 libsmb2.a 和 include/smb2 头文件复制到你的 OpenOrbis SDK include 文件夹中。</p>
+<h2 id="nintendo-3ds"><span class="header-section-number">9.5</span> Nintendo 3DS</h2>
+<p>Nintendo 3DS 的 CPU 是 ARM11 MPCore 变种。 要为 Nintendo 3DS 编译 libsmb2，首先安装 devkitPro 和 libctru 进行设置。</p>
+<dl>
+<dt>然后要构建 libsmb2，运行：</dt>
+<dd><p>$ make -f Makefile.platform 3ds_install</p>
+</dd>
+</dl>
+<p>该过程将把生成的 libsmb2.a 和 include/smb2 头文件复制到你的 devkitPro 3ds portlibs 文件夹中。</p>
+<p>Nintendo Switch -------------Nintendo Switch 的 CPU 是自定义 Nvidia Tegra X1。 要为 Nintendo Switch 编译 libsmb2，首先安装 devkitPro 和 libnx 进行设置。</p>
+<dl>
+<dt>然后要构建 libsmb2，运行：</dt>
+<dd><p>$ cd lib $ make -f Makefile.platform switch_install</p>
+</dd>
+</dl>
+<p>该过程将把生成的 libsmb2.a 和 include/smb2 头文件复制到你的 devkitPro switch portlibs 文件夹中。</p>
+<h2 id="nintendo-wii"><span class="header-section-number">9.6</span> Nintendo Wii</h2>
+<p>Nintendo Wii 的 CPU 是 Broadway PowerPC 处理器。 要为 Nintendo Wii 编译 libsmb2，首先使用 pacman 安装 devkitPro 和 libogc 进行设置。</p>
+<dl>
+<dt>然后要构建 libsmb2，运行：</dt>
+<dd><p>$ make -f Makefile.platform wii_install</p>
+</dd>
+</dl>
+<p>该过程将把生成的 libsmb2.a 和 include/smb2 头文件复制到你的 devkitPro wii portlibs 文件夹中。</p>
+<p>Nintendo Gamecube -------------Nintendo GameCube 的 CPU 是 IBM "Gekko" PowerPC CPU。 要为 Gamecube 编译 libsmb2，首先使用 pacman 安装 devkitPro 和 libogc 进行设置。</p>
+<dl>
+<dt>然后要构建 libsmb2，运行：</dt>
+<dd><p>$ make -f Makefile.platform gc_install</p>
+</dd>
+</dl>
+<p>该过程将把生成的 libsmb2.a 和 include/smb2 头文件复制到你的 devkitPro gamecube portlibs 文件夹中。</p>
+<h2 id="nintendo-ds"><span class="header-section-number">9.7</span> Nintendo DS</h2>
+<p>Nintendo DS 的 CPU 是 ARM7TDMI 和 ARM946E-S。 要为 Nintendo DS 编译 libsmb2，首先使用 pacman 安装 devkitPro 和 libnds 进行设置。</p>
+<dl>
+<dt>然后要构建 libsmb2，运行：</dt>
+<dd><p>$ cd lib $ make -f Makefile.platform ds_install</p>
+</dd>
+</dl>
+<p>该过程将把生成的 libsmb29.a 和 include/smb2 头文件复制到你的 devkitPro ds portlibs 文件夹中的 lib/arm9。</p>
+<p>Nintendo WII-U -------------Nintendo Wii-U 的 CPU 是 IBM "Espresso" PowerPC 基于 45 纳米工艺，具有 4 核，主频为 1.24 GHz。 要为 Nintendo WII-U 编译 libsmb2，首先使用 pacman 安装 devkitPro 和 libwut 进行设置。</p>
+<dl>
+<dt>然后要构建 libsmb2，运行：</dt>
+<dd><p>$ cd lib $ make -f Makefile.platform wiiu_install</p>
+</dd>
+</dl>
+<p>该过程将把生成的 libsmb2.a 和 include/smb2 头文件复制到你的 devkitPro wiiu portlibs 文件夹中。</p>
+<h2 id="amiga-amigaos"><span class="header-section-number">9.8</span> Amiga (AmigaOS)</h2>
+<p>AmigaOS 是一种操作系统，主处理器是 PowerPC 微处理器。 有 3 个版本： AmigaOS4(Makefile.AMIGA) AmigaOS3(Makefile.AMIGA_OS3) AmigaAROS(Makefile.AMIGA_AROS) 要为 AmigaOS 编译 libsmb2，你需要设置 newlib.library V53.40 或更高版本（或 V53.30，如 4.1 FE 中所包含）和 filesysbox.library 54.4 或更高版本进行设置。</p>
+<dl>
+<dt>然后根据你的 AmigaOS 系统选择相应的 makefile 并执行：</dt>
+<dd><p>$ cd lib $ make -f Makefile.YOUR_AMIGA_OS_USED clean install</p>
+</dd>
+</dl>
+<p>该过程将把生成的 libsmb2.a 和 include/smb2 头文件复制到 lib 文件夹中的 bin 文件夹。</p>
+<p>注意：Amiga AROS 是 AmigaOS 的开源版本，因此除非使用 AmigaAROS，否则不要构建此版本。</p>
+<h2 id="dreamcast-kallistios"><span class="header-section-number">9.9</span> Dreamcast (KallistiOS)</h2>
+<p>Hitachi SH4（小端模式）是 Dreamcast 的主 CPU。 要为 Dreamcast 编译 libsmb2，首先安装 KOS 工具链并进行设置。</p>
+<dl>
+<dt>然后要构建 libsmb2，运行：</dt>
+<dd><p>$ cd lib $ make -f Makefile.platform clean dc_install</p>
+</dd>
+</dl>
+<p>该过程将把生成的 libsmb2.a 和 include/smb2 头文件复制到 KallistiOS 工具链的安装位置 addons 文件夹。 注意：目前还没有 libsmb2 的 kos-ports 条目，但一旦创建了包含 Dreamcast 支持的版本发布，从 kos-ports 安装将成为首选安装方法。</p>
+<h2 id="xbox-xbox-xdk"><span class="header-section-number">9.10</span> Xbox (Xbox XDK)</h2>
+<p>Xbox 的 CPU 是定制的 Intel Pentium III Coppermine 处理器，仅支持小端值。 要为 Xbox 编译 libsmb2，首先安装 Xbox XDK（包括所有功能），Microsoft Visual C++ 2003 Professional 和 Windows XP。</p>
+<p>然后要构建 libsmb2，进入 Xbox 文件夹 并打开提供的 .sln 文件，然后点击绿色按钮进行构建：</p>
+<p>该过程将生成 libsmb2.lib。然后你可以将包含文件和 .lib 文件复制到你的 Xbox 项目中。</p>
+<p>Xbox 360 (Xbox 360 SDK) ----------------------Xbox 360 的 CPU 是 PPC（PowerPC）Xenon，仅支持大端值。 要为 Xbox 360 编译 libsmb2，首先安装 Xbox 360 SDK（包括所有功能），Microsoft Visual C++ 2010 Ultimate 和 Windows XP（推荐）或 Windows 7。</p>
+<p>然后要构建 libsmb2，进入 Xbox 360 文件夹 并打开提供的 .sln 文件，然后点击绿色按钮进行构建：</p>
+<p>该过程将生成 libsmb2.lib。然后你可以将包含文件和 .lib 文件复制到你的 Xbox 360 项目中。</p>
+<p>注意：这两个端口基于 BDC（Brent De Cartet）的 XBMC-360 端口，现在正在更新为 libsmb2 标准，以提供最佳性能。</p>
+</body>
+</html>

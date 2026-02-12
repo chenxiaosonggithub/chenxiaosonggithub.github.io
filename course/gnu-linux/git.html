@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>git分布式版本控制系统</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">git分布式版本控制系统</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#log"><span class="toc-section-number">1</span> <code>log</code></a></li>
+<li><a href="#name-rev"><span class="toc-section-number">2</span> <code>name-rev</code></a></li>
+<li><a href="#github-22端口没法ssh"><span class="toc-section-number">3</span> github 22端口没法ssh</a></li>
+<li><a href="#两个github账号"><span class="toc-section-number">4</span> 两个github账号</a></li>
+<li><a href="#cherry-pick-or-am"><span class="toc-section-number">5</span> <code>cherry-pick</code>或<code>am</code></a></li>
+<li><a href="#format-patch"><span class="toc-section-number">6</span> <code>format-patch</code></a></li>
+<li><a href="#stash"><span class="toc-section-number">7</span> <code>git stash</code></a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
+<h1 id="log"><span class="header-section-number">1</span> <code>log</code></h1>
+<p>单行显示补丁，前面再加上时间:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># --oneline：简化每条提交的显示。</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="co"># --date=short：以简短的日期格式（YYYY-MM-DD）显示时间。</span></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="co"># --format=&quot;%ad %h %s&quot;：自定义输出格式，其中：</span></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co"># %a Author, %c Commit</span></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="co"># %ad %cd：显示提交的日期（由 --date 指定的格式），%d: 不包含时分秒</span></a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="co"># %ai %ci：显示提交的 日期和时间，%i: 包含时分秒</span></a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="co"># %h：显示提交的简短哈希值。</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="co"># %s：显示提交的信息。</span></a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="co"># %an：提交者的名字。</span></a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="co"># %ae：提交者的邮箱。</span></a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="fu">git</span> log --oneline --date=short --format=<span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> --author=yourname</a></code></pre></div>
+<p><code>git log -L&lt;start&gt;,&lt;end&gt;:&lt;file&gt;, -L:&lt;funcname&gt;:&lt;file&gt;</code>（查看帮助文档<code>man 1 git log</code>），以内核主线代码<a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/fs/namespace.c?id=8f6f76a6a29f">fs/namespace.c</a>文件为例，查看<code>do_new_mount</code>函数:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">git</span> log -L:do_new_mount:fs/namespace.c</a></code></pre></div>
+<p>我们发现列出的却是<code>do_new_mount_fc</code>的修改记录，因为<code>do_new_mount_fc</code>包含字符串<code>do_new_mount</code>，又在<code>do_new_mount()</code>函数前面，解决方法是在<code>do_new_mount</code>后面再加个<code>\(</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">git</span> log -L:do_new_mount<span class="dt">\(</span>:fs/namespace.c</a></code></pre></div>
+<h1 id="name-rev"><span class="header-section-number">2</span> <code>name-rev</code></h1>
+<p>在内核开发过程中我们经常需要找某个commit提交记录是哪个版本引入的，使用以下命令</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">git</span> name-rev <span class="op">&lt;</span>commit<span class="op">&gt;</span></a></code></pre></div>
+<h1 id="github-22端口没法ssh"><span class="header-section-number">3</span> github 22端口没法ssh</h1>
+<p>在<code>~/.ssh/config</code>中添加:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">Host</span> github.com</a>
+<a class="sourceLine" id="cb5-2" title="2">  <span class="ex">HostName</span> ssh.github.com</a>
+<a class="sourceLine" id="cb5-3" title="3">  <span class="ex">Port</span> 443</a></code></pre></div>
+<h1 id="两个github账号"><span class="header-section-number">4</span> 两个github账号</h1>
+<p>如果我们有两个github账号，两个账号不能在网站上添加同一个ssh key，这时我们就要再生成一个ssh key:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># 生成id_rsa_2和id_rsa_2.pub</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="fu">ssh-keygen</span> -f ~/.ssh/id_rsa_2</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="co"># 创建配置文件</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="fu">cat</span> <span class="op">&lt;&lt;EOF</span> <span class="op">&gt;</span> <span class="ex">~/.ssh/config</span></a>
+<a class="sourceLine" id="cb6-5" title="5"># 10.42.20.225 改成本机的ip</a>
+<a class="sourceLine" id="cb6-6" title="6">Host 10.42.20.225</a>
+<a class="sourceLine" id="cb6-7" title="7">  HostName 10.42.20.225</a>
+<a class="sourceLine" id="cb6-8" title="8">  User sonvhi</a>
+<a class="sourceLine" id="cb6-9" title="9">Host <span class="op">g</span><span class="ex">ithub.com</span></a>
+<a class="sourceLine" id="cb6-10" title="10">  HostName ssh.github.com</a>
+<a class="sourceLine" id="cb6-11" title="11">  Port 443</a>
+<a class="sourceLine" id="cb6-12" title="12">  User git</a>
+<a class="sourceLine" id="cb6-13" title="13">  IdentityFile ~/.ssh/id_rsa</a>
+<a class="sourceLine" id="cb6-14" title="14">  IdentitiesOnly yes</a>
+<a class="sourceLine" id="cb6-15" title="15"># 指定账号: specifiedaccount</a>
+<a class="sourceLine" id="cb6-16" title="16">Host github.com-specifiedaccount</a>
+<a class="sourceLine" id="cb6-17" title="17">  HostName ssh.github.com</a>
+<a class="sourceLine" id="cb6-18" title="18">  Port 443</a>
+<a class="sourceLine" id="cb6-19" title="19">  User git</a>
+<a class="sourceLine" id="cb6-20" title="20">  IdentityFile ~/.ssh/id_rsa_2</a>
+<a class="sourceLine" id="cb6-21" title="21">  IdentitiesOnly yes</a>
+<a class="sourceLine" id="cb6-22" title="22">EOF</a>
+<a class="sourceLine" id="cb6-23" title="23"># 重新设置url，specifiedaccount为指定的账号名</a>
+<a class="sourceLine" id="cb6-24" title="24">git remote set-url origin git@github.com-specifiedaccount:specifiedaccount/repo-name.git</a></code></pre></div>
+<p>如果报错<code>Bad owner or permissions on ~/.ssh/config</code>，需要修改文件权限:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="fu">chown</span> <span class="va">$(</span><span class="fu">whoami</span><span class="va">)</span>:<span class="va">$(</span><span class="fu">id</span> -gn<span class="va">)</span> ~/.ssh/config</a></code></pre></div>
+<h1 id="cherry-pick-or-am"><span class="header-section-number">5</span> <code>cherry-pick</code>或<code>am</code></h1>
+<p><code>cherry-pick</code>多个<code>commit</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="fu">git</span> cherry-pick <span class="op">&lt;</span>commit1<span class="op">&gt;</span>..<span class="op">&lt;</span>commitN<span class="op">&gt;</span> <span class="co"># 不包含commit1</span></a></code></pre></div>
+<p>如果多个commit中包含有Merge的commit，直接cherry-pick多个会报错<code>error: 提交 xxxx 是一个合并提交但未提供 -m 选项</code>，可以把<code>git log --oneline</code>的输出放到文件<code>commits.txt</code>中，把Merge相关的commit删除，并删除掉每行的后面的commit信息，每行只保留commit号，然后用以下脚本<code>cherry-pick</code>（各位朋友如果有什么更好的方法请一定要联系告诉我）:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># tac 从最后一行开始 cherry-pick</span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="fu">tac</span> commits.txt <span class="kw">|</span> <span class="kw">while</span> <span class="va">IFS=</span> <span class="bu">read</span> -r <span class="va">commit</span>; <span class="kw">do</span></a>
+<a class="sourceLine" id="cb9-3" title="3">    <span class="fu">git</span> cherry-pick <span class="va">$commit</span></a>
+<a class="sourceLine" id="cb9-4" title="4">    <span class="kw">if</span><span class="bu"> [</span> <span class="va">$?</span> <span class="ot">-eq</span> 0<span class="bu"> ]</span>; <span class="kw">then</span></a>
+<a class="sourceLine" id="cb9-5" title="5">        <span class="bu">echo</span> <span class="st">&quot;合并成功&quot;</span></a>
+<a class="sourceLine" id="cb9-6" title="6">    <span class="kw">else</span></a>
+<a class="sourceLine" id="cb9-7" title="7">        <span class="bu">echo</span> <span class="st">&quot;合并失败&quot;</span></a>
+<a class="sourceLine" id="cb9-8" title="8">        <span class="bu">return</span></a>
+<a class="sourceLine" id="cb9-9" title="9">    <span class="kw">fi</span></a>
+<a class="sourceLine" id="cb9-10" title="10"><span class="kw">done</span></a>
+<a class="sourceLine" id="cb9-11" title="11"><span class="bu">echo</span> <span class="st">&quot;全部合并成功&quot;</span></a></code></pre></div>
+<p><code>git cherry-pick</code>或<code>git am</code>合补丁时如果有冲突，在解决完冲突后，在<code>commit</code>信息中在<code>Conflicts:</code>后列出冲突文件，如:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="ex">Conflicts</span>:</a>
+<a class="sourceLine" id="cb10-2" title="2">        <span class="ex">include/linux/sunrpc/clnt.h</span></a>
+<a class="sourceLine" id="cb10-3" title="3">[<span class="ex">Commit</span> xxxxxxxxx (<span class="st">&quot;xxx: here is subject&quot;</span>) 这里描述冲突的原因，如果后面还有补丁就用封号;</a>
+<a class="sourceLine" id="cb10-4" title="4"> <span class="ex">Commit</span> xxxxxxxxx (<span class="st">&quot;xxx: here is subject&quot;</span>) 最后一个补丁用点号<span class="ex">.</span>]</a></code></pre></div>
+<h1 id="format-patch"><span class="header-section-number">6</span> <code>format-patch</code></h1>
+<p>查看帮助文档<code>man git format-patch</code>:</p>
+<pre><code>--stat[=&lt;width&gt;[,&lt;name-width&gt;[,&lt;count&gt;]]]
+           生成一个 diffstat。默认情况下，文件名部分将使用尽可能多的空间，其余部分用于图形部分。最大宽度默认为终端宽度，如果未连接终端则为 80 列，可以通过 &lt;width&gt; 覆盖。文件名部分的宽度可以通过在逗号后提供另一个宽度 &lt;name-width&gt; 来限制。图形部分的宽度可以通过使用 --stat-graph-width=&lt;width&gt; 来限制（影响所有生成统计图的命令），或通过设置 diff.statGraphWidth=&lt;width&gt;（不影响 git format-patch）。通过提供第三个参数 &lt;count&gt;，可以限制输出到前 &lt;count&gt; 行，如果有更多行，则以 ... 结尾。
+
+           这些参数也可以单独设置，使用 --stat-width=&lt;width&gt;、--stat-name-width=&lt;name-width&gt; 和 --stat-count=&lt;count&gt;。</code></pre>
+<p>如果文件名较长，可以用以下命令让补丁中的路径显示完整:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="fu">git</span> format-patch -3 --cover-letter --stat=300,200</a></code></pre></div>
+<h1 id="stash"><span class="header-section-number">7</span> <code>git stash</code></h1>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="co"># 保存已跟踪文件在工作目录和暂存区的所有修改</span></a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="fu">git</span> stash save <span class="st">&quot;描述信息&quot;</span></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="co"># 也保存未跟踪的文件</span></a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="fu">git</span> stash save <span class="st">&quot;描述信息&quot;</span> -u <span class="co"># --include-untracked</span></a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="co"># 保存被忽略的文件（通常不建议）</span></a>
+<a class="sourceLine" id="cb13-6" title="6"><span class="fu">git</span> stash save <span class="st">&quot;描述信息&quot;</span> -a <span class="co"># --all</span></a>
+<a class="sourceLine" id="cb13-7" title="7"><span class="co"># 列出</span></a>
+<a class="sourceLine" id="cb13-8" title="8"><span class="fu">git</span> stash list</a>
+<a class="sourceLine" id="cb13-9" title="9"><span class="co"># 恢复指定的 stash，不会自动删除这个 stash</span></a>
+<a class="sourceLine" id="cb13-10" title="10"><span class="fu">git</span> stash apply stash@<span class="dt">{n}</span></a>
+<a class="sourceLine" id="cb13-11" title="11"><span class="co"># 恢复暂存状态（就是哪些已经执行过git add）</span></a>
+<a class="sourceLine" id="cb13-12" title="12"><span class="fu">git</span> stash apply stash@<span class="dt">{n}</span> --index</a>
+<a class="sourceLine" id="cb13-13" title="13"><span class="co"># 恢复栈顶的 stash（最近保存的 stash@{0}），这个 stash 会从栈中删除</span></a>
+<a class="sourceLine" id="cb13-14" title="14"><span class="fu">git</span> stash pop</a>
+<a class="sourceLine" id="cb13-15" title="15"><span class="co"># 删除 stash</span></a>
+<a class="sourceLine" id="cb13-16" title="16"><span class="fu">git</span> stash drop stash@<span class="dt">{n}</span></a>
+<a class="sourceLine" id="cb13-17" title="17"><span class="co"># 清空整个 stash 栈（删除所有 stash）</span></a>
+<a class="sourceLine" id="cb13-18" title="18"><span class="fu">git</span> stash clear</a>
+<a class="sourceLine" id="cb13-19" title="19"><span class="co"># 显示简略diff（相当于git show --stat）</span></a>
+<a class="sourceLine" id="cb13-20" title="20"><span class="fu">git</span> stash show stash@<span class="dt">{n}</span></a>
+<a class="sourceLine" id="cb13-21" title="21"><span class="co"># 显示完整diff（patch格式）</span></a>
+<a class="sourceLine" id="cb13-22" title="22"><span class="fu">git</span> stash show -p stash@<span class="dt">{n}</span></a>
+<a class="sourceLine" id="cb13-23" title="23"><span class="co"># 创建一个名为 new-branch-name 的新分支</span></a>
+<a class="sourceLine" id="cb13-24" title="24"><span class="co"># 然后在这个新分支上应用指定的 stash@{n}（相当于 apply）</span></a>
+<a class="sourceLine" id="cb13-25" title="25"><span class="co"># 如果应用成功，会自动删除这个 stash</span></a>
+<a class="sourceLine" id="cb13-26" title="26"><span class="fu">git</span> stash branch new-branch-name stash@<span class="dt">{n}</span></a></code></pre></div>
+</body>
+</html>

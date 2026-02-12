@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>陈孝松openEuler nfs+贡献</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">陈孝松openEuler nfs+贡献</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#年10月16日-openeulerkernel-enfs-add-new-path-state-pm_state_unstable"><span class="toc-section-number">1</span> <span>2025年10月16日 openEuler/kernel: enfs: add new path state PM_STATE_UNSTABLE</span></a></li>
+<li><a href="#年09月25日-openeulerkernel-enfs-recreate-shard-info-when-re-adding-enfs-module"><span class="toc-section-number">2</span> <span>2025年09月25日 openEuler/kernel: enfs: recreate shard info when re-adding enfs module</span></a></li>
+<li><a href="#年09月12日-openeulerkernel-enfs-fix-some-bugs-and-optimize-performance"><span class="toc-section-number">3</span> <span>2025年09月12日 openEuler/kernel: enfs: fix some bugs and optimize performance</span></a></li>
+<li><a href="#年08月15日-openeulerkernel-fix-some-bugs-of-enfs"><span class="toc-section-number">4</span> <span>2025年08月15日 openEuler/kernel: fix some bugs of enfs</span></a></li>
+<li><a href="#年08月02日-openeulerkernel-fix-some-panic-bugs-and-memory-leak-bugs-of-enfs"><span class="toc-section-number">5</span> <span>2025年08月02日 openEuler/kernel: fix some panic bugs and memory leak bugs of enfs</span></a></li>
+<li><a href="#年07月26日-openeulerkernel-unify-log-function-usage-of-enfs"><span class="toc-section-number">6</span> <span>2025年07月26日 openEuler/kernel: unify log function usage of enfs</span></a></li>
+<li><a href="#年07月04日-openeulerkernel-fix-some-build-errors-of-enfs"><span class="toc-section-number">7</span> <span>2025年07月04日 openEuler/kernel: fix some build errors of enfs</span></a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/openeuler-enfs.html">点击这里查看openEuler的nfs+的使用</a>。</p>
+<p>nfs+（Enhanced NFS，简称 eNFS），是华为提出的，麒麟软件等公司共同参与开发的特性，对 Linux 内核原生 NFS 进行增强，通过多链路等技术很好的解决原生 NFS 客户端在性能和可靠性方面存在的一些不足，极大提升业务的性能与稳定性。</p>
+<h1 id="年10月16日-openeulerkernel-enfs-add-new-path-state-pm_state_unstable"><span class="header-section-number">1</span> <a href="https://gitee.com/openeuler/kernel/pulls/18249/commits">2025年10月16日 openEuler/kernel: enfs: add new path state PM_STATE_UNSTABLE</a></h1>
+<p>5 个补丁，改动 279 行。</p>
+<ul>
+<li><span style="color:red">feature: </span><a href="https://gitee.com/openeuler/kernel/commit/9220b0cf32cfb5c0f0eb8777298a77875d896267">nfs/enfs: introduce enum PM_STATE_UNSTABLE</a></li>
+<li><span style="color:red">feature: </span><a href="https://gitee.com/openeuler/kernel/commit/e961e79037beaa80d7709dd8ae2bf682263ce537">nfs/enfs: set PM_STATE_UNSTABLE if path is unstable</a></li>
+<li><span style="color:red">feature: </span><a href="https://gitee.com/openeuler/kernel/commit/1c9eb515727c21c6c7b8212f40c006d656473bb6">nfs/enfs: introduce reconnect time KUnit tests</a></li>
+<li><span style="color:red">feature: </span><a href="https://gitee.com/openeuler/kernel/commit/456df8f077c45533e49990364a9594008f9df8e8">nfs/enfs: prefer normal rpc transport over unstable one</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/b46237072d129a16a1ad2d671fab93ada3ff04bc">nfs/enfs: cleanups in pm_set_path_state()</a></li>
+</ul>
+<h1 id="年09月25日-openeulerkernel-enfs-recreate-shard-info-when-re-adding-enfs-module"><span class="header-section-number">2</span> <a href="https://gitee.com/openeuler/kernel/pulls/17973/commits">2025年09月25日 openEuler/kernel: enfs: recreate shard info when re-adding enfs module</a></h1>
+<p>12 个补丁，改动 440 行。</p>
+<ul>
+<li><span style="color:red">feature: </span><a href="https://gitee.com/openeuler/kernel/commit/01f8a9007306f71ce2f9d1642d0de754b976c353">nfs/enfs: recreate shard info when re-adding enfs module</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/c83bfa180d2e2a0b9f1a39cc641b4b4839f5d8b3">nfs/enfs: reload config when re-adding enfs module</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/b31506834cd780cb0574b0d48c85cffabf73e6ca">nfs/enfs: fix possible memory leak in exten_call.c</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/b6300d7bb68a616ffa9ee278daead4cb3e9698c1">nfs/enfs: free memory uniformly at the end of function in exten_call.c</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/ba6ad67f35cf88bfc9036cd7c30a23957a7b38b4">nfs/enfs: fix possible null-ptr-deref in exten_call.c</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/d2f0e013f9f87e5d60f65602517fa9837cde5e12">nfs/enfs: handle error returned by NfsExtendProcInfoExtendEncode()</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/965d05feb591c2675cdcc15d4f23f1d3ca8e8610">nfs/enfs: return more nuanced error in NfsExtendProcInfoExtendEncode() and NfsExtendProcInfoExtendDecode()</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/6887a78ae29e55d6bb8d99177afd2e0dc0bbe424">nfs/enfs: remove redundant flush_workqueue() before destroy_workqueue()</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/8f2393a3b9b05e718df2a9bee9aafc94546b61b0">nfs/enfs: remove lookupcache_workq_lock</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/2ce743a252aa9f7b58e7d42ae65e936c440d67b9">nfs/enfs: remove ping_execute_workq_lock</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/5797e07079ce65c21872506f9fc8cda9cc413c55">nfs/enfs: remove enfs_tp_common.h</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/9b3a7b07e0df58566869da185945346f43a358f9">nfs/enfs: remove duplicate EOPNOTSUPP definition</a></li>
+</ul>
+<h1 id="年09月12日-openeulerkernel-enfs-fix-some-bugs-and-optimize-performance"><span class="header-section-number">3</span> <a href="https://gitee.com/openeuler/kernel/pulls/17898/commits">2025年09月12日 openEuler/kernel: enfs: fix some bugs and optimize performance</a></h1>
+<p>6 个补丁，改动 61 行。</p>
+<ul>
+<li><span style="color:red">performance: </span><a href="https://gitee.com/openeuler/kernel/commit/24f295baf843a8d506ea8ff7c14f9435b8f9a62b">sunrpc: do not set enfs transport in rpc_task_set_client()</a></li>
+<li><span style="color:red">performance: </span><a href="https://gitee.com/openeuler/kernel/commit/0e7a7ac732578ca804d5d81b26ef88869669d5a6">nfs/enfs: get rpc procedure number from rpc_procinfo in get_uuid_from_task()</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/0fbb6e383e6818e7f24f90388d061f020f9640b0">nfs/enfs: introduce is_enfs_debug()</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/96155a2ffed0ef662cfb6f30c9eaf575d19c9cc0">nfs/enfs: fix finding root uuid issue</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/22519a440ab80af2f3c8530aec7a4a1b3c9892ea">nfs/enfs: fix some cleanup issues</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/960de6c02b85577e9b2851bcf1ef42a8c4b5376f">nfs/enfs: remove duplicate definitions</a></li>
+</ul>
+<h1 id="年08月15日-openeulerkernel-fix-some-bugs-of-enfs"><span class="header-section-number">4</span> <a href="https://gitee.com/openeuler/kernel/pulls/17479/commits">2025年08月15日 openEuler/kernel: fix some bugs of enfs</a></h1>
+<p>9 个补丁，改动 314 行。</p>
+<ul>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/068e87b7ffc2d168cedd409e48e262b8dc0b9017">nfs/enfs: fix memory leak of shard_view_ctrl when removing nfs module</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/0b85eddf5ae7ab0cf1aec485e0e2fbd13b38ff1b">nfs/enfs: set CONFIG_SUNRPC_ENFS=y by default</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/59da5fcc7897637e47a2f7c63535379b01e26909">nfs/enfs: fix alignment between struct rpc_clnt and rpc_clnt_reserve</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/ef21a71a781b6fb424d5aa0229b37be4788e3136">nfs/enfs: fix error when showing dns list</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/7d7c14ce5591646018ff176c1e232eef23c332fb">nfs/enfs: support debugging ip and dns list</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/c214f46042043f23f8b916a8f7275dc49c773999">nfs/enfs: unlock uniformly at the end of function in shard_route.c</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/c591cbd938429333b46451adc60a30c967b50e33">nfs/enfs: format get_ip_to_str() in shard_route.c</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/5c582afec12819031e40ac56ad6f77adccfde048">nfs/enfs: remove enfs_init() and enfs_fini()</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/bc954e6ba5c80f2f7fafde7cd2eb818628421786">nfs/enfs: make some functions static in enfs_multipath_client.c</a></li>
+</ul>
+<h1 id="年08月02日-openeulerkernel-fix-some-panic-bugs-and-memory-leak-bugs-of-enfs"><span class="header-section-number">5</span> <a href="https://gitee.com/openeuler/kernel/pulls/17205/commits">2025年08月02日 openEuler/kernel: fix some panic bugs and memory leak bugs of enfs</a></h1>
+<p>16 个补丁，改动 537 行。</p>
+<ul>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/b29f941d7c6454ae39e85a23d8a004f47b274505">nfs/enfs: fix null-ptr-deref in shard_update_work()</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/d6f01631a69cbca08be0157a09f30a93283c50d4">nfs/enfs: fix double free of multipath_client_info</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/f42fc08b94165563565d2c3cfda2bf208b2579cd">nfs/enfs: fix memory leak in enfs_delete_fs_info()</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/2d5981287b67cc1a5d9231bff267f90001251ba3">nfs/enfs: introduce DEFINE_CLEAR_LIST_FUNC to define enfs_clear_fs_info()</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/c91d7a809058cb3e7dfe883f7273d2f3e4dfea5a">nfs/enfs: use DEFINE_CLEAR_LIST_FUNC to define enfs_clear_shard_view()</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/ca593c48d1e16a8143aa02ec6f8234d1a05af45e">nfs/enfs: fix memory leak when free view_table</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/341daeb30f7a89cce5b355a537c49064ccd6a0cf">nfs/enfs: introduce DEFINE_PARSE_FH_FUNC to define parse_fh()</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/219d679b1436559ee1997f657294a29631f3dfbc">nfs/enfs: make some functions static in shard_route.c</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/a08dbac46462aacf6b2d34dd69b7b93c67383442">nfs/enfs: remove unused functions in shard_route.c</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/fddc2e489dfbdc50e57d1716641fdaad54a6bf04">nfs/enfs: fix typos in shard_route.c</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/d11adecaa2cf72263a972a7348377c7c92e50ee4">nfs/enfs: remove nfs_multipath_client_info_free_work()</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/1b175bd74767555c8d096ff44483834b78921ec9">nfs/enfs: remove judgement about enfs_option in nfs_multipath_client_info_init()</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/918127ac2167cf836ce2ebcb3b15665584bccb77">sunrpc: remove redundant rpc_task_release_xprt() of enfs</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/23ee6e77f816d7527aa8a0eb7bf7bcce88d99db9">nfs/enfs: remove usage of list_entry_is_head() in shard_route.c</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/11caad69b1bff61d4b809a8126e866cfab81e34e">nfs/enfs: remove enfs_uuid_debug in shard_route.c</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/0f58edce86117b769f8e675a2265336676c780c1">nfs/enfs: remove unnecessary shard_should_stop in shard_route.c</a></li>
+</ul>
+<h1 id="年07月26日-openeulerkernel-unify-log-function-usage-of-enfs"><span class="header-section-number">6</span> <a href="https://gitee.com/openeuler/kernel/pulls/17266/commits">2025年07月26日 openEuler/kernel: unify log function usage of enfs</a></h1>
+<p>7 个补丁，改动 355 行。</p>
+<ul>
+<li><span style="color:red">feature: </span><a href="https://gitee.com/openeuler/kernel/commit/e6faa11b29056bfdd959b913c1da731f3f8f5770">nfs: use dfprintk() to debug enfs</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/74cbdf25fcf1cd15c2a2de1050f8b42bd93aa9d2">nfs/enfs: use enfs_log_debug() instead of dfprintk() to debug enfs</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/28504d23f7771a50d8bbdd1882854861ea41feb6">nfs/enfs: remove unused code in enfs/dns_internal.h</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/fac67ff637aa9d6301bb948bdb201416a7b2405f">nfs/enfs: use enfs_log_debug() instead of pr_debug() to debug enfs</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/4fa937704cd76e82c6c91fe28e9a816aab3b690c">nfs/enfs: cleanups in enfs/shard_route.c</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/de09a3d1076cccbce3970d3ee1008c6f6101e9b8">nfs/enfs: use enfs_log_info() instead of pr_info() in enfs</a></li>
+<li><a href="https://gitee.com/openeuler/kernel/commit/69ccb9f7620d556dc3cd02572d34b145564d8591">nfs/enfs: use enfs_log_error() instead of pr_err() in enfs</a></li>
+</ul>
+<h1 id="年07月04日-openeulerkernel-fix-some-build-errors-of-enfs"><span class="header-section-number">7</span> <a href="https://gitee.com/openeuler/kernel/pulls/16891/commits">2025年07月04日 openEuler/kernel: fix some build errors of enfs</a></h1>
+<p>4 个补丁，改动 15 行。</p>
+<ul>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/f4f81ee1ead7362e5bb0b6b2fdebb3049cbaa76e">nfs: fix enfs mount failure when CONFIG_ENFS=y</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/53806d18641c15b833cd6f4f7c540c3018099d7f">nfs: fix build errors when CONFIG_ENFS=m &amp;&amp; CONFIG_NFS_FS=y</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/2b5eae5c990f2df1de43dbae22fd46ebab87a3af">sunrpc, nfs: fix build errors when CONFIG_SUNRPC_ENFS=m &amp;&amp; CONFIG_ENFS=m &amp;&amp; CONFIG_NFS=y</a></li>
+<li><span style="color:red">bugfix: </span><a href="https://gitee.com/openeuler/kernel/commit/9ec2dde4a003ebdebab8bf6f54e2c96c229b85ce">sunrpc, nfs: CONFIG_ENFS should select CONFIG_SUNRPC_ENFS</a></li>
+</ul>
+</body>
+</html>

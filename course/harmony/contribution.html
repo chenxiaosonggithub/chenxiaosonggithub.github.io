@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>陈孝松OpenHarmony贡献</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">陈孝松OpenHarmony贡献</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#内核"><span class="toc-section-number">1</span> 内核</a></li>
+<li><a href="#分布式文件系统"><span class="toc-section-number">2</span> 分布式文件系统</a></li>
+<li><a href="#存储管理部件"><span class="toc-section-number">3</span> 存储管理部件</a></li>
+<li><a href="#媒体库"><span class="toc-section-number">4</span> 媒体库</a></li>
+<li><a href="#selinux"><span class="toc-section-number">5</span> selinux</a></li>
+<li><a href="#应用孵化模块"><span class="toc-section-number">6</span> 应用孵化模块</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/harmony/harmony.html">点击跳转到鸿蒙课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://www.openharmony.cn/mainPlay">OpenHarmony</a>是华为“鸿蒙操作系统”的底座，包含: 华为捐献的“鸿蒙操作系统”的基础能力 和 其他参与者的贡献。</p>
+<p>华为的HarmonyOS（鸿蒙操作系统）与OpenHarmony的关系，相当于谷歌的Android（安卓系统）与AOSP(Android Open Source Project)的关系。2024年10月22日，华为原生鸿蒙HarmonyOS NEXT正式发布，目前鸿蒙内核暂未开源。</p>
+<p>我主要从事开发<strong>端云协同</strong>功能，也就是端设备（如手机、智能设备等）与云端（云服务、云计算资源）之间的协同工作和通信，工作内容有 <strong>内核hmdfs（鸿蒙分布式文件系统）</strong> 、 <strong>fuse（用户态文件系统）</strong> 和 <strong>媒体库</strong> 等开发。</p>
+<p>OpenHarmony的代码托管在gitee上，gitee的功能挺完善，但在尊重开源方面以及一些细节方面有待加强，曾经我公开给gitee提过这一问题，具体请查看<a href="https://gitee.com/oschina/git-osc/issues/I76RNI">《gitee的搜索功能真的很有问题》</a>。</p>
+<h1 id="内核"><span class="header-section-number">1</span> 内核</h1>
+<p>基于社区LTS 5.10版本，自研hmdfs（鸿蒙分布式文件系统）等特性。</p>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10/pulls/791/commits">动态加载端云场景的dentryfile，读云端文件</a></p>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10/pulls/775/commits">hmdfs: fix compile warning in hmdfs_file_open_cloud()</a></p>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10/commit/75a864d47e45457de395456c593964b0129f0c5e">hmdfs: use ‘vfs_iter_read’ instead of ‘vfs_read’ in ’hmdfs_file_read_iter_cloud()</a>（可能需要注册登录才能查看）</p>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10/pulls/900/commits">hmdfs: implement ‘mmap’ interface of ‘hmdfs_dev_file_fops_cloud’</a></p>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10/pulls/917/commits">hmdfs: prohibit renaming cross-view for cloud merge</a></p>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10/pulls/910/commits">hmdfs: fix possible use-after-free in hmdfs lookup()</a></p>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10/pulls/927/commits">hmdfs: fix attribute error when mkdir in cloud_merge_view/merge_view</a></p>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10/pulls/940/commits">hmdfs: fix braces coding style</a></p>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10/pulls/967/commits">hmdfs: sync lookup cloud merge view</a></p>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10/pulls/991/commits">hmdfs: implement ‘unlink’ interface for ‘hmdfs_dev_dir_inode_ops_cloud’</a></p>
+<p><a href="https://gitee.com/openharmony/kernel_linux_5.10/pulls/1012/commits">hmdfs: make hmdfs_unlink_cloud() always succeed</a></p>
+<h1 id="分布式文件系统"><span class="header-section-number">2</span> 分布式文件系统</h1>
+<p>分布式文件系统用户态服务，功能主要包括挂载/卸载hmdfs，在设备间已组网的前提下，通过分布式软总线建立通信链路，供内核hmdfs使用。</p>
+<p><a href="https://gitee.com/openharmony/filemanagement_dfs_service/pulls/258/commits">dfs: fuse read cloud file</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_dfs_service/pulls/362/commits">dfs: always read from dentryfile instead from cache when lookup</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_dfs_service/pulls/220/commits">dfs: clean up build warnings</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_dfs_service/pulls/407/commits">dfs: fix ‘user_data_rw’ user open fuse mountpoint fail</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_dfs_service/pulls/480/commits">dfs: save thumbnail/lcd pictures locally after read done</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_dfs_service/pulls/486/commits">dfs: fix failure to remove from dentryfile when thumbnail/lcd reading is done</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_dfs_service/pulls/529/commits">dfs: fix use-after-free in CloudRelease()</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_dfs_service/pulls/547/commits">cloudfiledaemon: delete file of cloud merge view to update kernel dentry cache</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_dfs_service/pulls/558/commits">cloudfiledaemon/cloudsyncservice: rename from temp path to local path after downloading is complete</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_dfs_service/pulls/608/commits">cloudsyncservice: implement stop download</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_dfs_service/pulls/628/commits">cloudsyncservice: fix stop download</a></p>
+<h1 id="存储管理部件"><span class="header-section-number">3</span> 存储管理部件</h1>
+<p>存储管理部件提供外置存储卡挂载管理、文件加解密、磁盘和卷的查询与管理、用户目录管理和空间统计等功能，为系统和应用提供基础的存储查询、管理能力。</p>
+<p><a href="https://gitee.com/openharmony/filemanagement_storage_service/pulls/526/commits">add hmdfs mount option ‘cloud_dir’</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_storage_service/pulls/530/commits">storagedaemon: create directory ‘/data/service/el2/{userid}/hmdfs/fuse’</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_storage_service/pulls/534/commits">storagedaemon: add fuse umount</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_storage_service/pulls/551/commits">storagedaemon: pass user id to clouddaemon when mount fuse</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_storage_service/pulls/558/commits">storagedaemon: mount fuse when cloudfiledaemon is ready</a></p>
+<p><a href="https://gitee.com/openharmony/filemanagement_storage_service/pulls/613/commits">storage_daemon: change fuse mountpoint from ‘/mnt/hmdfs/{userid}/cloud’ to ‘/mnt/data/{userid}/cloud’</a></p>
+<h1 id="媒体库"><span class="header-section-number">4</span> 媒体库</h1>
+<p>数据库管理，文件管理，为提供用户态程序提供napi调用接口。</p>
+<p><a href="https://gitee.com/openharmony/multimedia_medialibrary_standard/pulls/1551/commits">Add ‘position’ column to medialibrary database</a></p>
+<p><a href="https://gitee.com/openharmony/multimedia_medialibrary_standard/pulls/1623/commits">declare napi property ‘enum PositionType’</a></p>
+<h1 id="selinux"><span class="header-section-number">5</span> selinux</h1>
+<p>让设备更安全。</p>
+<p><a href="https://gitee.com/openharmony/security_selinux_adapter/pulls/2325/commits">Add storage_daemon umount fuse selinux policy</a></p>
+<h1 id="应用孵化模块"><span class="header-section-number">6</span> 应用孵化模块</h1>
+<p><a href="https://gitee.com/openharmony/startup_appspawn/pulls/768/commits">appdata-sandbox.json: add medialibrary sandbox-path ‘/mnt/data/<currentUserId>’</a></p>
+</body>
+</html>

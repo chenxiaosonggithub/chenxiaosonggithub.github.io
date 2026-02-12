@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>2bbfed98a4d8 nfsd: Fix races between nfsd4_cb_release() and nfsd4_shutdown_callback()</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">2bbfed98a4d8 nfsd: Fix races between nfsd4_cb_release() and nfsd4_shutdown_callback()</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#邮件内容"><span class="toc-section-number">1</span> 邮件内容</a></li>
+<li><a href="#依赖补丁"><span class="toc-section-number">2</span> 依赖补丁</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">3</span> 代码分析</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="邮件内容"><span class="header-section-number">1</span> 邮件内容</h1>
+<p><a href="https://lore.kernel.org/all/20191023214318.9350-1-trond.myklebust@hammerspace.com/"><code>2bbfed98a4d8 nfsd: Fix races between nfsd4_cb_release() and nfsd4_shutdown_callback()</code></a> 邮件:</p>
+<ul>
+<li>Trond Myklebust: 当我们销毁客户端租约并调用 <code>nfsd4_shutdown_callback()</code> 时，我们必须确保在所有未完成的回调终止并释放它们的有效负载之前不返回。</li>
+<li>J. Bruce Fields: 这太好了，谢谢！我们从 Red Hat 用户那里看到了我相当确定是相同的 bug。我认为我的盲区是假设 rpc 任务不会在 <code>rpc_shutdown_client()</code> 之后继续存在。然而，它导致了 xfstests 的运行挂起，我还没有弄清楚原因。我会在今天下午花些时间进行研究，并告诉你我找到的东西。</li>
+<li>Trond Myklebust: 这是发生在版本2还是版本1？在版本1中，<code>__destroy_client()</code> 中肯定存在挂起问题，我认为在版本2中已经修复的引用计数泄漏。</li>
+<li>J. Bruce Fields: 我以为我正在运行版本2，让我仔细检查一下…</li>
+<li>J. Bruce Fields: 是的，在版本2上我在 <code>generic/013</code> 测试中遇到了挂起的情况。我快速检查了一下日志，没有看到有趣的信息，除此之外我还没有进行详细的调查。</li>
+<li>J. Bruce Fields: 通过运行 <code>./check -nfs generic/013</code> 可以重现。在Wireshark中看到的最后一条信息是一个异步的COPY调用和回复。这意味着可能正在尝试执行 CB_OFFLOAD。嗯。</li>
+<li>J. Bruce Fields: <a href="https://lore.kernel.org/all/20191107222712.GB10806@fieldses.org/">哦，我认为它只需要以下的更改。</a></li>
+<li>J. Bruce Fields: 应用如下更改，其中一部分更改拆分为单独的补丁（因为这是我注意到这个 bug 的方式）。</li>
+<li>J. Bruce Fields: <a href="https://lore.kernel.org/all/20191108175228.GB758@fieldses.org/">哎呀，这次记得附上补丁了。–b.</a></li>
+<li>J. Bruce Fields: <a href="https://lore.kernel.org/all/20191108175417.GC758@fieldses.org/">回调代码依赖于其中很多部分只能从有序工作队列 callback_wq 中调用，这值得记录。</a></li>
+<li>J. Bruce Fields: <a href="https://lore.kernel.org/all/20191108175559.GD758@fieldses.org/">意外的错误可能表明回调路径存在问题。</a></li>
+</ul>
+<p>讨论此补丁的相关邮件: <a href="https://lore.kernel.org/all/76C32636621C40EC87811F625761F2AF@alyakaslap/">nfsd: radix tree warning in nfs4_put_stid and kernel panic</a></p>
+<h1 id="依赖补丁"><span class="header-section-number">2</span> 依赖补丁</h1>
+<p>4.19等低版本合入此补丁可能还要合入前置补丁<a href="https://chenxiaosong.com/course/nfs/patch/nfsd-minor-4.1-callback-cleanup.html"><code>12357f1b2c8e nfsd: minor 4.1 callback cleanup</code></a>。</p>
+<p>已被回退的后续修复补丁<a href="https://chenxiaosong.com/course/nfs/patch/NFSD-Reschedule-CB-operations-when-backchannel-rpc_c.html"><code>c1ccfcf1a9bf NFSD: Reschedule CB operations when backchannel rpc_clnt is shut down</code></a>。</p>
+<h1 id="代码分析"><span class="header-section-number">3</span> 代码分析</h1>
+<p><code>struct nfs4_client</code>中增加一个字段<code>cl_cb_inflight</code>表示未完成的回调的个数，注意这个补丁的标题是说竞争发生在两个函数之间。我们先来看一下补丁合入前的竞争，<code>nfsd4_cb_release()</code>和<code>__destroy_client()</code>同时调用到<code>radix_tree_node_free()</code>，导致<code>rcu_head</code>在被释放之后又被释放了一次。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb1-1" title="1">nfsd<span class="dv">4</span><span class="er">_cb_release</span></a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="co">// nfsd4_run_cb // 这里补丁合入前后没有变化</span></a>
+<a class="sourceLine" id="cb1-3" title="3">  <span class="co">//   queue_work(callback_wq, &amp;cb-&gt;cb_work)</span></a>
+<a class="sourceLine" id="cb1-4" title="4">  nfsd4_cb_recall_release <span class="co">// cb-&gt;cb_ops-&gt;release</span></a>
+<a class="sourceLine" id="cb1-5" title="5">    nfs<span class="dv">4</span><span class="er">_put_stid</span></a>
+<a class="sourceLine" id="cb1-6" title="6">      idr_remove</a>
+<a class="sourceLine" id="cb1-7" title="7">        radix_tree_delete_item</a>
+<a class="sourceLine" id="cb1-8" title="8">          __radix_tree_delete</a>
+<a class="sourceLine" id="cb1-9" title="9">            delete_node</a>
+<a class="sourceLine" id="cb1-10" title="10">              radix_tree_node_free <span class="co">// __destroy_client中也调用到这里，并发</span></a>
+<a class="sourceLine" id="cb1-11" title="11"></a>
+<a class="sourceLine" id="cb1-12" title="12">__destroy_client</a>
+<a class="sourceLine" id="cb1-13" title="13">  nfsd<span class="dv">4</span><span class="er">_shutdown_callback</span></a>
+<a class="sourceLine" id="cb1-14" title="14">  free_client</a>
+<a class="sourceLine" id="cb1-15" title="15">    idr_destroy</a>
+<a class="sourceLine" id="cb1-16" title="16">      radix_tree_free_nodes</a>
+<a class="sourceLine" id="cb1-17" title="17">        radix_tree_node_free <span class="co">// nfsd4_cb_release也调用到这里，并发</span></a></code></pre></div>
+<p>合入补丁之后，<code>nfsd4_cb_release()</code>中的<code>radix_tree_node_free()</code>执行完后调用<code>nfsd41_cb_inflight_end()</code>唤醒<code>nfsd4_shutdown_callback()</code>，<code>free_client()</code>才开始执行，避免了并发的场景。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb2-1" title="1">nfsd<span class="dv">4</span><span class="er">_cb_release</span></a>
+<a class="sourceLine" id="cb2-2" title="2">  <span class="co">// nfsd4_queue_cb // 这里补丁合入前后没有变化</span></a>
+<a class="sourceLine" id="cb2-3" title="3">  <span class="co">//   queue_work(callback_wq, &amp;cb-&gt;cb_work)</span></a>
+<a class="sourceLine" id="cb2-4" title="4">  nfsd<span class="dv">41</span><span class="er">_destroy_cb</span></a>
+<a class="sourceLine" id="cb2-5" title="5">    nfsd4_cb_recall_release <span class="co">// cb-&gt;cb_ops-&gt;release</span></a>
+<a class="sourceLine" id="cb2-6" title="6">      nfs<span class="dv">4</span><span class="er">_put_stid</span></a>
+<a class="sourceLine" id="cb2-7" title="7">        idr_remove</a>
+<a class="sourceLine" id="cb2-8" title="8">          radix_tree_delete_item</a>
+<a class="sourceLine" id="cb2-9" title="9">            __radix_tree_delete</a>
+<a class="sourceLine" id="cb2-10" title="10">              delete_node</a>
+<a class="sourceLine" id="cb2-11" title="11">                radix_tree_node_free <span class="co">// 执行完后调用nfsd41_cb_inflight_end唤醒nfsd4_shutdown_callback</span></a>
+<a class="sourceLine" id="cb2-12" title="12">    nfsd<span class="dv">41</span><span class="er">_cb_inflight_end</span></a>
+<a class="sourceLine" id="cb2-13" title="13">      atomic_dec_and_test</a>
+<a class="sourceLine" id="cb2-14" title="14">      wake_up_var <span class="co">// cl_cb_inflight变为0时，唤醒nfsd4_shutdown_callback</span></a>
+<a class="sourceLine" id="cb2-15" title="15"></a>
+<a class="sourceLine" id="cb2-16" title="16">__destroy_client</a>
+<a class="sourceLine" id="cb2-17" title="17">  nfsd<span class="dv">4</span><span class="er">_shutdown_callback</span></a>
+<a class="sourceLine" id="cb2-18" title="18">    nfsd41_cb_inflight_wait_complete <span class="co">// cl_cb_inflight变为0时，唤醒</span></a>
+<a class="sourceLine" id="cb2-19" title="19">  free_client</a>
+<a class="sourceLine" id="cb2-20" title="20">    idr_destroy</a>
+<a class="sourceLine" id="cb2-21" title="21">      radix_tree_free_nodes</a>
+<a class="sourceLine" id="cb2-22" title="22">        radix_tree_node_free <span class="co">// nfsd41_cb_inflight_wait_complete唤醒后才会执行到这里，没有并发的情况</span></a></code></pre></div>
+</body>
+</html>

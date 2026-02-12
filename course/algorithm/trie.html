@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>前缀树（字典树）</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">前缀树（字典树）</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#leetcode-208.-实现-trie-前缀树"><span class="toc-section-number">1</span> leetcode 208. 实现 Trie (前缀树)</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/algorithm/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/algorithm/algorithm.html">点击跳转到算法课程所有目录</a>。</p>
+<h1 id="leetcode-208.-实现-trie-前缀树"><span class="header-section-number">1</span> leetcode 208. 实现 Trie (前缀树)</h1>
+<ul>
+<li><a href="https://leetcode.cn/problems/implement-trie-prefix-tree/description/">点击这里查看题目</a></li>
+</ul>
+<p>前缀树，又称字典树。</p>
+<p>c语言实现:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">typedef</span> <span class="kw">struct</span> Trie { <span class="co">// 这里不能写成 typedef struct {</span></a>
+<a class="sourceLine" id="cb1-2" title="2">    <span class="kw">struct</span> Trie *children[<span class="dv">26</span>]; <span class="co">// 前面的 struct 不能少，否则编译不过</span></a>
+<a class="sourceLine" id="cb1-3" title="3">    <span class="dt">bool</span> is_end;</a>
+<a class="sourceLine" id="cb1-4" title="4">} Trie;</a>
+<a class="sourceLine" id="cb1-5" title="5"></a>
+<a class="sourceLine" id="cb1-6" title="6">Trie* trieCreate() {</a>
+<a class="sourceLine" id="cb1-7" title="7">    Trie *ret = malloc(<span class="kw">sizeof</span>(Trie));</a>
+<a class="sourceLine" id="cb1-8" title="8">    memset(ret-&gt;children, <span class="dv">0</span>, <span class="kw">sizeof</span>(ret-&gt;children));</a>
+<a class="sourceLine" id="cb1-9" title="9">    ret-&gt;is_end = false;</a>
+<a class="sourceLine" id="cb1-10" title="10">    <span class="cf">return</span> ret;</a>
+<a class="sourceLine" id="cb1-11" title="11">}</a>
+<a class="sourceLine" id="cb1-12" title="12"></a>
+<a class="sourceLine" id="cb1-13" title="13"><span class="dt">void</span> trieFree(Trie* obj) {</a>
+<a class="sourceLine" id="cb1-14" title="14">    <span class="cf">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; <span class="dv">26</span>; i++) {</a>
+<a class="sourceLine" id="cb1-15" title="15">        <span class="cf">if</span> (obj-&gt;children[i])</a>
+<a class="sourceLine" id="cb1-16" title="16">            trieFree(obj-&gt;children[i]);</a>
+<a class="sourceLine" id="cb1-17" title="17">    }</a>
+<a class="sourceLine" id="cb1-18" title="18">    free(obj);</a>
+<a class="sourceLine" id="cb1-19" title="19">}</a>
+<a class="sourceLine" id="cb1-20" title="20"></a>
+<a class="sourceLine" id="cb1-21" title="21"><span class="dt">void</span> trieInsert(Trie* obj, <span class="dt">char</span>* word) {</a>
+<a class="sourceLine" id="cb1-22" title="22">    <span class="dt">int</span> len = strlen(word);</a>
+<a class="sourceLine" id="cb1-23" title="23">    <span class="cf">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; len; i++) {</a>
+<a class="sourceLine" id="cb1-24" title="24">        <span class="dt">int</span> ch = word[i] - <span class="ch">&#39;a&#39;</span>;</a>
+<a class="sourceLine" id="cb1-25" title="25">        <span class="cf">if</span> (!obj-&gt;children[ch])</a>
+<a class="sourceLine" id="cb1-26" title="26">            obj-&gt;children[ch] = trieCreate();</a>
+<a class="sourceLine" id="cb1-27" title="27">        obj = obj-&gt;children[ch];</a>
+<a class="sourceLine" id="cb1-28" title="28">    }</a>
+<a class="sourceLine" id="cb1-29" title="29">    obj-&gt;is_end = true;</a>
+<a class="sourceLine" id="cb1-30" title="30">}</a>
+<a class="sourceLine" id="cb1-31" title="31"></a>
+<a class="sourceLine" id="cb1-32" title="32"><span class="dt">static</span> <span class="dt">bool</span> __trie_starts_with(Trie **obj, <span class="dt">char</span> *prefix)</a>
+<a class="sourceLine" id="cb1-33" title="33">{</a>
+<a class="sourceLine" id="cb1-34" title="34">    <span class="dt">int</span> len = strlen(prefix);</a>
+<a class="sourceLine" id="cb1-35" title="35">    <span class="cf">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; len; i++) {</a>
+<a class="sourceLine" id="cb1-36" title="36">        <span class="dt">int</span> ch = prefix[i] - <span class="ch">&#39;a&#39;</span>;</a>
+<a class="sourceLine" id="cb1-37" title="37">        <span class="cf">if</span> (!(*obj)-&gt;children[ch])</a>
+<a class="sourceLine" id="cb1-38" title="38">            <span class="cf">return</span> false;</a>
+<a class="sourceLine" id="cb1-39" title="39">        *obj = (*obj)-&gt;children[ch];</a>
+<a class="sourceLine" id="cb1-40" title="40">    }</a>
+<a class="sourceLine" id="cb1-41" title="41">    <span class="cf">return</span> true;</a>
+<a class="sourceLine" id="cb1-42" title="42">}</a>
+<a class="sourceLine" id="cb1-43" title="43"></a>
+<a class="sourceLine" id="cb1-44" title="44"><span class="dt">bool</span> trieStartsWith(Trie* obj, <span class="dt">char</span>* prefix) {</a>
+<a class="sourceLine" id="cb1-45" title="45">    <span class="cf">return</span> __trie_starts_with(&amp;obj, prefix);</a>
+<a class="sourceLine" id="cb1-46" title="46">}</a>
+<a class="sourceLine" id="cb1-47" title="47"></a>
+<a class="sourceLine" id="cb1-48" title="48"><span class="dt">bool</span> trieSearch(Trie* obj, <span class="dt">char</span>* word) {</a>
+<a class="sourceLine" id="cb1-49" title="49">    <span class="cf">if</span> (__trie_starts_with(&amp;obj, word))</a>
+<a class="sourceLine" id="cb1-50" title="50">        <span class="cf">return</span> obj-&gt;is_end;</a>
+<a class="sourceLine" id="cb1-51" title="51">    <span class="cf">return</span> false;</a>
+<a class="sourceLine" id="cb1-52" title="52">}</a>
+<a class="sourceLine" id="cb1-53" title="53"></a>
+<a class="sourceLine" id="cb1-54" title="54"><span class="co">/**</span></a>
+<a class="sourceLine" id="cb1-55" title="55"><span class="co"> * Your Trie struct will be instantiated and called as such:</span></a>
+<a class="sourceLine" id="cb1-56" title="56"><span class="co"> * Trie* obj = trieCreate();</span></a>
+<a class="sourceLine" id="cb1-57" title="57"><span class="co"> * trieInsert(obj, word);</span></a>
+<a class="sourceLine" id="cb1-58" title="58"><span class="co"> </span></a>
+<a class="sourceLine" id="cb1-59" title="59"><span class="co"> * bool param_2 = trieSearch(obj, word);</span></a>
+<a class="sourceLine" id="cb1-60" title="60"><span class="co"> </span></a>
+<a class="sourceLine" id="cb1-61" title="61"><span class="co"> * bool param_3 = trieStartsWith(obj, prefix);</span></a>
+<a class="sourceLine" id="cb1-62" title="62"><span class="co"> </span></a>
+<a class="sourceLine" id="cb1-63" title="63"><span class="co"> * trieFree(obj);</span></a>
+<a class="sourceLine" id="cb1-64" title="64"><span class="co">*/</span></a></code></pre></div>
+</body>
+</html>

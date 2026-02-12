@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>如何拥有个人域名的网站和邮箱</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">如何拥有个人域名的网站和邮箱</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#所需软件"><span class="toc-section-number">1</span> 所需软件</a></li>
+<li><a href="#域名和公网ip"><span class="toc-section-number">2</span> 域名和公网ip</a></li>
+<li><a href="#简陋的个人网站"><span class="toc-section-number">3</span> 简陋的个人网站</a><ul>
+<li><a href="#nginx"><span class="toc-section-number">3.1</span> nginx</a></li>
+<li><a href="#nginx某个目录密码保护"><span class="toc-section-number">3.2</span> nginx某个目录密码保护</a></li>
+<li><a href="#检查.rst文件的格式"><span class="toc-section-number">3.3</span> 检查.rst文件的格式</a></li>
+<li><a href="#pandoc"><span class="toc-section-number">3.4</span> pandoc</a></li>
+<li><a href="#sphinx"><span class="toc-section-number">3.5</span> sphinx</a></li>
+<li><a href="#脚本"><span class="toc-section-number">3.6</span> 脚本</a></li>
+<li><a href="#转pdf"><span class="toc-section-number">3.7</span> 转pdf</a><ul>
+<li><a href="#chrome"><span class="toc-section-number">3.7.1</span> <code>chrome</code></a></li>
+<li><a href="#wkhtmltopdf"><span class="toc-section-number">3.7.2</span> <code>wkhtmltopdf</code></a></li>
+<li><a href="#pandoc-1"><span class="toc-section-number">3.7.3</span> <code>pandoc</code></a></li>
+</ul></li>
+<li><a href="#被百度搜索到"><span class="toc-section-number">3.8</span> 被百度搜索到</a></li>
+</ul></li>
+<li><a href="#个人域名后缀的邮箱"><span class="toc-section-number">4</span> 个人域名后缀的邮箱</a></li>
+<li><a href="#github.io"><span class="toc-section-number">5</span> github.io</a></li>
+<li><a href="#gitee.io"><span class="toc-section-number">6</span> gitee.io</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/video.html">点击这里查看配套的教学视频</a>。</p>
+<p>这篇文章记录一下我是如何搭建<a href="https://chenxiaosong.com/">我那个简陋的个人网站</a>，以及怎么拥有像<a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a>这种个人域名后缀的邮箱。各位朋友如果有更好的建议，请务必联系我。</p>
+<h1 id="所需软件"><span class="header-section-number">1</span> 所需软件</h1>
+<p>安装以下软件:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">apt</span> install nginx -y <span class="co"># 异步框架的网页服务器</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="ex">apt-get</span> install pandoc -y <span class="co"># 用于生成html</span></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="ex">apt</span> install jq -y <span class="co"># 解析json</span></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="ex">apt-get</span> install -y apache2-utils <span class="co"># 用于密码保护，ubuntu</span></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="ex">yum</span> install -y httpd-tools <span class="co"># 用于密码保护, fedora</span></a></code></pre></div>
+<h1 id="域名和公网ip"><span class="header-section-number">2</span> 域名和公网ip</h1>
+<p>首先，得先申请个域名，比如《你的名字拼音全拼.com》，可以在<a href="https://dc.console.aliyun.com/next/index?spm=5176.100251.console-base.ddomain.17894f15m8MjuR#/overview">阿里云</a>、腾讯云等平台注册申请。然后还要有一台有公网ip的服务器，我用的是<a href="https://ecs.console.aliyun.com/home#/">阿里云的服务器</a>。再把这个域名对应到这个公网ip上。</p>
+<p>注意默认的80端口要放开。</p>
+<h1 id="简陋的个人网站"><span class="header-section-number">3</span> 简陋的个人网站</h1>
+<h2 id="nginx"><span class="header-section-number">3.1</span> nginx</h2>
+<p>Nginx（发音同「engine X」）是异步框架的网页服务器，也可以用作反向代理、负载平衡器和HTTP缓存。</p>
+<p>在<a href="https://yundun.console.aliyun.com/?p=cas#/certExtend/free/cn-hangzhou">阿里云</a>购买免费SSL证书，再点击“创建证书”，点击“状态”栏中的感叹号，然后根据提示添加域名解析记录，注意证书签发后有效期为3个月。</p>
+<p>将<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/blog-web/nginx-config"><code>nginx-config</code></a>复制到<code>/etc/nginx/sites-enabled/default</code>，具体的配置选项的解释请查看配置文件的具体内容。</p>
+<p>重启nginx服务:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">service</span> nginx restart <span class="co"># 在docker中</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="fu">sudo</span> systemctl restart nginx</a></code></pre></div>
+<h2 id="nginx某个目录密码保护"><span class="header-section-number">3.2</span> nginx某个目录密码保护</h2>
+<p>创建密码文件:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">htpasswd</span> -c /etc/nginx/.htpasswd username <span class="co"># username 是你要设置的用户名</span></a></code></pre></div>
+<p>在<code>/etc/nginx/sites-enabled/default</code>加入以下配置:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">       <span class="ex">location</span> /passwd {</a>
+<a class="sourceLine" id="cb4-2" title="2">               <span class="ex">auth_basic</span> <span class="st">&quot;passwd access&quot;</span><span class="kw">;</span>   <span class="co"># 提示文本，可以随意设置</span></a>
+<a class="sourceLine" id="cb4-3" title="3">               <span class="ex">auth_basic_user_file</span> /etc/nginx/.htpasswd<span class="kw">;</span>  <span class="co"># 密码文件的路径</span></a>
+<a class="sourceLine" id="cb4-4" title="4">       }</a></code></pre></div>
+<h2 id="检查.rst文件的格式"><span class="header-section-number">3.3</span> 检查.rst文件的格式</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">sudo</span> apt install rstcheck -y</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="ex">rstcheck</span> file</a></code></pre></div>
+<h2 id="pandoc"><span class="header-section-number">3.4</span> pandoc</h2>
+<p>pandoc用于将markdown或rst（ReStructuredText）格式文件转换成html。</p>
+<p>具体的命令可以参考<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/blog-web/create-html.sh"><code>create-html.sh</code></a>，脚本里写了详细的说明。</p>
+<h2 id="sphinx"><span class="header-section-number">3.5</span> sphinx</h2>
+<p>参考<a href="https://www.sphinx-doc.org/en/master/">Sphinx documentation</a>。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="fu">sudo</span> apt-get install python3-sphinx -y</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="ex">pip</span> install --upgrade myst-parser <span class="co"># https://www.sphinx-doc.org/en/master/usage/markdown.html</span></a></code></pre></div>
+<h2 id="脚本"><span class="header-section-number">3.6</span> 脚本</h2>
+<p>先设置环境变量:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="bu">export</span> <span class="va">MY_TOP_PATH=</span>/your/top/path</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="bu">export</span> <span class="va">MY_CODE_TOP_PATH=${MY_TOP_PATH}</span>/code/</a></code></pre></div>
+<p><a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/blog-web/restart.sh"><code>restart.sh</code></a>脚本用于更新git仓库，重新生成html文件，以及重启nginx服务:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="fu">bash</span> src/blog-web/restart.sh</a></code></pre></div>
+<h2 id="转pdf"><span class="header-section-number">3.7</span> 转pdf</h2>
+<h3 id="chrome"><span class="header-section-number">3.7.1</span> <code>chrome</code></h3>
+<p>可以在图形界面系统中浏览器<code>右键 -&gt; 打印(ctrl+p) -&gt; 另存为pdf</code>。也可以参考<a href="https://developer.chrome.com/blog/headless-chrome?hl=zh-cn">《无头 Chrome 使用入门》</a>使用命令行将链接存为pdf，<code>chrome</code>的路径可能在<code>/opt/google/chrome/chrome</code>。</p>
+<h3 id="wkhtmltopdf"><span class="header-section-number">3.7.2</span> <code>wkhtmltopdf</code></h3>
+<p>参考<a href="https://linux.cn/article-13928-1.html">linux.cn的《如何在 Linux 下将网页转换为 PDF 文件》</a>。</p>
+<p>注意不能用<code>apt</code>安装（目录不能跳转），要在<a href="https://github.com/wkhtmltopdf/packaging/releases/"><code>wkhtmltopdf/packaging/releases</code></a>里下载最新的版本，ubuntu22.04下载<code>jammy</code>相关的文件。</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="ex">wkhtmltopdf</span> --enable-internal-links --enable-external-links test.html test.pdf</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="ex">wkhtmltopdf</span> --enable-internal-links --enable-external-links https://chenxiaosong.com/course/kernel/debug.html test.pdf</a></code></pre></div>
+<p>但代码框无法左右滑动，暂时不知道怎么搞TODO，知道的小伙伴一定要告诉我。</p>
+<p>作为对比，用<code>apt</code>安装的<code>wkhtmltopdf</code>转换的pdf，代码框里的代码会自动换行，但目录不能跳转。后续准备看一下<a href="https://github.com/wkhtmltopdf/wkhtmltopdf"><code>wkhtmltopdf</code>的源码</a>。</p>
+<h3 id="pandoc-1"><span class="header-section-number">3.7.3</span> <code>pandoc</code></h3>
+<p><code>man pandoc</code>中关于pdf的内容如下:</p>
+<pre><code>要生成PDF，请指定一个带有.pdf扩展名的输出文件:
+
+       pandoc test.txt -o test.pdf
+
+默认情况下，pandoc将使用LaTeX来创建PDF，这要求系统中安装了LaTeX引擎（请参见下面的--pdf-engine选项）。或者，pandoc也可以使用ConTeXt、roff ms或HTML作为中间格式。为此，请像之前一样指定一个带有.pdf扩展名的输出文件，但在命令行中添加--pdf-engine选项或使用-t context、-t html或-t ms。用于从中间格式生成PDF的工具可以使用--pdf-engine选项指定。
+
+你可以使用变量来控制PDF的样式，具体取决于使用的中间格式: 请参阅LaTeX的变量、ConTeXt的变量、wkhtmltopdf的变量、ms的变量。当使用HTML作为中间格式时，可以使用--css选项来设置输出样式。
+
+要调试PDF的创建，查看中间表示形式可能会有帮助: 不要使用-o test.pdf，而是使用例如-s -o test.tex来输出生成的LaTeX文件。然后你可以使用pdflatex test.tex来测试它。
+
+使用LaTeX时，需要以下包（它们包含在所有最近版本的TeX Live中）: amsfonts、amsmath、lm、unicode-math、ifxetex、ifluatex、listings（如果使用--listings选项）、fancyvrb、longtable、booktabs、graphicx（如果文档包含图片）、hyperref、xcolor、ulem、geometry（设置geometry变量）、setspace（使用linestretch）、以及babel（使用lang）。使用xelatex或lualatex作为PDF引擎需要fontspec。xelatex使用polyglossia（使用lang）、xecjk和bidi（设置dir变量）。如果设置了mathspec变量，xelatex将使用mathspec而不是unicode-math。如果可用，upquote和microtype包将被使用，如果csquotes变量或元数据字段设置为true，csquotes包将用于排版。natbib、biblatex、bibtex和biber包可以选择性地用于引用渲染。以下包如果存在，将用于提高输出质量，但pandoc不要求它们必须存在: upquote（用于直引号在verbatim环境中）、microtype（用于更好的间距调整）、parskip（用于更好的段间距）、xurl（用于更好的URL换行）、bookmark（用于更好的PDF书签）、以及footnotehyper或footnote（允许表格中的脚注）。</code></pre>
+<p>默认用的是<code>--pdf-engine pdflatex</code>，也可以指定其他的<code>--pdf-engine</code>，如果未安装，会提示以下内容，根据文档安装所需的软件:</p>
+<pre><code>pdflatex not found. Please select a different --pdf-engine or install pdflatex -- see also /usr/share/doc/pandoc/README.Debian</code></pre>
+<p>安装<code>texlive-xetex</code>相关软件:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="fu">sudo</span> apt install texlive-xetex texlive-lang-chinese -y</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="ex">fc-list</span> :lang=zh <span class="co"># 查看支持中文的字体</span></a></code></pre></div>
+<p>这时就可以转换了:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="ex">pandoc</span> test.html --pdf-engine=xelatex -V CJKmainfont=<span class="st">&quot;AR PL UKai CN&quot;</span> -o test.pdf --metadata encoding=gbk --number-sections --css https://chenxiaosong.com/stylesheet.css</a></code></pre></div>
+<p>但<code>xelatex</code>字体好像有点小问题，感兴趣的朋友可以再研究一下。</p>
+<p>还可以调用<code>wkhtmltopdf</code>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="ex">pandoc</span> test.html --pdf-engine=wkhtmltopdf -o test.pdf</a></code></pre></div>
+<p>这个和直接用<code>wkhtmltopdf</code>的效果好像是一毛一样。</p>
+<h2 id="被百度搜索到"><span class="header-section-number">3.8</span> 被百度搜索到</h2>
+<p>你辛辛苦苦写的文章，肯定是希望被更多人看到，虽然百度上广告很多，但毕竟国内用的人还是多。</p>
+<p>更具体的方法可以百度搜索，这里只说一下大致过程。进入<a href="https://ziyuan.baidu.com/linksubmit/url">链接提交</a>，填写提交就可以了，听说要等个把月才能被搜索到。如果你的网站已经被收录了，在<a href="https://www.baidu.com/">百度搜索引擎</a>中搜索<code>site:chenxiaosong.com</code>能看到结果。</p>
+<h1 id="个人域名后缀的邮箱"><span class="header-section-number">4</span> 个人域名后缀的邮箱</h1>
+<p>是不是受够了在qq邮箱、foxmail邮箱、163邮箱注册邮箱时你的姓名全拼已经被抢注了，只能在后面加一些乱七八糟的后缀。你有了域名，加上腾讯企业邮箱（免费），就可以拥有一个类似 <span class="citation" data-cites="chenxiaosong.com">@chenxiaosong.com</span> 结尾的邮箱了。</p>
+<p>首先，在<a href="https://work.weixin.qq.com/wework_admin/register_wx?from=exmail&amp;bizmail_code=&amp;wwbiz_version=free&amp;wwbiz_merge=true">腾讯企业微信网站</a>上注册一个你个人的企业微信。然后以管理员身份登录到<a href="https://work.weixin.qq.com/wework_admin/loginpage_wx">企业微信</a>，可通过【管理后台-&gt;协作-&gt;邮件-&gt;概况-&gt;配置】中绑定专属域名。详细的操作步骤可参考<a href="https://open.work.weixin.qq.com/help2/pc/19809?person_id=1">如何添加/更换/注销域名？</a>，温馨提醒: 若域名历史没有绑定过邮箱使用且无需搬迁历史邮箱数据的，请选择左侧的【立即迁移】入口；反之，需要搬迁历史邮箱数据的，请选择【同步使用】入口迁移数据。</p>
+<p>如果还是不知道怎么操作腾讯企业邮箱，请咨询企业微信客服。</p>
+<h1 id="github.io"><span class="header-section-number">5</span> github.io</h1>
+<p><a href="https://docs.github.com/zh/pages">GitHub Pages 文档</a>。</p>
+<p>首先在github上建立一个仓库，如<a href="https://github.com/chenxiaosonggithub/chenxiaosonggithub.github.io"><code>chenxiaosonggithub.github.io</code></a>，其中<code>chenxiaosonggithub</code>替换为你的github账号名，把html文件推送到这个仓库，注意要创建<a href="https://github.com/chenxiaosonggithub/chenxiaosonggithub.github.io/blob/master/404.html"><code>404.html</code></a>和<a href="https://github.com/chenxiaosonggithub/chenxiaosonggithub.github.io/blob/master/CNAME"><code>CNAME</code></a>。</p>
+<p>在<a href="https://dc.console.aliyun.com/next/index?spm=5176.100251.console-base.ddomain.17894f15m8MjuR#/overview">阿里云</a>上配置DNS域名解析， 添加记录类型<code>A</code>解析主域名<code>@</code>到记录值<code>185.199.108.153</code>、<code>185.199.109.153</code>、<code>185.199.110.153</code>、<code>185.199.111.153</code>之一（多个同时加好像不能生成ssl，但我不是很确定哈），再添加记录类型<code>CNAME</code>解析<code>www</code>到主域名。</p>
+<p>直接把生成的html文件推送到仓库，然后设置 <code>Settings -&gt; Pages -&gt; Build and deployment -&gt; Source: Deploy from a branch -&gt; Branch: master</code>。</p>
+<h1 id="gitee.io"><span class="header-section-number">6</span> gitee.io</h1>
+<p><a href="https://gitee.com/help/categories/56">gitee静态页面托管</a>。</p>
+<p>Gitee Pages 已经暂停提供服务了，忽略。</p>
+</body>
+</html>

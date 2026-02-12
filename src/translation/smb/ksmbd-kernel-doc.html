@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>KSMBD kernel doc</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">KSMBD kernel doc</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#ksmbd---smb3-内核服务器"><span class="toc-section-number">1</span> KSMBD - SMB3 内核服务器</a><ul>
+<li><a href="#ksmbd-架构"><span class="toc-section-number">1.1</span> KSMBD 架构</a><ul>
+<li><a href="#ksmbd内核守护进程"><span class="toc-section-number">1.1.1</span> ksmbd（内核守护进程）</a></li>
+<li><a href="#ksmbd.mountd用户空间守护进程"><span class="toc-section-number">1.1.2</span> ksmbd.mountd（用户空间守护进程）</a></li>
+</ul></li>
+<li><a href="#ksmbd-feature-status"><span class="toc-section-number">1.2</span> KSMBD Feature Status</a></li>
+<li><a href="#how-to-run"><span class="toc-section-number">1.3</span> How to run</a></li>
+<li><a href="#shutdown-ksmbd"><span class="toc-section-number">1.4</span> Shutdown KSMBD</a></li>
+<li><a href="#how-to-turn-debug-print-on"><span class="toc-section-number">1.5</span> How to turn debug print on</a></li>
+</ul></li>
+</ul>
+</nav>
+<p>本文档翻译自<a href="https://github.com/torvalds/linux/blob/fdfd6dde4328635861db029f6fdb649e17350526/Documentation/filesystems/smb/ksmbd.rst">Documentation/filesystems/smb/ksmbd.rst</a>，翻译时文件的最新提交是<code>fdfd6dde4328635861db029f6fdb649e17350526 ksmbd: update feature status in documentation</code>，大部分借助于ChatGPT翻译，仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<h1 id="ksmbd---smb3-内核服务器"><span class="header-section-number">1</span> KSMBD - SMB3 内核服务器</h1>
+<p>KSMBD 是一个 Linux 内核服务器，实现在内核空间中的 SMB3 协议，用于通过网络共享文件。</p>
+<h2 id="ksmbd-架构"><span class="header-section-number">1.1</span> KSMBD 架构</h2>
+<p>性能相关的操作子集属于内核空间，而与性能无关的操作子集则属于用户空间。因此，历史上导致许多缓冲区溢出问题和危险安全漏洞的 DCE/RPC 管理以及用户账户管理是在用户空间中实现的，作为 ksmbd.mountd。与性能相关的文件操作（打开/读取/写入/关闭等）在内核空间（ksmbd）中进行。这也使得与 VFS 接口的集成更容易。</p>
+<h3 id="ksmbd内核守护进程"><span class="header-section-number">1.1.1</span> ksmbd（内核守护进程）</h3>
+<p>当服务器守护进程启动时，它会在初始化时启动一个分叉线程（ksmbd/接口名称）并打开一个专用端口 445 来监听 SMB 请求。每当有新的客户端发出请求时，分叉线程将接受客户端连接，并为客户端与服务器之间的专用通信通道分叉一个新线程。这允许并行处理来自客户端的 SMB 请求（命令），以及允许新的客户端建立新连接。每个实例被命名为 ksmbd/1~n（端口号），以指示已连接的客户端。根据 SMB 请求类型，每个新线程可以决定将命令传递给用户空间（ksmbd.mountd），目前 DCE/RPC 命令被确定通过用户空间处理。为了进一步利用 Linux 内核，选择将命令作为工作项处理，并在 ksmbd-io kworker 线程的处理程序中执行。这允许处理程序的多路复用，因为内核会在负载增加时启动额外的工作线程，反之，如果负载减少，则销毁额外的工作线程。因此，在与客户端建立连接后，专用的 ksmbd/1..n（端口号）完全负责接收/解析 SMB 命令。每个接收到的命令都并行工作，即可以有多个客户端命令并行处理。接收每个命令后，为每个命令准备一个单独的内核工作项，这些工作项进一步排队由 ksmbd-io kworker 处理。因此，每个 SMB 工作项都排队到 kworker。这允许默认内核来管理负载共享，并通过并行处理客户端命令优化客户端性能。</p>
+<h3 id="ksmbd.mountd用户空间守护进程"><span class="header-section-number">1.1.2</span> ksmbd.mountd（用户空间守护进程）</h3>
+<p>ksmbd.mountd 是一个用户空间进程，用于传输通过 ksmbd.adduser（用户空间实用程序的一部分）注册的用户账户和密码。此外，它允许将从 smb.conf 解析的共享信息参数传递给内核中的 ksmbd。在执行部分，它有一个守护进程持续运行，并使用 netlink 套接字连接到内核接口，等待请求（dcerpc 和共享/用户信息）。它处理从 NetShareEnum 和 NetServerGetInfo 中最重要的文件服务器 RPC 调用（至少几十个）。完整的 DCE/RPC 响应从用户空间准备并传递给客户端的相关内核线程。</p>
+<h2 id="ksmbd-feature-status"><span class="header-section-number">1.2</span> KSMBD Feature Status</h2>
+<p>请查看原网页。</p>
+<h2 id="how-to-run"><span class="header-section-number">1.3</span> How to run</h2>
+<p>请查看原网页。</p>
+<h2 id="shutdown-ksmbd"><span class="header-section-number">1.4</span> Shutdown KSMBD</h2>
+<p>请查看原网页。</p>
+<h2 id="how-to-turn-debug-print-on"><span class="header-section-number">1.5</span> How to turn debug print on</h2>
+<p>请查看原网页。</p>
+</body>
+</html>

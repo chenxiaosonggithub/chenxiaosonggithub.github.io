@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NFS回写错误处理不正确的问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">NFS回写错误处理不正确的问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#原因分析"><span class="toc-section-number">2</span> 原因分析</a></li>
+<li><a href="#我的修改方案"><span class="toc-section-number">3</span> 我的修改方案</a><ul>
+<li><a href="#第一个补丁-write返回更详细的错误"><span class="toc-section-number">3.1</span> 第一个补丁: write返回更详细的错误</a></li>
+<li><a href="#第二个补丁-flush返回正确的错误"><span class="toc-section-number">3.2</span> 第二个补丁: flush返回正确的错误</a></li>
+<li><a href="#第三个补丁-解决-async-write-变成-sync-write-的问题"><span class="toc-section-number">3.3</span> 第三个补丁: 解决 async write 变成 sync write 的问题</a></li>
+</ul></li>
+<li><a href="#maintainer-的修改方案未解决此问题"><span class="toc-section-number">4</span> maintainer 的修改方案（未解决此问题）</a><ul>
+<li><a href="#想解决问题的补丁实际没解决"><span class="toc-section-number">4.1</span> 想解决问题的补丁（实际没解决）</a></li>
+<li><a href="#maintainer-的其他补丁"><span class="toc-section-number">4.2</span> maintainer 的其他补丁</a></li>
+</ul></li>
+<li><a href="#其他文件系统对-wb-err-的处理"><span class="toc-section-number">5</span> 其他文件系统对 wb err 的处理</a><ul>
+<li><a href="#调用-fsync-时清除-wb_err"><span class="toc-section-number">5.1</span> 调用 fsync 时清除 wb_err</a></li>
+<li><a href="#实现-flush-的文件系统"><span class="toc-section-number">5.2</span> 实现 flush 的文件系统</a></li>
+<li><a href="#async-write"><span class="toc-section-number">5.3</span> async write</a></li>
+</ul></li>
+<li><a href="#与-maintainer-的交流"><span class="toc-section-number">6</span> 与 maintainer 的交流</a><ul>
+<li><a href="#maintainer-两个版本的补丁都无法解决问题"><span class="toc-section-number">6.1</span> maintainer 两个版本的补丁都无法解决问题</a></li>
+<li><a href="#maintainer-不断强调是文档规定"><span class="toc-section-number">6.2</span> maintainer 不断强调是文档规定</a></li>
+<li><a href="#maintainer-最后直接说是vfs的问题"><span class="toc-section-number">6.3</span> maintainer 最后直接说是vfs的问题</a></li>
+</ul></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<p>这里介绍一组我发到社区的补丁集，这组补丁集被nfs maintainer剽窃了，但他修改后的版本却没有解决我提出的问题。</p>
+<p>我的补丁集: <a href="https://patchwork.kernel.org/project/linux-nfs/list/?series=628066&amp;state=%2A&amp;archive=both"><code>nfs: handle writeback errors correctly</code></a>。</p>
+<p><a href="https://gitee.com/openeuler/kernel/pulls/10046/commits">openeuler5.10的后续方案</a></p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<pre><code>1. 误报空间不足
+2. 执行`dd`命令非常非常慢</code></pre>
+<p>复现程序:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">        <span class="ex">nfs</span> server            <span class="kw">|</span>       <span class="ex">nfs</span> client</a>
+<a class="sourceLine" id="cb2-2" title="2"> <span class="ex">-----------------------------</span><span class="kw">|</span><span class="ex">---------------------------------------------</span></a>
+<a class="sourceLine" id="cb2-3" title="3"> <span class="co"># No space left on server    |</span></a>
+<a class="sourceLine" id="cb2-4" title="4"> <span class="ex">fallocate</span> -l 100G /svr/nospc <span class="kw">|</span></a>
+<a class="sourceLine" id="cb2-5" title="5">                              <span class="kw">|</span> <span class="fu">mount</span> -t nfs <span class="va">$nfs_server_ip</span>:/ /mnt</a>
+<a class="sourceLine" id="cb2-6" title="6">                              <span class="kw">|</span></a>
+<a class="sourceLine" id="cb2-7" title="7">                              <span class="kw">|</span> <span class="co"># 预期错误: 空间不足</span></a>
+<a class="sourceLine" id="cb2-8" title="8">                              <span class="kw">|</span> <span class="fu">dd</span> if=/dev/zero of=/mnt/file count=1 ibs=1M</a>
+<a class="sourceLine" id="cb2-9" title="9">                              <span class="kw">|</span></a>
+<a class="sourceLine" id="cb2-10" title="10">                              <span class="kw">|</span> <span class="co"># 释放挂载点的空间</span></a>
+<a class="sourceLine" id="cb2-11" title="11">                              <span class="kw">|</span> <span class="fu">rm</span> /mnt/nospc</a>
+<a class="sourceLine" id="cb2-12" title="12">                              <span class="kw">|</span></a>
+<a class="sourceLine" id="cb2-13" title="13">                              <span class="kw">|</span> <span class="co"># 问题1: 误报空间不足，问题2: 非常非常慢</span></a>
+<a class="sourceLine" id="cb2-14" title="14">                              <span class="kw">|</span> <span class="fu">dd</span> if=/dev/zero of=/mnt/file count=1 ibs=1M</a></code></pre></div>
+<h1 id="原因分析"><span class="header-section-number">2</span> 原因分析</h1>
+<p>空间不足时执行 <code>dd</code>，返回错误 <code>-ENOSPC</code>，没有清除 <code>wb_err</code> 中的错误:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb3-1" title="1">filp_close</a>
+<a class="sourceLine" id="cb3-2" title="2">  nfs<span class="dv">4</span><span class="er">_file_flush</span></a>
+<a class="sourceLine" id="cb3-3" title="3">    nfs_wb_all <span class="co">// 缓存落盘</span></a>
+<a class="sourceLine" id="cb3-4" title="4">      filemap_write_and_wait</a>
+<a class="sourceLine" id="cb3-5" title="5">        filemap_write_and_wait_range</a>
+<a class="sourceLine" id="cb3-6" title="6">          __filemap_fdatawrite_range</a>
+<a class="sourceLine" id="cb3-7" title="7">            filemap_fdatawrite_wbc</a>
+<a class="sourceLine" id="cb3-8" title="8">              do_writepages</a>
+<a class="sourceLine" id="cb3-9" title="9">                nfs_writepages <span class="co">// 向 nfs server 发送 write 请求</span></a>
+<a class="sourceLine" id="cb3-10" title="10">          filemap_fdatawait_range</a>
+<a class="sourceLine" id="cb3-11" title="11">            __filemap_fdatawait_range</a>
+<a class="sourceLine" id="cb3-12" title="12">              wait_on_page_writeback <span class="co">// 等待 write 请求回复</span></a>
+<a class="sourceLine" id="cb3-13" title="13">    filemap_check_wb_err <span class="co">// 返回错误 -ENOSPC，没有清除 wb_err 中的错误</span></a>
+<a class="sourceLine" id="cb3-14" title="14"></a>
+<a class="sourceLine" id="cb3-15" title="15">rpc_async_release</a>
+<a class="sourceLine" id="cb3-16" title="16">  rpc_free_task</a>
+<a class="sourceLine" id="cb3-17" title="17">    rpc_release_calldata</a>
+<a class="sourceLine" id="cb3-18" title="18">      nfs_pgio_release</a>
+<a class="sourceLine" id="cb3-19" title="19">        nfs_write_completion</a>
+<a class="sourceLine" id="cb3-20" title="20">          nfs_mapping_set_error</a>
+<a class="sourceLine" id="cb3-21" title="21">            mapping_set_error</a>
+<a class="sourceLine" id="cb3-22" title="22">              __filemap_set_wb_err</a>
+<a class="sourceLine" id="cb3-23" title="23">                errset_set(&amp;mapping-&gt;wb_err, err) <span class="co">// 在 wb_err 中记录错误</span></a>
+<a class="sourceLine" id="cb3-24" title="24">              set_bit(..., &amp;mapping-&gt;flags); <span class="co">// 在 flags 中记录错误，现已经被 nfs maintainer 删除</span></a></code></pre></div>
+<p>空间释放后执行 <code>dd</code>, 上一次执行 <code>dd</code> 时的错误还没清除，导致变成了同步写，速度非常非常慢，即使空间足够还是报错空间不足:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb4-1" title="1">write</a>
+<a class="sourceLine" id="cb4-2" title="2">  ksys_write</a>
+<a class="sourceLine" id="cb4-3" title="3">    vfs_write</a>
+<a class="sourceLine" id="cb4-4" title="4">      new_sync_write</a>
+<a class="sourceLine" id="cb4-5" title="5">        call_write_iter</a>
+<a class="sourceLine" id="cb4-6" title="6">          nfs_file_write</a>
+<a class="sourceLine" id="cb4-7" title="7">            since = filemap_sample_wb_err = <span class="dv">0</span></a>
+<a class="sourceLine" id="cb4-8" title="8">              errseq_sample</a>
+<a class="sourceLine" id="cb4-9" title="9">                <span class="cf">if</span> (!(old &amp; ERRSEQ_SEEM)) <span class="co">// 上一次执行 dd 时的错误还没清除</span></a>
+<a class="sourceLine" id="cb4-10" title="10">                <span class="cf">return</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb4-11" title="11">            error = filemap_check_wb_err(..., since = <span class="dv">0</span>) = -ENOSPC</a>
+<a class="sourceLine" id="cb4-12" title="12">            <span class="cf">if</span> (nfs_need_check_write) <span class="co">// 条件满足</span></a>
+<a class="sourceLine" id="cb4-13" title="13">              nfs_error_is_fatal_on_server</a>
+<a class="sourceLine" id="cb4-14" title="14">                nfs_error_is_fatal</a>
+<a class="sourceLine" id="cb4-15" title="15">                  <span class="cf">return</span> true <span class="co">// -ENOSPC</span></a>
+<a class="sourceLine" id="cb4-16" title="16">            nfs_wb_all <span class="co">// 变成了 sync write，每 4K 耗时约 10ms，导致 dd 命令非常非常慢</span></a>
+<a class="sourceLine" id="cb4-17" title="17"></a>
+<a class="sourceLine" id="cb4-18" title="18"></a>
+<a class="sourceLine" id="cb4-19" title="19">filp_close</a>
+<a class="sourceLine" id="cb4-20" title="20">  nfs<span class="dv">4</span><span class="er">_file_flush</span></a>
+<a class="sourceLine" id="cb4-21" title="21">    nfs_wb_all <span class="co">// 缓存落盘</span></a>
+<a class="sourceLine" id="cb4-22" title="22">      filemap_write_and_wait</a>
+<a class="sourceLine" id="cb4-23" title="23">        filemap_write_and_wait_range</a>
+<a class="sourceLine" id="cb4-24" title="24">          <span class="cf">if</span> (mapping_needs_writeback) <span class="co">// 所有的数据已经落盘</span></a>
+<a class="sourceLine" id="cb4-25" title="25">    since = filemap_sample_wb_err = <span class="dv">0</span></a>
+<a class="sourceLine" id="cb4-26" title="26">      errseq_sample</a>
+<a class="sourceLine" id="cb4-27" title="27">        <span class="cf">if</span> (!(old &amp; ERRSEQ_SEEM)) <span class="co">// 上一次执行 dd 时的错误还没清除</span></a>
+<a class="sourceLine" id="cb4-28" title="28">        <span class="cf">return</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb4-29" title="29">    filemap_check_wb_err <span class="co">// 返回错误 -ENOSPC，还是没有清除 wb_err 中的错误</span></a></code></pre></div>
+<h1 id="我的修改方案"><span class="header-section-number">3</span> 我的修改方案</h1>
+<h2 id="第一个补丁-write返回更详细的错误"><span class="header-section-number">3.1</span> 第一个补丁: write返回更详细的错误</h2>
+<p><a href="https://patchwork.kernel.org/project/linux-nfs/patch/20220401034409.256770-2-chenxiaosong2@huawei.com/">NFS: return more nuanced writeback errors in nfs_file_write()</a></p>
+<p>回退 <a href="https://lore.kernel.org/all/20220215230518.24923-1-trondmy@kernel.org/">6c984083ec24 (“NFS: Use of mapping_set_error() results in spurious errors”)</a>，并且在 <code>write</code> 中返回更详细的错误:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb5-1" title="1">rpc_async_release</a>
+<a class="sourceLine" id="cb5-2" title="2">  rpc_free_task</a>
+<a class="sourceLine" id="cb5-3" title="3">    rpc_release_calldata</a>
+<a class="sourceLine" id="cb5-4" title="4">      nfs_pgio_release</a>
+<a class="sourceLine" id="cb5-5" title="5">        nfs_write_completion</a>
+<a class="sourceLine" id="cb5-6" title="6">          nfs_mapping_set_error</a>
+<a class="sourceLine" id="cb5-7" title="7">            mapping_set_error</a>
+<a class="sourceLine" id="cb5-8" title="8">              __filemap_set_wb_err</a>
+<a class="sourceLine" id="cb5-9" title="9">                errset_set(&amp;mapping-&gt;wb_err, err) <span class="co">// 在 wb_err 中记录错误</span></a>
+<a class="sourceLine" id="cb5-10" title="10">              set_bit(..., &amp;mapping-&gt;flags); <span class="co">// 回退 maintainer 的补丁，在 flags 中记录错误</span></a>
+<a class="sourceLine" id="cb5-11" title="11"></a>
+<a class="sourceLine" id="cb5-12" title="12">nfs_file_write</a>
+<a class="sourceLine" id="cb5-13" title="13">  generic_perform_write <span class="co">// 同步写</span></a>
+<a class="sourceLine" id="cb5-14" title="14">    nfs_write_end</a>
+<a class="sourceLine" id="cb5-15" title="15">      nfs_wb_all</a>
+<a class="sourceLine" id="cb5-16" title="16">        filemap_write_and_wait</a>
+<a class="sourceLine" id="cb5-17" title="17">          filemap_write_and_wait_range</a>
+<a class="sourceLine" id="cb5-18" title="18">            filemap_check_errors</a>
+<a class="sourceLine" id="cb5-19" title="19">              test_and_clear_bit(..., &amp;mapping-&gt;flags) <span class="co">// 返回 flags 中的错误，并清除</span></a>
+<a class="sourceLine" id="cb5-20" title="20">  filemap_fdatawrite_range <span class="co">// 异步写</span></a>
+<a class="sourceLine" id="cb5-21" title="21">  filemap_fdatawait_range <span class="co">// 同步写</span></a>
+<a class="sourceLine" id="cb5-22" title="22">    __filemap_check_errors</a>
+<a class="sourceLine" id="cb5-23" title="23">      test_and_clear_bit(..., &amp;mapping-&gt;flags) <span class="co">// 返回 flags 中的错误，并清除</span></a>
+<a class="sourceLine" id="cb5-24" title="24">  generic_write_sync <span class="co">// 同步写</span></a>
+<a class="sourceLine" id="cb5-25" title="25">    vfs_fsync_range</a>
+<a class="sourceLine" id="cb5-26" title="26">      nfs_file_fsync</a>
+<a class="sourceLine" id="cb5-27" title="27">  filemap_check_wb_err <span class="co">// 返回更详细的错误</span></a>
+<a class="sourceLine" id="cb5-28" title="28">    <span class="cf">return</span> -(file-&gt;f_mapping-&gt;wb_err &amp; MAX_ERRNO) <span class="co">// 返回wb_err 中的错误</span></a></code></pre></div>
+<h2 id="第二个补丁-flush返回正确的错误"><span class="header-section-number">3.2</span> 第二个补丁: flush返回正确的错误</h2>
+<p><a href="https://patchwork.kernel.org/project/linux-nfs/patch/20220401034409.256770-3-chenxiaosong2@huawei.com/">NFS: nfs{,4}_file_flush() return correct writeback errors</a></p>
+<p>只有在 <code>nfs_wb_all</code> 有新错误产生的情况下，才尝试返回更详细的错误:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb6-1" title="1">nfs_file_flush</a>
+<a class="sourceLine" id="cb6-2" title="2">  <span class="co">// nfs_wb_all 执行期间如果有新的错误产生，才尝试返回更详细的错误，否则返回0</span></a>
+<a class="sourceLine" id="cb6-3" title="3">  <span class="cf">if</span> (nfs_wb_all)</a>
+<a class="sourceLine" id="cb6-4" title="4">  filemap_check_wb_err</a>
+<a class="sourceLine" id="cb6-5" title="5">    <span class="cf">return</span> -(file-&gt;f_mapping-&gt;wb_err &amp; MAX_ERRNO) <span class="co">// 返回 wb_err 中的错误</span></a></code></pre></div>
+<h2 id="第三个补丁-解决-async-write-变成-sync-write-的问题"><span class="header-section-number">3.3</span> 第三个补丁: 解决 async write 变成 sync write 的问题</h2>
+<p><a href="https://patchwork.kernel.org/project/linux-nfs/patch/20220401034409.256770-4-chenxiaosong2@huawei.com/">Revert “nfs: nfs_file_write() should check for writeback errors”</a></p>
+<p>回退问题补丁 “nfs: nfs_file_write() should check for writeback errors” 问题补丁存在的问题:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb7-1" title="1">write</a>
+<a class="sourceLine" id="cb7-2" title="2">  ksys_write</a>
+<a class="sourceLine" id="cb7-3" title="3">    vfs_write</a>
+<a class="sourceLine" id="cb7-4" title="4">      new_sync_write</a>
+<a class="sourceLine" id="cb7-5" title="5">        call_write_iter</a>
+<a class="sourceLine" id="cb7-6" title="6">          nfs_file_write</a>
+<a class="sourceLine" id="cb7-7" title="7">            since = filemap_sample_wb_err = <span class="dv">0</span></a>
+<a class="sourceLine" id="cb7-8" title="8">              errseq_sample</a>
+<a class="sourceLine" id="cb7-9" title="9">                <span class="cf">if</span> (!(old &amp; ERRSEQ_SEEM)) <span class="co">// 上一次执行 dd 时的错误还没清除</span></a>
+<a class="sourceLine" id="cb7-10" title="10">                <span class="cf">return</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb7-11" title="11">            error = filemap_check_wb_err(..., since = <span class="dv">0</span>) = -ENOSPC</a>
+<a class="sourceLine" id="cb7-12" title="12">            <span class="cf">if</span> (nfs_need_check_write) <span class="co">// 条件满足</span></a>
+<a class="sourceLine" id="cb7-13" title="13">              nfs_error_is_fatal_on_server</a>
+<a class="sourceLine" id="cb7-14" title="14">                nfs_error_is_fatal</a>
+<a class="sourceLine" id="cb7-15" title="15">                  <span class="cf">return</span> true <span class="co">// -ENOSPC</span></a>
+<a class="sourceLine" id="cb7-16" title="16">            nfs_wb_all <span class="co">// 变成了 sync write，每 4K 耗时约 10ms，导致 dd 命令非常非常慢</span></a></code></pre></div>
+<h1 id="maintainer-的修改方案未解决此问题"><span class="header-section-number">4</span> maintainer 的修改方案（未解决此问题）</h1>
+<p>补丁集: <a href="https://patchwork.kernel.org/project/linux-nfs/list/?series=631225&amp;state=%2A&amp;archive=both">Ensure mapping errors are reported only once</a></p>
+<h2 id="想解决问题的补丁实际没解决"><span class="header-section-number">4.1</span> 想解决问题的补丁（实际没解决）</h2>
+<p><a href="https://patchwork.kernel.org/project/linux-nfs/patch/20220411213346.762302-4-trondmy@kernel.org/">NFS: Don’t report ENOSPC write errors twice</a></p>
+<p>存在的问题:</p>
+<pre><code>1. 没解决空间释放后执行 dd 报错的问题
+2. async write 清除 wb_err</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb9-1" title="1"><span class="co">// dd 命令会多次调用 write, 由于第一次调用 write 就报错 -ENOSPC, 所以后续不再调用 write，dd 命令失败</span></a>
+<a class="sourceLine" id="cb9-2" title="2">nfs_file_write</a>
+<a class="sourceLine" id="cb9-3" title="3">  since = filemap_sample_wb_err = <span class="dv">0</span></a>
+<a class="sourceLine" id="cb9-4" title="4">    errseq_sample</a>
+<a class="sourceLine" id="cb9-5" title="5">      <span class="cf">if</span> (!(old &amp; ERRSEQ_SEEM)) <span class="co">// 上一次执行 dd 时的错误还没清除</span></a>
+<a class="sourceLine" id="cb9-6" title="6">      <span class="cf">return</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb9-7" title="7">  error = filemap_check_wb_err(..., since = <span class="dv">0</span>) = -ENOSPC <span class="co">// 没有新的错误产生，却报错</span></a>
+<a class="sourceLine" id="cb9-8" title="8">  nfs_wb_all <span class="co">// 执行了一次落盘</span></a>
+<a class="sourceLine" id="cb9-9" title="9">  error = file_check_and_advance_wb_err <span class="co">// 返回 -ENOSPC，并清除 wb_err 错误</span></a>
+<a class="sourceLine" id="cb9-10" title="10">    errseq_check_and_advance</a>
+<a class="sourceLine" id="cb9-11" title="11">      <span class="co">// *eseq 和 old 比较，相等则 *eseq = new, return old，不相等则 return *eseq</span></a>
+<a class="sourceLine" id="cb9-12" title="12">      cmpxchg(eseq, old, new)</a>
+<a class="sourceLine" id="cb9-13" title="13">        *eseq = new</a>
+<a class="sourceLine" id="cb9-14" title="14">        <span class="cf">return</span> old</a>
+<a class="sourceLine" id="cb9-15" title="15">      <span class="cf">return</span> -(new &amp; MAX_ERRNO)</a>
+<a class="sourceLine" id="cb9-16" title="16">  <span class="cf">return</span> error <span class="co">// -ENOSPC</span></a></code></pre></div>
+<h2 id="maintainer-的其他补丁"><span class="header-section-number">4.2</span> maintainer 的其他补丁</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb10-1" title="1">[v2,<span class="dv">1</span>/<span class="dv">5</span>] NFS: Do not report EINTR/ERESTARTSYS as mapping errors</a>
+<a class="sourceLine" id="cb10-2" title="2">如果执行 flush 时被信号打断，page 请求重新排队传输</a>
+<a class="sourceLine" id="cb10-3" title="3"></a>
+<a class="sourceLine" id="cb10-4" title="4">[v2,<span class="dv">2</span>/<span class="dv">5</span>] NFS: fsync() should report filesystem errors over EINTR/ERESTARTSYS</a>
+<a class="sourceLine" id="cb10-5" title="5">`nfs_file_fsync -&gt; nfs_file_fsync_commit -&gt; nfs_commit_inode` 被信号打断，优先报 wb err</a>
+<a class="sourceLine" id="cb10-6" title="6"></a>
+<a class="sourceLine" id="cb10-7" title="7">[v2,<span class="dv">4</span>/<span class="dv">5</span>] NFS: Do not report flush errors in nfs_write_end()</a>
+<a class="sourceLine" id="cb10-8" title="8">在 `nfs_write_end` 中推迟报错</a>
+<a class="sourceLine" id="cb10-9" title="9"></a>
+<a class="sourceLine" id="cb10-10" title="10">[v2,<span class="dv">5</span>/<span class="dv">5</span>] NFS: Don&#39;t report errors from nfs_pageio_complete() more than once</a>
+<a class="sourceLine" id="cb10-11" title="11">不尝试报 nfs_pageio_complete 的错误</a></code></pre></div>
+<h1 id="其他文件系统对-wb-err-的处理"><span class="header-section-number">5</span> 其他文件系统对 wb err 的处理</h1>
+<h2 id="调用-fsync-时清除-wb_err"><span class="header-section-number">5.1</span> 调用 fsync 时清除 wb_err</h2>
+<p><code>btrfs, ceph, ext4, fuse</code> 调用 <code>file_check_and_advance_wb_err</code> 清除 <code>address_space wb_err</code></p>
+<h2 id="实现-flush-的文件系统"><span class="header-section-number">5.2</span> 实现 flush 的文件系统</h2>
+<p><code>cifs</code> 通过 <code>address_space</code> 中的 <code>flags</code> 返回错误（只有 -EIO 或 -ENOSPC）:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb11-1" title="1">cifs_flush</a>
+<a class="sourceLine" id="cb11-2" title="2">  filemap_write_and_wait</a>
+<a class="sourceLine" id="cb11-3" title="3">    filemap_write_and_wait_range</a>
+<a class="sourceLine" id="cb11-4" title="4">      filemap_check_errors</a>
+<a class="sourceLine" id="cb11-5" title="5">        test_and_clear_bit(..., &amp;mapping-&gt;flags)</a></code></pre></div>
+<p><code>fuse</code> 通过 <code>address_space</code> 中的 <code>flags</code> 返回错误（只有 -EIO 或 -ENOSPC）:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb12-1" title="1">fuse_flush</a>
+<a class="sourceLine" id="cb12-2" title="2">  filemap_check_errors</a>
+<a class="sourceLine" id="cb12-3" title="3">    test_and_clear_bit(..., &amp;mapping-&gt;flags)</a></code></pre></div>
+<p><code>orangefs</code> 通过 <code>address_space</code> 中的 <code>flags</code> 返回错误（只有 -EIO 或 -ENOSPC）:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb13-1" title="1">orangefs_flush</a>
+<a class="sourceLine" id="cb13-2" title="2">  filemap_write_and_wait</a>
+<a class="sourceLine" id="cb13-3" title="3">    filemap_write_and_wait_range</a>
+<a class="sourceLine" id="cb13-4" title="4">      filemap_check_errors</a>
+<a class="sourceLine" id="cb13-5" title="5">        test_and_clear_bit(..., &amp;mapping-&gt;flags)</a></code></pre></div>
+<p><code>f2fs</code> 的 <code>f2fs_file_flush</code> 总是返回0</p>
+<p><code>ecryptfs, overlayfs</code> 调用真实文件系统的 <code>flush</code> 函数</p>
+<h2 id="async-write"><span class="header-section-number">5.3</span> async write</h2>
+<p>其他文件系统异步写都不会清除 <code>address_space</code> 中的 <code>wb_err</code>, 因为只会被 <code>file_check_and_advance_wb_err</code> 清除</p>
+<h1 id="与-maintainer-的交流"><span class="header-section-number">6</span> 与 maintainer 的交流</h1>
+<p><a href="https://patchwork.kernel.org/project/linux-nfs/patch/20220411213346.762302-4-trondmy@kernel.org/">[v2,3/5] NFS: Don’t report ENOSPC write errors twice</a></p>
+<p><a href="https://patchwork.kernel.org/project/linux-nfs/patch/20220305124636.2002383-2-chenxiaosong2@huawei.com/">[-next,1/2] nfs: nfs{,4}_file_flush should consume writeback error</a></p>
+<p><a href="https://patchwork.kernel.org/project/linux-nfs/patch/20220614152817.271507-1-chenxiaosong2@huawei.com/">[-next,v2] NFS: report and clear ENOSPC/EFBIG/EDQUOT writeback error on close() file</a></p>
+<h2 id="maintainer-两个版本的补丁都无法解决问题"><span class="header-section-number">6.1</span> maintainer 两个版本的补丁都无法解决问题</h2>
+<p>和 maintainer 说了2次，他的回复没有正面回答这个问题。</p>
+<p>第一次没有回答，马上发了第2版。</p>
+<p>第二次没有正面回答:</p>
+<pre><code>I understand all that. The point you appear to be missing is that this
+is in fact in agreement with the documented behaviour in the write(2)
+and fsync(2) manpages. These errors are supposed to be reported once,
+even if they were caused by a write to a different file descriptor.
+
+In fact, even with your change, if you make the second &#39;dd&#39; call fsync
+(by adding a conv=fsync), I would expect it to report the exact same
+ENOSPC error, and that would be correct behaviour!
+
+So my patches are more concerned with the fact that we appear to be
+reporting the same error more than once, rather than the fact that
+we&#39;re reporting them in the second attempt at I/O. As far as I&#39;m
+concerned, that is the main change that is needed to meet the behaviour
+that is documented in the manpages.</code></pre>
+<p>回复中提到我的补丁空间释放后加 <code>(conv=fsync)</code> 执行 <code>dd</code> 时应该要报错，我回复说我的补丁符合他的预期，maintainer 不再回复。</p>
+<h2 id="maintainer-不断强调是文档规定"><span class="header-section-number">6.2</span> maintainer 不断强调是文档规定</h2>
+<pre><code>&gt; And more importantly, we can not detect new error by using 
+&gt; filemap_sample_wb_err()/filemap_sample_wb_err() while
+&gt; nfs_wb_all(),just 
+&gt; as I described:
+&gt; 
+&gt; ```c
+&gt;    since = filemap_sample_wb_err() = 0
+&gt;      errseq_sample
+&gt;        if (!(old &amp; ERRSEQ_SEEN)) // nobody see the error
+&gt;          return 0;
+&gt;    nfs_wb_all // no new error
+&gt;    error = filemap_check_wb_err(..., since) != 0 // unexpected error
+&gt; ```
+
+
+As I keep repeating, that is _documented behaviour_!</code></pre>
+<p>我和他说的明明是 <code>filemap_sample_wb_err/filemap_check_wb_err</code> 的用法错误，他却强调是文档规定</p>
+<h2 id="maintainer-最后直接说是vfs的问题"><span class="header-section-number">6.3</span> maintainer 最后直接说是vfs的问题</h2>
+<pre><code>If you want the rules to change, then you need to talk to the entire
+filesystem community and get them to accept that the VFS level
+implementation of error handling is incorrect.
+
+That&#39;s my final word on this subject.</code></pre>
+<p>vfs的处理机制明明是没有问题的，他到最后却直接说是vfs处理机制的问题，而且说不再讨论这个问题。</p>
+</body>
+</html>

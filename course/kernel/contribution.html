@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>陈孝松Linux内核贡献</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">陈孝松Linux内核贡献</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#mainline"><span class="toc-section-number">1</span> Linux内核上游（Upstream）mainline仓库贡献</a><ul>
+<li><a href="#mainline-smb"><span class="toc-section-number">1.1</span> SMB贡献</a></li>
+<li><a href="#mainline-others"><span class="toc-section-number">1.2</span> 内核其他模块贡献</a></li>
+</ul></li>
+<li><a href="#upstream-other"><span class="toc-section-number">2</span> Linux内核上游（Upstream）其他贡献</a></li>
+<li><a href="#openeuler-enfs"><span class="toc-section-number">3</span> openEuler的nfs多路径（nfs+）贡献</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<h1 id="mainline"><span class="header-section-number">1</span> Linux内核上游（Upstream）mainline仓库贡献</h1>
+<p><a href="https://lore.kernel.org/all/?q=chenxiaosong">点击查看kernel.org网站Linux内核邮件列表我和社区的沟通</a></p>
+<p><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/?qt=grep&amp;q=chenxiaosong">点击查看kernel.org网站上我的Linux内核上游仓库提交记录</a>（加载需要一丢丢时间哈，可以直接查看下面列出的补丁链接）</p>
+<p>Linux内核是我现在的工作，更是我的兴趣和信仰（自由软件），在内核社区里可以让我这个小菜鸟直接和世上最顶尖的程序员交流。</p>
+<p>主要从事的方向是<strong>文件系统</strong>（nfs，smb等），修复多个<strong>内核社区CVE</strong>（通用漏洞披露，Common Vulnerabilities and Exposures）。</p>
+<p>下面按时间顺序列出所有的补丁，最新的补丁放在前面。</p>
+<h2 id="mainline-smb"><span class="header-section-number">1.1</span> SMB贡献</h2>
+<p><a href="https://chenxiaosong.com/course/smb/contribution.html">点击这里查看我的SMB贡献</a>。</p>
+<p>我的内核补丁大部分都是SMB方向的。</p>
+<h2 id="mainline-others"><span class="header-section-number">1.2</span> 内核其他模块贡献</h2>
+<ul>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=52e89100754b2e888cb63bf2d19e65d809497cd6">52e89100754b NFSv4, NFSD: move enum nfs_cb_opnum4 to include/linux/nfs4.h</a>（<a href="https://lore.kernel.org/all/tencent_03EDD0CAFBF93A9667CFCA1B68EDB4C4A109@qq.com/">邮件列表</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=b4e4f66901658fae0614dea5bf91062a5387eda7">b4e4f6690165 NFSv4.x: Fail client initialisation if state manager thread can’t run</a>（这个补丁是maintainer剽窃我的，<a href="https://lore.kernel.org/linux-nfs/20221112073055.1024799-1-chenxiaosong2@huawei.com/">我的补丁请查看这里</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d564d2c4c2445cb0972453933dc87c2dcaac8597">d564d2c4c244 NFSv4: check FMODE_EXEC from open context mode in nfs4_opendata_access()</a>（<a href="https://chenxiaosong.com/course/kernel/my-patch/CVE-2022-24448.html">查看分析</a>）</li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2022-24448">CVE-2022-24448</a>: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6f1c1d95dc93b52a8ef9cc1f3f610c2d5e6b217b">6f1c1d95dc93 NFS: make sure open context mode have FMODE_EXEC when file open for exec</a>（<a href="https://chenxiaosong.com/course/kernel/my-patch/CVE-2022-24448.html">查看分析</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a4c853af0c511d7e0f7cb306bbc8a4f1dbdb64ca">a4c853af0c51 btrfs: add might_sleep() annotations</a>（<a href="https://lore.kernel.org/all/20221116142354.1228954-2-chenxiaosong2@huawei.com/">邮件列表</a>）</li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2022-49033">CVE-2022-49033</a>: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f7e942b5bb35d8e3af54053d19a6bf04143a3955">f7e942b5bb35 btrfs: qgroup: fix sleep from invalid context bug in btrfs_qgroup_inherit()</a>（<a href="https://lore.kernel.org/all/20221116142354.1228954-3-chenxiaosong2@huawei.com/">邮件列表</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=1342f9dd3fc219089deeb2620f6790f19b4129b1">1342f9dd3fc2 nfsd: use DEFINE_SHOW_ATTRIBUTE to define nfsd_file_cache_stats_fops</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=64776611a06322b99386f8dfe3b3ba1aa0347a38">64776611a063 nfsd: use DEFINE_SHOW_ATTRIBUTE to define nfsd_reply_cache_stats_fops</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=1d7f6b302b75ff7acb9eb3cab0c631b10cfa7542">1d7f6b302b75 nfsd: use DEFINE_SHOW_ATTRIBUTE to define client_info_fops</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9beeaab8e05d353d709103cafa1941714b4d5d94">9beeaab8e05d nfsd: use DEFINE_SHOW_ATTRIBUTE to define export_features_fops and supported_enctypes_fops</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0cfb0c4228a5c8e2ed2b58f8309b660b187cef02">0cfb0c4228a5 nfsd: use DEFINE_PROC_SHOW_ATTRIBUTE to define nfsd_proc_ops</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=19029f3f47c7f2dd796cecd001619a37034d658a">19029f3f47c7 debugfs: use DEFINE_SHOW_ATTRIBUTE to define debugfs_regset32_fops</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ddfa68d415c749390e6a89f760b5edfa2774ad7b">ddfa68d415c7 mtd: rawnand: remove misguided comment of nand_get_device()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=1b513f613731e2afc05550e8070d79fac80c661e">1b513f613731 ntfs: fix BUG_ON in ntfs_lookup_inode_by_name()</a>（<a href="https://lore.kernel.org/all/20220809064730.2316892-1-chenxiaosong2@huawei.com/">邮件列表</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=001c179c4e26d04db8c9f5e3fef9558b58356be6">001c179c4e26 xfs: fix NULL pointer dereference in xfs_getbmap()</a>（<a href="https://chenxiaosong.com/course/kernel/my-patch/xfs-fix-NULL-pointer-dereference-in-xfs_getbmap.html">查看分析</a>）</li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2023-26607">CVE-2023-26607</a>: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=38c9c22a85aeed28d0831f230136e9cf6fa2ed44">38c9c22a85ae ntfs: fix use-after-free in ntfs_ucsncmp()</a>（<a href="https://lore.kernel.org/all/20220709064511.3304299-1-chenxiaosong2@huawei.com/">邮件列表</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=064109db53ecc5d88621d02f36da9f33ca0d64bd">064109db53ec NFS: remove redundant code in nfs_file_write()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e6005436f6cc9ed13288f936903f0151e5543485">e6005436f6cc NFS: Don’t report ENOSPC write errors twice</a>（这个补丁是maintainer剽窃我的，<a href="https://chenxiaosong.com/course/kernel/my-patch/nfs-handle-writeback-errors-incorrectly.html">我的补丁请查看这里</a>）</li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2022-24448">CVE-2022-24448</a>: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b243874f6f9568b2daf1a00e9222cacdc15e159c">b243874f6f95 NFSv4: fix open failure with O_ACCMODE flag</a>（<a href="https://chenxiaosong.com/course/kernel/my-patch/CVE-2022-24448.html">查看分析</a>）</li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2022-24448">CVE-2022-24448</a>: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ab0fc21bc7105b54bafd85bd8b82742f9e68898a">ab0fc21bc710 Revert “NFSv4: Handle the special Linux file open access mode”</a>（<a href="https://chenxiaosong.com/course/kernel/my-patch/CVE-2022-24448.html">查看分析</a>）</li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2022-48931">CVE-2022-48931</a>: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=84ec758fb2daa236026506868c8796b0500c047d">84ec758fb2da configfs: fix a race in configfs_{,un}register_subsystem()</a>（<a href="https://chenxiaosong.com/course/kernel/my-patch/configfs-fix-a-race-in-configfs_-un-register_subsyst.html">查看分析</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=aa4ceed7c3276852031a3e3d6fa767ff1858831f">aa4ceed7c327 apparmor: fix doc warning</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=5823e40055166cdf959a77e7b5fe75998b0b9b1f">5823e4005516 nfs_common: fix doc warning</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=98eaa63e96273de075f3ce4eac0f18b33d28b84c">98eaa63e9627 tomoyo: fix doc warnings</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=1d3156396cf6ea0873145092f4e040374ff1d862">1d3156396cf6 x86/sgx: Correct kernel-doc’s arg name in sgx_encl_release()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=02ffbe6351f5c88337143bcbc649832ded7445c0">02ffbe6351f5 KVM: SVM: fix doc warnings</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fe6bde732be8c4711a878b11491d9a2749b03909">fe6bde732be8 Smack: fix doc warning</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=5ca54404e68de8560ca15e8d0e6b625fd05ceeaf">5ca54404e68d perf: qcom: Remove redundant dev_err call in qcom_l3_cache_pmu_probe()</a></li>
+</ul>
+<h1 id="upstream-other"><span class="header-section-number">2</span> Linux内核上游（Upstream）其他贡献</h1>
+<p>除了mainline仓库的补丁外，还有以下补丁:</p>
+<ul>
+<li>stable仓库linux-4.19.y分支: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=linux-4.19.y&amp;id=8033f109be4a1d5b466284e8ab9119c04f2a334b">VFS: Fix memory leak caused by concurrently mounting fs with subtype</a>，<a href="https://lore.kernel.org/all/20211102142206.3972465-1-chenxiaosong2@huawei.com/">2021年11月2日提的补丁</a>，<a href="https://lore.kernel.org/all/20220513142228.347780404@linuxfoundation.org/">到半年后2022年5月13日才合入stable仓库linux-4.19.y分支</a>。</li>
+<li>邮件列表: 补丁集: <a href="https://chenxiaosong.com/course/kernel/my-patch/nfs-handle-writeback-errors-incorrectly.html">NFS回写错误处理不正确的问题</a>（未合入主线）</li>
+<li>邮件列表: <a href="https://lore.kernel.org/all/20241209085410.601489-1-chenxiaosong@chenxiaosong.com/">[PATCH 4.19] NFS: fix null-ptr-deref in nfs_inode_add_request()</a></li>
+</ul>
+<h1 id="openeuler-enfs"><span class="header-section-number">3</span> openEuler的nfs多路径（nfs+）贡献</h1>
+<p><a href="https://chenxiaosong.com/enfs-contribution.html">点击这里查看我的openEuler nfs+贡献</a>。</p>
+</body>
+</html>

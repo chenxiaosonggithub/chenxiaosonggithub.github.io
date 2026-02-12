@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>BPF</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">BPF</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#bpftrace"><span class="toc-section-number">1</span> bpftrace</a><ul>
+<li><a href="#安装"><span class="toc-section-number">1.1</span> 安装</a></li>
+<li><a href="#例子"><span class="toc-section-number">1.2</span> 例子</a></li>
+</ul></li>
+<li><a href="#bcc"><span class="toc-section-number">2</span> bcc</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<p>BPF是最近几年比较火的内核子系统，我也与时俱进来学习一下。</p>
+<ul>
+<li>BPF（Berkeley Packet Filter）: 伯克利数据包过滤器，诞生于1992年，用于提升网络包过滤工具的性能。 1997年引入Linux内核，称为Linux套接字过滤器（LSF，Linux Socket Filter）。 2014年重新实现BPF的补丁合入Linux内核主线。主要应用领域: 网络、可观测性、安全。</li>
+<li>eBPF（extended BPF）: 扩展后的BPF，官方的缩写仍然是BPF，Linux 3.15添加到内核。 BCC和bpftrace是可以提供高级语言编程支持的BPF前端。</li>
+<li>bpftrace: 提供了专门用于创建BPF工具的高级语言支持。相比BCC，bpftrace更适合编写功能强大的单行程序、短小的脚本。</li>
+<li>BCC（BPF Compiler Collection）: BPF编译器集合，最早用于开发BPF跟踪程序的高级框架，提供高级语言环境来实现用户端接口，如BPF程序、C语言、Python、Lua、C++。相比bpftrace，BCC更适合开发复杂的脚本和作为后台进程使用。<a href="https://github.com/iovisor/bcc">源码</a>。</li>
+</ul>
+<h1 id="bpftrace"><span class="header-section-number">1</span> bpftrace</h1>
+<p><a href="https://github.com/bpftrace/bpftrace">bpftrace源码</a>。</p>
+<h2 id="安装"><span class="header-section-number">1.1</span> 安装</h2>
+<p>编译Linux内核时要打开以下配置:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="va">CONFIG_BPF=</span>y</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="va">CONFIG_BPF_SYSCALL=</span>y</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="va">CONFIG_BPF_JIT=</span>y</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="va">CONFIG_HAVE_EBPF_JIT=</span>y</a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="va">CONFIG_BPF_EVENTS=</span>y</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="va">CONFIG_FTRACE_SYSCALLS=</span>y</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="va">CONFIG_FUNCTION_TRACER=</span>y</a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="va">CONFIG_HAVE_DYNAMIC_FTRACE=</span>y</a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="va">CONFIG_DYNAMIC_FTRACE=</span>y</a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="va">CONFIG_HAVE_KPROBES=</span>y</a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="va">CONFIG_KPROBES=</span>y</a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="va">CONFIG_KPROBE_EVENTS=</span>y</a>
+<a class="sourceLine" id="cb1-13" title="13"><span class="va">CONFIG_ARCH_SUPPORTS_UPROBES=</span>y</a>
+<a class="sourceLine" id="cb1-14" title="14"><span class="va">CONFIG_UPROBES=</span>y</a>
+<a class="sourceLine" id="cb1-15" title="15"><span class="va">CONFIG_UPROBE_EVENTS=</span>y</a>
+<a class="sourceLine" id="cb1-16" title="16"><span class="va">CONFIG_DEBUG_FS=</span>y</a></code></pre></div>
+<p>参考<a href="https://github.com/bpftrace/bpftrace/blob/master/INSTALL.md"><code>INSTALL.md</code></a></p>
+<p>可以使用包管理器安装:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">sudo</span> apt-get update -y <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> apt install bpftrace -y</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="fu">sudo</span> dnf install bpftrace -y</a></code></pre></div>
+<p>或者使用源码安装。</p>
+<p>fedora环境，参考<a href="https://github.com/bpftrace/bpftrace/blob/master/docker/Dockerfile.fedora"><code>Dockerfile.fedora</code></a>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">sudo</span> dnf install -y \</a>
+<a class="sourceLine" id="cb3-2" title="2">        asciidoctor \</a>
+<a class="sourceLine" id="cb3-3" title="3">        bison \</a>
+<a class="sourceLine" id="cb3-4" title="4">        binutils-devel \</a>
+<a class="sourceLine" id="cb3-5" title="5">        bcc-devel \</a>
+<a class="sourceLine" id="cb3-6" title="6">        cereal-devel \</a>
+<a class="sourceLine" id="cb3-7" title="7">        clang-devel \</a>
+<a class="sourceLine" id="cb3-8" title="8">        cmake \</a>
+<a class="sourceLine" id="cb3-9" title="9">        elfutils-devel \</a>
+<a class="sourceLine" id="cb3-10" title="10">        elfutils-libelf-devel \</a>
+<a class="sourceLine" id="cb3-11" title="11">        elfutils-libs \</a>
+<a class="sourceLine" id="cb3-12" title="12">        flex \</a>
+<a class="sourceLine" id="cb3-13" title="13">        gcc \</a>
+<a class="sourceLine" id="cb3-14" title="14">        gcc-c++ \</a>
+<a class="sourceLine" id="cb3-15" title="15">        libpcap-devel \</a>
+<a class="sourceLine" id="cb3-16" title="16">        libbpf-devel \</a>
+<a class="sourceLine" id="cb3-17" title="17">        llvm-devel \</a>
+<a class="sourceLine" id="cb3-18" title="18">        make \</a>
+<a class="sourceLine" id="cb3-19" title="19">        systemtap-sdt-devel \</a>
+<a class="sourceLine" id="cb3-20" title="20">        zlib-devel</a></code></pre></div>
+<p>debian环境，参考<a href="https://github.com/bpftrace/bpftrace/blob/master/docker/Dockerfile.debian"><code>Dockerfile.debian</code></a>，注意debian版本不能太老，版本太老（如bullseye）有些默认安装的软件可能不支持编译。</p>
+<p>编译:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">git</span> clone https://github.com/bpftrace/bpftrace</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="bu">cd</span> bpftrace</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="co"># mkdir build; cd build; cmake -DCMAKE_BUILD_TYPE=DEBUG .. # 《bpf之巅》书上的命令</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="fu">mkdir</span> build<span class="kw">;</span> <span class="bu">cd</span> build<span class="kw">;</span> <span class="fu">cmake</span> -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/local ..</a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="fu">make</span> -j<span class="va">$(</span><span class="ex">nproc</span><span class="va">)</span> <span class="co"># 内存要大一点，否则会发生oom</span></a></code></pre></div>
+<p>测试和安装:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">./src/bpftrace</span> -e <span class="st">&#39;kprobe:do_nanosleep { printf(&quot;sleep by %s\n&quot;, comm); }&#39;</span> <span class="co"># 输出 &quot;sleep by crond&quot; 之类的</span></a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="fu">sudo</span> make install -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span> <span class="co"># 二进制安装到 /usr/local/bin/，工具安装/usr/local/share/bpftrace/tools/</span></a></code></pre></div>
+<h2 id="例子"><span class="header-section-number">1.2</span> 例子</h2>
+<p><code>test.bt</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">kprobe</span>:ext2_read_folio</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="kw">{</span></a>
+<a class="sourceLine" id="cb6-3" title="3">        <span class="ex">@start</span>[tid] = nsecs<span class="kw">;</span></a>
+<a class="sourceLine" id="cb6-4" title="4">        <span class="bu">printf</span>(<span class="st">&quot;kprobe\n&quot;</span>);</a>
+<a class="sourceLine" id="cb6-5" title="5">        <span class="ex">print</span>(kstack());</a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="kw">}</span></a>
+<a class="sourceLine" id="cb6-7" title="7"></a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="ex">kretprobe</span>:ext2_read_folio</a>
+<a class="sourceLine" id="cb6-9" title="9"><span class="kw">{</span></a>
+<a class="sourceLine" id="cb6-10" title="10">        <span class="va">$us</span> = <span class="kw">(</span><span class="ex">nsecs</span> - @start[tid]<span class="kw">)</span> <span class="ex">/</span> 100<span class="kw">;</span></a>
+<a class="sourceLine" id="cb6-11" title="11">        <span class="bu">printf</span>(<span class="st">&quot;kretprobe, duration %d\n&quot;</span>, <span class="va">$us</span>);</a>
+<a class="sourceLine" id="cb6-12" title="12">        <span class="ex">delete</span>(@start[tid]);</a>
+<a class="sourceLine" id="cb6-13" title="13">        <span class="ex">print</span>(kstack());</a>
+<a class="sourceLine" id="cb6-14" title="14"><span class="kw">}</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="ex">bpftrace</span> test.bt <span class="kw">&amp;</span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="ex">mkfs.ext2</span> -F image</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="fu">mount</span> image /mnt</a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="bu">echo</span> something <span class="op">&gt;</span> /mnt/file</a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="fu">cat</span> /mnt/file</a></code></pre></div>
+<h1 id="bcc"><span class="header-section-number">2</span> bcc</h1>
+<p>安装:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">apt</span> install -y bpfcc-tools <span class="co"># debian</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">dnf</span> install -y bcc-tools bcc-doc <span class="co"># fedora</span></a></code></pre></div>
+<p>debian下例子所在路径<code>/usr/share/doc/bpfcc-tools/examples/</code>，fedora下例子所在路径<code>/usr/share/doc/bcc/examples/</code>。</p>
+<p>可以参考以下demo:</p>
+<ul>
+<li><code>tracing/hello_fields.py</code>: 执行到<code>clone()</code>系统调用时打印<code>Hello, World!</code>。</li>
+<li><code>tracing/task_switch.py</code>: 统计进程切换信息，如<code>task_switch[    0-&gt;  308]=20</code>表示从<code>0</code>号进程切换到<code>308</code>号进程发生了<code>20</code>次。</li>
+</ul>
+</body>
+</html>

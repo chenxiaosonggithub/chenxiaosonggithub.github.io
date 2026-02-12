@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>openEuler的sysmonitor</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">openEuler的sysmonitor</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#测试"><span class="toc-section-number">1</span> 测试</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">2</span> 代码分析</a></li>
+<li><a href="#宿主机上编译"><span class="toc-section-number">3</span> 宿主机上编译</a></li>
+<li><a href="#虚拟机中编译"><span class="toc-section-number">4</span> 虚拟机中编译</a></li>
+</ul>
+</nav>
+<p>sysmonitor工具通过内核的inotify特性实现文件的监控功能。inotify 是 Linux 内核提供的一种文件系统监视机制，用于监控文件系统事件，比如文件或目录的创建、删除、修改等。它允许应用程序在文件系统发生变化时立即获得通知，而不需要轮询文件系统状态。</p>
+<p>相关文档: <a href="https://gitee.com/openeuler/docs/tree/stable2-22.03_LTS_SP2/docs/zh/docs/sysmonitor">docs/sysmonitor</a>。</p>
+<h1 id="测试"><span class="header-section-number">1</span> 测试</h1>
+<p>当前（2023年12月13日）仅在<a href="https://gitee.com/openeuler/kernel/tree/openEuler-22.03-LTS-SP2/">openEuler内核openEuler-22.03-LTS-SP2分支</a>发布。</p>
+<p>下载openeuler的qcow2镜像（可参考<a href="https://chenxiaosong.com/src/kernel-environment/kernel-qemu-kvm.html">《QEMU/KVM环境搭建与使用》</a>中openeuler相关的章节），安装并启动sysmonitor:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">dnf</span> install sysmonitor -y</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="ex">systemctl</span> restart sysmonitor</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="ex">systemctl</span> restart rsyslog</a></code></pre></div>
+<p>编辑<code>/etc/sysmonitor/file</code>配置文件，在最后一行添加<code>/root 0x300</code>。创建文件<code>touch /root/file</code>，删除文件<code>rm /root/file</code>，查看日志:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">tail</span> -f /var/log/sysmonitor.log</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="ex">1</span> events queued</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="ex">1th</span> event handled</a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="ex">Subfile</span> <span class="st">&quot;file&quot;</span> under <span class="st">&quot;/root&quot;</span> was added.</a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="ex">1</span> events queued</a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="ex">1th</span> event handled</a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="ex">Subfile</span> <span class="st">&quot;file&quot;</span> under <span class="st">&quot;/root&quot;</span> was deleted.</a></code></pre></div>
+<h1 id="代码分析"><span class="header-section-number">2</span> 代码分析</h1>
+<p><a href="https://gitee.com/src-openeuler/sysmonitor">src-openeuler/sysmonitor</a>是开发中的代码。<a href="https://gitee.com/openeuler/sysmonitor">openeuler/sysmonitor</a>是发布的代码。</p>
+<p>我们期望<code>set_event_msg()</code>函数中的打印是类似<code>Subfile "file" under "/root" was added, comm: 进程名[进程pid], parent comm: 父进程名[父进程pid]</code>，但实际运行的日志中没有进程和父进程的信息，代码流程如下:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb3-1" title="1"><span class="pp">#define INOTIFY_IOC_SET_SYSMONITOR_FM 0xABAB</span></a>
+<a class="sourceLine" id="cb3-2" title="2"></a>
+<a class="sourceLine" id="cb3-3" title="3">main</a>
+<a class="sourceLine" id="cb3-4" title="4">  monitor_var_init</a>
+<a class="sourceLine" id="cb3-5" title="5">    file_monitor_init</a>
+<a class="sourceLine" id="cb3-6" title="6">      file_monitor_start</a>
+<a class="sourceLine" id="cb3-7" title="7">        open_inotify_fd</a>
+<a class="sourceLine" id="cb3-8" title="8">          ret = ioctl(fd, INOTIFY_IOC_SET_SYSMONITOR_FM) = -<span class="dv">1</span></a>
+<a class="sourceLine" id="cb3-9" title="9">          <span class="co">// 没执行 g_save_process = true</span></a>
+<a class="sourceLine" id="cb3-10" title="10">        fm_add_watch</a>
+<a class="sourceLine" id="cb3-11" title="11">        <span class="cf">if</span> (event_check(inotify_fd) &gt; <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb3-12" title="12">        read_events</a>
+<a class="sourceLine" id="cb3-13" title="13">        handle_events</a>
+<a class="sourceLine" id="cb3-14" title="14">          handle_event</a>
+<a class="sourceLine" id="cb3-15" title="15">            set_event_msg</a>
+<a class="sourceLine" id="cb3-16" title="16">              <span class="cf">if</span> (!g_save_process) <span class="co">// 条件满足，不打印event信息</span></a></code></pre></div>
+<h1 id="宿主机上编译"><span class="header-section-number">3</span> 宿主机上编译</h1>
+<p><a href="https://gitee.com/openeuler/kernel/tree/openEuler-22.03-LTS-SP2/">openEuler内核openEuler-22.03-LTS-SP2分支</a>代码以<code>gcc -Og</code>编译。</p>
+<p><a href="https://gitee.com/openeuler/sysmonitor/tree/master/sysmonitor-1.3.2/module">sysmonitor/sysmonitor-1.3.2/module</a>代码如果以<code>gcc -Og</code>编译，需要修改<a href="https://gitee.com/openeuler/sysmonitor/blob/master/sysmonitor-1.3.2/module/Makefile">sysmonitor/sysmonitor-1.3.2/module/Makefile</a>以保证编译通过:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">diff</span> --git a/sysmonitor-1.3.2/module/Makefile b/sysmonitor-1.3.2/module/Makefile</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="ex">index</span> 8030152..cdd40ae 100644</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="ex">---</span> a/sysmonitor-1.3.2/module/Makefile</a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="ex">+++</span> b/sysmonitor-1.3.2/module/Makefile</a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="ex">@@</span> -5,9 +5,9 @@</a>
+<a class="sourceLine" id="cb4-6" title="6"> </a>
+<a class="sourceLine" id="cb4-7" title="7"> <span class="ex">obj-m</span> += sysmonitor.o</a>
+<a class="sourceLine" id="cb4-8" title="8"> <span class="ex">sysmonitor-objs</span> := sysmonitor_main.o signo_catch.o fdstat.o monitor_netdev.o</a>
+<a class="sourceLine" id="cb4-9" title="9"><span class="ex">-KERNELDIR</span> ?= /lib/modules/<span class="va">$(</span><span class="ex">shell</span> uname -r<span class="va">)</span>/build</a>
+<a class="sourceLine" id="cb4-10" title="10"><span class="ex">+KERNELDIR</span> ?= /home/sonvhi/chenxiaosong/code/openeuler-22.03/build</a>
+<a class="sourceLine" id="cb4-11" title="11"> <span class="ex">PWD</span> := <span class="va">$(</span><span class="ex">shell</span> pwd<span class="va">)</span></a>
+<a class="sourceLine" id="cb4-12" title="12"><span class="ex">-EXTRA_CFLAGS</span> += -Wall -Werror</a>
+<a class="sourceLine" id="cb4-13" title="13"><span class="ex">+EXTRA_CFLAGS</span> += -Wall</a>
+<a class="sourceLine" id="cb4-14" title="14"> </a>
+<a class="sourceLine" id="cb4-15" title="15"> <span class="ex">modules</span>:</a>
+<a class="sourceLine" id="cb4-16" title="16">        <span class="va">$(</span><span class="ex">MAKE</span><span class="va">)</span> <span class="ex">-C</span> <span class="va">$(</span><span class="ex">KERNELDIR</span><span class="va">)</span> M=<span class="va">$(</span><span class="ex">PWD</span><span class="va">)</span> modules</a></code></pre></div>
+<p>qemu启动时指定<code>-kernel</code>和<code>-append</code>选项，将编译出的<code>sysmonitor.ko</code>复制到虚拟机中的<code>/lib/modules/sysmonitor/sysmonitor.ko</code></p>
+<h1 id="虚拟机中编译"><span class="header-section-number">4</span> 虚拟机中编译</h1>
+<p>进入openeuler镜像的虚拟机后。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">yum-builddep</span> sysmonitor-kmod.spec -y</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="ex">dnf</span> install rpm-build -y</a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="fu">mkdir</span> ../rpmbuild/SOURCES/ -p</a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="fu">tar</span> -cvjf sysmonitor-1.3.2.tar.bz2 sysmonitor-1.3.2</a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="fu">mv</span> sysmonitor-1.3.2.tar.bz2 ../rpmbuild/SOURCES/</a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="ex">rpmbuild</span> -ba sysmonitor-kmod.spec</a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="ex">yum</span> localinstall sysmonitor-kmod-1.3.2-1.2.xxx.x86_64.rpm</a></code></pre></div>
+<p>qemu不管是指定内核还是使用镜像自带的内核，运行以上命令后，qemu镜像都损坏了，无法正常使用，重启后发生oom，不知道搞什么东西。</p>
+</body>
+</html>

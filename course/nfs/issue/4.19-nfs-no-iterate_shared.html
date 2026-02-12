@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>nfs没实现iterate_shared()导致的遍历目录无法并发问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">nfs没实现iterate_shared()导致的遍历目录无法并发问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#vmcore解析"><span class="toc-section-number">2</span> vmcore解析</a><ul>
+<li><a href="#qemu构造vmcore解析"><span class="toc-section-number">2.1</span> qemu构造vmcore解析</a></li>
+</ul></li>
+<li><a href="#构造"><span class="toc-section-number">3</span> 构造</a><ul>
+<li><a href="#内核测试结果"><span class="toc-section-number">3.1</span> 4.19内核测试结果</a><ul>
+<li><a href="#w个文件20个进程"><span class="toc-section-number">3.1.1</span> 100w个文件20个进程</a></li>
+<li><a href="#w个文件10个进程"><span class="toc-section-number">3.1.2</span> 100w个文件10个进程</a></li>
+</ul></li>
+<li><a href="#最新内核测试结果"><span class="toc-section-number">3.2</span> 最新内核测试结果</a><ul>
+<li><a href="#w个文件10个进程-1"><span class="toc-section-number">3.2.1</span> 100w个文件10个进程</a></li>
+</ul></li>
+<li><a href="#最新内核改成写锁测试结果"><span class="toc-section-number">3.3</span> 最新内核改成写锁测试结果</a><ul>
+<li><a href="#w个文件10个进程-2"><span class="toc-section-number">3.3.1</span> 100w个文件10个进程</a></li>
+<li><a href="#w个文件20个进程-1"><span class="toc-section-number">3.3.2</span> 100w个文件20个进程</a></li>
+<li><a href="#w个文件15个进程"><span class="toc-section-number">3.3.3</span> 100w个文件15个进程</a></li>
+<li><a href="#w个文件15个进程-1"><span class="toc-section-number">3.3.4</span> 10w个文件15个进程</a></li>
+<li><a href="#w个文件15个进程-2"><span class="toc-section-number">3.3.5</span> 1w个文件15个进程</a></li>
+<li><a href="#数据分析"><span class="toc-section-number">3.3.6</span> 数据分析</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#其他命令请跳过没什么卵用"><span class="toc-section-number">4</span> 其他命令（请跳过，没什么卵用）</a></li>
+<li><a href="#strace跟踪系统调用分析"><span class="toc-section-number">5</span> <code>strace</code>跟踪系统调用分析</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">6</span> 代码分析</a></li>
+<li><a href="#问题分析结果"><span class="toc-section-number">7</span> 问题分析结果</a></li>
+<li><a href="#解决方案"><span class="toc-section-number">8</span> 解决方案</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>内核版本<code>tag: 4.19.90-23.23.v2101</code>。</p>
+<p>现场环境如下:</p>
+<pre><code>+-------------+           +-------------+
+|   huawei    |           |   huawei    |
+| nfsserver1  |           | nfsserver2  |
+|    (A)      |           |    (D)      |
++-------------+           +-------------+
+      ^                          ^
+      |                          |
+     nfs                        nfs
+      |                          |
+      v                          v
++-------------+           +-------------+
+|             |           |             |
+| rsyncserver |&lt;--rsync--&gt;| rsyncclient |
+|    (B)      |           |    (C)      |
++-------------+           +-------------+</code></pre>
+<p>rsyncclient(C)通过nfs挂载nfsserver2(D)，rsyncserver(B)通过nfs挂载nfsserver1(A)，rsyncclient(C)通过rsync备份rsyncserver(B)的数据。</p>
+<p>rsyncserver(B)的挂载参数如下:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">172.23.15.11</span>:/WGPCDIAPP_FS01 on /home/cdis/data type nfs4 (rw,relatime,vers=4.0,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,clientaddr=172.23.8.123,local_lock=none,addr=172.23.15.11)</a></code></pre></div>
+<p>rsyncserver(B)使用的<code>rsync</code>命令如下:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">rsync</span> -avz rsuser@172.23.8.123::CDISDATA_FS01  /home/cdis/data/  --port 10000 --password-file=/etc/rsync_cdis.password</a></code></pre></div>
+<p>现在问题出在B访问A上的文件时，出现hung task现象，但在B上用<code>ls</code>命令查看A上的文件可以正常返回输出，说明A和B的nfs连接是正常的。</p>
+<p>rsyncserver(B)的日志如下:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">[<span class="ex">316100.086897</span>] INFO: task rsync:3621271 blocked for more than 120 seconds.</a>
+<a class="sourceLine" id="cb4-2" title="2">[<span class="ex">316100.086950</span>]       Not tainted 4.19.90-23.23.v2101.ky10.x86_64 <span class="co">#1</span></a>
+<a class="sourceLine" id="cb4-3" title="3">[<span class="ex">316100.086987</span>] <span class="st">&quot;echo 0 &gt; /proc/sys/kernel/hung_task_timeout_secs&quot;</span> disables this message.</a>
+<a class="sourceLine" id="cb4-4" title="4">[<span class="ex">316100.087036</span>] rsync           D    0 3621271 152322 0x00000080</a>
+<a class="sourceLine" id="cb4-5" title="5">[<span class="ex">316100.087039</span>] Call Trace:</a>
+<a class="sourceLine" id="cb4-6" title="6">[<span class="ex">316100.087052</span>]  schedule+0x28/0x80</a>
+<a class="sourceLine" id="cb4-7" title="7">[<span class="ex">316100.087055</span>]  rwsem_down_read_failed+0x11c/0x190</a>
+<a class="sourceLine" id="cb4-8" title="8">[<span class="ex">316100.087059</span>]  call_rwsem_down_read_failed+0x14/0x30</a>
+<a class="sourceLine" id="cb4-9" title="9">[<span class="ex">316100.087060</span>]  down_read+0x13/0x30</a>
+<a class="sourceLine" id="cb4-10" title="10">[<span class="ex">316100.087063</span>]  lookup_slow+0x27/0x50</a>
+<a class="sourceLine" id="cb4-11" title="11">[<span class="ex">316100.087066</span>]  walk_component+0x1c4/0x350</a>
+<a class="sourceLine" id="cb4-12" title="12">[<span class="ex">316100.087071</span>]  path_lookupat+0x6e/0x270</a>
+<a class="sourceLine" id="cb4-13" title="13">[<span class="ex">316100.087074</span>]  filename_lookup+0xb6/0x190</a>
+<a class="sourceLine" id="cb4-14" title="14">[<span class="ex">316100.087085</span>]  vfs_statx+0x73/0xe0</a>
+<a class="sourceLine" id="cb4-15" title="15">[<span class="ex">316100.087087</span>]  __do_sys_newlstat+0x39/0x70</a>
+<a class="sourceLine" id="cb4-16" title="16">[<span class="ex">316100.087093</span>]  do_syscall_64+0x5b/0x1d0</a>
+<a class="sourceLine" id="cb4-17" title="17">[<span class="ex">316100.087095</span>]  entry_SYSCALL_64_after_hwframe+0x44/0xa9</a>
+<a class="sourceLine" id="cb4-18" title="18">[<span class="ex">316100.087097</span>] RIP: 0033:0x7f612a9e5575</a>
+<a class="sourceLine" id="cb4-19" title="19">[<span class="ex">316100.087102</span>] Code: Bad RIP value.</a>
+<a class="sourceLine" id="cb4-20" title="20">[<span class="ex">316100.087103</span>] RSP: 002b:00007fff67b25fd8 EFLAGS: 00000246 ORIG_RAX: 0000000000000006</a>
+<a class="sourceLine" id="cb4-21" title="21">[<span class="ex">316100.087105</span>] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f612a9e5575</a>
+<a class="sourceLine" id="cb4-22" title="22">[<span class="ex">316100.087105</span>] RDX: 00007fff67b26100 RSI: 00007fff67b26100 RDI: 00007fff67b26190</a>
+<a class="sourceLine" id="cb4-23" title="23">[<span class="ex">316100.087106</span>] RBP: 0000000000000000 R08: 00007fff67b261bf R09: 0000000000000000</a>
+<a class="sourceLine" id="cb4-24" title="24">[<span class="ex">316100.087107</span>] R10: 0000000000000001 R11: 0000000000000246 R12: 00007fff67b26190</a>
+<a class="sourceLine" id="cb4-25" title="25">[<span class="ex">316100.087107</span>] R13: 00007fff67b26100 R14: 0000000000000002 R15: 0000000000010004</a>
+<a class="sourceLine" id="cb4-26" title="26">[<span class="ex">316341.753069</span>] INFO: task rsync:3621271 blocked for more than 120 seconds.</a></code></pre></div>
+<h1 id="vmcore解析"><span class="header-section-number">2</span> vmcore解析</h1>
+<p>解压提取<code>vmlinux</code>和<code>ko</code>文件:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">rpm2cpio</span> kernel-debuginfo-4.19.90-23.23.v2101.ky10.x86_64.rpm <span class="kw">|</span> <span class="fu">cpio</span> -div</a></code></pre></div>
+<p>加载<code>ko</code>文件:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfs kernel-debuginfo-4.19.90-23.23.v2101.ky10.x86_64/usr/lib/debug/lib/modules/4.19.90-23.23.v2101.ky10.x86_64/kernel/fs/nfs/nfs.ko.debug</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfsv3 kernel-debuginfo-4.19.90-23.23.v2101.ky10.x86_64/usr/lib/debug/lib/modules/4.19.90-23.23.v2101.ky10.x86_64/kernel/fs/nfs/nfsv3.ko.debug <span class="co"># 不用加载</span></a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="ex">crash</span><span class="op">&gt;</span> mod -s nfsv4 kernel-debuginfo-4.19.90-23.23.v2101.ky10.x86_64/usr/lib/debug/lib/modules/4.19.90-23.23.v2101.ky10.x86_64/kernel/fs/nfs/nfsv4.ko.debug</a></code></pre></div>
+<p>打印<code>rsync</code>的所有进程，其中<code>IN</code>代表<code>TASK_INTERRUPTIBLE</code>，<code>UN</code>代表<code>TASK_UNINTERRUPTIBLE</code>，具体看<a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/linux/sched.h">include/linux/sched.h</a>。</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> ps rsync <span class="co"># 或用 ps | grep UN 找到所有 TASK_UNINTERRUPTIBLE 的进程</span></a>
+<a class="sourceLine" id="cb7-2" title="2">   <span class="ex">PID</span>    PPID  CPU       TASK        ST  %MEM     VSZ    RSS  COMM</a>
+<a class="sourceLine" id="cb7-3" title="3">  <span class="ex">152322</span>      1   5  ffff91fd87239780  IN   0.0  213108   1592  rsync</a>
+<a class="sourceLine" id="cb7-4" title="4">  <span class="ex">3621271</span>  152322   7  ffff91fd6d044680  UN   0.7  409284 128232  rsync</a>
+<a class="sourceLine" id="cb7-5" title="5">  <span class="ex">3632440</span>  152322   5  ffff91fde98a1780  UN   1.0  410648 181880  rsync</a>
+<a class="sourceLine" id="cb7-6" title="6">  <span class="ex">3644149</span>  152322   0  ffff91fe2c35de00  UN   1.0  410052 183764  rsync</a>
+<a class="sourceLine" id="cb7-7" title="7">  <span class="ex">3655486</span>  152322   5  ffff91fd8f1ac680  UN   1.0  410948 184780  rsync</a>
+<a class="sourceLine" id="cb7-8" title="8">  <span class="ex">3667062</span>  152322   5  ffff91fe2d47c680  UN   1.0  409860 183572  rsync</a>
+<a class="sourceLine" id="cb7-9" title="9">  <span class="ex">3678549</span>  152322   3  ffff91fe2f851780  UN   1.0  410072 182824  rsync</a>
+<a class="sourceLine" id="cb7-10" title="10">  <span class="ex">3690262</span>  152322   4  ffff91fddd830000  UN   1.0  409832 182816  rsync</a>
+<a class="sourceLine" id="cb7-11" title="11">  <span class="ex">3701961</span>  152322   4  ffff91fd8723c680  UN   1.0  410392 182852  rsync</a>
+<a class="sourceLine" id="cb7-12" title="12">  <span class="ex">3713720</span>  152322   7  ffff91fe12449780  UN   1.0  410080 183720  rsync</a>
+<a class="sourceLine" id="cb7-13" title="13">  <span class="ex">3725136</span>  152322   3  ffff91fb2af01780  UN   1.0  410104 183060  rsync</a>
+<a class="sourceLine" id="cb7-14" title="14">  <span class="ex">3736677</span>  152322   1  ffff91fb1d6e9780  UN   1.0  409856 182816  rsync</a>
+<a class="sourceLine" id="cb7-15" title="15">  <span class="ex">3748012</span>  152322   5  ffff91fe27069780  UN   1.0  410108 183348  rsync</a>
+<a class="sourceLine" id="cb7-16" title="16">  <span class="ex">3759132</span>  152322   0  ffff91fab0c0de00  UN   1.0  407016 180696  rsync</a>
+<a class="sourceLine" id="cb7-17" title="17">  <span class="ex">3770908</span>  152322   7  ffff91fde4e95e00  UN   1.0  411200 184848  rsync</a>
+<a class="sourceLine" id="cb7-18" title="18">  <span class="ex">3782024</span>  152322   7  ffff91fde9f82f00  UN   1.0  411028 184848  rsync</a>
+<a class="sourceLine" id="cb7-19" title="19">  <span class="ex">3794329</span>  152322   5  ffff91fb26acaf00  UN   1.0  409796 182864  rsync</a>
+<a class="sourceLine" id="cb7-20" title="20">  <span class="ex">3805549</span>  152322   7  ffff91fab7445e00  UN   1.0  410084 182880  rsync</a>
+<a class="sourceLine" id="cb7-21" title="21">  <span class="ex">3817313</span>  152322   2  ffff91fab0c0af00  UN   1.0  410084 183448  rsync</a>
+<a class="sourceLine" id="cb7-22" title="22">  <span class="ex">3828467</span>  152322   7  ffff91fd8f1aaf00  UN   1.0  410600 183164  rsync</a>
+<a class="sourceLine" id="cb7-23" title="23">  <span class="ex">3840283</span>  152322   6  ffff91fe2d5a5e00  UN   1.0  410384 183152  rsync</a></code></pre></div>
+<p>其中有18个状态为<code>UN</code>的进程的栈如下:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> bt 3632440</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">PID</span>: 3632440  TASK: ffff91fde98a1780  CPU: 5   COMMAND: <span class="st">&quot;rsync&quot;</span></a>
+<a class="sourceLine" id="cb8-3" title="3"> <span class="co">#0 [ffffa932c498bca0] __schedule at ffffffffa749c4a6</span></a>
+<a class="sourceLine" id="cb8-4" title="4"> <span class="co">#1 [ffffa932c498bd40] schedule at ffffffffa749cb48</span></a>
+<a class="sourceLine" id="cb8-5" title="5"> <span class="co">#2 [ffffa932c498bd48] rwsem_down_write_failed_killable at ffffffffa74a074d</span></a>
+<a class="sourceLine" id="cb8-6" title="6"> <span class="co">#3 [ffffa932c498bdf0] call_rwsem_down_write_failed_killable at ffffffffa7493a53</span></a>
+<a class="sourceLine" id="cb8-7" title="7"> <span class="co">#4 [ffffa932c498be30] down_write_killable at ffffffffa749f7b0</span></a>
+<a class="sourceLine" id="cb8-8" title="8"> <span class="co">#5 [ffffa932c498be38] iterate_dir at ffffffffa6edccc9</span></a>
+<a class="sourceLine" id="cb8-9" title="9"> <span class="co">#6 [ffffa932c498be78] ksys_getdents64 at ffffffffa6eddc30</span></a>
+<a class="sourceLine" id="cb8-10" title="10"> <span class="co">#7 [ffffa932c498bf30] __x64_sys_getdents64 at ffffffffa6edde46</span></a>
+<a class="sourceLine" id="cb8-11" title="11"> <span class="co">#8 [ffffa932c498bf38] do_syscall_64 at ffffffffa6c0430b</span></a>
+<a class="sourceLine" id="cb8-12" title="12"> <span class="co">#9 [ffffa932c498bf50] entry_SYSCALL_64_after_hwframe at ffffffffa7600088</span></a>
+<a class="sourceLine" id="cb8-13" title="13">    <span class="ex">RIP</span>: 00007f612a9bd757  RSP: 00007fff67b2a338  RFLAGS: 00000246</a>
+<a class="sourceLine" id="cb8-14" title="14">    <span class="ex">RAX</span>: ffffffffffffffda  RBX: 0000562293813e70  RCX: 00007f612a9bd757</a>
+<a class="sourceLine" id="cb8-15" title="15">    <span class="ex">RDX</span>: 0000000000008000  RSI: 0000562293813ea0  RDI: 0000000000000009</a>
+<a class="sourceLine" id="cb8-16" title="16">    <span class="ex">RBP</span>: 0000562293813ea0   R8: 0000000000000000   R9: 0000000000000001</a>
+<a class="sourceLine" id="cb8-17" title="17">    <span class="ex">R10</span>: 0000000000000001  R11: 0000000000000246  R12: ffffffffffffff80</a>
+<a class="sourceLine" id="cb8-18" title="18">    <span class="ex">R13</span>: 0000000000000000  R14: 000056229381be73  R15: 000056229381be60</a>
+<a class="sourceLine" id="cb8-19" title="19">    <span class="ex">ORIG_RAX</span>: 00000000000000d9  CS: 0033  SS: 002b</a></code></pre></div>
+<p>另外2个进程的栈是:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> bt 3621271</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="ex">PID</span>: 3621271  TASK: ffff91fd6d044680  CPU: 7   COMMAND: <span class="st">&quot;rsync&quot;</span></a>
+<a class="sourceLine" id="cb9-3" title="3"> <span class="co">#0 [ffffa932d099fa90] __schedule at ffffffffa749c4a6</span></a>
+<a class="sourceLine" id="cb9-4" title="4"> <span class="co">#1 [ffffa932d099fb30] schedule at ffffffffa749cb48</span></a>
+<a class="sourceLine" id="cb9-5" title="5"> <span class="co">#2 [ffffa932d099fb38] rwsem_down_read_failed at ffffffffa74a02fc</span></a>
+<a class="sourceLine" id="cb9-6" title="6"> <span class="co">#3 [ffffa932d099fbe0] call_rwsem_down_read_failed at ffffffffa74939d4</span></a>
+<a class="sourceLine" id="cb9-7" title="7"> <span class="co">#4 [ffffa932d099fc28] down_read at ffffffffa749f703</span></a>
+<a class="sourceLine" id="cb9-8" title="8"> <span class="co">#5 [ffffa932d099fc30] lookup_slow at ffffffffa6ed42f7</span></a>
+<a class="sourceLine" id="cb9-9" title="9"> <span class="co">#6 [ffffa932d099fc58] walk_component at ffffffffa6ed47d4</span></a>
+<a class="sourceLine" id="cb9-10" title="10"> <span class="co">#7 [ffffa932d099fcb8] path_lookupat at ffffffffa6ed4f5e</span></a>
+<a class="sourceLine" id="cb9-11" title="11"> <span class="co">#8 [ffffa932d099fd18] filename_lookup at ffffffffa6ed8866</span></a>
+<a class="sourceLine" id="cb9-12" title="12"> <span class="co">#9 [ffffa932d099fe40] vfs_statx at ffffffffa6ecc593</span></a>
+<a class="sourceLine" id="cb9-13" title="13"><span class="co">#10 [ffffa932d099fe98] __do_sys_newlstat at ffffffffa6eccbd9</span></a>
+<a class="sourceLine" id="cb9-14" title="14"><span class="co">#11 [ffffa932d099ff38] do_syscall_64 at ffffffffa6c0430b</span></a>
+<a class="sourceLine" id="cb9-15" title="15"><span class="co">#12 [ffffa932d099ff50] entry_SYSCALL_64_after_hwframe at ffffffffa7600088</span></a>
+<a class="sourceLine" id="cb9-16" title="16">    <span class="ex">RIP</span>: 00007f612a9e5575  RSP: 00007fff67b25fd8  RFLAGS: 00000246</a>
+<a class="sourceLine" id="cb9-17" title="17">    <span class="ex">RAX</span>: ffffffffffffffda  RBX: 0000000000000000  RCX: 00007f612a9e5575</a>
+<a class="sourceLine" id="cb9-18" title="18">    <span class="ex">RDX</span>: 00007fff67b26100  RSI: 00007fff67b26100  RDI: 00007fff67b26190</a>
+<a class="sourceLine" id="cb9-19" title="19">    <span class="ex">RBP</span>: 0000000000000000   R8: 00007fff67b261bf   R9: 0000000000000000</a>
+<a class="sourceLine" id="cb9-20" title="20">    <span class="ex">R10</span>: 0000000000000001  R11: 0000000000000246  R12: 00007fff67b26190</a>
+<a class="sourceLine" id="cb9-21" title="21">    <span class="ex">R13</span>: 00007fff67b26100  R14: 0000000000000002  R15: 0000000000010004</a>
+<a class="sourceLine" id="cb9-22" title="22">    <span class="ex">ORIG_RAX</span>: 0000000000000006  CS: 0033  SS: 002b</a>
+<a class="sourceLine" id="cb9-23" title="23"></a>
+<a class="sourceLine" id="cb9-24" title="24"><span class="ex">crash</span><span class="op">&gt;</span> bt 3748012</a>
+<a class="sourceLine" id="cb9-25" title="25"><span class="ex">PID</span>: 3748012  TASK: ffff91fe27069780  CPU: 5   COMMAND: <span class="st">&quot;rsync&quot;</span></a>
+<a class="sourceLine" id="cb9-26" title="26"> <span class="co">#0 [ffffa932c4ea77f8] __schedule at ffffffffa749c4a6</span></a>
+<a class="sourceLine" id="cb9-27" title="27"> <span class="co">#1 [ffffa932c4ea7898] schedule at ffffffffa749cb48</span></a>
+<a class="sourceLine" id="cb9-28" title="28"> <span class="co">#2 [ffffa932c4ea78a0] rpc_wait_bit_killable at ffffffffc072230e [sunrpc]</span></a>
+<a class="sourceLine" id="cb9-29" title="29"> <span class="co">#3 [ffffa932c4ea78b8] __wait_on_bit at ffffffffa749cf94</span></a>
+<a class="sourceLine" id="cb9-30" title="30"> <span class="co">#4 [ffffa932c4ea78f0] out_of_line_wait_on_bit at ffffffffa749d071</span></a>
+<a class="sourceLine" id="cb9-31" title="31"> <span class="co">#5 [ffffa932c4ea7940] __rpc_execute at ffffffffc0722fd0 [sunrpc]</span></a>
+<a class="sourceLine" id="cb9-32" title="32"> <span class="co">#6 [ffffa932c4ea7998] rpc_run_task at ffffffffc0716e69 [sunrpc]</span></a>
+<a class="sourceLine" id="cb9-33" title="33"> <span class="co">#7 [ffffa932c4ea79d8] nfs4_call_sync_sequence at ffffffffc0828854 [nfsv4]</span></a>
+<a class="sourceLine" id="cb9-34" title="34"> <span class="co">#8 [ffffa932c4ea7a48] _nfs4_proc_readdir at ffffffffc082ab85 [nfsv4]</span></a>
+<a class="sourceLine" id="cb9-35" title="35"> <span class="co">#9 [ffffa932c4ea7b58] nfs4_proc_readdir at ffffffffc0834ff6 [nfsv4]</span></a>
+<a class="sourceLine" id="cb9-36" title="36"><span class="co">#10 [ffffa932c4ea7bd0] nfs_readdir_xdr_to_array at ffffffffc07e053c [nfs]</span></a>
+<a class="sourceLine" id="cb9-37" title="37"><span class="co">#11 [ffffa932c4ea7cd0] nfs_readdir_filler at ffffffffc07e07dd [nfs]</span></a>
+<a class="sourceLine" id="cb9-38" title="38"><span class="co">#12 [ffffa932c4ea7cf0] do_read_cache_page at ffffffffa6e16e6a</span></a>
+<a class="sourceLine" id="cb9-39" title="39"><span class="co">#13 [ffffa932c4ea7da0] nfs_readdir at ffffffffc07e096c [nfs]</span></a>
+<a class="sourceLine" id="cb9-40" title="40"><span class="co">#14 [ffffa932c4ea7e38] iterate_dir at ffffffffa6edcce6</span></a>
+<a class="sourceLine" id="cb9-41" title="41"><span class="co">#15 [ffffa932c4ea7e78] ksys_getdents64 at ffffffffa6eddc30</span></a>
+<a class="sourceLine" id="cb9-42" title="42"><span class="co">#16 [ffffa932c4ea7f30] __x64_sys_getdents64 at ffffffffa6edde46</span></a>
+<a class="sourceLine" id="cb9-43" title="43"><span class="co">#17 [ffffa932c4ea7f38] do_syscall_64 at ffffffffa6c0430b</span></a>
+<a class="sourceLine" id="cb9-44" title="44"><span class="co">#18 [ffffa932c4ea7f50] entry_SYSCALL_64_after_hwframe at ffffffffa7600088</span></a>
+<a class="sourceLine" id="cb9-45" title="45">    <span class="ex">RIP</span>: 00007f612a9bd757  RSP: 00007fff67b2a338  RFLAGS: 00000246</a>
+<a class="sourceLine" id="cb9-46" title="46">    <span class="ex">RAX</span>: ffffffffffffffda  RBX: 000056228f6a5a90  RCX: 00007f612a9bd757</a>
+<a class="sourceLine" id="cb9-47" title="47">    <span class="ex">RDX</span>: 0000000000008000  RSI: 000056228f6a5ac0  RDI: 0000000000000009</a>
+<a class="sourceLine" id="cb9-48" title="48">    <span class="ex">RBP</span>: 000056228f6a5ac0   R8: 0000000000000000   R9: 0000000000000001</a>
+<a class="sourceLine" id="cb9-49" title="49">    <span class="ex">R10</span>: 0000000000000001  R11: 0000000000000246  R12: ffffffffffffff80</a>
+<a class="sourceLine" id="cb9-50" title="50">    <span class="ex">R13</span>: 0000000000000000  R14: 000056228f6ada93  R15: 000056228f6ada80</a>
+<a class="sourceLine" id="cb9-51" title="51">    <span class="ex">ORIG_RAX</span>: 00000000000000d9  CS: 0033  SS: 002b</a></code></pre></div>
+<p>下面分析<code>inode</code>相关的信息，栈中的数据暂时不分析汇编（TODO），因为从代码上看只会操作一个<code>inode</code>。</p>
+<p>与进程<code>3632440</code>栈一样的几个进程操作的<code>inode</code>如下:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> bt 3632440 -FF</a>
+<a class="sourceLine" id="cb10-2" title="2"> <span class="co">#5 [ffffa932c498be38] iterate_dir at ffffffffa6edccc9</span></a>
+<a class="sourceLine" id="cb10-3" title="3">    <span class="ex">ffffa932c498be60</span>: 00000000fffffff2 [ffff91fe2bb65b00:filp]</a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff91fe2bb65b00</a>
+<a class="sourceLine" id="cb10-5" title="5">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-6" title="6">  [<span class="ex">ffff91fe2bb65b00</span>]</a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="ex">crash</span><span class="op">&gt;</span> struct file.f_inode ffff91fe2bb65b00</a>
+<a class="sourceLine" id="cb10-8" title="8">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-9" title="9"><span class="ex">struct</span> inode 0xffff91fca5985500 -x</a>
+<a class="sourceLine" id="cb10-10" title="10">  <span class="ex">i_mode</span> = 0x41e0, <span class="co"># S_IFDIR为0x4000,所以是文件类型是文件夹</span></a>
+<a class="sourceLine" id="cb10-11" title="11"></a>
+<a class="sourceLine" id="cb10-12" title="12"><span class="ex">crash</span><span class="op">&gt;</span> bt 3644149 -FF</a>
+<a class="sourceLine" id="cb10-13" title="13"> <span class="co">#5 [ffffa932cf64fe38] iterate_dir at ffffffffa6edccc9</span></a>
+<a class="sourceLine" id="cb10-14" title="14">    <span class="ex">ffffa932cf64fe60</span>: 00000000fffffff2 [ffff91fb608c1a00:filp] </a>
+<a class="sourceLine" id="cb10-15" title="15"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff91fb608c1a00</a>
+<a class="sourceLine" id="cb10-16" title="16">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-17" title="17">  [<span class="ex">ffff91fb608c1a00</span>]</a>
+<a class="sourceLine" id="cb10-18" title="18"><span class="ex">crash</span><span class="op">&gt;</span> struct file.f_inode ffff91fb608c1a00</a>
+<a class="sourceLine" id="cb10-19" title="19">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-20" title="20"></a>
+<a class="sourceLine" id="cb10-21" title="21"><span class="ex">crash</span><span class="op">&gt;</span> bt 3655486 -FF</a>
+<a class="sourceLine" id="cb10-22" title="22"> <span class="co">#5 [ffffa932c4d37e38] iterate_dir at ffffffffa6edccc9</span></a>
+<a class="sourceLine" id="cb10-23" title="23">    <span class="ex">ffffa932c4d37e60</span>: 00000000fffffff2 [ffff91fe2b81b300:filp] </a>
+<a class="sourceLine" id="cb10-24" title="24"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff91fe2b81b300</a>
+<a class="sourceLine" id="cb10-25" title="25">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-26" title="26">  [<span class="ex">ffff91fe2b81b300</span>]</a>
+<a class="sourceLine" id="cb10-27" title="27"><span class="ex">crash</span><span class="op">&gt;</span> struct file.f_inode ffff91fe2b81b300</a>
+<a class="sourceLine" id="cb10-28" title="28">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-29" title="29"></a>
+<a class="sourceLine" id="cb10-30" title="30"><span class="ex">crash</span><span class="op">&gt;</span> bt 3667062 -FF</a>
+<a class="sourceLine" id="cb10-31" title="31"> <span class="co">#5 [ffffa932d0857e38] iterate_dir at ffffffffa6edccc9</span></a>
+<a class="sourceLine" id="cb10-32" title="32">    <span class="ex">ffffa932d0857e60</span>: 00000000fffffff2 [ffff91fe2bd4a900:filp] </a>
+<a class="sourceLine" id="cb10-33" title="33"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff91fe2bd4a900</a>
+<a class="sourceLine" id="cb10-34" title="34">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-35" title="35">  [<span class="ex">ffff91fe2bd4a900</span>]</a>
+<a class="sourceLine" id="cb10-36" title="36"><span class="ex">crash</span><span class="op">&gt;</span> struct file ffff91fe2bd4a900</a>
+<a class="sourceLine" id="cb10-37" title="37">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-38" title="38"></a>
+<a class="sourceLine" id="cb10-39" title="39"><span class="co"># 以下就不列出命令了，只写结果</span></a>
+<a class="sourceLine" id="cb10-40" title="40"><span class="co"># 3678549</span></a>
+<a class="sourceLine" id="cb10-41" title="41">[<span class="ex">ffff91fcbfe03f00</span>:filp]</a>
+<a class="sourceLine" id="cb10-42" title="42">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-43" title="43">  [<span class="ex">ffff91fcbfe03f00</span>]</a>
+<a class="sourceLine" id="cb10-44" title="44">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-45" title="45"></a>
+<a class="sourceLine" id="cb10-46" title="46"><span class="co"># 3690262</span></a>
+<a class="sourceLine" id="cb10-47" title="47">[<span class="ex">ffff91fe2ce37c00</span>:filp]</a>
+<a class="sourceLine" id="cb10-48" title="48">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-49" title="49">  [<span class="ex">ffff91fe2ce37c00</span>]</a>
+<a class="sourceLine" id="cb10-50" title="50">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-51" title="51"></a>
+<a class="sourceLine" id="cb10-52" title="52"><span class="co"># 3701961</span></a>
+<a class="sourceLine" id="cb10-53" title="53">[<span class="ex">ffff91fddda2bb00</span>:filp]</a>
+<a class="sourceLine" id="cb10-54" title="54">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-55" title="55">  [<span class="ex">ffff91fddda2bb00</span>]</a>
+<a class="sourceLine" id="cb10-56" title="56">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-57" title="57"></a>
+<a class="sourceLine" id="cb10-58" title="58"><span class="co"># 3713720</span></a>
+<a class="sourceLine" id="cb10-59" title="59">[<span class="ex">ffff91fe12783b00</span>:filp]</a>
+<a class="sourceLine" id="cb10-60" title="60">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-61" title="61">  [<span class="ex">ffff91fe12783b00</span>]</a>
+<a class="sourceLine" id="cb10-62" title="62">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-63" title="63"></a>
+<a class="sourceLine" id="cb10-64" title="64"><span class="co"># 3725136</span></a>
+<a class="sourceLine" id="cb10-65" title="65">[<span class="ex">ffff91fde961b900</span>:filp]</a>
+<a class="sourceLine" id="cb10-66" title="66">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-67" title="67">  [<span class="ex">ffff91fde961b900</span>]</a>
+<a class="sourceLine" id="cb10-68" title="68">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-69" title="69"></a>
+<a class="sourceLine" id="cb10-70" title="70"><span class="co"># 3736677</span></a>
+<a class="sourceLine" id="cb10-71" title="71">[<span class="ex">ffff91fe29e98300</span>:filp]</a>
+<a class="sourceLine" id="cb10-72" title="72">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-73" title="73">  [<span class="ex">ffff91fe29e98300</span>]</a>
+<a class="sourceLine" id="cb10-74" title="74">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-75" title="75"></a>
+<a class="sourceLine" id="cb10-76" title="76"><span class="co"># 3759132</span></a>
+<a class="sourceLine" id="cb10-77" title="77">[<span class="ex">ffff91fe10973900</span>:filp]</a>
+<a class="sourceLine" id="cb10-78" title="78">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-79" title="79">  [<span class="ex">ffff91fe10973900</span>]</a>
+<a class="sourceLine" id="cb10-80" title="80">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-81" title="81"></a>
+<a class="sourceLine" id="cb10-82" title="82"><span class="co"># 3770908</span></a>
+<a class="sourceLine" id="cb10-83" title="83">[<span class="ex">ffff91fe2f936800</span>:filp]</a>
+<a class="sourceLine" id="cb10-84" title="84">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-85" title="85">  [<span class="ex">ffff91fe2f936800</span>]</a>
+<a class="sourceLine" id="cb10-86" title="86">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-87" title="87"></a>
+<a class="sourceLine" id="cb10-88" title="88"><span class="co"># 3782024</span></a>
+<a class="sourceLine" id="cb10-89" title="89">[<span class="ex">ffff91fde4eb7c00</span>:filp]</a>
+<a class="sourceLine" id="cb10-90" title="90">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-91" title="91">  [<span class="ex">ffff91fde4eb7c00</span>]</a>
+<a class="sourceLine" id="cb10-92" title="92">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-93" title="93"></a>
+<a class="sourceLine" id="cb10-94" title="94"><span class="co"># 3794329</span></a>
+<a class="sourceLine" id="cb10-95" title="95">[<span class="ex">ffff91fe2a111c00</span>:filp]</a>
+<a class="sourceLine" id="cb10-96" title="96">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-97" title="97">  [<span class="ex">ffff91fe2a111c00</span>]</a>
+<a class="sourceLine" id="cb10-98" title="98">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-99" title="99"></a>
+<a class="sourceLine" id="cb10-100" title="100"><span class="co"># 3805549</span></a>
+<a class="sourceLine" id="cb10-101" title="101">[<span class="ex">ffff91fe2bd4a000</span>:filp]</a>
+<a class="sourceLine" id="cb10-102" title="102">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-103" title="103">  [<span class="ex">ffff91fe2bd4a000</span>]</a>
+<a class="sourceLine" id="cb10-104" title="104">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-105" title="105"></a>
+<a class="sourceLine" id="cb10-106" title="106"><span class="co"># 3817313</span></a>
+<a class="sourceLine" id="cb10-107" title="107">[<span class="ex">ffff91fd8704b800</span>:filp]</a>
+<a class="sourceLine" id="cb10-108" title="108">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-109" title="109">  [<span class="ex">ffff91fd8704b800</span>]</a>
+<a class="sourceLine" id="cb10-110" title="110">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-111" title="111"></a>
+<a class="sourceLine" id="cb10-112" title="112"><span class="co"># 3828467</span></a>
+<a class="sourceLine" id="cb10-113" title="113">[<span class="ex">ffff91fe063d3500</span>:filp]</a>
+<a class="sourceLine" id="cb10-114" title="114">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-115" title="115">  [<span class="ex">ffff91fe063d3500</span>]</a>
+<a class="sourceLine" id="cb10-116" title="116">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb10-117" title="117"></a>
+<a class="sourceLine" id="cb10-118" title="118"><span class="co"># 3840283</span></a>
+<a class="sourceLine" id="cb10-119" title="119">[<span class="ex">ffff91fe25417100</span>:filp]</a>
+<a class="sourceLine" id="cb10-120" title="120">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb10-121" title="121">  [<span class="ex">ffff91fe25417100</span>]</a>
+<a class="sourceLine" id="cb10-122" title="122">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a></code></pre></div>
+<p>进程<code>3748012</code>的<code>inode</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> bt 3748012 -FF</a>
+<a class="sourceLine" id="cb11-2" title="2">[<span class="ex">ffff91fdfdcbf000</span>:filp]</a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff91fdfdcbf000</a>
+<a class="sourceLine" id="cb11-4" title="4">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb11-5" title="5">  [<span class="ex">ffff91fdfdcbf000</span>]</a>
+<a class="sourceLine" id="cb11-6" title="6"><span class="ex">crash</span><span class="op">&gt;</span> struct file.f_inode ffff91fdfdcbf000</a>
+<a class="sourceLine" id="cb11-7" title="7">  <span class="ex">f_inode</span> = 0xffff91fca5985500,</a></code></pre></div>
+<p>进程<code>3621271</code>的<code>inode</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> bt 3621271 -FF</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="ex">PID</span>: 3621271  TASK: ffff91fd6d044680  CPU: 7   COMMAND: <span class="st">&quot;rsync&quot;</span></a>
+<a class="sourceLine" id="cb12-3" title="3"> <span class="co">#0 [ffffa932d099fa90] __schedule at ffffffffa749c4a6</span></a>
+<a class="sourceLine" id="cb12-4" title="4"> <span class="co">#1 [ffffa932d099fb30] schedule at ffffffffa749cb48</span></a>
+<a class="sourceLine" id="cb12-5" title="5"> <span class="co">#2 [ffffa932d099fb38] rwsem_down_read_failed at ffffffffa74a02fc</span></a>
+<a class="sourceLine" id="cb12-6" title="6"> <span class="co">#3 [ffffa932d099fbe0] call_rwsem_down_read_failed at ffffffffa74939d4</span></a>
+<a class="sourceLine" id="cb12-7" title="7">     <span class="ex">ffffa932d099fbe8</span>: 0000000000000000 61c8864680b583eb </a>
+<a class="sourceLine" id="cb12-8" title="8">    <span class="ex">ffffa932d099fbf8</span>: [ffff91fe29cee027:names_cache] 0000000000000028 </a>
+<a class="sourceLine" id="cb12-9" title="9">    <span class="ex">ffffa932d099fc08</span>: 0000000000000000 00072a8500000000 </a>
+<a class="sourceLine" id="cb12-10" title="10">    <span class="ex">ffffa932d099fc18</span>: [ffff91fcb02b7440:dentry] [ffff91fca59855a0:nfs_inode_cache] </a>
+<a class="sourceLine" id="cb12-11" title="11">    <span class="ex">ffffa932d099fc28</span>: down_read+19     </a>
+<a class="sourceLine" id="cb12-12" title="12"> <span class="co">#4 [ffffa932d099fc28] down_read at ffffffffa749f703</span></a>
+<a class="sourceLine" id="cb12-13" title="13"> <span class="co">#5 [ffffa932d099fc30] lookup_slow at ffffffffa6ed42f7</span></a>
+<a class="sourceLine" id="cb12-14" title="14"> <span class="co">#6 [ffffa932d099fc58] walk_component at ffffffffa6ed47d4</span></a>
+<a class="sourceLine" id="cb12-15" title="15"> <span class="co">#7 [ffffa932d099fcb8] path_lookupat at ffffffffa6ed4f5e</span></a>
+<a class="sourceLine" id="cb12-16" title="16"> <span class="co">#8 [ffffa932d099fd18] filename_lookup at ffffffffa6ed8866</span></a>
+<a class="sourceLine" id="cb12-17" title="17"> <span class="co">#9 [ffffa932d099fe40] vfs_statx at ffffffffa6ecc593</span></a>
+<a class="sourceLine" id="cb12-18" title="18"><span class="co">#10 [ffffa932d099fe98] __do_sys_newlstat at ffffffffa6eccbd9</span></a>
+<a class="sourceLine" id="cb12-19" title="19"><span class="co">#11 [ffffa932d099ff38] do_syscall_64 at ffffffffa6c0430b</span></a>
+<a class="sourceLine" id="cb12-20" title="20"><span class="co">#12 [ffffa932d099ff50] entry_SYSCALL_64_after_hwframe at ffffffffa7600088</span></a>
+<a class="sourceLine" id="cb12-21" title="21"></a>
+<a class="sourceLine" id="cb12-22" title="22"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff91fcb02b7440 <span class="co"># [ffff91fcb02b7440:dentry]</span></a>
+<a class="sourceLine" id="cb12-23" title="23">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb12-24" title="24">  [<span class="ex">ffff91fcb02b7440</span>]</a>
+<a class="sourceLine" id="cb12-25" title="25"><span class="ex">crash</span><span class="op">&gt;</span> struct dentry ffff91fcb02b7440</a>
+<a class="sourceLine" id="cb12-26" title="26">  <span class="ex">d_inode</span> = 0xffff91fca5985500,</a>
+<a class="sourceLine" id="cb12-27" title="27"></a>
+<a class="sourceLine" id="cb12-28" title="28"><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff91fca59855a0 <span class="co"># [ffff91fca59855a0:nfs_inode_cache]</span></a>
+<a class="sourceLine" id="cb12-29" title="29">  <span class="ex">FREE</span> / [ALLOCATED]</a>
+<a class="sourceLine" id="cb12-30" title="30">  [<span class="ex">ffff91fca5985320</span>]</a>
+<a class="sourceLine" id="cb12-31" title="31"><span class="ex">crash</span><span class="op">&gt;</span> struct nfs_inode ffff91fca5985320 -ox</a>
+<a class="sourceLine" id="cb12-32" title="32">  [<span class="ex">ffff91fca5985500</span>] struct inode vfs_inode<span class="kw">;</span></a></code></pre></div>
+<p>可以看出，20个进程操作的<code>inode</code>是一样的，且这个<code>inode</code>的文件类型是目录。</p>
+<h2 id="qemu构造vmcore解析"><span class="header-section-number">2.1</span> qemu构造vmcore解析</h2>
+<p>按<code>ctrl + a c</code>打开QEMU控制台，使用以下命令导出vmcore:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">(</span><span class="ex">qemu</span><span class="kw">)</span> <span class="ex">dump-guest-memory</span> /your_path/vmcore</a></code></pre></div>
+<p>列出所有<code>ls</code>进程:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="ex">crash</span><span class="op">&gt;</span> ps ls</a>
+<a class="sourceLine" id="cb14-2" title="2">   <span class="ex">PID</span>    PPID  CPU       TASK        ST  %MEM     VSZ    RSS  COMM</a>
+<a class="sourceLine" id="cb14-3" title="3">    <span class="ex">571</span>    570   5  ffff88812f9b2680  UN   3.3  189588 175328  ls</a>
+<a class="sourceLine" id="cb14-4" title="4">    <span class="ex">574</span>    573  12  ffff888117444d00  UN   3.4  190248 180860  ls</a>
+<a class="sourceLine" id="cb14-5" title="5">    <span class="ex">578</span>    577  13  ffff888117440000  UN   2.3  182328 123108  ls</a>
+<a class="sourceLine" id="cb14-6" title="6">    <span class="ex">581</span>    580  10  ffff88810217cd00  UN   2.9  186420 153032  ls</a>
+<a class="sourceLine" id="cb14-7" title="7">    <span class="ex">584</span>    583   2  ffff88812e5da680  UN   2.1  180876 112452  ls</a>
+<a class="sourceLine" id="cb14-8" title="8">    <span class="ex">587</span>    586   4  ffff88812e5dcd00  UN   3.2  188796 170200  ls</a>
+<a class="sourceLine" id="cb14-9" title="9">    <span class="ex">590</span>    589   3  ffff88812f988000  UN   2.7  184836 141652  ls</a>
+<a class="sourceLine" id="cb14-10" title="10">    <span class="ex">593</span>    592   4  ffff88810c8dcd00  UN   2.8  185628 147248  ls</a>
+<a class="sourceLine" id="cb14-11" title="11">    <span class="ex">596</span>    595  14  ffff88810c8d8000  UN   2.9  186288 152092  ls</a>
+<a class="sourceLine" id="cb14-12" title="12">    <span class="ex">599</span>    598   2  ffff8881176b8000  UN   3.2  188796 169756  ls</a>
+<a class="sourceLine" id="cb14-13" title="13">    <span class="ex">602</span>    601   4  ffff88812fb32680  UN   3.8  352624 197372  ls</a>
+<a class="sourceLine" id="cb14-14" title="14">    <span class="ex">605</span>    604   2  ffff88812fb34d00  UN   3.2  188796 169760  ls</a>
+<a class="sourceLine" id="cb14-15" title="15">    <span class="ex">608</span>    607   0  ffff88810769a680  UN   2.5  183384 131228  ls</a>
+<a class="sourceLine" id="cb14-16" title="16">    <span class="ex">611</span>    610   4  ffff88810761cd00  UN   2.8  185892 149336  ls</a>
+<a class="sourceLine" id="cb14-17" title="17">    <span class="ex">614</span>    613   1  ffff8881076e4d00  UN   2.9  186024 150032  ls</a>
+<a class="sourceLine" id="cb14-18" title="18">    <span class="ex">617</span>    616  14  ffff888134ab4d00  UN   3.1  188004 164404  ls</a>
+<a class="sourceLine" id="cb14-19" title="19">    <span class="ex">620</span>    619   6  ffff888102244d00  UN   2.3  182196 121744  ls</a>
+<a class="sourceLine" id="cb14-20" title="20">    <span class="ex">623</span>    622  13  ffff88812fa88000  UN   2.8  185628 147200  ls</a>
+<a class="sourceLine" id="cb14-21" title="21">    <span class="ex">626</span>    625  13  ffff888107618000  UN   3.0  187344 159756  ls</a>
+<a class="sourceLine" id="cb14-22" title="22">    <span class="ex">629</span>    628   3  ffff888117762680  UN   2.6  184440 137968  ls</a></code></pre></div>
+<p>有19个进程的栈如下所示:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="ex">PID</span>: 571    TASK: ffff88812f9b2680  CPU: 5   COMMAND: <span class="st">&quot;ls&quot;</span></a>
+<a class="sourceLine" id="cb15-2" title="2"> <span class="co">#0 [ffffc900011dbce0] __schedule at ffffffff82186cdc</span></a>
+<a class="sourceLine" id="cb15-3" title="3"> <span class="co">#1 [ffffc900011dbd78] schedule at ffffffff82187222</span></a>
+<a class="sourceLine" id="cb15-4" title="4"> <span class="co">#2 [ffffc900011dbd88] rwsem_down_write_failed_killable at ffffffff8218a202</span></a>
+<a class="sourceLine" id="cb15-5" title="5"> <span class="co">#3 [ffffc900011dbe18] call_rwsem_down_write_failed_killable at ffffffff8217bab3</span></a>
+<a class="sourceLine" id="cb15-6" title="6"> <span class="co">#4 [ffffc900011dbe58] down_write_killable at ffffffff821893c9</span></a>
+<a class="sourceLine" id="cb15-7" title="7"> <span class="co">#5 [ffffc900011dbe68] iterate_dir at ffffffff813f52fc</span></a>
+<a class="sourceLine" id="cb15-8" title="8"> <span class="co">#6 [ffffc900011dbea8] ksys_getdents64 at ffffffff813f629c</span></a>
+<a class="sourceLine" id="cb15-9" title="9"> <span class="co">#7 [ffffc900011dbf18] __x64_sys_getdents64 at ffffffff813f636d</span></a>
+<a class="sourceLine" id="cb15-10" title="10"> <span class="co">#8 [ffffc900011dbf28] do_syscall_64 at ffffffff81004ad2</span></a>
+<a class="sourceLine" id="cb15-11" title="11"> <span class="co">#9 [ffffc900011dbf50] entry_SYSCALL_64_after_hwframe at ffffffff82200088</span></a></code></pre></div>
+<p>1个进程的栈如下所示（过一会儿，进入nfs请求的进程变成其他进程）:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"> <span class="ex">PID</span>: 574    TASK: ffff888117444d00  CPU: 12  COMMAND: <span class="st">&quot;ls&quot;</span></a>
+<a class="sourceLine" id="cb16-2" title="2"> <span class="co">#0 [ffffc900011eb860] __schedule at ffffffff82186cdc</span></a>
+<a class="sourceLine" id="cb16-3" title="3"> <span class="co">#1 [ffffc900011eb8f8] schedule at ffffffff82187222</span></a>
+<a class="sourceLine" id="cb16-4" title="4"> <span class="co">#2 [ffffc900011eb908] rpc_wait_bit_killable at ffffffff820c0d55</span></a>
+<a class="sourceLine" id="cb16-5" title="5"> <span class="co">#3 [ffffc900011eb928] __wait_on_bit at ffffffff82187652</span></a>
+<a class="sourceLine" id="cb16-6" title="6"> <span class="co">#4 [ffffc900011eb960] out_of_line_wait_on_bit at ffffffff82187722</span></a>
+<a class="sourceLine" id="cb16-7" title="7"> <span class="co">#5 [ffffc900011eb9a8] __rpc_execute at ffffffff820c22fa</span></a>
+<a class="sourceLine" id="cb16-8" title="8"> <span class="co">#6 [ffffc900011eb9e8] rpc_execute at ffffffff820c297e</span></a>
+<a class="sourceLine" id="cb16-9" title="9"> <span class="co">#7 [ffffc900011eba10] rpc_run_task at ffffffff820adc89</span></a>
+<a class="sourceLine" id="cb16-10" title="10"> <span class="co">#8 [ffffc900011eba50] nfs4_call_sync_sequence at ffffffff8156b97f</span></a>
+<a class="sourceLine" id="cb16-11" title="11"> <span class="co">#9 [ffffc900011ebad8] _nfs4_proc_readdir at ffffffff81570173</span></a>
+<a class="sourceLine" id="cb16-12" title="12"><span class="co">#10 [ffffc900011ebbd8] nfs4_proc_readdir at ffffffff81579dd6</span></a>
+<a class="sourceLine" id="cb16-13" title="13"><span class="co">#11 [ffffc900011ebc50] nfs_readdir_xdr_to_array at ffffffff8153f3b0</span></a>
+<a class="sourceLine" id="cb16-14" title="14"><span class="co">#12 [ffffc900011ebd50] nfs_readdir_filler at ffffffff8153f5cb</span></a>
+<a class="sourceLine" id="cb16-15" title="15"><span class="co">#13 [ffffc900011ebd70] do_read_cache_page at ffffffff812ec110</span></a>
+<a class="sourceLine" id="cb16-16" title="16"><span class="co">#14 [ffffc900011ebdc0] nfs_readdir at ffffffff8153f7eb</span></a>
+<a class="sourceLine" id="cb16-17" title="17"><span class="co">#15 [ffffc900011ebe68] iterate_dir at ffffffff813f522e</span></a>
+<a class="sourceLine" id="cb16-18" title="18"><span class="co">#16 [ffffc900011ebea8] ksys_getdents64 at ffffffff813f629c</span></a>
+<a class="sourceLine" id="cb16-19" title="19"><span class="co">#17 [ffffc900011ebf18] __x64_sys_getdents64 at ffffffff813f636d</span></a>
+<a class="sourceLine" id="cb16-20" title="20"><span class="co">#18 [ffffc900011ebf28] do_syscall_64 at ffffffff81004ad2</span></a>
+<a class="sourceLine" id="cb16-21" title="21"><span class="co">#19 [ffffc900011ebf50] entry_SYSCALL_64_after_hwframe at ffffffff82200088</span></a></code></pre></div>
+<h1 id="构造"><span class="header-section-number">3</span> 构造</h1>
+<p>有一个线索，出问题的目录下有80~90万个文件，每个文件几k字节，构造这个场景。</p>
+<p>在nfs server上生成很多文件:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" title="1"><span class="va">i=</span>0</a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="kw">while</span> <span class="fu">true</span></a>
+<a class="sourceLine" id="cb17-3" title="3"><span class="kw">do</span></a>
+<a class="sourceLine" id="cb17-4" title="4">    <span class="bu">echo</span> 1234567890 <span class="op">&gt;</span> file<span class="va">${i}</span> <span class="co"># 不要用touch创建文件，因为更慢</span></a>
+<a class="sourceLine" id="cb17-5" title="5">    <span class="kw">((</span>i++<span class="kw">))</span></a>
+<a class="sourceLine" id="cb17-6" title="6">    <span class="bu">echo</span> <span class="va">${i}</span></a>
+<a class="sourceLine" id="cb17-7" title="7">    <span class="kw">if</span><span class="bu"> [</span> <span class="va">${i}</span> <span class="ot">-eq</span> 1000000<span class="bu"> ]</span></a>
+<a class="sourceLine" id="cb17-8" title="8">    <span class="kw">then</span></a>
+<a class="sourceLine" id="cb17-9" title="9">        <span class="bu">break</span></a>
+<a class="sourceLine" id="cb17-10" title="10">    <span class="kw">fi</span></a>
+<a class="sourceLine" id="cb17-11" title="11"><span class="kw">done</span></a></code></pre></div>
+<p>在client上挂载:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1"><span class="fu">mount</span> -t nfs -o rw,relatime,vers=4.0,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,local_lock=none 192.168.122.209:/s_test /mnt</a></code></pre></div>
+<p>100万个文件，用<code>ls</code>遍历，分多次<code>readdir</code>请求，每次返回167个文件目录项。</p>
+<p>没有特别说明时，client和server都是使用的都是同一版本的内核。</p>
+<h2 id="内核测试结果"><span class="header-section-number">3.1</span> 4.19内核测试结果</h2>
+<h3 id="w个文件20个进程"><span class="header-section-number">3.1.1</span> 100w个文件20个进程</h3>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb19-2" title="2"><span class="bu">time</span> ls -lh /mnt/dir <span class="kw">|</span> <span class="fu">wc</span></a>
+<a class="sourceLine" id="cb19-3" title="3"><span class="ex">1000002</span> 9000011 50888949</a>
+<a class="sourceLine" id="cb19-4" title="4"><span class="ex">real</span>    0m37.319s</a>
+<a class="sourceLine" id="cb19-5" title="5"></a>
+<a class="sourceLine" id="cb19-6" title="6"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb19-7" title="7"><span class="bu">time</span> ls -lh /mnt/dir <span class="kw">|</span> <span class="fu">wc</span> <span class="kw">&amp;</span> <span class="co"># 连续执行20次</span></a></code></pre></div>
+<p>发生了oom。</p>
+<h3 id="w个文件10个进程"><span class="header-section-number">3.1.2</span> 100w个文件10个进程</h3>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb20-2" title="2"><span class="bu">time</span> ls -lh /mnt/dir <span class="kw">|</span> <span class="fu">wc</span></a>
+<a class="sourceLine" id="cb20-3" title="3"><span class="ex">1000002</span> 9000011 50888949</a>
+<a class="sourceLine" id="cb20-4" title="4"><span class="ex">real</span>    0m42.712s</a>
+<a class="sourceLine" id="cb20-5" title="5"></a>
+<a class="sourceLine" id="cb20-6" title="6"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb20-7" title="7"><span class="bu">time</span> ls -lh /mnt/dir <span class="kw">|</span> <span class="fu">wc</span> <span class="kw">&amp;</span> <span class="co"># 连续执行10次</span></a>
+<a class="sourceLine" id="cb20-8" title="8"><span class="ex">real</span>    5m30.489s</a></code></pre></div>
+<h2 id="最新内核测试结果"><span class="header-section-number">3.2</span> 最新内核测试结果</h2>
+<h3 id="w个文件10个进程-1"><span class="header-section-number">3.2.1</span> 100w个文件10个进程</h3>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb21-2" title="2"><span class="bu">time</span> ls -lh /mnt/dir <span class="kw">|</span> <span class="fu">wc</span></a>
+<a class="sourceLine" id="cb21-3" title="3"><span class="ex">1000002</span> 9000011 50888949</a>
+<a class="sourceLine" id="cb21-4" title="4"><span class="ex">real</span>    1m21.104s</a>
+<a class="sourceLine" id="cb21-5" title="5"></a>
+<a class="sourceLine" id="cb21-6" title="6"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb21-7" title="7"><span class="bu">time</span> ls -lh /mnt/dir <span class="kw">|</span> <span class="fu">wc</span> <span class="kw">&amp;</span> <span class="co"># 连续执行10次</span></a>
+<a class="sourceLine" id="cb21-8" title="8"><span class="ex">real</span>    1m26.528s</a></code></pre></div>
+<h2 id="最新内核改成写锁测试结果"><span class="header-section-number">3.3</span> 最新内核改成写锁测试结果</h2>
+<p>补丁为<a href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/nfs/0001-nfs-add-old-iterate-directory-operation-for-debug.patch">0001-nfs-add-old-iterate-directory-operation-for-debug.patch</a></p>
+<h3 id="w个文件10个进程-2"><span class="header-section-number">3.3.1</span> 100w个文件10个进程</h3>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb22-1" title="1"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb22-2" title="2"><span class="bu">time</span> ls -lh /mnt/dir-100w <span class="kw">|</span> <span class="fu">wc</span></a>
+<a class="sourceLine" id="cb22-3" title="3"><span class="ex">1000002</span> 9000011 50888949</a>
+<a class="sourceLine" id="cb22-4" title="4"><span class="ex">real</span>    1m34.346s</a>
+<a class="sourceLine" id="cb22-5" title="5"></a>
+<a class="sourceLine" id="cb22-6" title="6"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb22-7" title="7"><span class="bu">time</span> ls -lh /mnt/dir-100w <span class="kw">|</span> <span class="fu">wc</span> <span class="kw">&amp;</span> <span class="co"># 连续执行10次</span></a>
+<a class="sourceLine" id="cb22-8" title="8"><span class="ex">real</span>    5m26.562s</a></code></pre></div>
+<h3 id="w个文件20个进程-1"><span class="header-section-number">3.3.2</span> 100w个文件20个进程</h3>
+<p>没多久就oom了。</p>
+<h3 id="w个文件15个进程"><span class="header-section-number">3.3.3</span> 100w个文件15个进程</h3>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb23-1" title="1"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb23-2" title="2"><span class="bu">time</span> ls -lh /mnt/dir-100w <span class="kw">|</span> <span class="fu">wc</span></a>
+<a class="sourceLine" id="cb23-3" title="3"><span class="ex">1000002</span> 9000011 50888949</a>
+<a class="sourceLine" id="cb23-4" title="4"><span class="ex">real</span>    1m34.346s</a>
+<a class="sourceLine" id="cb23-5" title="5"></a>
+<a class="sourceLine" id="cb23-6" title="6"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb23-7" title="7"><span class="bu">time</span> ls -lh /mnt/dir-100w <span class="kw">|</span> <span class="fu">wc</span> <span class="kw">&amp;</span> <span class="co"># 连续执行15次</span></a>
+<a class="sourceLine" id="cb23-8" title="8"><span class="ex">real</span>    7m50.229s</a></code></pre></div>
+<h3 id="w个文件15个进程-1"><span class="header-section-number">3.3.4</span> 10w个文件15个进程</h3>
+<div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="bu">time</span> ls -lh /mnt/dir-10w <span class="kw">|</span> <span class="fu">wc</span></a>
+<a class="sourceLine" id="cb24-3" title="3"><span class="ex">100002</span>  900011 4988949</a>
+<a class="sourceLine" id="cb24-4" title="4"><span class="ex">real</span>    0m7.268s</a>
+<a class="sourceLine" id="cb24-5" title="5"></a>
+<a class="sourceLine" id="cb24-6" title="6"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb24-7" title="7"><span class="bu">time</span> ls -lh /mnt/dir-10w <span class="kw">|</span> <span class="fu">wc</span> <span class="kw">&amp;</span> <span class="co"># 连续执行15次</span></a>
+<a class="sourceLine" id="cb24-8" title="8"><span class="ex">real</span>    0m21.190s</a></code></pre></div>
+<h3 id="w个文件15个进程-2"><span class="header-section-number">3.3.5</span> 1w个文件15个进程</h3>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1"><span class="bu">time</span> ls -lh /mnt/dir-1w <span class="kw">|</span> <span class="fu">wc</span></a>
+<a class="sourceLine" id="cb25-2" title="2">  <span class="ex">10002</span>   90011  488948</a>
+<a class="sourceLine" id="cb25-3" title="3"><span class="ex">real</span>    0m0.830s</a>
+<a class="sourceLine" id="cb25-4" title="4"><span class="ex">real</span>    0m0.838s</a>
+<a class="sourceLine" id="cb25-5" title="5"><span class="ex">real</span>    0m0.848s</a>
+<a class="sourceLine" id="cb25-6" title="6"></a>
+<a class="sourceLine" id="cb25-7" title="7"><span class="bu">echo</span> 3 <span class="op">&gt;</span> /proc/sys/vm/drop_caches</a>
+<a class="sourceLine" id="cb25-8" title="8"><span class="bu">time</span> ls -lh /mnt/dir-1w <span class="kw">|</span> <span class="fu">wc</span> <span class="kw">&amp;</span> <span class="co"># 连续执行15次</span></a>
+<a class="sourceLine" id="cb25-9" title="9"><span class="ex">real</span>    0m0.981s</a>
+<a class="sourceLine" id="cb25-10" title="10"><span class="ex">real</span>    0m0.984s</a>
+<a class="sourceLine" id="cb25-11" title="11"><span class="ex">real</span>    0m1.038s</a>
+<a class="sourceLine" id="cb25-12" title="12"><span class="ex">real</span>    0m0.974s</a></code></pre></div>
+<h3 id="数据分析"><span class="header-section-number">3.3.6</span> 数据分析</h3>
+<div class="sourceCode" id="cb26"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb26-1" title="1"><span class="co"># 100w        10w       1w</span></a>
+<a class="sourceLine" id="cb26-2" title="2"><span class="co"># 1个进程</span></a>
+<a class="sourceLine" id="cb26-3" title="3">  <span class="ex">94.346s</span>     7.268s    0.848s</a>
+<a class="sourceLine" id="cb26-4" title="4"><span class="co"># 15个进程</span></a>
+<a class="sourceLine" id="cb26-5" title="5">  <span class="ex">470.229s</span>    21.190s   1s</a></code></pre></div>
+<p>100w、10w、1w个文件时，同样是15个进程的情况下，所用的时间比是470:21:1，文件每增加10倍，所用时间大概增加20+倍。</p>
+<h1 id="其他命令请跳过没什么卵用"><span class="header-section-number">4</span> 其他命令（请跳过，没什么卵用）</h1>
+<p>对结果没什么卵用，请跳过，但毕竟曾经定位过，还是记录一下。</p>
+<p>由于现场环境数据量非常大，不能长时间抓包，只能抓取一段时间的数据包然后覆盖文件，判断问题复现后就停止:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb27-1" title="1"><span class="kw">while</span> <span class="fu">true</span></a>
+<a class="sourceLine" id="cb27-2" title="2"><span class="kw">do</span></a>
+<a class="sourceLine" id="cb27-3" title="3">    <span class="fu">sudo</span> tcpdump --interface=<span class="op">&lt;</span>网络接口<span class="op">&gt;</span> --buffer-size=20480 -w out.cap</a>
+<a class="sourceLine" id="cb27-4" title="4">    <span class="va">pid=$(</span><span class="fu">sudo</span> pgrep tcpdump<span class="va">)</span></a>
+<a class="sourceLine" id="cb27-5" title="5">    <span class="fu">sleep</span> 60</a>
+<a class="sourceLine" id="cb27-6" title="6">    <span class="fu">sudo</span> kill -SIGINT <span class="va">${pid}</span></a>
+<a class="sourceLine" id="cb27-7" title="7">    <span class="fu">sudo</span> ps aux <span class="kw">|</span> <span class="fu">grep</span> rsync <span class="kw">|</span> <span class="fu">grep</span> D</a>
+<a class="sourceLine" id="cb27-8" title="8">    <span class="kw">if</span><span class="bu"> [</span> <span class="va">$?</span> <span class="ot">-eq</span> 0<span class="bu"> ]</span></a>
+<a class="sourceLine" id="cb27-9" title="9">        <span class="bu">break</span></a>
+<a class="sourceLine" id="cb27-10" title="10">    <span class="kw">fi</span></a>
+<a class="sourceLine" id="cb27-11" title="11">    <span class="fu">sudo</span> rm out.cap</a>
+<a class="sourceLine" id="cb27-12" title="12"><span class="kw">done</span></a></code></pre></div>
+<pre><code>+-------------+
+|     test    |
+|  nfsclient  |
+|    (E)      |
++-------------+
+      ^
+      | 
+     nfs
+      |
+      v        
++-------------+           +-------------+
+|   huawei    |           |   huawei    |
+| nfsserver1  |           | nfsserver2  |
+|    (A)      |           |    (D)      |
++-------------+           +-------------+
+      ^                          ^
+      |                          |
+     nfs                        nfs
+      |                          |
+      v                          v
++-------------+           +-------------+
+|             |           |             |
+| rsyncserver |&lt;--rsync--&gt;| rsyncclient |
+|    (B)      |           |    (C)      |
++-------------+           +-------------+</code></pre>
+<p>抓包步骤（已证明不可行，长时间抓包数据太多文件太大）:</p>
+<ul>
+<li>连接nas盘的B上复现问题（<code>rsync</code>进程卡住），连接nas盘的E正常，注意连接的是同一个nas盘</li>
+<li>B和E同时开启抓包<code>sudo tcpdump --interface=&lt;网络接口&gt; --buffer-size=20480 -w out.cap</code></li>
+<li>B和E上同时在有百万文件的目录下执行<code>ls | wc</code>，30秒后停止抓包</li>
+</ul>
+<p>查看进程状态步骤:</p>
+<ul>
+<li>查看卡住的<code>rsync</code>进程号: <code>ps aux | grep rsync</code></li>
+<li>打印所有<code>rsync</code>进程栈: <code>cat /proc/&lt;进程号&gt;/stack</code></li>
+<li>找到执行到nfs请求的那个<code>rsync</code>进程</li>
+<li>查看上下文切换次数: <code>cat /proc/&lt;执行到nfs请求的rsync进程号&gt;/status | grep voluntary_ctxt_switches</code></li>
+</ul>
+<h1 id="strace跟踪系统调用分析"><span class="header-section-number">5</span> <code>strace</code>跟踪系统调用分析</h1>
+<pre><code>+-------------+
+|     test    |
+|  nfsclient  |
+|    (E)      |
++-------------+
+      ^
+      | 
+     nfs
+      |
+      v        
++-------------+           +-------------+
+|   huawei    |           |   huawei    |
+| nfsserver1  |           | nfsserver2  |
+|    (A)      |           |    (D)      |
++-------------+           +-------------+
+      ^                          ^
+      |                          |
+     nfs                        nfs
+      |                          |
+      v                          v
++-------------+           +-------------+
+|             |           |             |
+| rsyncserver |&lt;--rsync--&gt;| rsyncclient |
+|    (B)      |           |    (C)      |
++-------------+           +-------------+</code></pre>
+<p>使用<code>strace</code>命令记录<code>readdir</code>请求的时间点:</p>
+<ul>
+<li>B和E连接到同一个nas盘</li>
+<li>B和E同时执行<code>strace -ttt -f -v -s 40960 -o strace.out ls &lt;百万文件的那个目录&gt; | wc</code></li>
+<li>正常情况下是E先执行完，等E执行完<code>strace</code>命令后，B的<code>strace</code>命令也停止（直接<code>ctrl + c</code>）</li>
+<li>把两台机器上的<code>strace.out</code>文件复制出来</li>
+</ul>
+<div class="sourceCode" id="cb30"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb30-1" title="1"><span class="ex">nU2BlPA3xoSfYaPLVs1DqiZU4ANOtV</span> <span class="co"># 文件名</span></a>
+<a class="sourceLine" id="cb30-2" title="2"><span class="ex">1712802314.374988</span> <span class="co"># 机器B的时间点</span></a>
+<a class="sourceLine" id="cb30-3" title="3"><span class="ex">1712802323.791969</span> <span class="co"># 机器E的时间点</span></a>
+<a class="sourceLine" id="cb30-4" title="4"></a>
+<a class="sourceLine" id="cb30-5" title="5"><span class="ex">Y348qeD3dxaeJOsyiTNON3qCtEE8yn</span></a>
+<a class="sourceLine" id="cb30-6" title="6"><span class="ex">1712802401.142976-1712802314.374988</span>=86.767988</a>
+<a class="sourceLine" id="cb30-7" title="7"><span class="ex">1712802325.169445-1712802323.791969</span>=1.377476</a>
+<a class="sourceLine" id="cb30-8" title="8"></a>
+<a class="sourceLine" id="cb30-9" title="9"><span class="ex">xxwdIL00iCzXviXcoCaNCvrvIyAkeP</span></a>
+<a class="sourceLine" id="cb30-10" title="10"><span class="ex">1712802509.642010-1712802314.374988</span>=195.267022</a>
+<a class="sourceLine" id="cb30-11" title="11"><span class="ex">1712802326.528755-1712802323.791969</span>=2.736786</a>
+<a class="sourceLine" id="cb30-12" title="12"></a>
+<a class="sourceLine" id="cb30-13" title="13"><span class="ex">L8mSFdfuAtzgWAp646sVy73uTMgbaH</span></a>
+<a class="sourceLine" id="cb30-14" title="14"><span class="ex">1712802607.192381-1712802314.374988</span>=292.817393</a>
+<a class="sourceLine" id="cb30-15" title="15"><span class="ex">1712802328.083538-1712802323.791969</span>=4.291569</a>
+<a class="sourceLine" id="cb30-16" title="16"></a>
+<a class="sourceLine" id="cb30-17" title="17"><span class="ex">9wHPHGNObYKMRERIhHuRaKiZW9Jer4</span></a>
+<a class="sourceLine" id="cb30-18" title="18"><span class="ex">1712802707.587591-1712802314.374988</span>=393.212603</a>
+<a class="sourceLine" id="cb30-19" title="19"><span class="ex">1712802329.226065-1712802323.791969</span>=5.434096</a>
+<a class="sourceLine" id="cb30-20" title="20"></a>
+<a class="sourceLine" id="cb30-21" title="21"><span class="ex">Z9Jj6YvkzMCt0lymymEtZhmIAFEDMH</span></a>
+<a class="sourceLine" id="cb30-22" title="22"><span class="ex">1712802803.228566-1712802314.374988</span>=488.853578</a>
+<a class="sourceLine" id="cb30-23" title="23"><span class="ex">1712802330.254807-1712802323.791969</span>=6.462838</a>
+<a class="sourceLine" id="cb30-24" title="24"></a>
+<a class="sourceLine" id="cb30-25" title="25"><span class="ex">VLww0v31UJplVOvh1bYlQ2Wwz4OfiI</span></a>
+<a class="sourceLine" id="cb30-26" title="26"><span class="ex">1712802824.954462-1712802314.374988</span>=510.579474</a>
+<a class="sourceLine" id="cb30-27" title="27"><span class="ex">1712802330.369828-1712802323.791969</span>=6.577859</a></code></pre></div>
+<p>抽取几个时间点的数据可以看出，<code>ls</code>命令执行的速度差距将近100倍。</p>
+<h1 id="代码分析"><span class="header-section-number">6</span> 代码分析</h1>
+<p>由于nfs没有实现<code>iterate_shared</code>方法，所以执行了写锁<code>down_write_killable</code>，与其他进程的写锁、读锁都是互斥的，当并发量大时，<code>iterate_dir</code>函数中每次获取写锁的等待时间就非常长。而用<code>ps</code>命令查看进程状态时，大部分时间都处于<code>down_write_killable</code>和<code>__rpc_execute</code>执行后进入休眠的状态，所以查看到的都是处于<code>D</code>状态。</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb31-1" title="1">getdents<span class="dv">64</span></a>
+<a class="sourceLine" id="cb31-2" title="2">  ksys_getdents<span class="dv">64</span></a>
+<a class="sourceLine" id="cb31-3" title="3">    iterate_dir</a>
+<a class="sourceLine" id="cb31-4" title="4">      <span class="co">// nfs没有实现iterate_shared，实现的是iterate，条件不满足</span></a>
+<a class="sourceLine" id="cb31-5" title="5">      <span class="cf">if</span> (file-&gt;f_op-&gt;iterate_shared)</a>
+<a class="sourceLine" id="cb31-6" title="6">      shared == false</a>
+<a class="sourceLine" id="cb31-7" title="7">      <span class="co">// 这里使用写锁，无法和其他进程并发</span></a>
+<a class="sourceLine" id="cb31-8" title="8">      <span class="co">// 获取锁的时间长也是ps命令查看进程总是处于D状态的原因之一</span></a>
+<a class="sourceLine" id="cb31-9" title="9">      down_write_killable(&amp;inode-&gt;i_rwsem)</a>
+<a class="sourceLine" id="cb31-10" title="10">        call_rwsem_down_write_failed_killable</a>
+<a class="sourceLine" id="cb31-11" title="11">          rwsem_down_write_failed_killable</a>
+<a class="sourceLine" id="cb31-12" title="12">            schedule</a>
+<a class="sourceLine" id="cb31-13" title="13">              __schedule</a>
+<a class="sourceLine" id="cb31-14" title="14">      nfs_readdir</a>
+<a class="sourceLine" id="cb31-15" title="15">        do_read_cache_page</a>
+<a class="sourceLine" id="cb31-16" title="16">          nfs_readdir_filler</a>
+<a class="sourceLine" id="cb31-17" title="17">            nfs_readdir_xdr_to_array</a>
+<a class="sourceLine" id="cb31-18" title="18">              nfs<span class="dv">4</span><span class="er">_proc_readdir</span></a>
+<a class="sourceLine" id="cb31-19" title="19">                _nfs<span class="dv">4</span><span class="er">_proc_readdir</span></a>
+<a class="sourceLine" id="cb31-20" title="20">                  nfs<span class="dv">4</span><span class="er">_call_sync_sequence</span></a>
+<a class="sourceLine" id="cb31-21" title="21">                    rpc_run_task</a>
+<a class="sourceLine" id="cb31-22" title="22">                      __rpc_execute</a>
+<a class="sourceLine" id="cb31-23" title="23">                        out_of_line_wait_on_bit</a>
+<a class="sourceLine" id="cb31-24" title="24">                          __wait_on_bit</a>
+<a class="sourceLine" id="cb31-25" title="25">                            rpc_wait_bit_killable</a>
+<a class="sourceLine" id="cb31-26" title="26">                              schedule</a>
+<a class="sourceLine" id="cb31-27" title="27">                                <span class="co">// 由于循环的过程中，等待nfs server的回复时间占大部分</span></a>
+<a class="sourceLine" id="cb31-28" title="28">                                <span class="co">// 所以用ps命令看到这个进程都是处于D状态</span></a>
+<a class="sourceLine" id="cb31-29" title="29">                                __schedule</a></code></pre></div>
+<p>修复补丁: <code>93a6ab7b691f NFS: Switch readdir to using iterate_shared()</code>，移除所有<code>iterate()</code>接口的补丁<code>3e3271549670 vfs: get rid of old '-&gt;iterate' directory operation</code>。</p>
+<h1 id="问题分析结果"><span class="header-section-number">7</span> 问题分析结果</h1>
+<pre><code>+-------------+           +-------------+
+|   huawei    |           |   huawei    |
+| nfsserver1  |           | nfsserver2  |
+|    (A)      |           |    (D)      |
++-------------+           +-------------+
+      ^                          ^
+      |                          |
+     nfs                        nfs
+      |                          |
+      v                          v
++-------------+           +-------------+
+|             |           |             |
+| rsyncserver |&lt;--rsync--&gt;| rsyncclient |
+|    (B)      |           |    (C)      |
++-------------+           +-------------+</code></pre>
+<p>rsyncserver上有很多进程操作有百万数量文件的目录，而由于遍历目录时无法多进程并发，所以导致每个进程执行的时间非常长，出现很多用<code>ps</code>命令看是<code>D</code>状态的进程。</p>
+<h1 id="解决方案"><span class="header-section-number">8</span> 解决方案</h1>
+<p>建议增大rsync同步的时间间隔。</p>
+</body>
+</html>

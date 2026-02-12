@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>[PATCH 00/20 v3] SUNRPC: clean up server thread management</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">[PATCH 00/20 v3] SUNRPC: clean up server thread management</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#patch-0820-3409e4f1e8f2-nfsd-make-it-possible-to-use-svc_set_num_threads_sync"><span class="toc-section-number">1</span> <span><code>[PATCH 08/20] 3409e4f1e8f2 NFSD: Make it possible to use svc_set_num_threads_sync</code></span></a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="patch-0820-3409e4f1e8f2-nfsd-make-it-possible-to-use-svc_set_num_threads_sync"><span class="header-section-number">1</span> <a href="https://lore.kernel.org/all/163816148557.32298.11233238491435215789.stgit@noble.brown/"><code>[PATCH 08/20] 3409e4f1e8f2 NFSD: Make it possible to use svc_set_num_threads_sync</code></a></h1>
+<pre><code>NFSD: 使能使用 svc_set_num_threads_sync
+
+当前 nfsd 无法使用 svc_set_num_threads_sync。它使用的是不会等待线程退出的 svc_set_num_threads，并通过一个单独机制（nfsd_shutdown_complete）来等待完成。
+
+nfsd 与其他服务不同的原因在于 nfsd 线程可以在调用 svc_set_num_threads 后单独退出——它们在接收到 SIGKILL 时终止。此外，当最后一个线程退出时，服务必须关闭（套接字关闭）。
+
+为此，需要获取 nfsd_mutex，并且由于在调用 svc_set_num_threads 时需要持有该互斥锁，这二者无法相互等待。
+
+本补丁修改了 nfsd 线程，使其能够在不阻塞 nfsd_mutex 的情况下释放对服务的引用，以便可以使用 svc_set_num_threads_sync：
+ - 如果它可以释放非最后一个引用，则直接释放。这不会触发关闭，也不需要互斥锁。这会发生在除最后一个被发信号的线程以及由 nfsd_shutdown_threads() 关闭的线程之外的所有线程上。
+ - 如果它可以在不阻塞的情况下获取互斥锁（trylock），则获取后释放引用。这很可能发生在最后一个被 SIGKILL 杀死的线程上。
+ - 否则，可能有其他不相关任务持有该互斥锁（可能在另一个网络命名空间中），或者 nfsd_shutdown_threads() 正准备获取对服务的引用，此时我们可以安全地释放我们的引用。我们无法方便地获取这些事件的唤醒通知，而且也不太可能需要，因此我们会短暂休眠，然后再次检查。
+
+通过此方式，我们可以废弃 nfsd_shutdown_complete 和 nfsd_complete_shutdown()，并切换到 svc_set_num_threads_sync。</code></pre>
+<p>相关邮件:</p>
+<ul>
+<li><a href="https://lore.kernel.org/all/175042051171.608730.8613669948428192921@noble.neil.brown.name/">NeilBrown &lt;neilb@suse.de&gt; <code>Re: [RFC PATCH] nfsd: convert the nfsd_users to atomic_t</code></a>:</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">我能找到的此崩溃的唯一可能原因是，在调用 <span class="fu">nfsd_shutdown_net()</span> 和随后调用 <span class="fu">nfsd_shutdown_generic()</span> 时，<span class="ex">nfsd</span> 线程仍在运行，从而导致工作队列被销毁。</a>
+<a class="sourceLine" id="cb2-2" title="2">这些线程都会收到 <span class="ex">SIGKILL</span> 信号，但没有任何机制去等待它们执行完毕。</a>
+<a class="sourceLine" id="cb2-3" title="3">这一点在提交</a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="ex">Commit</span>: 3409e4f1e8f2 (<span class="st">&quot;NFSD: Make it possible to use svc_set_num_threads_sync&quot;</span>)</a>
+<a class="sourceLine" id="cb2-5" title="5">中得到了修正：在同步模式下，线程会被同步地停止，因此可以确保在移除工作队列之前，所有线程都已经停止运行。</a></code></pre></div>
+<p>前置补丁:</p>
+<ul>
+<li><a href="https://lore.kernel.org/all/20210313210847.569041-1-trondmy@kernel.org/"><code>c6c7f2a84da4 nfsd: Ensure knfsd shuts down when the "nfsd" pseudofs is unmounted</code></a>: <code>/proc/fs/nfsd</code>卸载时确保所有<code>nfsd</code>线程全部停止
+<ul>
+<li>前置补丁, 4.19可不合: <code>[PATCH 07/10] 97ad4031e295 nfsd4: add a client info file</code>](https://lore.kernel.org/all/1556201060-7947-8-git-send-email-bfields@redhat.com/)</li>
+</ul></li>
+<li><a href="https://lore.kernel.org/all/163816148551.32298.1997321981162233125.stgit@noble.brown/"><code>[PATCH 01/20] 89b24336f03a NFSD: handle error better in write_ports_addfd()</code></a>: 确保<code>nfsd_serv</code>刚创建时才销毁</li>
+<li><a href="https://lore.kernel.org/all/163816148552.32298.18413679797079617436.stgit@noble.brown/"><code>[PATCH 02/20] df5e49c880ea SUNRPC: change svc_get() to return the svc.</code></a>: 让<code>svc_get()</code>有返回值</li>
+<li><a href="https://lore.kernel.org/all/163816148553.32298.12054000235093970423.stgit@noble.brown/"><code>[PATCH 03/20] 8c62d12740a1 SUNRPC/NFSD: clean up get/put functions.</code></a>: 重构<code>svc_destroy()</code>和<code>nfsd_destroy()</code>
+<ul>
+<li>前置补丁: <a href="https://lore.kernel.org/all/547ee3794ac9678bc20ccb6ec35ba0fca5fe92f2.1633540771.git.bcodding@redhat.com/"><code>[PATCH v2] c20106944eb6 NFSD: Keep existing listeners on portlist error</code></a>: 如果已经存在sockets就只是减少计数，不调用<code>nfsd_destroy()</code></li>
+</ul></li>
+<li><a href="https://lore.kernel.org/all/163816148554.32298.8307258870002897708.stgit@noble.brown/"><code>[PATCH 04/20] ec52361df99b SUNRPC: stop using -&gt;sv_nrthreads as a refcount</code></a>: <code>sv_nrthreads</code>只作为线程计数，新增<code>sv_refcnt</code>作为引用计数
+<ul>
+<li>后续修复补丁: <a href="https://lore.kernel.org/all/20231215010030.7580-2-neilb@suse.de/"><code>[PATCH 1/5] 2a501f55cd64 nfsd: call nfsd_last_thread() before final nfsd_put()</code></a>: 失败时调用<code>nfsd_last_thread()</code>
+<ul>
+<li>前置补丁: <a href="https://lore.kernel.org/all/20230731064839.7729-6-neilb@suse.de/"><code>[PATCH 05/12] 9f28a971ee9f nfsd: separate nfsd_last_thread() from nfsd_put()</code></a>: 从<code>nfsd_put()</code>中分离出函数<code>nfsd_last_thread()</code>
+<ul>
+<li>前置补丁: <a href="https://lore.kernel.org/all/164511393711.1361.3789898013043466921.stgit@klimt.1015granger.net/"><code>[PATCH v2 3/8] 87cdd8641c8a SUNRPC: Remove svo_shutdown method</code></a>: 删除结构体的<code>.svo_shutdown()</code>，在使用的地方直接调用函数</li>
+<li>前置补丁: <a href="https://lore.kernel.org/all/164511394380.1361.15753264922295129414.stgit@klimt.1015granger.net/"><code>[PATCH v2 4/8] 352ad31448fe SUNRPC: Rename svc_create_xprt()</code></a>: 函数重命名成<code>svc_xprt_create()</code></li>
+<li>前置补丁: <a href="https://lore.kernel.org/all/164511395701.1361.2321498517172060697.stgit@klimt.1015granger.net/"><code>[PATCH v2 6/8] c7d7ec8f043e SUNRPC: Remove svc_shutdown_net()</code></a>: <code>svc_shutdown_net()</code>换成<code>svc_xprt_destroy_all()</code></li>
+<li>前置补丁（头文件<code>nfsd.h</code>）, 4.19可不合: <code>73598a0cfb21 nfsd: don't allocate the versions array.</code></li>
+<li>后续修复补丁: <a href="https://lore.kernel.org/all/169448190063.19905.9707641304438290692@noble.neil.brown.name/"><code>[PATCH] 88956eabfdea NFSD: fix possible oops when nfsd/pool_stats is closed.</code></a>: 修复可能的空指针解引用</li>
+</ul></li>
+<li>后续修复补丁: <a href="https://lore.kernel.org/all/20240103-nfsd-fixes-v1-1-4f4f9d7edd0d@kernel.org/"><code>[PATCH] 64e6304169f1 nfsd: drop the nfsd_put helper</code></a></li>
+</ul></li>
+</ul></li>
+<li><a href="https://lore.kernel.org/all/163816148555.32298.5422275287728622222.stgit@noble.brown/"><code>[PATCH 05/20] 9b6c8c9bebcc nfsd: make nfsd_stats.th_cnt atomic_t</code></a>: 把<code>nfsd_stats.th_cnt</code>变成原子变量
+<ul>
+<li>前置补丁, 4.19可不合: <a href="https://lore.kernel.org/all/20210106075236.4184-3-amir73il@gmail.com/"><code>[PATCH v2 2/3] e567b98ce9a4 nfsd: protect concurrent access to nfsd stats counters</code></a></li>
+</ul></li>
+<li><a href="https://lore.kernel.org/all/163816148556.32298.17419698380488869158.stgit@noble.brown/"><code>[PATCH 06/20] 2a36395fac3b SUNRPC: use sv_lock to protect updates to sv_nrthreads.</code></a>: 对<code>sv_nrthreads</code>加锁</li>
+<li><a href="https://lore.kernel.org/all/163816148556.32298.7308512506129152207.stgit@noble.brown/"><code>[PATCH 07/20] 9d3792aefdcd NFSD: narrow nfsd_mutex protection in nfsd thread</code></a>: 缩小<code>nfsd_mutex</code>加锁的范围</li>
+<li><a href="https://lore.kernel.org/all/163816148558.32298.2182168040527421256.stgit@noble.brown/"><code>[PATCH 09/20] 3ebdbe5203a8 SUNRPC: discard svo_setup and rename svc_set_num_threads_sync()</code></a>: 函数改名为<code>svc_set_num_threads()</code></li>
+<li><a href="https://lore.kernel.org/all/163816148559.32298.4434140851292696444.stgit@noble.brown/"><code>[PATCH 10/20] d057cfec4940 NFSD: simplify locking for network notifier.</code></a>: 使用自旋锁<code>nfsd_notifier_lock</code>
+<ul>
+<li>前置补丁（修改<code>nfsd_reset_versions()</code>），4.19可不合: <code>e333f3bbefe3 nfsd: Allow containers to set supported nfs versions</code></li>
+</ul></li>
+</ul>
+</body>
+</html>

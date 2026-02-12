@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>QEMU/KVM环境搭建与使用</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">QEMU/KVM环境搭建与使用</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#修改成不需要密码"><span class="toc-section-number">1</span> 修改成不需要密码</a></li>
+<li><a href="#arm32架构"><span class="toc-section-number">2</span> arm32架构</a></li>
+<li><a href="#riscv-ubuntu2204镜像"><span class="toc-section-number">3</span> riscv ubuntu2204镜像</a></li>
+<li><a href="#openeuler"><span class="toc-section-number">4</span> openeuler</a></li>
+</ul>
+</nav>
+<h1 id="修改成不需要密码"><span class="header-section-number">1</span> 修改成不需要密码</h1>
+<p><code>/etc/passwd</code>修改成:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">root</span>::0:0:Super User:/root:/bin/bash</a></code></pre></div>
+<p><code>/etc/shadow</code>可以不修改。</p>
+<h1 id="arm32架构"><span class="header-section-number">2</span> arm32架构</h1>
+<p>在 linux 仓库中执行 <code>make dtbs</code> 生成 dtb 文件</p>
+<p>ubuntu2204宿主机中创建网络:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">sudo</span> apt install bridge-utils -y <span class="co"># brctl命令</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="fu">sudo</span> apt-get install uml-utilities -y <span class="co"># tunctl 命令， centos９没有</span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="ex">qemu-system-arm</span> -net nic,model=? -M vexpress-a15 <span class="co"># 查看支持的虚拟网络</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="fu">sudo</span> tunctl -b <span class="co"># 按顺序创建 tap0 tap1，每输入一次命令创建一个</span></a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="fu">sudo</span> tunctl -t tap0 -u sonvhi <span class="co"># 指定名称创建</span></a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="fu">sudo</span> tunctl -t tap1 -u sonvhi</a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="fu">sudo</span> ip link set tap0 up <span class="co"># 激活</span></a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="fu">sudo</span> ip link set tap1 up <span class="co"># 激活</span></a>
+<a class="sourceLine" id="cb2-9" title="9"><span class="fu">sudo</span> tunctl -d tap1 <span class="co"># 删除 tap1</span></a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="fu">sudo</span> brctl show <span class="co"># 查看网桥</span></a>
+<a class="sourceLine" id="cb2-11" title="11"><span class="fu">sudo</span> brctl addif virbr0 tap0 <span class="co"># tap0 加入网桥</span></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="fu">sudo</span> brctl addif virbr0 tap1 <span class="co"># tap1 加入网桥</span></a>
+<a class="sourceLine" id="cb2-13" title="13"><span class="fu">sudo</span> brctl delif virbr0 tap0 <span class="co"># tap0 移出网桥</span></a>
+<a class="sourceLine" id="cb2-14" title="14"></a>
+<a class="sourceLine" id="cb2-15" title="15"><span class="fu">sudo</span> brctl addbr br0 <span class="co"># 新建网桥 br0</span></a>
+<a class="sourceLine" id="cb2-16" title="16"><span class="fu">sudo</span> brctl delbr br0 <span class="co"># 删除网桥 br0</span></a>
+<a class="sourceLine" id="cb2-17" title="17"><span class="fu">sudo</span> brctl addif br0 enx381428b8c32c <span class="co"># 注意:无线网卡不行, 必须是以太网卡</span></a>
+<a class="sourceLine" id="cb2-18" title="18"><span class="fu">sudo</span> brctl addif br0 tap0 <span class="co"># tap0 加入网桥</span></a></code></pre></div>
+<p>centos9宿主机中没有 <code>tunctl</code>的解决办法:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">sudo</span> ip tuntap add tap0 mode tap user sonvhi</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="fu">sudo</span> ip tuntap del tap0 mode tap</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="fu">sudo</span> ip tuntap list</a></code></pre></div>
+<p>bullseye aarch64 网络无法使用， <code>/etc/network/interfaces</code> 需要把 <code>eth0</code> 改成 <code>enp0s1</code>(通过<code>dmesg | grep -i eth</code>找到<code>enp0s1</code>)</p>
+<h1 id="riscv-ubuntu2204镜像"><span class="header-section-number">3</span> riscv ubuntu2204镜像</h1>
+<p>riscv64架构的镜像，可以直接下载<a href="https://ubuntu.com/download/risc-v">ubuntu2204</a>（选择[QEMU emulator]）。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">qemu-system-riscv64</span> -netdev ? <span class="co"># 宿主机中查看可用的netdev backend类型</span></a></code></pre></div>
+<p>虚拟机中修改配置:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">systemctl</span> status systemd-modules-load.service <span class="co"># 查看systemd-modules-load服务状态</span></a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="co"># 删除systemd-modules-load服务，怕万一后续有用，只做重命名</span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="fu">mv</span> /lib/systemd/system/systemd-modules-load.service /lib/systemd/system/systemd-modules-load.service.bak</a>
+<a class="sourceLine" id="cb5-4" title="4"></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="fu">cp</span> /etc/fstab /etc/fstab.bak <span class="co"># 备份</span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="ex">vim</span> /etc/fstab <span class="co"># 删除 LABEL=UEFI 一行</span></a></code></pre></div>
+<h1 id="openeuler"><span class="header-section-number">4</span> openeuler</h1>
+<p><a href="https://www.openeuler.org/en/download/?version=openEuler%2022.03%20LTS%20SP2">openEuler 22.03 LTS SP2（或更新的版本）</a>，Scenario选择“cloud computing”，下载<code>qcow2.xz</code>，解压:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="fu">xz</span> -d openEuler-22.03-LTS-SP2-x86_64.qcow2.xz</a></code></pre></div>
+<p>qemu启动参数需要做一些小修改 <code>-append "... root=/dev/vda2 ..."</code>。</p>
+<p>默认的登录账号是<code>root</code>，密码是 <code>openEuler12#$</code>，具体参考<a href="https://docs.openeuler.org/zh/docs/22.03_LTS_SP3/docs/Releasenotes/%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85.html">系统安装</a>。</p>
+<p>注意需要打开<code>vfat</code>文件系统相关配置，具体查看<a href="https://chenxiaosong.com/src/filesystem/microsoft-fs.html">《微软文件系统》</a>中<code>vfat</code>相关的一节。否则会进入emergency mode，如果你实在不想打开<code>vfat</code>文件系统相关配置，可以编辑<code>/etc/fstab</code>文件删除<code>/boot</code>相关的一行，重启系统就可以正常启动了，但不建议哈。</p>
+</body>
+</html>

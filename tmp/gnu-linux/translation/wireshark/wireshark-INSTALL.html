@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>wireshark INSTALL</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">wireshark INSTALL</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#安装"><span class="toc-section-number">1</span> 安装</a></li>
+</ul>
+</nav>
+<p>翻译自<a href="https://gitlab.com/wireshark/wireshark/-/blob/b6c161e1f4cca41d6fad248ecf29f443f57e8b25/INSTALL">INSTALL</a>。</p>
+<p>另请参见 https://wiki.wireshark.org/Development/ 以及位于 https://www.wireshark.org/docs/ 的《开发者指南》 和 doc/ 子目录中的相关文档。</p>
+<h1 id="安装"><span class="header-section-number">1</span> 安装</h1>
+<p>以下是适用于 Unix 及类 Unix 系统的安装说明。 这些并不是 Windows 系统的安装说明；Windows 的安装请参见 Wireshark 用户指南和 Wireshark 开发者指南，地址为 https://www.wireshark.org/docs/。</p>
+<ol start="0" type="1">
+<li><p>这是软件。请自行承担风险。</p></li>
+<li><p>如果你希望构建 Wireshark，请确保已安装 Qt 和 GLib 的开发包。 可先运行 ‘pkg-config glib-2.0 –modversion’ 以检查是否安装了 GLib 2.x。 然后运行 ‘pkg-config Qt6Widgets –modversion’ 以检查是否安装了 Qt 6。 如果没有，再尝试运行 ‘pkg-config Qt5Widgets –modversion’ 以检查是否安装了 Qt 5。</p>
+<p>Wireshark 需要 Qt 5.15 或更高版本，但强烈推荐使用最新的 LTS 版本。 使用 Qt 5 构建时需要 CMake 选项 ‘-DUSE_qt6=OFF’。 Wireshark 需要 GLib 2.54.0 或更高版本。</p>
+<p>如果你需要安装或重新安装 GLib，可以在以下地址找到相关软件包：</p>
+<pre><code> https://download.gnome.org/sources/glib/</code></pre>
+<p>Qt 可在以下地址获取：</p>
+<pre><code> https://www.qt.io/download</code></pre>
+<p>如果你是通过二进制包安装 Qt 或 GLib，可能还需要安装对应的 “开发”包；通常会有“用户”包和“开发者”包之分，前者不包含头文件等内容。 例如，Red Hat 用户需要安装名为 “glib2-devel” 的 .rpm 包。</p></li>
+<li><p>如果你希望构建 Wireshark 的命令行版本 TShark， 请确保已安装 GLib。检查方法见上面的注释 #1。</p></li>
+<li><p>如果你想抓包，请确保已安装 libpcap。 最新的“官方”版本可以在以下地址找到：</p>
+<pre><code> https://www.tcpdump.org</code></pre>
+<p>如果你是通过二进制包安装 libpcap，可能还需要安装相应的 “开发”包。例如，在 Debian 中可能有一个名为 “libpcap0” 的包， 但它只包含共享库、版权说明、变更日志和 README.md 文件； 你还需要安装 “libpcap-dev” 包才能获得头文件、非共享库以及 man 手册。 类似地，Red Hat 用户需要在安装 “libpcap” .rpm 的同时， 再安装 “libpcap-devel” .rpm。</p></li>
+<li><p>构建 Wireshark 需要 Python、flex 和 Asciidoctor。</p></li>
+<li><p>创建一个与源码目录分离的构建目录。 该目录可以位于任意位置，但如果路径中包含空格，可能会遇到问题。</p></li>
+<li><p>在构建目录中运行 ‘cmake <选项> <wireshark 源码路径>’。 运行 ‘cmake -LH <wireshark 源码路径>’ 可以显示完整的选项列表。 《开发者指南》的 “Tool Reference” 章节中包含使用 CMake 的通用说明。 一些 Wireshark 特有的选项如下：</p>
+<p>-G Ninja CMake 支持多种构建系统，包括 UNIX Make、MSBuild 和 Ninja。 UNIX Make 是默认选项，但 Ninja 通常更快。</p>
+<p>-DBUILD_wireshark=OFF 默认情况下，CMake 会尝试查找 Qt 库以构建 Wireshark（GUI 包分析器）。 使用此选项可以禁用 GUI 版本 Wireshark 的构建。</p>
+<p>-DBUILD_tshark=OFF 默认会构建命令行包分析器 TShark。 使用此选项可以避免构建它。</p>
+<p>-DBUILD_editcap=OFF 默认会构建抓包文件编辑程序。 使用此选项可以避免构建它。</p>
+<p>-DBUILD_capinfos=OFF 默认会构建抓包文件统计信息报告程序。 使用此选项可以避免构建它。</p>
+<p>-DBUILD_captype=OFF 默认会构建抓包类型报告程序。 使用此选项可以避免构建它。</p>
+<p>-DBUILD_mergecap=OFF 默认会构建抓包文件合并程序。 使用此选项可以避免构建它。</p>
+<p>-DBUILD_reordercap=OFF 默认会构建抓包文件重排序程序。 使用此选项可以避免构建它。</p>
+<p>-DBUILD_text2pcap=OFF 默认会构建十六进制转抓包文件的转换程序。 使用此选项可以避免构建它。</p>
+<p>-DBUILD_dftest=OFF 默认会构建显示过滤器编译器测试程序。 使用此选项可以避免构建它。</p>
+<p>-DBUILD_randpkt=OFF 默认会构建用于生成随机抓包文件的程序。 使用此选项可以避免构建它。</p>
+<p>-DBUILD_dumpcap=OFF 默认会构建网络流量抓包程序 dumpcap。 使用此选项可以避免构建它。</p>
+<p>-DBUILD_rawshark=OFF 默认会构建用于转储和分析原始 libpcap 数据的程序。 使用此选项可以避免构建它。</p>
+<p>-DUSE_qt6=OFF 默认情况下，如果需要 Qt，CMake 会尝试查找 Qt 6 库。 使用此选项可以改为查找并使用 Qt 5。</p>
+<p>-DDUMPCAP_INSTALL_OPTION=suid -DDUMPCAP_INSTALL_OPTION=capabilities Wireshark 和 TShark 依赖 dumpcap 进行抓包。 将该选项设置为 “suid” 会以 setuid root 权限安装 dumpcap， 从而允许系统中的任意用户抓取实时流量。 如果不希望这样，可以限制 dumpcap 的权限，仅允许特定用户或用户组运行， 并将该选项设置为 “capabilities”。</p>
+<pre><code> 不推荐以 root 身份运行 Wireshark 或 TShark。</code></pre>
+<p>-DENABLE_CAP=OFF 默认情况下，如果 ‘cmake’ 找到 libcap（POSIX capabilities 库）， dumpcap 在以 setuid root 安装时，会在放弃 root 权限前 尝试保留 CAP_NET_RAW 和 CAP_NET_ADMIN。 使用此选项可以禁用该行为。</p>
+<p>-DENABLE_PCAP=OFF 如果你希望构建一个只能分析抓包文件、但不能自行抓包的分析器， 且系统中已安装 libpcap， 或者你正在一个未安装 libpcap 的系统上构建 Wireshark （这种情况下只能构建无法抓包的版本）， 可以使用 -DENABLE_PCAP=OFF 来避免使用 libpcap。</p>
+<p>-DENABLE_ZLIB=OFF 默认情况下，如果 ‘cmake’ 找到 zlib（即 libz）， wiretap 库将支持读取压缩的抓包文件。 如果你安装了 zlib，但不希望将其集成到 wiretap 库中 （该库被 Wireshark、TShark 以及抓包文件工具使用）， 可以使用此选项。</p>
+<p>-DENABLE_BROTLI=OFF 默认情况下，如果 ‘cmake’ 找到 brotli， wiretap 库将支持读取 brotli 压缩的抓包文件。 如果你不希望启用该功能，可以使用此选项。</p>
+<p>-DENABLE_PLUGINS=OFF 默认情况下，如果系统支持运行时可加载模块， 包分析器将支持插件。 使用此选项可以在不支持插件的情况下构建。</p></li>
+<li><p>运行 ‘cmake’ 后，会看到一个所选选项的摘要。 请确认该摘要符合你的预期。 如果不符合，请使用新的选项重新运行 ‘cmake’。</p></li>
+<li><p>运行 ‘make’， 如果你选择生成 Ninja 构建文件，则运行 ‘ninja’。 希望你不会遇到任何问题。</p></li>
+<li><p>运行 ‘./run/wireshark’、‘./run/tshark’ 或 ‘./run/dumpcap’， 确认程序可以正常工作。 要抓取实时数据，你必须具有 root 权限。</p></li>
+</ol>
+<p>10/a. 运行 ‘make install’。 如果你使用的是支持 RPM 打包系统的发行版，可以运行：</p>
+<pre><code>    make wireshark_rpm</code></pre>
+<p>或</p>
+<pre><code>    ninja wireshark_rpm</code></pre>
+<p>来生成适用于你系统的可安装软件包。 默认的安装路径是 /usr/local， 因此你可能希望在 CMake 中传递 -DCMAKE_INSTALL_PREFIX=/usr。</p>
+<p>10/b. 如果你运行的是支持 APT（Debian/Ubuntu 等）的系统， 请在解压或检出 Wireshark 源码后，立即在源码目录中运行：</p>
+<pre><code>    ln -sn packaging/debian
+    dpkg-buildpackage -us -uc -rfakeroot</code></pre>
+<p>（在运行 dpkg-buildpackage 之前，不需要先运行 CMake/make/Ninja 等）</p>
+<p>如果在构建或安装过程中遇到问题， 你可以在 wireshark-users 和 wireshark-dev 邮件列表中寻求帮助 （详情见 https://www.wireshark.org/lists/）， 或者访问 Wireshark 问答网站： https://ask.wireshark.org 。</p>
+</body>
+</html>

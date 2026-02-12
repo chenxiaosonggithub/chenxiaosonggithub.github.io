@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>SMB Buildbot Test Cases</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<ul>
+<li>Author: 陈孝松 (ChenXiaoSong)</li>
+<li><a href="https://chenxiaosong.com/">Chinese Homepage: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en/">English Homepage: chenxiaosong.com/en</a></li>
+<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+</ul>
+<h1 class="title">SMB Buildbot Test Cases</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#environment"><span class="toc-section-number">1</span> Environment</a><ul>
+<li><a href="#windows11-environment"><span class="toc-section-number">1.1</span> Windows11 Environment</a></li>
+<li><a href="#samba-environment"><span class="toc-section-number">1.2</span> Samba Environment</a></li>
+<li><a href="#xfstests-environment"><span class="toc-section-number">1.3</span> Xfstests Environment</a></li>
+</ul></li>
+<li><a href="#cifs-103"><span class="toc-section-number">2</span> cifs/103</a><ul>
+<li><a href="#test-result"><span class="toc-section-number">2.1</span> Test Result</a></li>
+<li><a href="#debug"><span class="toc-section-number">2.2</span> Debug</a><ul>
+<li><a href="#smb2"><span class="toc-section-number">2.2.1</span> SMB2</a></li>
+<li><a href="#smb1"><span class="toc-section-number">2.2.2</span> SMB1</a></li>
+</ul></li>
+<li><a href="#cifs-103-bisect"><span class="toc-section-number">2.3</span> bisect</a><ul>
+<li><a href="#cifs-103-bisect-smb2"><span class="toc-section-number">2.3.1</span> SMB2</a></li>
+<li><a href="#cifs-103-bisect-smb1"><span class="toc-section-number">2.3.2</span> SMB1</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#test-result-for-git0003"><span class="toc-section-number">3</span> Test Result for git/0003</a></li>
+<li><a href="#test-result-for-generic533"><span class="toc-section-number">4</span> Test Result for generic/533</a></li>
+<li><a href="#test-result-for-generic565"><span class="toc-section-number">5</span> Test Result for generic/565</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/en/smb-test.html">Please refer to “How to Test SMB”</a>.</p>
+<p>This article describes some test cases on <a href="http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/">buildbot</a> (buildbot might be shut down).</p>
+<h1 id="environment"><span class="header-section-number">1</span> Environment</h1>
+<h2 id="windows11-environment"><span class="header-section-number">1.1</span> Windows11 Environment</h2>
+<p>Enable File Sharing:</p>
+<ul>
+<li>Go to Settings &gt; Network &amp; Internet &gt; Advanced network settings &gt; Advanced sharing settings</li>
+<li>Turn on:
+<ul>
+<li>Network discovery</li>
+<li>File and printer sharing</li>
+</ul></li>
+</ul>
+<p>Share a Folder:</p>
+<ul>
+<li>Right-click the folder you wanted to share &gt; Properties &gt; Sharing &gt; Advanced Sharing</li>
+<li>Check “Share this folder” and give it a name (e.g., test, test2)</li>
+<li>Go to “Permissions”, check “Allow Full Control”. By default, “Allow Change” is not checked</li>
+</ul>
+<h2 id="samba-environment"><span class="header-section-number">1.2</span> Samba Environment</h2>
+<p><code>smb.conf</code> is configured as follows:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">[<span class="ex">test</span>]</a>
+<a class="sourceLine" id="cb1-2" title="2">    <span class="ex">comment</span> = content server share1</a>
+<a class="sourceLine" id="cb1-3" title="3">    <span class="ex">path</span> = /tmp/s_test</a>
+<a class="sourceLine" id="cb1-4" title="4">    <span class="ex">public</span> = yes</a>
+<a class="sourceLine" id="cb1-5" title="5">    <span class="bu">read</span> <span class="va">only</span> <span class="va">=</span> <span class="va">no</span></a>
+<a class="sourceLine" id="cb1-6" title="6">    <span class="ex">writeable</span> = yes</a>
+<a class="sourceLine" id="cb1-7" title="7">[<span class="ex">test2</span>]</a>
+<a class="sourceLine" id="cb1-8" title="8">    <span class="ex">comment</span> = content server share2</a>
+<a class="sourceLine" id="cb1-9" title="9">    <span class="ex">path</span> = /tmp/s_test2</a>
+<a class="sourceLine" id="cb1-10" title="10">    <span class="ex">public</span> = yes</a>
+<a class="sourceLine" id="cb1-11" title="11">    <span class="bu">read</span> <span class="va">only</span> <span class="va">=</span> <span class="va">no</span></a>
+<a class="sourceLine" id="cb1-12" title="12">    <span class="ex">writeable</span> = yes</a></code></pre></div>
+<h2 id="xfstests-environment"><span class="header-section-number">1.3</span> Xfstests Environment</h2>
+<p><code>local.config</code> is configured as follows:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="va">smb_server_ip=</span><span class="op">&lt;</span><span class="ex">Windows</span> Ip<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="va">smb_username=</span><span class="op">&lt;</span><span class="ex">Windows</span> Account Name, it is an Email<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="va">smb_password=</span><span class="op">&lt;</span><span class="ex">Email</span> Account Password<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="va">smb_mount_options=</span><span class="st">&quot;-o username=</span><span class="va">${smb_username}</span><span class="st">,password=</span><span class="va">${smb_password}</span><span class="st">,uid=</span><span class="va">$(</span><span class="fu">id</span> -u<span class="va">)</span><span class="st">,gid=</span><span class="va">$(</span><span class="fu">id</span> -g<span class="va">)</span><span class="st">&quot;</span></a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="bu">export</span> <span class="va">FSTYP=</span>cifs</a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="bu">export</span> <span class="va">TEST_FS_MOUNT_OPTS=</span><span class="st">&quot;</span><span class="va">${smb_mount_options}</span><span class="st">&quot;</span></a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="bu">export</span> <span class="va">TEST_DEV=</span>//<span class="va">${smb_server_ip}</span>/test</a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="bu">export</span> <span class="va">TEST_DIR=</span>/tmp/test</a>
+<a class="sourceLine" id="cb2-9" title="9"><span class="bu">export</span> <span class="va">MOUNT_OPTIONS=</span><span class="st">&quot;</span><span class="va">${smb_mount_options}</span><span class="st">&quot;</span></a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="bu">export</span> <span class="va">SCRATCH_DEV=</span>//<span class="va">${smb_server_ip}</span>/test2</a>
+<a class="sourceLine" id="cb2-11" title="11"><span class="bu">export</span> <span class="va">SCRATCH_MNT=</span>/tmp/test2</a></code></pre></div>
+<h1 id="cifs-103"><span class="header-section-number">2</span> cifs/103</h1>
+<h2 id="test-result"><span class="header-section-number">2.1</span> Test Result</h2>
+<ul>
+<li><a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildbot-log/xfstest-smb3mc-cifs-103.txt">xfstest-smb3mc-cifs-103.txt</a></li>
+</ul>
+<p>When sharing a folder on Windows, do not check “Allow Change”, set the permissions of the shared directory to read-only.</p>
+<p>Alternatively, <code>smb.conf</code> of Samba is configured as follows:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">[<span class="ex">test</span>]</a>
+<a class="sourceLine" id="cb3-2" title="2">    <span class="ex">...</span></a>
+<a class="sourceLine" id="cb3-3" title="3">    <span class="bu">read</span> <span class="va">only</span> <span class="va">=</span> <span class="va">yes</span></a>
+<a class="sourceLine" id="cb3-4" title="4">[<span class="ex">test2</span>]</a>
+<a class="sourceLine" id="cb3-5" title="5">    <span class="ex">...</span></a>
+<a class="sourceLine" id="cb3-6" title="6">    <span class="bu">read</span> <span class="va">only</span> <span class="va">=</span> <span class="va">yes</span></a></code></pre></div>
+<p>You need to apply <a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/0001-xfstests-add-cifs-103.patch">0001-xfstests-add-cifs-103.patch</a> to xfstests before running the test case.</p>
+<p>The following error is reported (<a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/test/buildbot/cifs-103-log.txt">click here to view more detailed logs</a>) after executing <code>modprobe -r cifs</code>, :</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">sudo</span> ./check cifs/103 <span class="co"># fail if shared directory is read-only, but this is not relevant to our issue</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="ex">modprobe</span> -r cifs</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="bu">[</span>  131.265432] kmemleak: Automatic memory scanning thread ended</a>
+<a class="sourceLine" id="cb4-4" title="4">...</a>
+<a class="sourceLine" id="cb4-5" title="5">[  150.754818] =============================================================================</a>
+<a class="sourceLine" id="cb4-6" title="6">[  150.755800] BUG cifs_small_rq (Not tainted): Objects remaining on __kmem_cache_shutdown()</a>
+<a class="sourceLine" id="cb4-7" title="7">[  150.755800] -----------------------------------------------------------------------------</a>
+<a class="sourceLine" id="cb4-8" title="8">...</a>
+<a class="sourceLine" id="cb4-9" title="9">[  150.755800] ------------[ cut here ]------------</a>
+<a class="sourceLine" id="cb4-10" title="10">[  150.755800] WARNING: mm/slub.c:1251 at __kmem_cache_shutdown+0x34e/0x440, CPU#0: modprobe/1577</a>
+<a class="sourceLine" id="cb4-11" title="11">...</a>
+<a class="sourceLine" id="cb4-12" title="12">[  150.755800] Call Trace:</a>
+<a class="sourceLine" id="cb4-13" title="13">[  150.755800]  &lt;TASK&gt;</a>
+<a class="sourceLine" id="cb4-14" title="14">[  150.755800]  kmem_cache_destroy+0x94/0x190</a>
+<a class="sourceLine" id="cb4-15" title="15">[  150.755800]  cifs_destroy_request_bufs+0x3e/0x50 [cifs]</a>
+<a class="sourceLine" id="cb4-16" title="16">[  150.755800]  cleanup_module+0x4e/0x540 [cifs]</a>
+<a class="sourceLine" id="cb4-17" title="17">[  150.755800]  __se_sys_delete_module+0x278/0x400</a>
+<a class="sourceLine" id="cb4-18" title="18">[  150.755800]  __x64_sys_delete_module+0x5f/0x70</a>
+<a class="sourceLine" id="cb4-19" title="19">[  150.755800]  x64_sys_call+0x2299/0x2ff0</a>
+<a class="sourceLine" id="cb4-20" title="20">[  150.755800]  do_syscall_64+0x89/0x350</a>
+<a class="sourceLine" id="cb4-21" title="21">[  150.755800]  entry_SYSCALL_64_after_hwframe+0x76/0x7e</a>
+<a class="sourceLine" id="cb4-22" title="22">...</a>
+<a class="sourceLine" id="cb4-23" title="23">[  150.755800] ---[ end trace 0000000000000000 ]---</a>
+<a class="sourceLine" id="cb4-24" title="24">[  150.868636] ------------[ cut here ]------------</a>
+<a class="sourceLine" id="cb4-25" title="25">[  150.869931] kmem_cache_destroy cifs_small_rq: Slab cache still has objects when called from cifs_destroy_request_bufs+0x3e/0x50 [cifs]</a>
+<a class="sourceLine" id="cb4-26" title="26">[  150.870876] WARNING: mm/slab_common.c:532 at kmem_cache_destroy+0x16b/0x190, CPU#0: modprobe/1577</a>
+<a class="sourceLine" id="cb4-27" title="27">...</a>
+<a class="sourceLine" id="cb4-28" title="28">[  150.911210] Call Trace:</a>
+<a class="sourceLine" id="cb4-29" title="29">[  150.911972]  &lt;TASK&gt;</a>
+<a class="sourceLine" id="cb4-30" title="30">[  150.912598]  cifs_destroy_request_bufs+0x3e/0x50 [cifs]</a>
+<a class="sourceLine" id="cb4-31" title="31">[  150.915052]  cleanup_module+0x4e/0x540 [cifs]</a>
+<a class="sourceLine" id="cb4-32" title="32">[  150.917291]  __se_sys_delete_module+0x278/0x400</a>
+<a class="sourceLine" id="cb4-33" title="33">[  150.918645]  __x64_sys_delete_module+0x5f/0x70</a>
+<a class="sourceLine" id="cb4-34" title="34">[  150.921435]  x64_sys_call+0x2299/0x2ff0</a>
+<a class="sourceLine" id="cb4-35" title="35">[  150.923124]  do_syscall_64+0x89/0x350</a>
+<a class="sourceLine" id="cb4-36" title="36">[  150.924213]  entry_SYSCALL_64_after_hwframe+0x76/0x7e</a>
+<a class="sourceLine" id="cb4-37" title="37">...</a>
+<a class="sourceLine" id="cb4-38" title="38">[  150.956132] ---[ end trace 0000000000000000 ]---</a></code></pre></div>
+<p>The test fails when Samba is used as the server:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">sudo</span> ./check cifs/103</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="ex">-</span> output mismatch (see /root/code/xfstests-dev/results//cifs/103.out.bad)</a>
+<a class="sourceLine" id="cb5-4" title="4">    <span class="ex">---</span> tests/cifs/103.out      2026-01-28 17:51:01.833770569 +0800</a>
+<a class="sourceLine" id="cb5-5" title="5">    <span class="ex">+++</span> /root/code/xfstests-dev/results//cifs/103.out.bad       2026-01-29 17:04:17.102524129 +0800</a>
+<a class="sourceLine" id="cb5-6" title="6">    <span class="ex">@@</span> -1,2 +1,2 @@</a>
+<a class="sourceLine" id="cb5-7" title="7">     <span class="ex">QA</span> output created by 103</a>
+<a class="sourceLine" id="cb5-8" title="8">    <span class="ex">-pread</span> -1 bytes</a>
+<a class="sourceLine" id="cb5-9" title="9">    <span class="ex">+pread</span> 8 bytes</a>
+<a class="sourceLine" id="cb5-10" title="10">    <span class="ex">...</span></a>
+<a class="sourceLine" id="cb5-11" title="11">    <span class="kw">(</span><span class="ex">Run</span> <span class="st">&#39;diff -u /root/code/xfstests-dev/tests/cifs/103.out /root/code/xfstests-dev/results//cifs/103.out.bad&#39;</span>  to see the entire diff<span class="kw">)</span></a>
+<a class="sourceLine" id="cb5-12" title="12"><span class="ex">Ran</span>: cifs/103</a>
+<a class="sourceLine" id="cb5-13" title="13"><span class="ex">Failures</span>: cifs/103</a>
+<a class="sourceLine" id="cb5-14" title="14"><span class="ex">Failed</span> 1 of 1 tests</a></code></pre></div>
+<h2 id="debug"><span class="header-section-number">2.2</span> Debug</h2>
+<h3 id="smb2"><span class="header-section-number">2.2.1</span> SMB2</h3>
+<p>When sharing a folder on Windows, do not check “Allow Change”, set the permissions of the shared directory to read-only.</p>
+<p>Alternatively, <code>smb.conf</code> of Samba is configured as follows:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">[<span class="ex">test</span>]</a>
+<a class="sourceLine" id="cb6-2" title="2">    <span class="ex">...</span></a>
+<a class="sourceLine" id="cb6-3" title="3">    <span class="bu">read</span> <span class="va">only</span> <span class="va">=</span> <span class="va">yes</span></a>
+<a class="sourceLine" id="cb6-4" title="4">[<span class="ex">test2</span>]</a>
+<a class="sourceLine" id="cb6-5" title="5">    <span class="ex">...</span></a>
+<a class="sourceLine" id="cb6-6" title="6">    <span class="bu">read</span> <span class="va">only</span> <span class="va">=</span> <span class="va">yes</span></a></code></pre></div>
+<p>Test steps:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="va">mnt_point=</span>/mnt</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="va">filename=$mnt_point</span>/testfile</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="fu">mount</span> -t cifs //192.168.53.210/test <span class="va">$mnt_point</span> -o username=root,password=1,uid=<span class="va">$(</span><span class="fu">id</span> -u<span class="va">)</span>,gid=<span class="va">$(</span><span class="fu">id</span> -g<span class="va">)</span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="fu">rm</span> -rf <span class="va">$filename</span></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="fu">dd</span> if=/dev/zero of=<span class="va">$filename</span> bs=512 count=1000 oflag=direct <span class="op">&gt;</span>/dev/null <span class="op">2&gt;&amp;1</span></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="co"># sync</span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="fu">umount</span> <span class="va">$mnt_point</span></a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="fu">sleep</span> 1</a>
+<a class="sourceLine" id="cb7-9" title="9"><span class="ex">modprobe</span> -r cifs</a></code></pre></div>
+<h3 id="smb1"><span class="header-section-number">2.2.2</span> SMB1</h3>
+<p>When sharing a folder on Windows, do not check “Allow Change”, set the permissions of the shared directory to read-only.</p>
+<p>Alternatively, <code>smb.conf</code> of Samba is configured as follows:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">[<span class="ex">global</span>]</a>
+<a class="sourceLine" id="cb8-2" title="2">    <span class="co"># supports SMB1</span></a>
+<a class="sourceLine" id="cb8-3" title="3">    <span class="ex">server</span> min protocol = NT1</a>
+<a class="sourceLine" id="cb8-4" title="4">[<span class="ex">test</span>]</a>
+<a class="sourceLine" id="cb8-5" title="5">    <span class="ex">...</span></a>
+<a class="sourceLine" id="cb8-6" title="6">    <span class="bu">read</span> <span class="va">only</span> <span class="va">=</span> <span class="va">yes</span></a>
+<a class="sourceLine" id="cb8-7" title="7">[<span class="ex">test2</span>]</a>
+<a class="sourceLine" id="cb8-8" title="8">    <span class="ex">...</span></a>
+<a class="sourceLine" id="cb8-9" title="9">    <span class="bu">read</span> <span class="va">only</span> <span class="va">=</span> <span class="va">yes</span></a></code></pre></div>
+<p>Test steps:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="va">mnt_point=</span>/mnt</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="va">filename=$mnt_point</span>/testfile</a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="fu">mount</span> -t cifs //192.168.53.210/test <span class="va">$mnt_point</span> -o vers=1.0,username=root,password=1,uid=<span class="va">$(</span><span class="fu">id</span> -u<span class="va">)</span>,gid=<span class="va">$(</span><span class="fu">id</span> -g<span class="va">)</span></a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="fu">rm</span> -rf <span class="va">$filename</span></a>
+<a class="sourceLine" id="cb9-5" title="5"><span class="fu">dd</span> if=/dev/zero of=<span class="va">$filename</span> bs=512 count=1000 oflag=direct <span class="op">&gt;</span>/dev/null <span class="op">2&gt;&amp;1</span></a>
+<a class="sourceLine" id="cb9-6" title="6"><span class="co"># sync</span></a>
+<a class="sourceLine" id="cb9-7" title="7"><span class="fu">umount</span> <span class="va">$mnt_point</span></a>
+<a class="sourceLine" id="cb9-8" title="8"><span class="fu">sleep</span> 1</a>
+<a class="sourceLine" id="cb9-9" title="9"><span class="ex">modprobe</span> -r cifs</a></code></pre></div>
+<h2 id="cifs-103-bisect"><span class="header-section-number">2.3</span> bisect</h2>
+<h3 id="cifs-103-bisect-smb2"><span class="header-section-number">2.3.1</span> SMB2</h3>
+<p>Result of the bisect: <a href="https://lore.kernel.org/linux-cifs/20241222132029.23431-2-pali@kernel.org/">first bad commit: [e255612b5ed9f179abe8196df7c2ba09dd227900] cifs: Add fallback for SMB2 CREATE without FILE_READ_ATTRIBUTES</a>.</p>
+<p>If the clang build fails with <code>ERROR: modpost: "wcslen" [fs/smb/client/cifs.ko] undefined!</code>, please apply patch <a href="https://lore.kernel.org/all/20250407-fno-builtin-wcslen-v1-1-6775ce759b15@kernel.org/">84ffc79bfbf7 kbuild: Add ‘-fno-builtin-wcslen’</a>.</p>
+<p>Steps to bisect:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="fu">git</span> bisect start</a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="fu">git</span> bisect bad v6.15</a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="fu">git</span> bisect good v6.14</a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="ex">Bisecting</span>: 8357 revisions left to test after this (roughly 13 steps)</a>
+<a class="sourceLine" id="cb10-5" title="5">[<span class="ex">390513642ee6763c7ada07f0a1470474986e6c1c</span>] io_uring: always do atomic put from iowq</a>
+<a class="sourceLine" id="cb10-6" title="6"></a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="fu">git</span> bisect good 390513642ee6763c7ada07f0a1470474986e6c1c</a>
+<a class="sourceLine" id="cb10-8" title="8"><span class="ex">Bisecting</span>: 4194 revisions left to test after this (roughly 12 steps)</a>
+<a class="sourceLine" id="cb10-9" title="9">[<span class="ex">eb0ece16027f8223d5dc9aaf90124f70577bd22a</span>] Merge tag <span class="st">&#39;mm-stable-2025-03-30-16-52&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm</a>
+<a class="sourceLine" id="cb10-10" title="10"></a>
+<a class="sourceLine" id="cb10-11" title="11"><span class="fu">git</span> bisect good eb0ece16027f8223d5dc9aaf90124f70577bd22a</a>
+<a class="sourceLine" id="cb10-12" title="12"><span class="ex">Bisecting</span>: 2091 revisions left to test after this (roughly 11 steps)</a>
+<a class="sourceLine" id="cb10-13" title="13">[<span class="ex">ff885625298f83785b7db1b95af051a080aab7b4</span>] Merge tag <span class="st">&#39;block-6.15-20250411&#39;</span> of git://git.kernel.dk/linux</a>
+<a class="sourceLine" id="cb10-14" title="14"></a>
+<a class="sourceLine" id="cb10-15" title="15"><span class="fu">git</span> bisect bad ff885625298f83785b7db1b95af051a080aab7b4</a>
+<a class="sourceLine" id="cb10-16" title="16"><span class="ex">Bisecting</span>: 1016 revisions left to test after this (roughly 10 steps)</a>
+<a class="sourceLine" id="cb10-17" title="17">[<span class="ex">ddd0172f182e3e869a3a960e433578aeedcb37c9</span>] Merge tag <span class="st">&#39;tty-6.15-rc1&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/tty</a>
+<a class="sourceLine" id="cb10-18" title="18"></a>
+<a class="sourceLine" id="cb10-19" title="19"><span class="fu">git</span> bisect good ddd0172f182e3e869a3a960e433578aeedcb37c9</a>
+<a class="sourceLine" id="cb10-20" title="20"><span class="ex">Bisecting</span>: 508 revisions left to test after this (roughly 9 steps)</a>
+<a class="sourceLine" id="cb10-21" title="21">[<span class="ex">fc75ea20ffb452652f0d4033f38fe88d7cfdae35</span>] net: phy: allow MDIO bus PM ops to start/stop state machine for phylink-controlled PHY</a>
+<a class="sourceLine" id="cb10-22" title="22"></a>
+<a class="sourceLine" id="cb10-23" title="23"><span class="fu">git</span> bisect good fc75ea20ffb452652f0d4033f38fe88d7cfdae35</a>
+<a class="sourceLine" id="cb10-24" title="24"><span class="ex">Bisecting</span>: 258 revisions left to test after this (roughly 8 steps)</a>
+<a class="sourceLine" id="cb10-25" title="25">[<span class="ex">56799bc035658738f362acec3e7647bb84e68933</span>] perf: Fix hang while freeing sigtrap event</a>
+<a class="sourceLine" id="cb10-26" title="26"></a>
+<a class="sourceLine" id="cb10-27" title="27"><span class="fu">git</span> bisect bad 56799bc035658738f362acec3e7647bb84e68933</a>
+<a class="sourceLine" id="cb10-28" title="28"><span class="ex">Bisecting</span>: 124 revisions left to test after this (roughly 7 steps)</a>
+<a class="sourceLine" id="cb10-29" title="29">[<span class="ex">1cc24f2e766c5a6606b834a677bd58991c1b9781</span>] hrtimers: Remove unnecessary NULL check in hrtimer_start_range_ns()</a>
+<a class="sourceLine" id="cb10-30" title="30"></a>
+<a class="sourceLine" id="cb10-31" title="31"><span class="fu">git</span> bisect bad 1cc24f2e766c5a6606b834a677bd58991c1b9781</a>
+<a class="sourceLine" id="cb10-32" title="32"><span class="ex">Bisecting</span>: 62 revisions left to test after this (roughly 6 steps)</a>
+<a class="sourceLine" id="cb10-33" title="33">[<span class="ex">3f7023171df43641a8a8a1c9a12124501e589010</span>] riscv/purgatory: 4B align purgatory_start</a>
+<a class="sourceLine" id="cb10-34" title="34"></a>
+<a class="sourceLine" id="cb10-35" title="35"><span class="fu">git</span> bisect good 3f7023171df43641a8a8a1c9a12124501e589010</a>
+<a class="sourceLine" id="cb10-36" title="36"><span class="ex">Bisecting</span>: 40 revisions left to test after this (roughly 5 steps)</a>
+<a class="sourceLine" id="cb10-37" title="37">[<span class="ex">a52a3c18cdf369a713aca7593332bbb998c71d96</span>] Merge tag <span class="st">&#39;ntb-6.15&#39;</span> of https://github.com/jonmason/ntb</a>
+<a class="sourceLine" id="cb10-38" title="38"></a>
+<a class="sourceLine" id="cb10-39" title="39"><span class="fu">git</span> bisect good a52a3c18cdf369a713aca7593332bbb998c71d96</a>
+<a class="sourceLine" id="cb10-40" title="40"><span class="ex">Bisecting</span>: 21 revisions left to test after this (roughly 4 steps)</a>
+<a class="sourceLine" id="cb10-41" title="41">[<span class="ex">9f867ba24d3665d9ac9d9ef1f51844eb4479b291</span>] Merge tag <span class="st">&#39;6.15-rc-part2-smb3-client-fixes&#39;</span> of git://git.samba.org/sfrench/cifs-2.6</a>
+<a class="sourceLine" id="cb10-42" title="42"></a>
+<a class="sourceLine" id="cb10-43" title="43"><span class="fu">git</span> bisect bad 9f867ba24d3665d9ac9d9ef1f51844eb4479b291</a>
+<a class="sourceLine" id="cb10-44" title="44"><span class="ex">Bisecting</span>: 9 revisions left to test after this (roughly 3 steps)</a>
+<a class="sourceLine" id="cb10-45" title="45">[<span class="ex">665e18794804f8b42b6ae5d436a154342f62e288</span>] cifs: Improve handling of NetBIOS packets</a>
+<a class="sourceLine" id="cb10-46" title="46"></a>
+<a class="sourceLine" id="cb10-47" title="47"><span class="fu">git</span> bisect good 665e18794804f8b42b6ae5d436a154342f62e288</a>
+<a class="sourceLine" id="cb10-48" title="48"><span class="ex">Bisecting</span>: 4 revisions left to test after this (roughly 2 steps)</a>
+<a class="sourceLine" id="cb10-49" title="49">[<span class="ex">b07687edee99b9e53465fbd7f24406616f67070e</span>] cifs: Improve SMB2+ stat() <span class="ex">to</span> work also without FILE_READ_ATTRIBUTES</a>
+<a class="sourceLine" id="cb10-50" title="50"></a>
+<a class="sourceLine" id="cb10-51" title="51"><span class="fu">git</span> bisect bad b07687edee99b9e53465fbd7f24406616f67070e</a>
+<a class="sourceLine" id="cb10-52" title="52"><span class="ex">Bisecting</span>: 2 revisions left to test after this (roughly 1 step)</a>
+<a class="sourceLine" id="cb10-53" title="53">[<span class="ex">6aa9f1c9cd09c1c39a35da4fe5f43446ec18ce1e</span>] cifs: Fix access_flags_to_smbopen_mode</a>
+<a class="sourceLine" id="cb10-54" title="54"></a>
+<a class="sourceLine" id="cb10-55" title="55"><span class="fu">git</span> bisect good 6aa9f1c9cd09c1c39a35da4fe5f43446ec18ce1e</a>
+<a class="sourceLine" id="cb10-56" title="56"><span class="ex">Bisecting</span>: 0 revisions left to test after this (roughly 1 step)</a>
+<a class="sourceLine" id="cb10-57" title="57">[<span class="ex">e255612b5ed9f179abe8196df7c2ba09dd227900</span>] cifs: Add fallback for SMB2 CREATE without FILE_READ_ATTRIBUTES</a>
+<a class="sourceLine" id="cb10-58" title="58"></a>
+<a class="sourceLine" id="cb10-59" title="59"><span class="fu">git</span> bisect bad e255612b5ed9f179abe8196df7c2ba09dd227900</a>
+<a class="sourceLine" id="cb10-60" title="60"><span class="ex">Bisecting</span>: 0 revisions left to test after this (roughly 0 steps)</a>
+<a class="sourceLine" id="cb10-61" title="61">[<span class="ex">4236ac9fe5b8b42756070d4abfb76fed718e87c2</span>] cifs: Fix querying and creating MF symlinks over SMB1</a>
+<a class="sourceLine" id="cb10-62" title="62"></a>
+<a class="sourceLine" id="cb10-63" title="63"><span class="fu">git</span> bisect good 4236ac9fe5b8b42756070d4abfb76fed718e87c2</a>
+<a class="sourceLine" id="cb10-64" title="64"><span class="ex">e255612b5ed9f179abe8196df7c2ba09dd227900</span> is the first bad commit</a>
+<a class="sourceLine" id="cb10-65" title="65"><span class="ex">commit</span> e255612b5ed9f179abe8196df7c2ba09dd227900</a>
+<a class="sourceLine" id="cb10-66" title="66"><span class="ex">Author</span>: Pali Rohár <span class="op">&lt;</span>pali@kernel.org<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb10-67" title="67"><span class="ex">Date</span>:   Mon Dec 9 20:44:23 2024 +0100</a>
+<a class="sourceLine" id="cb10-68" title="68"></a>
+<a class="sourceLine" id="cb10-69" title="69">    <span class="ex">cifs</span>: Add fallback for SMB2 CREATE without FILE_READ_ATTRIBUTES</a>
+<a class="sourceLine" id="cb10-70" title="70">    </a>
+<a class="sourceLine" id="cb10-71" title="71">    <span class="ex">Some</span> operations, like WRITE, does not require FILE_READ_ATTRIBUTES access.</a>
+<a class="sourceLine" id="cb10-72" title="72">    </a>
+<a class="sourceLine" id="cb10-73" title="73">    <span class="ex">So</span> when FILE_READ_ATTRIBUTES is not explicitly requested for</a>
+<a class="sourceLine" id="cb10-74" title="74">    <span class="fu">smb2_open_file()</span> <span class="kw">then</span> <span class="ex">first</span> try to do SMB2 CREATE with FILE_READ_ATTRIBUTES</a>
+<a class="sourceLine" id="cb10-75" title="75">    <span class="ex">access</span> (like it was before) <span class="ex">and</span> then fallback to SMB2 CREATE without</a>
+<a class="sourceLine" id="cb10-76" title="76">    <span class="ex">FILE_READ_ATTRIBUTES</span> access (less common case)<span class="ex">.</span></a>
+<a class="sourceLine" id="cb10-77" title="77">    </a>
+<a class="sourceLine" id="cb10-78" title="78">    <span class="ex">This</span> change allows to complete WRITE operation to a file when it does not</a>
+<a class="sourceLine" id="cb10-79" title="79">    <span class="ex">grant</span> FILE_READ_ATTRIBUTES permission and its parent directory does not</a>
+<a class="sourceLine" id="cb10-80" title="80">    <span class="ex">grant</span> READ_DATA permission (parent directory READ_DATA is implicit grant of</a>
+<a class="sourceLine" id="cb10-81" title="81">    <span class="ex">child</span> FILE_READ_ATTRIBUTES permission)<span class="ex">.</span></a>
+<a class="sourceLine" id="cb10-82" title="82">    </a>
+<a class="sourceLine" id="cb10-83" title="83">    <span class="ex">Signed-off-by</span>: Pali Rohár <span class="op">&lt;</span>pali@kernel.org<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb10-84" title="84">    <span class="ex">Signed-off-by</span>: Steve French <span class="op">&lt;</span>stfrench@microsoft.com<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb10-85" title="85"></a>
+<a class="sourceLine" id="cb10-86" title="86"> <span class="ex">fs/smb/client/smb2file.c</span> <span class="kw">|</span> <span class="ex">11</span> ++++++++++-</a>
+<a class="sourceLine" id="cb10-87" title="87"> <span class="ex">1</span> file changed, 10 insertions(+), <span class="ex">1</span> deletion(-)</a>
+<a class="sourceLine" id="cb10-88" title="88"></a>
+<a class="sourceLine" id="cb10-89" title="89"><span class="fu">git</span> bisect log</a>
+<a class="sourceLine" id="cb10-90" title="90"><span class="fu">git</span> bisect start</a>
+<a class="sourceLine" id="cb10-91" title="91"><span class="co"># status: waiting for both good and bad commits</span></a>
+<a class="sourceLine" id="cb10-92" title="92"><span class="co"># bad: [0ff41df1cb268fc69e703a08a57ee14ae967d0ca] Linux 6.15</span></a>
+<a class="sourceLine" id="cb10-93" title="93"><span class="fu">git</span> bisect bad 0ff41df1cb268fc69e703a08a57ee14ae967d0ca</a>
+<a class="sourceLine" id="cb10-94" title="94"><span class="co"># status: waiting for good commit(s), bad commit known</span></a>
+<a class="sourceLine" id="cb10-95" title="95"><span class="co"># good: [38fec10eb60d687e30c8c6b5420d86e8149f7557] Linux 6.14</span></a>
+<a class="sourceLine" id="cb10-96" title="96"><span class="fu">git</span> bisect good 38fec10eb60d687e30c8c6b5420d86e8149f7557</a>
+<a class="sourceLine" id="cb10-97" title="97"><span class="co"># good: [390513642ee6763c7ada07f0a1470474986e6c1c] io_uring: always do atomic put from iowq</span></a>
+<a class="sourceLine" id="cb10-98" title="98"><span class="fu">git</span> bisect good 390513642ee6763c7ada07f0a1470474986e6c1c</a>
+<a class="sourceLine" id="cb10-99" title="99"><span class="co"># good: [eb0ece16027f8223d5dc9aaf90124f70577bd22a] Merge tag &#39;mm-stable-2025-03-30-16-52&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm</span></a>
+<a class="sourceLine" id="cb10-100" title="100"><span class="fu">git</span> bisect good eb0ece16027f8223d5dc9aaf90124f70577bd22a</a>
+<a class="sourceLine" id="cb10-101" title="101"><span class="co"># bad: [ff885625298f83785b7db1b95af051a080aab7b4] Merge tag &#39;block-6.15-20250411&#39; of git://git.kernel.dk/linux</span></a>
+<a class="sourceLine" id="cb10-102" title="102"><span class="fu">git</span> bisect bad ff885625298f83785b7db1b95af051a080aab7b4</a>
+<a class="sourceLine" id="cb10-103" title="103"><span class="co"># good: [ddd0172f182e3e869a3a960e433578aeedcb37c9] Merge tag &#39;tty-6.15-rc1&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/tty</span></a>
+<a class="sourceLine" id="cb10-104" title="104"><span class="fu">git</span> bisect good ddd0172f182e3e869a3a960e433578aeedcb37c9</a>
+<a class="sourceLine" id="cb10-105" title="105"><span class="co"># good: [fc75ea20ffb452652f0d4033f38fe88d7cfdae35] net: phy: allow MDIO bus PM ops to start/stop state machine for phylink-controlled PHY</span></a>
+<a class="sourceLine" id="cb10-106" title="106"><span class="fu">git</span> bisect good fc75ea20ffb452652f0d4033f38fe88d7cfdae35</a>
+<a class="sourceLine" id="cb10-107" title="107"><span class="co"># bad: [56799bc035658738f362acec3e7647bb84e68933] perf: Fix hang while freeing sigtrap event</span></a>
+<a class="sourceLine" id="cb10-108" title="108"><span class="fu">git</span> bisect bad 56799bc035658738f362acec3e7647bb84e68933</a>
+<a class="sourceLine" id="cb10-109" title="109"><span class="co"># bad: [1cc24f2e766c5a6606b834a677bd58991c1b9781] hrtimers: Remove unnecessary NULL check in hrtimer_start_range_ns()</span></a>
+<a class="sourceLine" id="cb10-110" title="110"><span class="fu">git</span> bisect bad 1cc24f2e766c5a6606b834a677bd58991c1b9781</a>
+<a class="sourceLine" id="cb10-111" title="111"><span class="co"># good: [3f7023171df43641a8a8a1c9a12124501e589010] riscv/purgatory: 4B align purgatory_start</span></a>
+<a class="sourceLine" id="cb10-112" title="112"><span class="fu">git</span> bisect good 3f7023171df43641a8a8a1c9a12124501e589010</a>
+<a class="sourceLine" id="cb10-113" title="113"><span class="co"># good: [a52a3c18cdf369a713aca7593332bbb998c71d96] Merge tag &#39;ntb-6.15&#39; of https://github.com/jonmason/ntb</span></a>
+<a class="sourceLine" id="cb10-114" title="114"><span class="fu">git</span> bisect good a52a3c18cdf369a713aca7593332bbb998c71d96</a>
+<a class="sourceLine" id="cb10-115" title="115"><span class="co"># bad: [9f867ba24d3665d9ac9d9ef1f51844eb4479b291] Merge tag &#39;6.15-rc-part2-smb3-client-fixes&#39; of git://git.samba.org/sfrench/cifs-2.6</span></a>
+<a class="sourceLine" id="cb10-116" title="116"><span class="fu">git</span> bisect bad 9f867ba24d3665d9ac9d9ef1f51844eb4479b291</a>
+<a class="sourceLine" id="cb10-117" title="117"><span class="co"># good: [665e18794804f8b42b6ae5d436a154342f62e288] cifs: Improve handling of NetBIOS packets</span></a>
+<a class="sourceLine" id="cb10-118" title="118"><span class="fu">git</span> bisect good 665e18794804f8b42b6ae5d436a154342f62e288</a>
+<a class="sourceLine" id="cb10-119" title="119"><span class="co"># bad: [b07687edee99b9e53465fbd7f24406616f67070e] cifs: Improve SMB2+ stat() to work also without FILE_READ_ATTRIBUTES</span></a>
+<a class="sourceLine" id="cb10-120" title="120"><span class="fu">git</span> bisect bad b07687edee99b9e53465fbd7f24406616f67070e</a>
+<a class="sourceLine" id="cb10-121" title="121"><span class="co"># good: [6aa9f1c9cd09c1c39a35da4fe5f43446ec18ce1e] cifs: Fix access_flags_to_smbopen_mode</span></a>
+<a class="sourceLine" id="cb10-122" title="122"><span class="fu">git</span> bisect good 6aa9f1c9cd09c1c39a35da4fe5f43446ec18ce1e</a>
+<a class="sourceLine" id="cb10-123" title="123"><span class="co"># bad: [e255612b5ed9f179abe8196df7c2ba09dd227900] cifs: Add fallback for SMB2 CREATE without FILE_READ_ATTRIBUTES</span></a>
+<a class="sourceLine" id="cb10-124" title="124"><span class="fu">git</span> bisect bad e255612b5ed9f179abe8196df7c2ba09dd227900</a>
+<a class="sourceLine" id="cb10-125" title="125"><span class="co"># good: [4236ac9fe5b8b42756070d4abfb76fed718e87c2] cifs: Fix querying and creating MF symlinks over SMB1</span></a>
+<a class="sourceLine" id="cb10-126" title="126"><span class="fu">git</span> bisect good 4236ac9fe5b8b42756070d4abfb76fed718e87c2</a>
+<a class="sourceLine" id="cb10-127" title="127"><span class="co"># first bad commit: [e255612b5ed9f179abe8196df7c2ba09dd227900] cifs: Add fallback for SMB2 CREATE without FILE_READ_ATTRIBUTES</span></a>
+<a class="sourceLine" id="cb10-128" title="128"></a>
+<a class="sourceLine" id="cb10-129" title="129"><span class="fu">git</span> bisect reset</a></code></pre></div>
+<h3 id="cifs-103-bisect-smb1"><span class="header-section-number">2.3.2</span> SMB1</h3>
+<p>Result of the bisect: <a href="https://lore.kernel.org/linux-cifs/20251201225732.1520128-3-dhowells@redhat.com/">first bad commit: [6be09580df5cf87e601c1ec56b9a0c891d3a0bc8] cifs: Make smb1’s SendReceive() wrap cifs_send_recv()</a>.</p>
+<p>Steps to bisect:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="fu">git</span> bisect start</a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="fu">git</span> bisect bad v6.19-rc1</a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="fu">git</span> bisect good v6.18</a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="ex">Bisecting</span>: 6523 revisions left to test after this (roughly 13 steps)</a>
+<a class="sourceLine" id="cb11-5" title="5">[<span class="ex">6dfafbd0299a60bfb5d5e277fdf100037c7ded07</span>] Merge tag <span class="st">&#39;drm-next-2025-12-03&#39;</span> of https://gitlab.freedesktop.org/drm/kernel</a>
+<a class="sourceLine" id="cb11-6" title="6"></a>
+<a class="sourceLine" id="cb11-7" title="7"><span class="fu">git</span> bisect good 6dfafbd0299a60bfb5d5e277fdf100037c7ded07</a>
+<a class="sourceLine" id="cb11-8" title="8"><span class="ex">Bisecting</span>: 3589 revisions left to test after this (roughly 12 steps)</a>
+<a class="sourceLine" id="cb11-9" title="9">[<span class="ex">09cab48db950b6fb8c114314a20c0fd5a80cf990</span>] Merge tag <span class="st">&#39;soc-arm-6.19&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc</a>
+<a class="sourceLine" id="cb11-10" title="10"></a>
+<a class="sourceLine" id="cb11-11" title="11"><span class="fu">git</span> bisect good 09cab48db950b6fb8c114314a20c0fd5a80cf990</a>
+<a class="sourceLine" id="cb11-12" title="12"><span class="ex">Bisecting</span>: 1870 revisions left to test after this (roughly 11 steps)</a>
+<a class="sourceLine" id="cb11-13" title="13">[<span class="ex">701d7d782d98242a64cdeed90750f88ff733bc39</span>] Merge tag <span class="st">&#39;spdx-6.19-rc1&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/spdx</a>
+<a class="sourceLine" id="cb11-14" title="14"></a>
+<a class="sourceLine" id="cb11-15" title="15"><span class="fu">git</span> bisect good 701d7d782d98242a64cdeed90750f88ff733bc39</a>
+<a class="sourceLine" id="cb11-16" title="16"><span class="ex">Bisecting</span>: 901 revisions left to test after this (roughly 10 steps)</a>
+<a class="sourceLine" id="cb11-17" title="17">[<span class="ex">ba65a4e7120a616d9c592750d9147f6dcafedffa</span>] Merge tag <span class="st">&#39;clk-for-linus&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/clk/linux</a>
+<a class="sourceLine" id="cb11-18" title="18"></a>
+<a class="sourceLine" id="cb11-19" title="19"><span class="fu">git</span> bisect good ba65a4e7120a616d9c592750d9147f6dcafedffa</a>
+<a class="sourceLine" id="cb11-20" title="20"><span class="ex">Bisecting</span>: 415 revisions left to test after this (roughly 9 steps)</a>
+<a class="sourceLine" id="cb11-21" title="21">[<span class="ex">9d588a1140b9ae211581a7a154d0b806d8cd8238</span>] Merge tag <span class="st">&#39;platform-drivers-x86-v6.19-1&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/pdx86/platform-drivers-x86</a>
+<a class="sourceLine" id="cb11-22" title="22"></a>
+<a class="sourceLine" id="cb11-23" title="23"><span class="fu">git</span> bisect bad 9d588a1140b9ae211581a7a154d0b806d8cd8238</a>
+<a class="sourceLine" id="cb11-24" title="24"><span class="ex">Bisecting</span>: 212 revisions left to test after this (roughly 8 steps)</a>
+<a class="sourceLine" id="cb11-25" title="25">[<span class="ex">a110f942672c8995dc1cacb5a44c6730856743aa</span>] Merge tag <span class="st">&#39;pinctrl-v6.19-1&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-pinctrl</a>
+<a class="sourceLine" id="cb11-26" title="26"></a>
+<a class="sourceLine" id="cb11-27" title="27"><span class="fu">git</span> bisect good a110f942672c8995dc1cacb5a44c6730856743aa</a>
+<a class="sourceLine" id="cb11-28" title="28"><span class="ex">Bisecting</span>: 97 revisions left to test after this (roughly 7 steps)</a>
+<a class="sourceLine" id="cb11-29" title="29">[<span class="ex">3d99347a2e1ae60d9368b1d734290bab1acde0ce</span>] Merge tag <span class="st">&#39;v6.19-rc-part1-smb3-client-fixes&#39;</span> of git://git.samba.org/sfrench/cifs-2.6</a>
+<a class="sourceLine" id="cb11-30" title="30"></a>
+<a class="sourceLine" id="cb11-31" title="31"><span class="fu">git</span> bisect bad 3d99347a2e1ae60d9368b1d734290bab1acde0ce</a>
+<a class="sourceLine" id="cb11-32" title="32"><span class="ex">Bisecting</span>: 62 revisions left to test after this (roughly 6 steps)</a>
+<a class="sourceLine" id="cb11-33" title="33">[<span class="ex">cfd4039213e7b5a828c5b78e1b5235cac91af53d</span>] Merge tag <span class="st">&#39;io_uring-6.19-20251208&#39;</span> of git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux</a>
+<a class="sourceLine" id="cb11-34" title="34"></a>
+<a class="sourceLine" id="cb11-35" title="35"><span class="fu">git</span> bisect good cfd4039213e7b5a828c5b78e1b5235cac91af53d</a>
+<a class="sourceLine" id="cb11-36" title="36"><span class="ex">Bisecting</span>: 31 revisions left to test after this (roughly 5 steps)</a>
+<a class="sourceLine" id="cb11-37" title="37">[<span class="ex">30a8496694f1a93328e5d7f19206380346918b5a</span>] f2fs: use memalloc_retry_wait() <span class="fu">as</span> much as possible</a>
+<a class="sourceLine" id="cb11-38" title="38"></a>
+<a class="sourceLine" id="cb11-39" title="39"><span class="fu">git</span> bisect good 30a8496694f1a93328e5d7f19206380346918b5a</a>
+<a class="sourceLine" id="cb11-40" title="40"><span class="ex">Bisecting</span>: 15 revisions left to test after this (roughly 4 steps)</a>
+<a class="sourceLine" id="cb11-41" title="41">[<span class="ex">7ad785927d9eb348adb381d168ed73d0dd3c7670</span>] smb: client: Add tracepoint for krb5 auth</a>
+<a class="sourceLine" id="cb11-42" title="42"></a>
+<a class="sourceLine" id="cb11-43" title="43"><span class="fu">git</span> bisect bad 7ad785927d9eb348adb381d168ed73d0dd3c7670</a>
+<a class="sourceLine" id="cb11-44" title="44"><span class="ex">Bisecting</span>: 7 revisions left to test after this (roughly 3 steps)</a>
+<a class="sourceLine" id="cb11-45" title="45">[<span class="ex">87fba18abbb8433a47045c785f2edc027e4d2bc5</span>] cifs: Remove the server pointer from smb_message</a>
+<a class="sourceLine" id="cb11-46" title="46"></a>
+<a class="sourceLine" id="cb11-47" title="47"><span class="fu">git</span> bisect bad 87fba18abbb8433a47045c785f2edc027e4d2bc5</a>
+<a class="sourceLine" id="cb11-48" title="48"><span class="ex">Bisecting</span>: 3 revisions left to test after this (roughly 2 steps)</a>
+<a class="sourceLine" id="cb11-49" title="49">[<span class="ex">6be09580df5cf87e601c1ec56b9a0c891d3a0bc8</span>] cifs: Make smb1<span class="st">&#39;s SendReceive() wrap cifs_send_recv()</span></a>
+<a class="sourceLine" id="cb11-50" title="50"></a>
+<a class="sourceLine" id="cb11-51" title="51"><span class="st">git bisect bad 6be09580df5cf87e601c1ec56b9a0c891d3a0bc8</span></a>
+<a class="sourceLine" id="cb11-52" title="52"><span class="st">Bisecting: 1 revision left to test after this (roughly 1 step)</span></a>
+<a class="sourceLine" id="cb11-53" title="53"><span class="st">[9d85ac939d52e93d80efb01a299c6f0bedb30487] cifs: Fix handling of a beyond-EOF DIO/unbuffered read over SMB1</span></a>
+<a class="sourceLine" id="cb11-54" title="54"></a>
+<a class="sourceLine" id="cb11-55" title="55"><span class="st">git bisect good 9d85ac939d52e93d80efb01a299c6f0bedb30487</span></a>
+<a class="sourceLine" id="cb11-56" title="56"><span class="st">Bisecting: 0 revisions left to test after this (roughly 0 steps)</span></a>
+<a class="sourceLine" id="cb11-57" title="57"><span class="st">[83bfbd0bb9025f98fa62b44f93bd67466773d1db] cifs: Remove the RFC1002 header from smb_hdr</span></a>
+<a class="sourceLine" id="cb11-58" title="58"></a>
+<a class="sourceLine" id="cb11-59" title="59"><span class="st">git bisect good 83bfbd0bb9025f98fa62b44f93bd67466773d1db</span></a>
+<a class="sourceLine" id="cb11-60" title="60"><span class="st">6be09580df5cf87e601c1ec56b9a0c891d3a0bc8 is the first bad commit</span></a>
+<a class="sourceLine" id="cb11-61" title="61"><span class="st">commit 6be09580df5cf87e601c1ec56b9a0c891d3a0bc8</span></a>
+<a class="sourceLine" id="cb11-62" title="62"><span class="st">Author: David Howells &lt;dhowells@redhat.com&gt;</span></a>
+<a class="sourceLine" id="cb11-63" title="63"><span class="st">Date:   Tue Aug 5 13:58:43 2025 +0100</span></a>
+<a class="sourceLine" id="cb11-64" title="64"></a>
+<a class="sourceLine" id="cb11-65" title="65"><span class="st">    cifs: Make smb1&#39;</span>s SendReceive() <span class="ex">wrap</span> cifs_send_recv()</a>
+<a class="sourceLine" id="cb11-66" title="66">    </a>
+<a class="sourceLine" id="cb11-67" title="67">    <span class="ex">Make</span> the smb1 transport<span class="st">&#39;s SendReceive() simply wrap cifs_send_recv() as</span></a>
+<a class="sourceLine" id="cb11-68" title="68"><span class="st">    does SendReceive2().  This will then allow that to pick up the transport</span></a>
+<a class="sourceLine" id="cb11-69" title="69"><span class="st">    changes there.</span></a>
+<a class="sourceLine" id="cb11-70" title="70"><span class="st">    </span></a>
+<a class="sourceLine" id="cb11-71" title="71"><span class="st">    Signed-off-by: David Howells &lt;dhowells@redhat.com&gt;</span></a>
+<a class="sourceLine" id="cb11-72" title="72"><span class="st">    Reviewed-by: Paulo Alcantara (Red Hat) &lt;pc@manguebit.org&gt;</span></a>
+<a class="sourceLine" id="cb11-73" title="73"><span class="st">    cc: Shyam Prasad N &lt;sprasad@microsoft.com&gt;</span></a>
+<a class="sourceLine" id="cb11-74" title="74"><span class="st">    cc: Tom Talpey &lt;tom@talpey.com&gt;</span></a>
+<a class="sourceLine" id="cb11-75" title="75"><span class="st">    cc: linux-cifs@vger.kernel.org</span></a>
+<a class="sourceLine" id="cb11-76" title="76"><span class="st">    cc: netfs@lists.linux.dev</span></a>
+<a class="sourceLine" id="cb11-77" title="77"><span class="st">    cc: linux-fsdevel@vger.kernel.org</span></a>
+<a class="sourceLine" id="cb11-78" title="78"><span class="st">    Signed-off-by: Steve French &lt;stfrench@microsoft.com&gt;</span></a>
+<a class="sourceLine" id="cb11-79" title="79"></a>
+<a class="sourceLine" id="cb11-80" title="80"><span class="st"> fs/smb/client/cifstransport.c | 82 ++++++++++------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb11-81" title="81"><span class="st"> 1 file changed, 10 insertions(+), 72 deletions(-)</span></a>
+<a class="sourceLine" id="cb11-82" title="82"></a>
+<a class="sourceLine" id="cb11-83" title="83"><span class="st">git bisect log</span></a>
+<a class="sourceLine" id="cb11-84" title="84"><span class="st">git bisect start</span></a>
+<a class="sourceLine" id="cb11-85" title="85"><span class="st"># status: waiting for both good and bad commits</span></a>
+<a class="sourceLine" id="cb11-86" title="86"><span class="st"># bad: [8f0b4cce4481fb22653697cced8d0d04027cb1e8] Linux 6.19-rc1</span></a>
+<a class="sourceLine" id="cb11-87" title="87"><span class="st">git bisect bad 8f0b4cce4481fb22653697cced8d0d04027cb1e8</span></a>
+<a class="sourceLine" id="cb11-88" title="88"><span class="st"># status: waiting for good commit(s), bad commit known</span></a>
+<a class="sourceLine" id="cb11-89" title="89"><span class="st"># good: [7d0a66e4bb9081d75c82ec4957c50034cb0ea449] Linux 6.18</span></a>
+<a class="sourceLine" id="cb11-90" title="90"><span class="st">git bisect good 7d0a66e4bb9081d75c82ec4957c50034cb0ea449</span></a>
+<a class="sourceLine" id="cb11-91" title="91"><span class="st"># good: [6dfafbd0299a60bfb5d5e277fdf100037c7ded07] Merge tag &#39;</span>drm-next-2025-12-03<span class="st">&#39; of https://gitlab.freedesktop.org/drm/kernel</span></a>
+<a class="sourceLine" id="cb11-92" title="92"><span class="st">git bisect good 6dfafbd0299a60bfb5d5e277fdf100037c7ded07</span></a>
+<a class="sourceLine" id="cb11-93" title="93"><span class="st"># good: [09cab48db950b6fb8c114314a20c0fd5a80cf990] Merge tag &#39;</span>soc-arm-6.19<span class="st">&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc</span></a>
+<a class="sourceLine" id="cb11-94" title="94"><span class="st">git bisect good 09cab48db950b6fb8c114314a20c0fd5a80cf990</span></a>
+<a class="sourceLine" id="cb11-95" title="95"><span class="st"># good: [701d7d782d98242a64cdeed90750f88ff733bc39] Merge tag &#39;</span>spdx-6.19-rc1<span class="st">&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/spdx</span></a>
+<a class="sourceLine" id="cb11-96" title="96"><span class="st">git bisect good 701d7d782d98242a64cdeed90750f88ff733bc39</span></a>
+<a class="sourceLine" id="cb11-97" title="97"><span class="st"># good: [ba65a4e7120a616d9c592750d9147f6dcafedffa] Merge tag &#39;</span>clk-for-linus<span class="st">&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/clk/linux</span></a>
+<a class="sourceLine" id="cb11-98" title="98"><span class="st">git bisect good ba65a4e7120a616d9c592750d9147f6dcafedffa</span></a>
+<a class="sourceLine" id="cb11-99" title="99"><span class="st"># bad: [9d588a1140b9ae211581a7a154d0b806d8cd8238] Merge tag &#39;</span>platform-drivers-x86-v6.19-1<span class="st">&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/pdx86/platform-drivers-x86</span></a>
+<a class="sourceLine" id="cb11-100" title="100"><span class="st">git bisect bad 9d588a1140b9ae211581a7a154d0b806d8cd8238</span></a>
+<a class="sourceLine" id="cb11-101" title="101"><span class="st"># good: [a110f942672c8995dc1cacb5a44c6730856743aa] Merge tag &#39;</span>pinctrl-v6.19-1<span class="st">&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-pinctrl</span></a>
+<a class="sourceLine" id="cb11-102" title="102"><span class="st">git bisect good a110f942672c8995dc1cacb5a44c6730856743aa</span></a>
+<a class="sourceLine" id="cb11-103" title="103"><span class="st"># bad: [3d99347a2e1ae60d9368b1d734290bab1acde0ce] Merge tag &#39;</span>v6.19-rc-part1-smb3-client-fixes<span class="st">&#39; of git://git.samba.org/sfrench/cifs-2.6</span></a>
+<a class="sourceLine" id="cb11-104" title="104"><span class="st">git bisect bad 3d99347a2e1ae60d9368b1d734290bab1acde0ce</span></a>
+<a class="sourceLine" id="cb11-105" title="105"><span class="st"># good: [cfd4039213e7b5a828c5b78e1b5235cac91af53d] Merge tag &#39;</span>io_uring-6.19-20251208<span class="st">&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux</span></a>
+<a class="sourceLine" id="cb11-106" title="106"><span class="st">git bisect good cfd4039213e7b5a828c5b78e1b5235cac91af53d</span></a>
+<a class="sourceLine" id="cb11-107" title="107"><span class="st"># good: [30a8496694f1a93328e5d7f19206380346918b5a] f2fs: use memalloc_retry_wait() as much as possible</span></a>
+<a class="sourceLine" id="cb11-108" title="108"><span class="st">git bisect good 30a8496694f1a93328e5d7f19206380346918b5a</span></a>
+<a class="sourceLine" id="cb11-109" title="109"><span class="st"># bad: [7ad785927d9eb348adb381d168ed73d0dd3c7670] smb: client: Add tracepoint for krb5 auth</span></a>
+<a class="sourceLine" id="cb11-110" title="110"><span class="st">git bisect bad 7ad785927d9eb348adb381d168ed73d0dd3c7670</span></a>
+<a class="sourceLine" id="cb11-111" title="111"><span class="st"># bad: [87fba18abbb8433a47045c785f2edc027e4d2bc5] cifs: Remove the server pointer from smb_message</span></a>
+<a class="sourceLine" id="cb11-112" title="112"><span class="st">git bisect bad 87fba18abbb8433a47045c785f2edc027e4d2bc5</span></a>
+<a class="sourceLine" id="cb11-113" title="113"><span class="st"># bad: [6be09580df5cf87e601c1ec56b9a0c891d3a0bc8] cifs: Make smb1&#39;</span>s SendReceive() <span class="ex">wrap</span> cifs_send_recv()</a>
+<a class="sourceLine" id="cb11-114" title="114"><span class="fu">git</span> bisect bad 6be09580df5cf87e601c1ec56b9a0c891d3a0bc8</a>
+<a class="sourceLine" id="cb11-115" title="115"><span class="co"># good: [9d85ac939d52e93d80efb01a299c6f0bedb30487] cifs: Fix handling of a beyond-EOF DIO/unbuffered read over SMB1</span></a>
+<a class="sourceLine" id="cb11-116" title="116"><span class="fu">git</span> bisect good 9d85ac939d52e93d80efb01a299c6f0bedb30487</a>
+<a class="sourceLine" id="cb11-117" title="117"><span class="co"># good: [83bfbd0bb9025f98fa62b44f93bd67466773d1db] cifs: Remove the RFC1002 header from smb_hdr</span></a>
+<a class="sourceLine" id="cb11-118" title="118"><span class="fu">git</span> bisect good 83bfbd0bb9025f98fa62b44f93bd67466773d1db</a>
+<a class="sourceLine" id="cb11-119" title="119"><span class="co"># first bad commit: [6be09580df5cf87e601c1ec56b9a0c891d3a0bc8] cifs: Make smb1&#39;s SendReceive() wrap cifs_send_recv()</span></a>
+<a class="sourceLine" id="cb11-120" title="120"></a>
+<a class="sourceLine" id="cb11-121" title="121"><span class="fu">git</span> bisect reset</a></code></pre></div>
+<h1 id="test-result-for-git0003"><span class="header-section-number">3</span> Test Result for git/0003</h1>
+<ul>
+<li><a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildbot-log/xfstest-smb3mcmfs-git-0003.txt">xfstest-smb3mcmfs-git-0003.txt</a></li>
+</ul>
+<p>You need to apply <a href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/0001-xfstests-add-git-0003.patch">0001-xfstests-add-git-0003.patch</a> to xfstests before running the test case.</p>
+<p>Clone the git repository and build it:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="bu">cd</span> <span class="op">&lt;</span>xfstests repo path<span class="op">&gt;</span>/../</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="fu">git</span> clone https://git.kernel.org/pub/scm/git/git.git</a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="bu">cd</span> git/</a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="fu">git</span> checkout v2.23.0</a>
+<a class="sourceLine" id="cb12-5" title="5"><span class="fu">make</span> configure -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></a>
+<a class="sourceLine" id="cb12-6" title="6"><span class="ex">./configure</span> --prefix=<span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>/install</a>
+<a class="sourceLine" id="cb12-7" title="7"><span class="fu">make</span> all doc -j<span class="kw">`</span><span class="ex">nproc</span><span class="kw">`</span></a></code></pre></div>
+<p>The test passes when both Windows and Samba are used as the server, it has not been reproduced yet.</p>
+<h1 id="test-result-for-generic533"><span class="header-section-number">4</span> Test Result for generic/533</h1>
+<ul>
+<li><a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildbot-log/xfstest-smb3mcmfs-generic-533.txt">xfstest-smb3mcmfs-generic-533.txt</a></li>
+</ul>
+<p>The test passes when both Windows and Samba are used as the server, it has not been reproduced yet.</p>
+<h1 id="test-result-for-generic565"><span class="header-section-number">5</span> Test Result for generic/565</h1>
+<ul>
+<li><a href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/smb/buildbot-log/xfstest-smb3mcmfs-generic-565.txt">xfstest-smb3mcmfs-generic-565.txt</a></li>
+</ul>
+<p>The test passes when both Windows and Samba are used as the server, it has not been reproduced yet.</p>
+</body>
+</html>

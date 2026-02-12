@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>BTRFS documentation</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">BTRFS documentation</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#介绍"><span class="toc-section-number">1</span> 介绍</a></li>
+<li><a href="#状态"><span class="toc-section-number">2</span> 状态</a><ul>
+<li><a href="#概述"><span class="toc-section-number">2.1</span> 概述</a></li>
+</ul></li>
+<li><a href="#手册页"><span class="toc-section-number">3</span> 手册页</a></li>
+<li><a href="#管理"><span class="toc-section-number">4</span> 管理</a><ul>
+<li><a href="#挂载选项"><span class="toc-section-number">4.1</span> 挂载选项</a></li>
+<li><a href="#启动加载程序"><span class="toc-section-number">4.2</span> 启动加载程序</a></li>
+<li><a href="#管理限制"><span class="toc-section-number">4.3</span> 文件系统限制</a></li>
+<li><a href="#管理灵活性"><span class="toc-section-number">4.4</span> 灵活性</a></li>
+</ul></li>
+</ul>
+</nav>
+<p>本文档翻译自<a href="https://btrfs.readthedocs.io/en/latest/">BTRFS documentation</a>，大部分借助于ChatGPT翻译，仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<p>持续更新中。。。</p>
+<p><a href="https://github.com/kdave/btrfs-progs/blob/devel/Documentation/index.rst">index.rst</a>翻译时文件的最新提交是<code>216c9f0ffb6774afff97df71f248936232df3b16 btrfs-progs: docs: move doc conventions to developer docs</code></p>
+<p>BTRFS 是一个为 Linux 设计的现代写时复制（Copy on Write，COW）文件系统，旨在实现先进功能，同时重点关注容错性、修复以及简易管理。您可以在介绍中了解更多功能，或从下面的页面中选择。btrfs(8)、mkfs.btrfs(8) 等命令行工具的文档位于手册页面中。</p>
+<p>这份文档仍在进行中，尚未完全迁移原始维基 <a href="https://btrfs.wiki.kernel.org">https://btrfs.wiki.kernel.org</a> 的所有内容至此。</p>
+<h1 id="介绍"><span class="header-section-number">1</span> 介绍</h1>
+<p><a href="https://github.com/kdave/btrfs-progs/blob/devel/Documentation/Introduction.rst">Introduction.rst</a>翻译时文件的最新提交是<code>9aafb384cb324f78b0a6f676fb179cf7bbe0b744 btrfs-progs: docs: cross references, ioctl updates</code>。</p>
+<p>BTRFS 是一个为 Linux 设计的现代写时复制（Copy on Write，COW）文件系统，旨在实现先进功能的同时，重点关注容错性、修复以及简易管理。其主要特点和优势包括:</p>
+<ul>
+<li>不进行完整文件复制的快照功能</li>
+<li>内置的卷管理，支持软件基础的 RAID 0、RAID 1、RAID 10 等</li>
+<li>自我修复 - 数据和元数据的校验和，自动检测静默数据损坏</li>
+</ul>
+<p>特性概览:</p>
+<ul>
+<li>基于范围的文件存储</li>
+<li>2的64次方字节 == 16 EiB: 由于 Linux VFS 的实际限制为 8 EiB，故实际文件大小有限制</li>
+<li>空间高效的小文件打包</li>
+<li>空间高效的索引目录</li>
+<li>动态的 inode 分配</li>
+<li>可写快照、只读快照、子卷（分离的内部文件系统根）支持</li>
+<li>数据和元数据的校验和（crc32c、xxhash、sha256、blake2b）</li>
+<li>压缩（ZLIB、LZO、ZSTD）及其启发式方法</li>
+<li><p>集成的多设备支持:</p>
+<blockquote>
+<ul>
+<li>文件分片（类似 RAID0）</li>
+<li>文件镜像（类似 RAID1，最多 4 份拷贝）</li>
+<li>文件分片+镜像（类似 RAID10）</li>
+<li>单和双奇偶性实现（类似 RAID5/6，实验性质，不适用于生产环境）</li>
+</ul>
+</blockquote></li>
+<li>SSD/NVMe（闪存存储）感知性，用于报告可重复使用的空闲块和优化（例如，避免不必要的寻道优化，以及以簇为单位发送写操作）</li>
+<li>背景扫描过程，用于查找并修复具有冗余拷贝的文件中的错误</li>
+<li>在线文件系统碎片整理</li>
+<li>离线文件系统检查</li>
+<li>现有 ext2/3/4 和 reiserfs 文件系统的原地转换</li>
+<li>种子设备支持。创建一个（只读）文件系统，作为为其他 Btrfs 文件系统提供模板。原始文件系统和设备被包括为新文件系统的只读起点。使用写时复制，所有修改都存储在不同的设备上；原始文件保持不变。</li>
+<li>子卷感知的配额支持</li>
+<li>子卷更改的发送/接收，高效的增量文件系统镜像和备份</li>
+<li>批处理或带外去重（写入后发生，而非期间）</li>
+<li>交换文件支持</li>
+<li>树检查器，读后和写前的元数据验证</li>
+<li>区域模式支持（适用于 SMR/ZBC/ZNS 的友好分配，在非区域化设备上进行模拟）</li>
+</ul>
+<h1 id="状态"><span class="header-section-number">2</span> 状态</h1>
+<p><a href="https://github.com/kdave/btrfs-progs/blob/devel/Documentation/Status.rst">Status.rst</a>翻译时文件的最新提交是<code>ac8edc15130ff37d66d68cb9c2f30daa7f60a6b8 btrfs-progs: docs: restyle the landing page</code>。</p>
+<h2 id="概述"><span class="header-section-number">2.1</span> 概述</h2>
+<p>要按其引入列出功能，请参见 <a href="Feature-by-version">更改 (功能/版本)</a>。</p>
+<p>下表旨在作为 BTRFS 支持的功能稳定性状态的概览。虽然某个功能在功能上可能是安全和可靠的，但这并不一定意味着它有用，例如满足您的特定工作负载的性能期望。功能的组合在性能上可能有所不同，表格不覆盖所有可能性。</p>
+<p><strong>该表基于最新发布的 Linux 内核: 6.6</strong></p>
+<p>每个功能的列反映了以下实现方式的状态:</p>
+<div class="line-block"><em>稳定性</em> - 实现的完整性，用例覆盖<br />
+<em>性能</em> - 在达到内在限制之前可以改进多少<br />
+<em>注释</em> - 已知问题的简短描述，或与状态相关的其他信息</div>
+<p><em>图例:</em></p>
+<ul>
+<li><strong>OK</strong>: 可以安全使用，没有已知的主要缺陷</li>
+<li><strong>mostly OK</strong>: 适用于常规使用，有一些已知问题，不影响大多数用户</li>
+<li><strong>Unstable</strong>: 除测试目的外，请勿使用，已知的严重问题，某些核心部分的实现缺失</li>
+</ul>
+<p>内容太多，不全列出来，详细请查看 <a href="https://btrfs.readthedocs.io/en/latest/Status.html">https://btrfs.readthedocs.io/en/latest/Status.html</a> 。</p>
+<h1 id="手册页"><span class="header-section-number">3</span> 手册页</h1>
+<p><a href="https://github.com/kdave/btrfs-progs/blob/devel/Documentation/man-index.rst">man-index.rst</a>翻译时文件的最新提交是<code>ee801c07d785760d2ec818d0cb9223211256fc28 btrfs-progs: docs: drop indices from pages</code>。</p>
+<p>请查看: <a href="https://btrfs.readthedocs.io/en/latest/man-index.html">https://btrfs.readthedocs.io/en/latest/man-index.html</a> 。</p>
+<h1 id="管理"><span class="header-section-number">4</span> 管理</h1>
+<p><a href="https://github.com/kdave/btrfs-progs/blob/devel/Documentation/Administration.rst">Administration.rst</a>翻译时文件的最新提交是<code>9aafb384cb324f78b0a6f676fb179cf7bbe0b744 btrfs-progs: docs: cross references, ioctl updates</code>。</p>
+<p>BTRFS 文件系统的主要管理工具是 <code class="interpreted-text" data-role="doc">btrfs</code>。 请参考子命令的手册页以获取更多文档。</p>
+<h2 id="挂载选项"><span class="header-section-number">4.1</span> 挂载选项</h2>
+<p>TODO: 翻译日期 Fri Dec 22 10:16:52 2023 +0000</p>
+<p>挂载选项翻译出来没太大意义，请查看: <a href="https://btrfs.readthedocs.io/en/latest/Administration.html#mount-options">https://btrfs.readthedocs.io/en/latest/Administration.html#mount-options</a> 。</p>
+<h2 id="启动加载程序"><span class="header-section-number">4.2</span> 启动加载程序</h2>
+<p>TODO: 翻译日期 Fri Dec 22 10:16:52 2023 +0000</p>
+<p>GRUB2 (<a href="https://www.gnu.org/software/grub">https://www.gnu.org/software/grub</a>) 对于从 BTRFS 启动具有最先进的支持，特别是在功能方面。</p>
+<p>U-Boot (<a href="https://www.denx.de/wiki/U-Boot/">https://www.denx.de/wiki/U-Boot/</a>) 对于启动有相当的支持，但并非所有的 BTRFS 功能都已实现，请查阅文档。</p>
+<p>一般而言，每个设备的前 1MiB 未被使用，但主超级块位于偏移 64KiB，并跨越 4KiB。其余部分可以自由地被引导加载程序或其他系统信息使用。请注意，从 <code class="interpreted-text" data-role="doc">zoned device&lt;Zoned-mode&gt;</code> 上的文件系统启动是不支持的。</p>
+<h2 id="管理限制"><span class="header-section-number">4.3</span> 文件系统限制</h2>
+<p>TODO: 翻译日期 Fri Dec 22 10:16:52 2023 +0000</p>
+<div class="包括">
+<p>ch-fs-limits.rst</p>
+</div>
+<h2 id="管理灵活性"><span class="header-section-number">4.4</span> 灵活性</h2>
+<p>TODO: 翻译日期 Fri Dec 22 10:16:52 2023 +0000</p>
+<div class="包括">
+<p>ch-flexibility.rst</p>
+</div>
+</body>
+</html>

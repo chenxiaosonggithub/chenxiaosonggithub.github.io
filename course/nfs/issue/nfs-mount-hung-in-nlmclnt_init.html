@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>nfsv3挂载卡在nlmclnt_init()的问题</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">nfsv3挂载卡在nlmclnt_init()的问题</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#问题描述"><span class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#debug"><span class="toc-section-number">2</span> 调试</a></li>
+<li><a href="#代码分析"><span class="toc-section-number">3</span> 代码分析</a></li>
+<li><a href="#补丁"><span class="toc-section-number">4</span> 补丁</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 id="问题描述"><span class="header-section-number">1</span> 问题描述</h1>
+<p>内核版本:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">uname</span> -a</a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="co"># Linux xxxx 4.19.90-24.4.v2101.ky10.x86_64 #1 SMP Mon May 24 12:14:55 CST 2021 x86_64 x86_64 x86_64 GNU/Linux</span></a></code></pre></div>
+<p>加了<code>nolock</code>选项可以挂载成功:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">mount</span> -t nfs -o vers=3,nolock 192.168.53.225:/tmp/s_test /mnt</a></code></pre></div>
+<p>不加<code>nolock</code>选项，挂载卡住:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">mount</span> -t nfs -o vers=3 192.168.53.225:/tmp/s_test /mnt</a></code></pre></div>
+<p>查看进程栈:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">cat</span> /proc/64997/stack</a>
+<a class="sourceLine" id="cb4-2" title="2">[<span class="op">&lt;0&gt;</span>] <span class="ex">nlmclnt_init+0x1d/0xa0</span> [lockd]</a>
+<a class="sourceLine" id="cb4-3" title="3">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_start_lockd+0xd7/0x110</span> [nfs]</a>
+<a class="sourceLine" id="cb4-4" title="4">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_init_server+0x1a1/0x2d0</span> [nfs]</a>
+<a class="sourceLine" id="cb4-5" title="5">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_create_server+0x57/0x1b0</span> [nfs]</a>
+<a class="sourceLine" id="cb4-6" title="6">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs3_create_server+0xb/0x30</span> [nfsv3]</a>
+<a class="sourceLine" id="cb4-7" title="7">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_try_mount+0x14f/0x2c0</span> [nfs]</a>
+<a class="sourceLine" id="cb4-8" title="8">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_fs_mount+0x627/0xdc0</span> [nfs]</a>
+<a class="sourceLine" id="cb4-9" title="9">[<span class="op">&lt;0&gt;</span>] <span class="ex">mount_fs+0x35/0x160</span></a>
+<a class="sourceLine" id="cb4-10" title="10">[<span class="op">&lt;0&gt;</span>] <span class="ex">vfs_kern_mount.part.28+0x54/0x120</span></a>
+<a class="sourceLine" id="cb4-11" title="11">[<span class="op">&lt;0&gt;</span>] <span class="ex">do_mount+0x5c2/0xc60</span></a>
+<a class="sourceLine" id="cb4-12" title="12">[<span class="op">&lt;0&gt;</span>] <span class="ex">ksys_mount+0x80/0xd0</span></a>
+<a class="sourceLine" id="cb4-13" title="13">[<span class="op">&lt;0&gt;</span>] <span class="ex">__x64_sys_mount+0x21/0x30</span></a>
+<a class="sourceLine" id="cb4-14" title="14">[<span class="op">&lt;0&gt;</span>] <span class="ex">do_syscall_64+0x5b/0x1d0</span></a>
+<a class="sourceLine" id="cb4-15" title="15">[<span class="op">&lt;0&gt;</span>] <span class="ex">entry_SYSCALL_64_after_hwframe+0x44/0xa9</span></a></code></pre></div>
+<h1 id="debug"><span class="header-section-number">2</span> 调试</h1>
+<p>脚本查看<a href="https://chenxiaosong.com/course/nfs/debug.html#get-all_stack">《nfs调试方法》</a>。</p>
+<p>找到以下几种栈:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">cat</span> /proc/23462/task/23462/stack</a>
+<a class="sourceLine" id="cb5-2" title="2">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_free_server+0x22/0x90</span> [nfs]</a>
+<a class="sourceLine" id="cb5-3" title="3">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_kill_super+0x2b/0x40</span> [nfs]</a>
+<a class="sourceLine" id="cb5-4" title="4">[<span class="op">&lt;0&gt;</span>] <span class="ex">deactivate_locked_super+0x3f/0x70</span></a>
+<a class="sourceLine" id="cb5-5" title="5">[<span class="op">&lt;0&gt;</span>] <span class="ex">cleanup_mnt+0x3b/0x80</span></a>
+<a class="sourceLine" id="cb5-6" title="6">[<span class="op">&lt;0&gt;</span>] <span class="ex">task_work_run+0x8a/0xb0</span></a>
+<a class="sourceLine" id="cb5-7" title="7">[<span class="op">&lt;0&gt;</span>] <span class="ex">exit_to_usermode_loop+0xeb/0xf0</span></a>
+<a class="sourceLine" id="cb5-8" title="8">[<span class="op">&lt;0&gt;</span>] <span class="ex">do_syscall_64+0x1a3/0x1d0</span></a>
+<a class="sourceLine" id="cb5-9" title="9">[<span class="op">&lt;0&gt;</span>] <span class="ex">entry_SYSCALL_64_after_hwframe+0x44/0xa9</span></a>
+<a class="sourceLine" id="cb5-10" title="10"></a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="fu">cat</span> /proc/65384/task/65384/stack</a>
+<a class="sourceLine" id="cb5-12" title="12">[<span class="op">&lt;0&gt;</span>] <span class="ex">nlmclnt_init+0x1d/0xa0</span> [lockd]</a>
+<a class="sourceLine" id="cb5-13" title="13">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_start_lockd+0xd7/0x110</span> [nfs]</a>
+<a class="sourceLine" id="cb5-14" title="14">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_init_server+0x1a1/0x2d0</span> [nfs]</a>
+<a class="sourceLine" id="cb5-15" title="15">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_create_server+0x57/0x1b0</span> [nfs]</a>
+<a class="sourceLine" id="cb5-16" title="16">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs3_create_server+0xb/0x30</span> [nfsv3]</a>
+<a class="sourceLine" id="cb5-17" title="17">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_try_mount+0x14f/0x2c0</span> [nfs] </a>
+<a class="sourceLine" id="cb5-18" title="18">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_fs_mount+0x627/0xdc0</span> [nfs]</a>
+<a class="sourceLine" id="cb5-19" title="19">[<span class="op">&lt;0&gt;</span>] <span class="ex">mount_fs+0x35/0x160</span> </a>
+<a class="sourceLine" id="cb5-20" title="20">[<span class="op">&lt;0&gt;</span>] <span class="ex">vfs_kern_mount.part.28+0x54/0x120</span></a>
+<a class="sourceLine" id="cb5-21" title="21">[<span class="op">&lt;0&gt;</span>] <span class="ex">do_mount+0x5c2/0xc60</span></a>
+<a class="sourceLine" id="cb5-22" title="22">[<span class="op">&lt;0&gt;</span>] <span class="ex">ksys_mount+0x80/0xd0</span></a>
+<a class="sourceLine" id="cb5-23" title="23">[<span class="op">&lt;0&gt;</span>] <span class="ex">__x64_sys_mount+0x21/0x30</span> </a>
+<a class="sourceLine" id="cb5-24" title="24">[<span class="op">&lt;0&gt;</span>] <span class="ex">do_syscall_64+0x5b/0x1d0</span></a>
+<a class="sourceLine" id="cb5-25" title="25">[<span class="op">&lt;0&gt;</span>] <span class="ex">entry_SYSCALL_64_after_hwframe+0x44/0xa9</span></a>
+<a class="sourceLine" id="cb5-26" title="26"></a>
+<a class="sourceLine" id="cb5-27" title="27"><span class="fu">cat</span> /proc/17310/task/17310/stack</a>
+<a class="sourceLine" id="cb5-28" title="28">[<span class="op">&lt;0&gt;</span>] <span class="ex">lockd_up+0x14b/0x350</span> [lockd]</a>
+<a class="sourceLine" id="cb5-29" title="29">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_start_lockd+0xd7/0x110</span> [nfs]</a>
+<a class="sourceLine" id="cb5-30" title="30">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_init_server+0x1a1/0x2d0</span> [nfs]</a>
+<a class="sourceLine" id="cb5-31" title="31">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_create_server+0x57/0x1b0</span> [nfs]</a>
+<a class="sourceLine" id="cb5-32" title="32">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs3_create_server+0xb/0x30</span> [nfsv3]</a>
+<a class="sourceLine" id="cb5-33" title="33">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_try_mount+0x14f/0x2c0</span> [nfs]</a>
+<a class="sourceLine" id="cb5-34" title="34">[<span class="op">&lt;0&gt;</span>] <span class="ex">nfs_fs_mount+0x627/0xdc0</span> [nfs]</a>
+<a class="sourceLine" id="cb5-35" title="35">[<span class="op">&lt;0&gt;</span>] <span class="ex">mount_fs+0x35/0x160</span></a>
+<a class="sourceLine" id="cb5-36" title="36">[<span class="op">&lt;0&gt;</span>] <span class="ex">vfs_kern_mount.part.28+0x54/0x120</span></a>
+<a class="sourceLine" id="cb5-37" title="37">[<span class="op">&lt;0&gt;</span>] <span class="ex">do_mount+0x5c2/0xc60</span>    </a>
+<a class="sourceLine" id="cb5-38" title="38">[<span class="op">&lt;0&gt;</span>] <span class="ex">ksys_mount+0x80/0xd0</span></a>
+<a class="sourceLine" id="cb5-39" title="39">[<span class="op">&lt;0&gt;</span>] <span class="ex">__x64_sys_mount+0x21/0x30</span></a>
+<a class="sourceLine" id="cb5-40" title="40">[<span class="op">&lt;0&gt;</span>] <span class="ex">do_syscall_64+0x5b/0x1d0</span></a>
+<a class="sourceLine" id="cb5-41" title="41">[<span class="op">&lt;0&gt;</span>] <span class="ex">entry_SYSCALL_64_after_hwframe+0x44/0xa9</span></a></code></pre></div>
+<p>没搜索到<code>reclaimer()</code>的栈。</p>
+<p>解析:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">rpm2cpio</span> kernel-debuginfo-4.19.90-24.4.v2101.ky10.x86_64.rpm <span class="kw">|</span> <span class="fu">cpio</span> -div</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="ex">./scripts/faddr2line</span> usr/lib/debug/lib/modules/4.19.90-24.4.v2101.ky10.x86_64/kernel/fs/lockd/lockd.ko.debug nlmclnt_init+0x1d/0xa0</a>
+<a class="sourceLine" id="cb6-3" title="3">  <span class="co"># nlmclnt_init+0x1d/0xa0:</span></a>
+<a class="sourceLine" id="cb6-4" title="4">  <span class="co"># nlmclnt_init at /usr/src/debug/kernel-4.19.90/linux-4.19.90-24.4.v2101.ky10.x86_64/fs/lockd/clntlock.c:60</span></a>
+<a class="sourceLine" id="cb6-5" title="5">  <span class="co"># 60: if (status &lt; 0)，应该是执行到59行: status = lockd_up(nlm_init-&gt;net);</span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="ex">./scripts/faddr2line</span> usr/lib/debug/lib/modules/4.19.90-24.4.v2101.ky10.x86_64/kernel/fs/nfs/nfs.ko.debug nfs_free_server+0x22/0x90</a>
+<a class="sourceLine" id="cb6-7" title="7">  <span class="co"># nfs_free_server+0x22/0x90:</span></a>
+<a class="sourceLine" id="cb6-8" title="8">  <span class="co"># nfs_free_server at /usr/src/debug/kernel-4.19.90/linux-4.19.90-24.4.v2101.ky10.x86_64/fs/nfs/client.c:924</span></a>
+<a class="sourceLine" id="cb6-9" title="9">  <span class="co"># 924: if (!IS_ERR(server-&gt;client_acl))</span></a></code></pre></div>
+<h1 id="代码分析"><span class="header-section-number">3</span> 代码分析</h1>
+<p>进程<code>17310</code>在<code>lockd_up_net()</code>中发生错误，在<code>lockd_unregister_notifiers()</code>中一直休眠:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb7-1" title="1"><span class="co">// 进程 17310</span></a>
+<a class="sourceLine" id="cb7-2" title="2">nfs_init_server</a>
+<a class="sourceLine" id="cb7-3" title="3">  nfs_start_lockd</a>
+<a class="sourceLine" id="cb7-4" title="4">    nlmclnt_init</a>
+<a class="sourceLine" id="cb7-5" title="5">      lockd_up</a>
+<a class="sourceLine" id="cb7-6" title="6">        mutex_lock(&amp;nlmsvc_mutex) <span class="co">// 持有锁</span></a>
+<a class="sourceLine" id="cb7-7" title="7">        lockd_up_net <span class="co">// 发生错误</span></a>
+<a class="sourceLine" id="cb7-8" title="8">        lockd_unregister_notifiers</a>
+<a class="sourceLine" id="cb7-9" title="9">          <span class="co">// 休眠直到 nlm_ntf_refcnt == 0</span></a>
+<a class="sourceLine" id="cb7-10" title="10">          <span class="co">// 当前 nlm_ntf_refcnt 值为 1</span></a>
+<a class="sourceLine" id="cb7-11" title="11">          wait_event(nlm_ntf_wq, atomic_read(&amp;nlm_ntf_refcnt) == <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb7-12" title="12">        lockd_start_svc <span class="co">// nlm_ntf_refcnt增加，未执行到</span></a>
+<a class="sourceLine" id="cb7-13" title="13">          atomic_inc(&amp;nlm_ntf_refcnt)</a></code></pre></div>
+<p>进程 <code>65384</code>以及其他执行到<code>nfs_init_server()</code>的进程都在<code>lockd_up()</code>中等待进程 17310 释放锁:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb8-1" title="1"><span class="co">// 进程 65384</span></a>
+<a class="sourceLine" id="cb8-2" title="2">nfs_init_server</a>
+<a class="sourceLine" id="cb8-3" title="3">  nfs_start_lockd</a>
+<a class="sourceLine" id="cb8-4" title="4">    nlmclnt_init</a>
+<a class="sourceLine" id="cb8-5" title="5">      lockd_up</a>
+<a class="sourceLine" id="cb8-6" title="6">        mutex_lock(&amp;nlmsvc_mutex) <span class="co">// 等待进程 17310 释放锁</span></a></code></pre></div>
+<h1 id="补丁"><span class="header-section-number">4</span> 补丁</h1>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="ex">2018-10-22</span> 84df9525b0c2 Linux 4.19 Greg Kroah-Hartman <span class="op">&lt;</span>gregkh@linuxfoundation.org<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb9-2" title="2"></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="fu">git</span> log origin/master --oneline --date=short --format=<span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> --grep=nlm_ntf_refcnt</a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="fu">git</span> log origin/master --oneline --date=short --format=<span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> --grep=nlm_ntf_wq</a>
+<a class="sourceLine" id="cb9-5" title="5">  <span class="co"># 2021-12-13 5a8a7ff57421 lockd: simplify management of network status notifiers NeilBrown &lt;neilb@suse.de&gt;</span></a>
+<a class="sourceLine" id="cb9-6" title="6">  <span class="co"># 2018-03-19 554faf281988 lockd: make nlm_ntf_refcnt and nlm_ntf_wq static Colin Ian King &lt;colin.king@canonical.com&gt;</span></a>
+<a class="sourceLine" id="cb9-7" title="7"><span class="fu">git</span> log origin/master --oneline --date=short --format=<span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> --grep=lockd_unregister_notifiers</a>
+<a class="sourceLine" id="cb9-8" title="8">  <span class="co"># 2017-11-07 dc3033e16c59 lockd: double unregister of inetaddr notifiers Vasily Averin &lt;vvs@virtuozzo.com&gt;</span></a>
+<a class="sourceLine" id="cb9-9" title="9"><span class="fu">git</span> log origin/master --oneline --date=short --format=<span class="st">&quot;%cd %h %s %an &lt;%ae&gt;&quot;</span> --grep=lockd_up</a>
+<a class="sourceLine" id="cb9-10" title="10">  <span class="co"># 2021-12-13 865b674069e0 lockd: introduce lockd_put() NeilBrown &lt;neilb@suse.de&gt;</span></a>
+<a class="sourceLine" id="cb9-11" title="11">  <span class="co"># 2021-12-13 b73a2972041b lockd: move lockd_start_svc() call into lockd_create_svc() NeilBrown &lt;neilb@suse.de&gt;</span></a>
+<a class="sourceLine" id="cb9-12" title="12">  <span class="co"># 2021-12-13 5a8a7ff57421 lockd: simplify management of network status notifiers NeilBrown &lt;neilb@suse.de&gt;</span></a></code></pre></div>
+</body>
+</html>

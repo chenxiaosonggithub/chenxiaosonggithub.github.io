@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>块I/O层</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">块I/O层</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#简介"><span class="toc-section-number">1</span> 简介</a></li>
+<li><a href="#缓冲区和缓冲区头"><span class="toc-section-number">2</span> 缓冲区和缓冲区头</a></li>
+<li><a href="#bio"><span class="toc-section-number">3</span> bio</a></li>
+<li><a href="#io调度器介绍"><span class="toc-section-number">4</span> I/O调度器介绍</a></li>
+<li><a href="#已淘汰的io调度器"><span class="toc-section-number">5</span> 已淘汰的I/O调度器</a><ul>
+<li><a href="#linus-elevator"><span class="toc-section-number">5.1</span> Linus Elevator</a></li>
+<li><a href="#deadline"><span class="toc-section-number">5.2</span> Deadline</a></li>
+<li><a href="#anticipatory"><span class="toc-section-number">5.3</span> Anticipatory</a></li>
+<li><a href="#cfqcomplete-fair-queuing"><span class="toc-section-number">5.4</span> CFQ(Complete Fair Queuing)</a></li>
+<li><a href="#noop"><span class="toc-section-number">5.5</span> Noop</a></li>
+</ul></li>
+<li><a href="#drbd"><span class="toc-section-number">6</span> drbd</a></li>
+</ul>
+</nav>
+<p><a href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
+<p><a href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<h1 id="简介"><span class="header-section-number">1</span> 简介</h1>
+<p>块设备（block device）是指硬盘、软盘驱动器、蓝光光驱、闪存等，能够随机访问固定大小的数据片（块）。 字符设备（character device）是按字符流的方式有序访问，如串口和键盘。</p>
+<p>对块设备和块设备的请求进行管理的子系统叫“块I/O层”（block I/O layer）。</p>
+<p>块设备（又叫硬扇区、设备块）最小可寻址单元是扇区（sector），扇区大小最常见的是512字节。 块（block，又叫文件块、I/O块）是文件系统的一种抽象，是文件系统的最小寻址单元，块大小不能超过一个page大小， 只能是扇区的整数倍，通常是512B、1KB或4KB。</p>
+<h1 id="缓冲区和缓冲区头"><span class="header-section-number">2</span> 缓冲区和缓冲区头</h1>
+<p>一个块（block）与一个缓冲区（buffer）对应，一个page可以包含一个或多个块，缓存区用缓冲区头结构体表示:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb1-1" title="1"><span class="co">/*</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="co"> * 在历史上，buffer_head 用于映射页面中的单个块，当然也是通过文件系统和块层进行 I/O 的单位。</span></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="co"> * 如今，基本的 I/O 单位是 bio，而 buffer_head 则用于提取块映射（通过 get_block_t 调用）、</span></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co"> * 在页面内跟踪状态（通过 page_mapping）以及为了向后兼容性包装 bio 提交（例如 submit_bh）。</span></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="co"> */</span></a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="kw">struct</span> buffer_head {</a>
+<a class="sourceLine" id="cb1-7" title="7">        <span class="dt">unsigned</span> <span class="dt">long</span> b_state;          <span class="co">/* 缓冲区状态位图，查看枚举bh_state_bits */</span></a>
+<a class="sourceLine" id="cb1-8" title="8">        <span class="kw">struct</span> buffer_head *b_this_page;<span class="co">/* 页面缓冲区的循环链表 */</span></a>
+<a class="sourceLine" id="cb1-9" title="9">        <span class="kw">union</span> {</a>
+<a class="sourceLine" id="cb1-10" title="10">                <span class="kw">struct</span> page *b_page;    <span class="co">/* 此 bh 映射到的页面 */</span></a>
+<a class="sourceLine" id="cb1-11" title="11">                <span class="kw">struct</span> folio *b_folio;  <span class="co">/* 此 bh 映射到的 folio */</span></a>
+<a class="sourceLine" id="cb1-12" title="12">        };</a>
+<a class="sourceLine" id="cb1-13" title="13"></a>
+<a class="sourceLine" id="cb1-14" title="14">        sector_t b_blocknr;             <span class="co">/* 起始块号 */</span></a>
+<a class="sourceLine" id="cb1-15" title="15">        <span class="dt">size_t</span> b_size;                  <span class="co">/* 映射的大小 */</span></a>
+<a class="sourceLine" id="cb1-16" title="16">        <span class="co">// 位于b_page的page上的某个位置，起始位置在b_data处，结束位置在b_data+b_size处</span></a>
+<a class="sourceLine" id="cb1-17" title="17">        <span class="dt">char</span> *b_data;                   <span class="co">/* 页面内数据的指针 */</span></a>
+<a class="sourceLine" id="cb1-18" title="18"></a>
+<a class="sourceLine" id="cb1-19" title="19">        <span class="kw">struct</span> block_device *b_bdev;   <span class="co">/* 块设备 */</span></a>
+<a class="sourceLine" id="cb1-20" title="20">        bh_end_io_t *b_end_io;          <span class="co">/* I/O 完成回调 */</span></a>
+<a class="sourceLine" id="cb1-21" title="21">        <span class="dt">void</span> *b_private;                <span class="co">/* 保留给 b_end_io 使用 */</span></a>
+<a class="sourceLine" id="cb1-22" title="22">        <span class="kw">struct</span> list_head b_assoc_buffers; <span class="co">/* 与其他映射关联 */</span></a>
+<a class="sourceLine" id="cb1-23" title="23">        <span class="kw">struct</span> address_space *b_assoc_map;      <span class="co">/* 此缓冲区关联的映射 */</span></a>
+<a class="sourceLine" id="cb1-24" title="24">        atomic_t b_count;               <span class="co">/* 使用此 buffer_head 的用户计数，通过get_bh()和put_bh()操作 */</span></a>
+<a class="sourceLine" id="cb1-25" title="25">        spinlock_t b_uptodate_lock;     <span class="co">/* 页面中第一个 bh 使用的自旋锁，</span></a>
+<a class="sourceLine" id="cb1-26" title="26"><span class="co">                                         * 用于序列化页面中其他缓冲区的 IO 完成 */</span></a>
+<a class="sourceLine" id="cb1-27" title="27">};</a>
+<a class="sourceLine" id="cb1-28" title="28"></a>
+<a class="sourceLine" id="cb1-29" title="29"><span class="kw">enum</span> bh_state_bits {</a>
+<a class="sourceLine" id="cb1-30" title="30">        BH_Uptodate,    <span class="co">/* 包含有效数据 */</span></a>
+<a class="sourceLine" id="cb1-31" title="31">        BH_Dirty,       <span class="co">/* 脏数据，比磁盘中的数据新 */</span></a>
+<a class="sourceLine" id="cb1-32" title="32">        BH_Lock,        <span class="co">/* 已加锁 */</span></a>
+<a class="sourceLine" id="cb1-33" title="33">        BH_Req,         <span class="co">/* 已提交 I/O 请求 */</span></a>
+<a class="sourceLine" id="cb1-34" title="34"></a>
+<a class="sourceLine" id="cb1-35" title="35">        BH_Mapped,      <span class="co">/* 有磁盘映射 */</span></a>
+<a class="sourceLine" id="cb1-36" title="36">        BH_New,         <span class="co">/* 磁盘映射由 get_block 新创建，不能访问 */</span></a>
+<a class="sourceLine" id="cb1-37" title="37">        BH_Async_Read,  <span class="co">/* 正在执行 end_buffer_async_read 的异步 I/O */</span></a>
+<a class="sourceLine" id="cb1-38" title="38">        BH_Async_Write, <span class="co">/* 正在执行 end_buffer_async_write 的异步 I/O */</span></a>
+<a class="sourceLine" id="cb1-39" title="39">        BH_Delay,       <span class="co">/* 缓冲区尚未分配到磁盘 */</span></a>
+<a class="sourceLine" id="cb1-40" title="40">        BH_Boundary,    <span class="co">/* 块后面有不连续部分，处于边界，下一个块不再连续 */</span></a>
+<a class="sourceLine" id="cb1-41" title="41">        BH_Write_EIO,   <span class="co">/* 写入时发生 I/O 错误 */</span></a>
+<a class="sourceLine" id="cb1-42" title="42">        BH_Unwritten,   <span class="co">/* 缓冲区已分配到磁盘但未写入 */</span></a>
+<a class="sourceLine" id="cb1-43" title="43">        BH_Quiet,       <span class="co">/* 缓冲区错误消息静默 */</span></a>
+<a class="sourceLine" id="cb1-44" title="44">        BH_Meta,        <span class="co">/* 缓冲区包含元数据 */</span></a>
+<a class="sourceLine" id="cb1-45" title="45">        BH_Prio,        <span class="co">/* 缓冲区应以 REQ_PRIO 提交 */</span></a>
+<a class="sourceLine" id="cb1-46" title="46">        BH_Defer_Completion, <span class="co">/* 将异步 I/O 的完成延迟到工作队列 */</span></a>
+<a class="sourceLine" id="cb1-47" title="47"></a>
+<a class="sourceLine" id="cb1-48" title="48">        BH_PrivateStart,<span class="co">/* 不是状态位，而是其他实体可私有分配的第一个可用位 */</span></a>
+<a class="sourceLine" id="cb1-49" title="49">};</a>
+<a class="sourceLine" id="cb1-50" title="50"></a>
+<a class="sourceLine" id="cb1-51" title="51"><span class="kw">typedef</span> <span class="dt">int</span> (get_block_t)(<span class="kw">struct</span> inode *inode, sector_t iblock,    </a>
+<a class="sourceLine" id="cb1-52" title="52">                        <span class="kw">struct</span> buffer_head *bh_result, <span class="dt">int</span> create);</a></code></pre></div>
+<p>我们还会看到<code>buffer_uptodate()</code>、<code>set_buffer_uptodate()</code>、<code>buffer_uptodate()</code>之类的函数，但找不到函数定义， 这是因为函数定义是以宏定义的形式展开，具体可以看<code>BUFFER_FNS(bit, name)</code>。</p>
+<h1 id="bio"><span class="header-section-number">3</span> bio</h1>
+<p>块I/O操作的容器用<code>bio</code>结构体表示，以segment(一小块连续内存缓冲区)链表形式组织，一个缓冲区可以分散在内存的多个位置，叫向量I/O，又叫聚散I/O。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb2-1" title="1"><span class="co">/*</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="co"> * 块层和底层（例如驱动程序和堆叠驱动程序）的I/O主单元</span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="co"> */</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="kw">struct</span> bio {</a>
+<a class="sourceLine" id="cb2-5" title="5">        <span class="kw">struct</span> bio              *bi_next;       <span class="co">/* 请求队列链接 */</span></a>
+<a class="sourceLine" id="cb2-6" title="6">        <span class="kw">struct</span> block_device     *bi_bdev;</a>
+<a class="sourceLine" id="cb2-7" title="7">        blk_opf_t               bi_opf;         <span class="co">/* 底部位 REQ_OP，顶部位</span></a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="co">                                                 * req_flags。</span></a>
+<a class="sourceLine" id="cb2-9" title="9"><span class="co">                                                 */</span></a>
+<a class="sourceLine" id="cb2-10" title="10">        <span class="dt">unsigned</span> <span class="dt">short</span>          bi_flags;       <span class="co">/* BIO_* 标志 */</span></a>
+<a class="sourceLine" id="cb2-11" title="11">        <span class="dt">unsigned</span> <span class="dt">short</span>          bi_ioprio;</a>
+<a class="sourceLine" id="cb2-12" title="12">        blk_status_t            bi_status;</a>
+<a class="sourceLine" id="cb2-13" title="13">        atomic_t                __bi_remaining;</a>
+<a class="sourceLine" id="cb2-14" title="14"></a>
+<a class="sourceLine" id="cb2-15" title="15">        <span class="co">// bi_iter.bi_idx表示bi_io_vec的当前索引，bi_iter.bi_idx在RAID中有多个</span></a>
+<a class="sourceLine" id="cb2-16" title="16">        <span class="kw">struct</span> bvec_iter        bi_iter;</a>
+<a class="sourceLine" id="cb2-17" title="17"></a>
+<a class="sourceLine" id="cb2-18" title="18">        blk_qc_t                bi_cookie;</a>
+<a class="sourceLine" id="cb2-19" title="19">        bio_end_io_t            *bi_end_io;</a>
+<a class="sourceLine" id="cb2-20" title="20">        <span class="dt">void</span>                    *bi_private;</a>
+<a class="sourceLine" id="cb2-21" title="21"><span class="pp">#ifdef CONFIG_BLK_CGROUP</span></a>
+<a class="sourceLine" id="cb2-22" title="22">        <span class="co">/*</span></a>
+<a class="sourceLine" id="cb2-23" title="23"><span class="co">         * 表示bio与css和请求队列的关联。</span></a>
+<a class="sourceLine" id="cb2-24" title="24"><span class="co">         * 如果bio直接传输到设备，它将没有blkg，因为它不会与请求队列关联。</span></a>
+<a class="sourceLine" id="cb2-25" title="25"><span class="co">         * 该引用会在bio释放时被释放。</span></a>
+<a class="sourceLine" id="cb2-26" title="26"><span class="co">         */</span></a>
+<a class="sourceLine" id="cb2-27" title="27">        <span class="kw">struct</span> blkcg_gq         *bi_blkg;</a>
+<a class="sourceLine" id="cb2-28" title="28">        <span class="kw">struct</span> bio_issue        bi_issue;</a>
+<a class="sourceLine" id="cb2-29" title="29"><span class="pp">#ifdef CONFIG_BLK_CGROUP_IOCOST</span></a>
+<a class="sourceLine" id="cb2-30" title="30">        u64                     bi_iocost_cost;</a>
+<a class="sourceLine" id="cb2-31" title="31"><span class="pp">#endif</span></a>
+<a class="sourceLine" id="cb2-32" title="32"><span class="pp">#endif</span></a>
+<a class="sourceLine" id="cb2-33" title="33"></a>
+<a class="sourceLine" id="cb2-34" title="34"><span class="pp">#ifdef CONFIG_BLK_INLINE_ENCRYPTION</span></a>
+<a class="sourceLine" id="cb2-35" title="35">        <span class="kw">struct</span> bio_crypt_ctx    *bi_crypt_context;</a>
+<a class="sourceLine" id="cb2-36" title="36"><span class="pp">#endif</span></a>
+<a class="sourceLine" id="cb2-37" title="37"></a>
+<a class="sourceLine" id="cb2-38" title="38">        <span class="kw">union</span> {</a>
+<a class="sourceLine" id="cb2-39" title="39"><span class="pp">#if defined(CONFIG_BLK_DEV_INTEGRITY)</span></a>
+<a class="sourceLine" id="cb2-40" title="40">                <span class="kw">struct</span> bio_integrity_payload *bi_integrity; <span class="co">/* 数据完整性 */</span></a>
+<a class="sourceLine" id="cb2-41" title="41"><span class="pp">#endif</span></a>
+<a class="sourceLine" id="cb2-42" title="42">        };</a>
+<a class="sourceLine" id="cb2-43" title="43"></a>
+<a class="sourceLine" id="cb2-44" title="44">        <span class="dt">unsigned</span> <span class="dt">short</span>          bi_vcnt;        <span class="co">/* bio_vec的数量 */</span></a>
+<a class="sourceLine" id="cb2-45" title="45"></a>
+<a class="sourceLine" id="cb2-46" title="46">        <span class="co">/*</span></a>
+<a class="sourceLine" id="cb2-47" title="47"><span class="co">         * 从bi_max_vecs开始的所有成员将由bio_reset()保留</span></a>
+<a class="sourceLine" id="cb2-48" title="48"><span class="co">         */</span></a>
+<a class="sourceLine" id="cb2-49" title="49"></a>
+<a class="sourceLine" id="cb2-50" title="50">        <span class="dt">unsigned</span> <span class="dt">short</span>          bi_max_vecs;    <span class="co">/* 我们可以容纳的最大bio_vecs数量 */</span></a>
+<a class="sourceLine" id="cb2-51" title="51"></a>
+<a class="sourceLine" id="cb2-52" title="52">        atomic_t                __bi_cnt;       <span class="co">/* 引用计数 */</span> <span class="co">// 用bio_get()和bio_put()操作</span></a>
+<a class="sourceLine" id="cb2-53" title="53"></a>
+<a class="sourceLine" id="cb2-54" title="54">        <span class="kw">struct</span> bio_vec          *bi_io_vec;     <span class="co">/* 实际的vec列表 */</span> <span class="co">// 整个数组表示完整的缓冲区</span></a>
+<a class="sourceLine" id="cb2-55" title="55"></a>
+<a class="sourceLine" id="cb2-56" title="56">        <span class="kw">struct</span> bio_set          *bi_pool;</a>
+<a class="sourceLine" id="cb2-57" title="57"></a>
+<a class="sourceLine" id="cb2-58" title="58">        <span class="co">/*</span></a>
+<a class="sourceLine" id="cb2-59" title="59"><span class="co">         * 我们可以在bio的末尾内联多个vec，以避免为少量bio_vecs进行双重分配。</span></a>
+<a class="sourceLine" id="cb2-60" title="60"><span class="co">         * 这个成员必须显然保持在bio的最后。</span></a>
+<a class="sourceLine" id="cb2-61" title="61"><span class="co">         */</span></a>
+<a class="sourceLine" id="cb2-62" title="62">        <span class="kw">struct</span> bio_vec          bi_inline_vecs[];</a>
+<a class="sourceLine" id="cb2-63" title="63">};</a></code></pre></div>
+<p><code>bio</code>结构体的<code>bi_io_vec</code>成员指向一个向量（<code>&lt;page, offset, len&gt;</code>）数组:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb3-1" title="1"><span class="co">/**</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="co"> * struct bio_vec - 一个连续的物理内存地址范围</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="co"> * </span><span class="an">@bv_page:</span><span class="co">   与地址范围相关联的第一个页面。</span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="co"> * </span><span class="an">@bv_len:</span><span class="co">    地址范围内的字节数。</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co"> * </span><span class="an">@bv_offset:</span><span class="co"> 相对于@bv_page起始位置的地址范围的起始位置。</span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="co"> *</span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="co"> * 如果n * PAGE_SIZE &lt; bv_offset + bv_len，则以下条件成立：</span></a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="co"> *</span></a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="co"> *   nth_page(</span><span class="an">@bv_page,</span><span class="co"> n) == </span><span class="an">@bv_page</span><span class="co"> + n</span></a>
+<a class="sourceLine" id="cb3-10" title="10"><span class="co"> *</span></a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="co"> * 这是因为page_is_mergeable()会检查上述属性。</span></a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="co"> */</span></a>
+<a class="sourceLine" id="cb3-13" title="13"><span class="kw">struct</span> bio_vec {</a>
+<a class="sourceLine" id="cb3-14" title="14">        <span class="kw">struct</span> page     *bv_page;</a>
+<a class="sourceLine" id="cb3-15" title="15">        <span class="dt">unsigned</span> <span class="dt">int</span>    bv_len;</a>
+<a class="sourceLine" id="cb3-16" title="16">        <span class="dt">unsigned</span> <span class="dt">int</span>    bv_offset;</a>
+<a class="sourceLine" id="cb3-17" title="17">};</a></code></pre></div>
+<h1 id="io调度器介绍"><span class="header-section-number">4</span> I/O调度器介绍</h1>
+<p>用于保存挂起的块I/O请求的请求队列结构体是<code>struct request_queue</code>，队列中的每项请求用<code>struct request</code>（<code>include/linux/blk-mq.h</code>）表示，每个请求可以包含多个<code>bio</code>。</p>
+<p>磁盘寻址是计算机中最慢的操作之一，为了优化，内核在将I/O请求提交给磁盘之前，会先执行合并与排序的预操作，我们将负责提交I/O请求的子系统称为I/O调度器（I/O Schedulers），注意有些书籍翻译成“I/O调度程序“。 I/O调度器将磁盘I/O资源分配给挂起的块I/O请求。</p>
+<p>I/O调度器管理块设备的请求队列，减少磁盘寻址时间，提高全局吞吐量，注意提高“全局“意味着可能对某些请求不公平。</p>
+<p>合并是将多个请求结合成一个请求，原本要执行的多次磁盘寻址就变成只需要一次磁盘寻址。排序是将请求按磁盘上扇区的排列顺序尽可能的有序排列，从而让磁盘头以直线方向移动，和电梯调度类似。</p>
+<p><a href="https://github.com/torvalds/linux/blob/master/Documentation/block/switching-sched.rst">参考内核文档</a>，用以下命令查看和切换I/O调度器:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="fu">cat</span> /sys/block/sda/queue/scheduler <span class="co"># 查看</span></a>
+<a class="sourceLine" id="cb4-2" title="2">  <span class="co"># [mq-deadline] kyber bfq none</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="bu">echo</span> none <span class="op">&gt;</span>/sys/block/sda/queue/scheduler <span class="co"># 切换</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="fu">cat</span> /sys/block/sda/queue/scheduler</a>
+<a class="sourceLine" id="cb4-5" title="5">  <span class="co"># [none] mq-deadline kyber bfq # 已经切换了</span></a></code></pre></div>
+<h1 id="已淘汰的io调度器"><span class="header-section-number">5</span> 已淘汰的I/O调度器</h1>
+<p>我们先介绍几个现在最新的内核代码中已经淘汰了的I/O调度器，第一是因为资料多，第二是比较适合作为入门学习。</p>
+<h2 id="linus-elevator"><span class="header-section-number">5.1</span> Linus Elevator</h2>
+<p>Linus电梯在2.6版本中已经被取代了，但我们还是介绍一下，因为它足够简单。</p>
+<p>当有新的I/O请求时，先检查挂起的请求是否可以和新请求合并:</p>
+<ul>
+<li>向前合并: 新请求连在一个现存的挂起的请求前。</li>
+<li>向后合并: 新请求连在一个现存的挂起的请求后。是概率比较大的合并类型，因为文件是以扇区号增长分布。</li>
+</ul>
+<p>如果合并失败，就尝试按扇区方向为序插入。如果队列中存在一个驻留很久的请求，则新请求插入到队列尾部。</p>
+<h2 id="deadline"><span class="header-section-number">5.2</span> Deadline</h2>
+<p>deadline I/O调度器被mq-deadline延续了，在最新的代码中已经没有了，是为了解决Linus Elevator的饥饿问题提出的。</p>
+<p>Linus Elevator可能因为对某个磁盘区域的操作，让较远位置的其他请求永远得不到机会。 还可能造成writes starving reads的问题，写操作是异步的，读请求是同步的。</p>
+<p>deadline I/O调度器的每个请求都有一个超时时间，写请求的超时时间比读请求长，写5s，读500ms。</p>
+<p>涉及的几个队列:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">Read</span> FIFO queue</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="ex">----------------</span><span class="op">&gt;</span> =========+</a>
+<a class="sourceLine" id="cb5-3" title="3">                           <span class="kw">|</span></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="ex">Write</span> FIFO queue           v   dispatch queue    +----+</a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="ex">----------------</span><span class="op">&gt;</span> =========<span class="op">&gt;</span>   ---------------<span class="op">&gt;</span>  <span class="kw">|</span><span class="ex">disk</span><span class="kw">|</span></a>
+<a class="sourceLine" id="cb5-6" title="6">                           ^                     <span class="ex">+----+</span></a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="ex">Sorted</span> queue               <span class="kw">|</span></a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="ex">----------------</span><span class="op">&gt;</span> =========+</a></code></pre></div>
+<p>请求除了插入排序队列，还会插入写请求队列或读请求队列，如果写请求队列或读请求队列的最前面的请求快超时了，就会立刻得到执行。 这样就避免了请求饥饿的发生。</p>
+<h2 id="anticipatory"><span class="header-section-number">5.3</span> Anticipatory</h2>
+<p>最新的代码中已经没有这个I/O调度器了。 Anticipatory I/O调度器在deadline基础之上增加预测启发，调度器跟踪并统计每个应用程序块I/O操作的习惯行为，然后预测应用程序的未来行为。 读请求提交后等待6ms左右，如果有其他读请求到来，节省寻址次数。</p>
+<h2 id="cfqcomplete-fair-queuing"><span class="header-section-number">5.4</span> CFQ(Complete Fair Queuing)</h2>
+<p>CFQ I/O调度器已经被BFQ取代。CFQ是给每个进程维护一个请求队列，然后每个队列按扇区方向排序，以时间片轮转调度队列，从每个队列选取4个请求数。</p>
+<h2 id="noop"><span class="header-section-number">5.5</span> Noop</h2>
+<p>最新的代码中已经没有这个I/O调度器了，已经被多队列版本的none取代了。</p>
+<p>Noop只做了合并的操作，适用于“寻址”代价小或没有代价的块设备。</p>
+<h1 id="drbd"><span class="header-section-number">6</span> drbd</h1>
+<p>请查看<a href="https://chenxiaosong.com/course/mptcp/issue/drbd-mptcp.html">《drbd支持mptcp》</a>。</p>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>kernel doc: NFS ID Mapper</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">英文主页: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">kernel doc: NFS ID Mapper</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#nfs-id-mapper"><span class="toc-section-number">1</span> NFS ID Mapper</a><ul>
+<li><a href="#configuring"><span class="toc-section-number">1.1</span> Configuring</a></li>
+<li><a href="#nfsidmap"><span class="toc-section-number">1.2</span> nfsidmap</a></li>
+</ul></li>
+</ul>
+</nav>
+<p>本文档翻译自<a href="https://github.com/torvalds/linux/blob/master/Documentation/admin-guide/nfs/nfs-idmapper.rst">Documentation/admin-guide/nfs/nfs-idmapper.rst</a>，翻译时文件的最新提交是<a href="https://github.com/torvalds/linux/blob/fbdcd0b8e56492dd85bd8d08f15a14334bb59259/Documentation/admin-guide/nfs/nfs-idmapper.rst">fbdcd0b8e56492dd85bd8d08f15a14334bb59259 Documentation: nfs: idmapper: convert to ReST</a>，翻译时chatgpt不能用了，所以只能用文心一言，仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<blockquote>
+<p>注: <code>nfs.idmap</code>可能是以前系统的程序名中间有个点号，也可能是写错，已改正为<code>nfsidmap</code>。</p>
+</blockquote>
+<h1 id="nfs-id-mapper"><span class="header-section-number">1</span> NFS ID Mapper</h1>
+<p>ID映射器（Id mapper）被NFS（网络文件系统）用来将用户和组ID翻译成名称，以及将用户和组名称翻译成ID。这一转换过程的一部分涉及向用户空间发起上调用来请求相关信息。NFS有两种方式可以获得这些信息：调用/sbin/request-key或调用rpc.idmap守护进程。</p>
+<p>NFS会首先尝试调用/sbin/request-key。如果调用成功，结果将被缓存到通用的request-key缓存中。这个调用仅在/etc/request-key.conf没有为id_resolver键类型进行配置时才会失败，如果你希望使用request-key方法，请参见下面的“配置”部分。</p>
+<p>如果调用/sbin/request-key失败（即/etc/request-key.conf没有为id_resolver键类型进行配置），那么ID映射器将向遗留的rpc.idmap守护进程请求ID映射。这个结果将被存储在NFS自定义的ID映射缓存中。</p>
+<h2 id="configuring"><span class="header-section-number">1.1</span> Configuring</h2>
+<blockquote>
+<p>陈孝松注: 最新的用法请查看<a href="https://chenxiaosong.com/src/translation/nfs/man-nfsidmap.html">《nfs idmap相关man手册》</a>，这里的写的已经和最新的用法不一样了。</p>
+</blockquote>
+<p>为了让/sbin/request-key能够指导上调用，需要修改/etc/request-key.conf文件。应该添加以下行：</p>
+<p><code>#OP   TYPE    DESCRIPTION CALLOUT INFO    PROGRAM ARG1 ARG2 ARG3 ...</code></p>
+<p><code>#======   ======= =============== =============== ===============================</code></p>
+<p><code>create    id_resolver *   *       /usr/sbin/nfsidmap %k %d 600</code></p>
+<p>这将把所有id_resolver请求指向程序/usr/sbin/nfsidmap。最后一个参数600定义了密钥在未来多少秒后过期。这个参数对于/usr/sbin/nfsidmap是可选的。当没有指定超时时间时，nfsidmap将默认为600秒。</p>
+<p>ID映射器使用的密钥描述为:</p>
+<pre><code>uid:  Find the UID for the given user
+gid:  Find the GID for the given group</code></pre>
+<blockquote>
+<p>user: Find the user name for the given UID</p>
+</blockquote>
+<blockquote>
+<p>group: Find the group name for the given GID</p>
+</blockquote>
+<p>你可以单独处理这些请求中的任何一个，而不是使用通用的上调用程序。如果你想要使用自己的程序来查找用户ID（uid），那么你需要编辑你的request-key.conf文件，使其看起来像这样：</p>
+<p><code>#OP   TYPE    DESCRIPTION CALLOUT INFO    PROGRAM ARG1 ARG2 ARG3 ...</code></p>
+<p><code>#======   ======= =============== =============== ===============================</code></p>
+<p><code>create    id_resolver uid:*   *       /some/other/program %k %d 600</code></p>
+<p><code>create    id_resolver *   *       /usr/sbin/nfsidmap %k %d 600</code></p>
+<p>请注意，新行被添加在通用程序对应行的上方。request-key会找到第一个匹配的行和对应的程序。在这种情况下，/some/other/program将处理所有用户ID（uid）的查找，而/usr/sbin/nfsidmap将处理组ID（gid）、用户名和组名的查找。</p>
+<p>有关request-key功能的更多信息，请参阅Documentation/security/keys/request-key.rst文件。</p>
+<h2 id="nfsidmap"><span class="header-section-number">1.2</span> nfsidmap</h2>
+<p>nfsidmap 是被设计为被 request-key 调用的，而不应该“手动”运行。这个程序接受两个参数：一个序列化的密钥和一个密钥描述。序列化的密钥首先被转换成 key_serial_t 类型，然后作为参数传递给 keyctl_instantiate（这两个都是 keyutils.h 的一部分）。</p>
+<p>实际的查找操作是由在 nfsidmap.h 中找到的函数执行的。nfsidmap 通过查看描述字符串的第一部分来确定要调用的正确函数。例如，一个用户ID（uid）查找的描述将显示为 "uid:<a href="mailto:user@domain">user@domain</a>"。</p>
+<p>如果密钥被实例化，nfsidmap 将返回0；否则返回非0值。</p>
+</body>
+</html>
