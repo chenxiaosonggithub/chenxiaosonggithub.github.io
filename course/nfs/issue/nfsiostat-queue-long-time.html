@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>nfsiostat命令queue时间长的问题</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<!-- sign begin -->
+<ul>
+<li>作者: 陈孝松</li>
+<li><a href="https://chenxiaosong.com/">中文主页:
+chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">English Homepage:
+chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
+陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程:
+chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客:
+chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献:
+chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
+点击查看群介绍</a></li>
+</ul>
+<!-- sign end -->
+<h1 class="title">nfsiostat命令queue时间长的问题</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#问题描述" id="toc-问题描述"><span
+class="toc-section-number">1</span> 问题描述</a></li>
+<li><a href="#nfsiostat命令" id="toc-nfsiostat命令"><span
+class="toc-section-number">2</span> <code>nfsiostat</code>命令</a>
+<ul>
+<li><a href="#man手册" id="toc-man手册"><span
+class="toc-section-number">2.1</span> man手册</a></li>
+<li><a href="#代码分析" id="toc-代码分析"><span
+class="toc-section-number">2.2</span> 代码分析</a></li>
+</ul></li>
+<li><a href="#procstat文件" id="toc-procstat文件"><span
+class="toc-section-number">3</span> <code>/proc/stat</code>文件</a></li>
+<li><a href="#调试" id="toc-调试"><span
+class="toc-section-number">4</span> 调试</a></li>
+<li><a href="#代码分析-1" id="toc-代码分析-1"><span
+class="toc-section-number">5</span> 代码分析</a>
+<ul>
+<li><a href="#最新主线" id="toc-最新主线"><span
+class="toc-section-number">5.1</span> 最新主线</a></li>
+<li><a href="#内核" id="toc-内核"><span
+class="toc-section-number">5.2</span> 4.19内核</a></li>
+</ul></li>
+<li><a href="#nfs-server分析" id="toc-nfs-server分析"><span
+class="toc-section-number">6</span> nfs server分析</a></li>
+<li><a href="#vmcore分析" id="toc-vmcore分析"><span
+class="toc-section-number">7</span> vmcore分析</a></li>
+<li><a href="#抓包数据分析" id="toc-抓包数据分析"><span
+class="toc-section-number">8</span> 抓包数据分析</a></li>
+</ul>
+</nav>
+<p><a
+href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a
+href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<h1 data-number="1" id="问题描述"><span
+class="header-section-number">1</span> 问题描述</h1>
+<p>挂载信息:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="kw">|</span> <span class="fu">grep</span> nfs</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">xx.xx.xx.xx:/server/export</span> on /mnt type nfs <span class="er">(</span><span class="ex">rw,relatime,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=xx.xx.xx.xx,mountvers=3,mountport=20048,mountproto=udp,local_lock=none,addr=xx.xx.xx.xx,_netdev</span><span class="kw">)</span></span></code></pre></div>
+<p><code>nfsiostat</code>命令输出:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>           <span class="ex">ops/s</span>       rpc bklog</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>           <span class="ex">8.246</span>           0.000</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">read:</span>              ops/s            kB/s           kB/op         retrans    avg RTT <span class="er">(</span><span class="ex">ms</span><span class="kw">)</span>    <span class="ex">avg</span> exe <span class="er">(</span><span class="ex">ms</span><span class="kw">)</span>  <span class="ex">avg</span> queue <span class="er">(</span><span class="ex">ms</span><span class="kw">)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                   <span class="ex">0.002</span>           0.143          67.001        0 <span class="er">(</span><span class="ex">0.0%</span><span class="kw">)</span>           <span class="ex">1.618</span>           1.658           0.015</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">write:</span>             ops/s            kB/s           kB/op         retrans    avg RTT <span class="er">(</span><span class="ex">ms</span><span class="kw">)</span>    <span class="ex">avg</span> exe <span class="er">(</span><span class="ex">ms</span><span class="kw">)</span>  <span class="ex">avg</span> queue <span class="er">(</span><span class="ex">ms</span><span class="kw">)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                   <span class="ex">6.549</span>          24.308           3.711        0 <span class="er">(</span><span class="ex">0.0%</span><span class="kw">)</span>           <span class="ex">0.987</span>        4621.857        4620.851</span></code></pre></div>
+<p><code>mpstat</code>和<code>iostat -xm</code>命令输出中的<code>%iowait</code>过高，需要确认是否和nfs有关。</p>
+<h1 data-number="2" id="nfsiostat命令"><span
+class="header-section-number">2</span> <code>nfsiostat</code>命令</h1>
+<h2 data-number="2.1" id="man手册"><span
+class="header-section-number">2.1</span> man手册</h2>
+<p>顺便把<code>man nfsiostat</code>做个翻译，方便查阅:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">NAME</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>       <span class="ex">nfsiostat</span> <span class="at">-</span> 使用 /proc/self/mountstats 模拟 NFS 挂载点的 iostat</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">SYNOPSIS</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>       <span class="ex">nfsiostat</span> [[<span class="op">&lt;</span>interval<span class="op">&gt;</span>] [<span class="op">&lt;</span>count<span class="op">&gt;</span>]] [<span class="op">&lt;</span>options<span class="op">&gt;</span>] [<span class="op">&lt;</span>mount_point<span class="op">&gt;</span>]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">DESCRIPTION</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>       <span class="ex">nfsiostat</span> 命令显示 NFS 客户端每个挂载点的统计信息。</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>       <span class="op">&lt;</span>interval<span class="op">&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>              <span class="ex">指定每个报告之间的时间间隔（单位：秒）。第一次报告包含自每个文件系统挂载以来的统计信息。之后的每个报告包含自上一个报告以来的统计信息。</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>       <span class="op">&lt;</span>count<span class="op">&gt;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>              <span class="ex">如果指定了</span> <span class="op">&lt;</span>count<span class="op">&gt;</span> 参数，则 <span class="op">&lt;</span>count<span class="op">&gt;</span> 的值决定了在 <span class="op">&lt;</span>interval<span class="op">&gt;</span> 秒间隔下生成的报告数量。如果没有指定 <span class="op">&lt;</span>count<span class="op">&gt;</span> 参数，命令将连续生成报告。</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>       <span class="op">&lt;</span>options<span class="op">&gt;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>              <span class="ex">见下文定义</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>       <span class="op">&lt;</span>mount_point<span class="op">&gt;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>              <span class="ex">如果指定了一个或多个</span> <span class="op">&lt;</span>mount_point<span class="op">&gt;</span>，则仅显示这些挂载点的统计信息。否则，客户端上所有的 NFS 挂载点的统计信息将会列出。</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>       <span class="ex">nfsiostat</span> 输出的每一列的含义如下：</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>               <span class="ex">-</span> op/s</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                      <span class="ex">每秒操作次数。</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>               <span class="ex">-</span> rpc bklog</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                      <span class="ex">后台队列的长度。</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>               <span class="ex">-</span> kB/s</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>                      <span class="ex">每秒读取/写入的千字节数。</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>               <span class="ex">-</span> kB/op</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>                      <span class="ex">每次操作读取/写入的千字节数。</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>               <span class="ex">-</span> retrans</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>                      <span class="ex">重传的次数。</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>               <span class="ex">-</span> avg RTT <span class="er">(</span><span class="ex">ms</span><span class="kw">)</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>                      <span class="ex">从客户端内核发送</span> RPC 请求到接收到回复的时间延迟（毫秒）。</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>               <span class="ex">-</span> avg exe <span class="er">(</span><span class="ex">ms</span><span class="kw">)</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>                      <span class="ex">从</span> NFS 客户端发出 RPC 请求到 RPC 请求完成的时间延迟（毫秒），包括上述 RTT 时间。</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>               <span class="ex">-</span> avg queue <span class="er">(</span><span class="ex">ms</span><span class="kw">)</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>                      <span class="ex">从</span> NFS 客户端创建 RPC 请求任务到请求被传输的时间延迟（毫秒）。</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>               <span class="ex">-</span> errors</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>                      <span class="ex">以错误状态（状态值小于</span> 0）完成的操作次数。此计数仅在内核支持 RPC iostats 版本 1.1 或更高版本时可用。</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>       <span class="ex">注意，如果使用时间间隔作为</span> nfsiostat 的参数，则显示的是与上一个时间间隔的差值，否则结果将显示自挂载共享以来的统计信息。</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="ex">OPTIONS</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>       <span class="ex">-a</span>  或  <span class="at">--attr</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>              <span class="ex">显示与属性缓存相关的统计信息。</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>       <span class="ex">-d</span>  或  <span class="at">--dir</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>              <span class="ex">显示与目录操作相关的统计信息。</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>       <span class="ex">-h</span>  或  <span class="at">--help</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>              <span class="ex">显示帮助信息并退出。</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>       <span class="ex">-l</span> LIST 或  <span class="at">--list</span><span class="op">=</span>LIST</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>              <span class="ex">仅打印前</span> LIST 个挂载点的统计信息。</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>       <span class="ex">-p</span>  或  <span class="at">--page</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>              <span class="ex">显示与页面缓存相关的统计信息。</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>       <span class="ex">-s</span>  或  <span class="at">--sort</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>              <span class="ex">按每秒操作次数（ops/second）排序</span> NFS 挂载点。</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>       <span class="ex">--version</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>              <span class="ex">显示程序的版本号并退出。</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="ex">FILES</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>       <span class="ex">/proc/self/mountstats</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="ex">SEE</span> ALSO</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>       <span class="ex">iostat</span><span class="er">(</span><span class="ex">8</span><span class="kw">)</span><span class="ex">,</span> mountstats<span class="er">(</span><span class="ex">8</span><span class="kw">)</span><span class="ex">,</span> nfsstat<span class="er">(</span><span class="ex">8</span><span class="kw">)</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="ex">AUTHOR</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>       <span class="ex">Chuck</span> Lever <span class="op">&lt;</span>chuck.lever@oracle.com<span class="op">&gt;</span></span></code></pre></div>
+<h2 data-number="2.2" id="代码分析"><span
+class="header-section-number">2.2</span> 代码分析</h2>
+<p><code>/proc/self/mountstats</code>文件内容:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">device</span> localhost:/tmp/s_test mounted on /mnt with fstype nfs statvers=1.1</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>        <span class="ex">opts:</span>   rw,vers=3,rsize=1048576,wsize=1048576,namlen=255,acregmin=3,acregmax=60,acdirmin=30,acdirmax=60,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=127.0.0.1,mountvers=3,mountport=20048,mountproto=udp,local_lock=none</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="ex">age:</span>    159</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">caps:</span>   caps=0xf,wtmult=4096,dtsize=1048576,bsize=0,namlen=255</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">sec:</span>    flavor=1,pseudoflavor=1</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">events:</span> 0 0 0 0 2 1 7 1 0 1 0 1 0 0 3 0 0 2 0 0 1 0 0 0 0 0 0 </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="ex">bytes:</span>  15 15 0 0 15 15 1 1 </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="ex">RPC</span> iostats version: 1.1  p/v: 100003/3 <span class="er">(</span><span class="ex">nfs</span><span class="kw">)</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="ex">xprt:</span>   tcp 795 1 2 0 2 15 15 0 15 0 2 0 0</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="ex">per-op</span> statistics</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                <span class="ex">NULL:</span> 1 1 0 44 24 0 0 0 0</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                <span class="ex">...</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                <span class="ex">READ:</span> 1 1 0 124 144 0 0 0 0</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>               <span class="ex">WRITE:</span> 1 1 0 148 136 0 14 14 0</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>               <span class="ex">...</span></span></code></pre></div>
+<p><code>rpc_init_task_statistics()</code>记录rpc任务开始的时刻，<code>xs_tcp_send_request()</code>记录tcp请求的时刻，<code>xprt_lookup_rqst()</code>计算tcp请求到收到回复的间隔时间，<code>rpc_count_iostats_metrics()</code>计算排队的时间和rpc任务总的时间:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>REG<span class="op">(</span><span class="st">&quot;mountstats&quot;</span><span class="op">,</span> S_IRUSR<span class="op">,</span> proc_mountstats_operations<span class="op">)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>mountstats_open</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  mounts_open_common</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    p<span class="op">-&gt;</span>show <span class="op">=</span> show_vfsstat</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>show_vfsstat</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  nfs_show_stats</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    rpc_clnt_show_stats</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      _add_rpc_iostats</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      _print_rpc_iostats</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        ktime_to_ms<span class="op">(</span>stats<span class="op">-&gt;</span>om_queue<span class="op">)</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>rpc_call_sync</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  rpc_run_task</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    rpc_new_task</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>      rpc_init_task</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        rpc_init_task_statistics</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>          task<span class="op">-&gt;</span>tk_start <span class="op">=</span> ktime_get<span class="op">()</span> <span class="co">// rpc任务开始的时刻</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>rpc_execute</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  __rpc_execute</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    call_transmit</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>      xprt_transmit</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        xprt_request_transmit</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>          xs_tcp_send_request</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>            req<span class="op">-&gt;</span>rq_xtime <span class="op">=</span> ktime_get<span class="op">()</span> <span class="co">// 发送tcp请求的时刻</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>xprt_lookup_rqst</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  entry<span class="op">-&gt;</span>rq_rtt <span class="op">=</span> ktime_sub<span class="op">(</span>ktime_get<span class="op">(),</span> entry<span class="op">-&gt;</span>rq_xtime<span class="op">)</span> <span class="co">// tcp请求到收到回复的间隔时间</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>rpc_count_iostats_metrics</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  backlog <span class="op">=</span> ktime_sub<span class="op">(</span>req<span class="op">-&gt;</span>rq_xtime<span class="op">,</span> task<span class="op">-&gt;</span>tk_start<span class="op">)</span> <span class="co">// rpc任务开始到tcp请求的间隔时间，也就是排队的时间</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  execute <span class="op">=</span> ktime_sub<span class="op">(</span>now<span class="op">,</span> task<span class="op">-&gt;</span>tk_start<span class="op">)</span> <span class="co">// 总的时间</span></span></code></pre></div>
+<h1 data-number="3" id="procstat文件"><span
+class="header-section-number">3</span> <code>/proc/stat</code>文件</h1>
+<p>通过<code>strace -o strace.out -f -v -s 4096 xxxx</code>抓取系统调用可以看出<code>iostat -xm</code>
+和<code>mpstat</code>都是解析<code>/proc/stat</code>中的内容。</p>
+<p>代码分析如下:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> proc_ops stat_proc_ops</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>stat_open</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  single_open_size<span class="op">(</span>file<span class="op">,</span> show_stat<span class="op">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>show_stat</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  get_iowait_time</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    get_cpu_iowait_time_us</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      get_cpu_sleep_time_us<span class="op">(</span>ts<span class="op">,</span> <span class="op">&amp;</span>ts<span class="op">-&gt;</span>iowait_sleeptime<span class="op">,</span> <span class="co">// 进程设置current-&gt;in_iowait期间统计的时间</span></span></code></pre></div>
+<h1 data-number="4" id="调试"><span
+class="header-section-number">4</span> 调试</h1>
+<p>挂载:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> rw,relatime,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountvers=3,mountport=20048,mountproto=udp,local_lock=none,_netdev localhost:/tmp/s_test /mnt</span></code></pre></div>
+<p>测试读写一个字节所需时间:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">time</span> dd if=/dev/random of=/mnt/file bs=1 count=1 oflag=direct</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">time</span> dd if=/mnt/file of=/dev/null bs=1 count=1 iflag=direct</span></code></pre></div>
+<p>从结果看，<code>dd</code>命令读写所用的时间正常。</p>
+<p>再打开nfs和sunrpc的日志调试开关:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0xFFFF <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug <span class="co"># NFSDBG_ALL</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0x7fff <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug <span class="co"># RPCDBG_ALL</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">nfsiostat</span> 1 <span class="op">&gt;</span>  nfsiostat.txt <span class="kw">&amp;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="va">nfsiostat_pid</span><span class="op">=</span><span class="va">$!</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 10</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">dmesg</span> <span class="op">&gt;</span> dmesg.txt</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 关闭日志调试开关</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/nfs_debug</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 0 <span class="op">&gt;</span> /proc/sys/sunrpc/rpc_debug</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">kill</span> <span class="at">-9</span> <span class="va">${nfsiostat_pid}</span></span></code></pre></div>
+<p>抓包:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">--interface</span><span class="op">=</span>any <span class="at">--buffer-size</span><span class="op">=</span>20480 <span class="at">-w</span> out.cap</span></code></pre></div>
+<h1 data-number="5" id="代码分析-1"><span
+class="header-section-number">5</span> 代码分析</h1>
+<h2 data-number="5.1" id="最新主线"><span
+class="header-section-number">5.1</span> 最新主线</h2>
+<p>调用<code>io_schedule_prepare()</code>的地方:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>io_schedule</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>io_schedule_timeout</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>mutex_lock_io</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>mutex_lock_io_nested</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>blkcg_maybe_throttle_blkg</span></code></pre></div>
+<p>调用<code>io_schedule()</code>地方:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>nfs_wb_folio</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  folio_wait_writeback</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    folio_wait_bit</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>      folio_wait_bit_common</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        io_schedule</span></code></pre></div>
+<h2 data-number="5.2" id="内核"><span
+class="header-section-number">5.2</span> 4.19内核</h2>
+<p>调用<code>io_schedule()</code>地方:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>write</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  vfs_write</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    __vfs_write</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>      new_sync_write</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        nfs_file_write</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>          generic_perform_write</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>            nfs_write_end</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>              nfs_updatepage</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>                nfs_writepage_setup</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                  nfs_setup_write_request</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>                    nfs_try_to_update_request</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                      nfs_wb_page</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>nfs_wb_page</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  nfs_writepage_locked</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    nfs_do_writepage</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>      nfs_page_async_flush</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>        nfs_set_page_writeback <span class="co">// 设置回写标记</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>        nfs_pageio_add_request</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    nfs_pageio_complete</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>      nfs_pageio_complete_mirror</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>        nfs_pageio_doio</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>          nfs_generic_pg_pgios <span class="co">// .pg_doio</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>            nfs_generic_pgio</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>              desc<span class="op">-&gt;</span>pg_rpc_callops <span class="op">=</span> <span class="op">&amp;</span>nfs_pgio_common_ops</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>                <span class="op">.</span>rpc_call_done <span class="op">=</span> nfs_pgio_result<span class="op">,</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>            nfs_initiate_pgio</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>              <span class="op">.</span>flags <span class="op">=</span> RPC_TASK_ASYNC <span class="op">|</span> flags<span class="op">,</span> <span class="co">// 异步</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>              rpc_run_task</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>                rpc_execute</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>                  rpc_make_runnable <span class="co">// 异步执行</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>  wait_on_page_writeback <span class="co">// 等待异步回写完成</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    wait_on_page_bit_common</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>      io_schedule <span class="co">// 这里会影响`mpstat`和`iostat -xm`命令输出中的`%iowait`</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="co">// rpc请求回复后</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>rpc_free_task</span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>  rpc_release_calldata</span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>    nfs_pgio_release <span class="co">// .rpc_release</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>      nfs_write_completion <span class="co">// hdr-&gt;completion_ops-&gt;completion</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>        nfs_end_page_writeback</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>          end_page_writeback <span class="co">// 在这里清除回写标记</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>            wake_up_page<span class="op">(</span>page<span class="op">,</span> PG_writeback<span class="op">)</span> <span class="co">// 唤醒wait_on_page_writeback</span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>nfs3_xdr_dec_read3res</span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>nfs3_xdr_dec_write3res</span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>  nfs3_stat_to_errno</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>    nfs_errtbl</span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>      <span class="op">{</span> NFSERR_JUKEBOX<span class="op">,</span>       <span class="op">-</span>EJUKEBOX       <span class="op">}</span> <span class="co">// 接下来我们再找使用 EJUKEBOX 的地方</span></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a><span class="co">// 读写好像没调用sync</span></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>rpc_call_sync</span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>  nfs3_rpc_wrapper</span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>res <span class="op">!=</span> <span class="op">-</span>EJUKEBOX<span class="op">)</span></span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a>nfs_pgio_result <span class="co">// .rpc_call_done</span></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>  nfs_readpage_done <span class="co">// .rw_done</span></span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a>    nfs3_read_done <span class="co">// 还有nfs3_write_done</span></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a>      nfs3_async_handle_jukebox</span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>task<span class="op">-&gt;</span>tk_status <span class="op">==</span> <span class="op">-</span>EJUKEBOX<span class="op">)</span></span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a>        rpc_restart_call <span class="co">// 继续尝试rpc请示</span></span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a>        rpc_delay<span class="op">(</span>task<span class="op">,</span> NFS_JUKEBOX_RETRY_TIME<span class="op">)</span></span></code></pre></div>
+<h1 data-number="6" id="nfs-server分析"><span
+class="header-section-number">6</span> nfs server分析</h1>
+<p>此问题的场景nfs
+server是个黑盒子，但我们还是分析一下Linux内核中的错误情况。</p>
+<p>以下错误nfs server都会返回<code>nfserr_jukebox</code>给nfs
+client:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>nfserrno</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> nfserr_jukebox<span class="op">,</span> <span class="op">-</span>ETIMEDOUT <span class="op">},</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> nfserr_jukebox<span class="op">,</span> <span class="op">-</span>ERESTARTSYS <span class="op">},</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> nfserr_jukebox<span class="op">,</span> <span class="op">-</span>EAGAIN <span class="op">},</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> nfserr_jukebox<span class="op">,</span> <span class="op">-</span>EWOULDBLOCK <span class="op">},</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> nfserr_jukebox<span class="op">,</span> <span class="op">-</span>ENOMEM <span class="op">},</span></span></code></pre></div>
+<h1 data-number="7" id="vmcore分析"><span
+class="header-section-number">7</span> vmcore分析</h1>
+<p>从以下vmcore的解析结果看，处于<code>D</code>状态（uninterruptible
+sleep，usually
+IO）的进程所操作的文件是日志文件，对这个日志文件手动进行读写都正常。</p>
+<p>启动在线调试:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span> /usr/lib/debug/lib/modules/<span class="kw">`</span><span class="fu">uname</span> <span class="at">-r</span><span class="kw">`</span>/vmlinux <span class="co"># 在线调试</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 找到D状态进程</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> aux <span class="kw">|</span> <span class="fu">grep</span> D</span></code></pre></div>
+<p>解析进程<code>134743</code>:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/134743/stack</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt 134743</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff800b46525fe8</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">FREE/[ALLOCATED]</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[ffff800b46525c88]</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct nfs_inode ffff800b46525c88 <span class="at">-o</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[ffff800b46525e68]</span> struct inode vfs_inode<span class="kw">;</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff800f9bd00400</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">FREE/[ALLOCATED]</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[ffff800f9bd00400]</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct file ffff800f9bd00400</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="ex">f_path</span> = {</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">dentry</span> = 0xffff800b4838dc38</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="ex">,</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="ex">f_inode</span> = 0xffff800b46525e68 <span class="co"># 和前面的值一样</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800b4838dc38 <span class="at">-o</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[ffff800b4838dc58]</span> struct qstr d_name<span class="kw">;</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct qstr ffff800b4838dc58</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="ex">name</span> = ... <span class="st">&quot;stat.log&quot;</span> <span class="co"># 文件名</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800b4838dc38</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="ex">d_parent</span> = 0xffff800f66abf738 <span class="co"># 获取父目录dentry</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800f66abf738 <span class="at">-o</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[ffff800f66abf758]</span> struct qstr d_name<span class="kw">;</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct qstr ffff800f66abf758</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="ex">name</span> = ... <span class="st">&quot;kuas-authorization-rpc&quot;</span> <span class="co"># 父目录名</span></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800f66abf738</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  <span class="ex">d_parent</span> = 0xffff800f66ba41d0</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800f66ba41d0 <span class="at">-o</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[ffff800f66ba41f0]</span> struct qstr d_name<span class="kw">;</span></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct qstr ffff800f66ba41f0</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>  <span class="ex">name</span> = ... <span class="st">&quot;kuas-log&quot;</span> <span class="co"># 再上一级目录名</span></span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800f66ba41d0</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>  <span class="ex">d_parent</span> = 0xffff800f667b4da0</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a><span class="co"># 可以了，搜索一下目录名</span></span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> /opt/glusterfs <span class="at">-name</span> <span class="st">&quot;*kuas-authorization-rpc*&quot;</span></span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>  <span class="ex">/opt/glusterfs/data/logs/kuas-log/kuas-authorization-rpc/stat.log</span></span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a><span class="co"># 读写测试，看着都正常</span></span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /opt/glusterfs/data/logs/kuas-log/kuas-authorization-rpc/stat.log</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;test log&quot;</span> <span class="op">&gt;</span> test-log.txt</span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> test-log.txt <span class="op">&gt;&gt;</span> /opt/glusterfs/data/logs/kuas-log/kuas-authorization-rpc/stat.log</span></code></pre></div>
+<p>再解析一个进程:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/2802473/stack</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> kmem ffff800f46d36400</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[ffff800f46d36400]</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct file ffff800f46d36400</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">f_path</span> = {</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">dentry</span> = 0xffff800b4589acf8</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct dentry 0xffff800b4589acf8 <span class="at">-o</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">[ffff800b4589ad18]</span> struct qstr d_name<span class="kw">;</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> struct qstr ffff800b4589ad18</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="ex">name</span> = ... <span class="st">&quot;stat.log&quot;</span> <span class="co"># 还是日志文件</span></span></code></pre></div>
+<h1 data-number="8" id="抓包数据分析"><span
+class="header-section-number">8</span> 抓包数据分析</h1>
+<p>从抓包数据中看到有很多nfsv3
+write回复<code>NFS3ERR_JUKEBOX</code>错误，从<a
+href="https://www.rfc-editor.org/rfc/rfc1813">nfsv3的rfc1813协议</a>查阅到此错误的解释:</p>
+<pre><code>NFS3ERR_JUKEBOX
+       The server initiated the request, but was not able to
+       complete it in a timely fashion. The client should wait
+       and then try the request with a new RPC transaction ID.
+       For example, this error should be returned from a server
+       that supports hierarchical storage and receives a request
+       to process a file that has been migrated. In this case,
+       the server should start the immigration process and
+       respond to client with this error.
+
+翻译如下:
+服务器已启动请求，但未能及时完成。客户端应该等待，然后使用新的 RPC 事务 ID 重试请求。例如，如果服务器支持层次化存储，并且接收到请求处理已迁移文件的请求时，应该返回此错误。在这种情况下，服务器应启动文件迁移过程，并向客户端返回此错误。</code></pre>
+</body>
+</html>
