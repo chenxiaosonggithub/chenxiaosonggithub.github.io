@@ -5,87 +5,74 @@
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>nfs多路径</title>
-  <style>
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
-    html { -webkit-text-size-adjust: 100%; }
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      {   }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-    code span.at { color: #7d9029; } /* Attribute */
-    code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
-    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #4070a0; } /* Char */
-    code span.cn { color: #880000; } /* Constant */
-    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-    code span.dt { color: #902000; } /* DataType */
-    code span.dv { color: #40a070; } /* DecVal */
-    code span.er { color: #ff0000; font-weight: bold; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #40a070; } /* Float */
-    code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
-    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-    code span.op { color: #666666; } /* Operator */
-    code span.ot { color: #007020; } /* Other */
-    code span.pp { color: #bc7a00; } /* Preprocessor */
-    code span.sc { color: #4070a0; } /* SpecialChar */
-    code span.ss { color: #bb6688; } /* SpecialString */
-    code span.st { color: #4070a0; } /* String */
-    code span.va { color: #19177c; } /* Variable */
-    code span.vs { color: #4070a0; } /* VerbatimString */
-    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -94,108 +81,44 @@
 <!-- sign begin -->
 <ul>
 <li>作者: 陈孝松</li>
-<li><a href="https://chenxiaosong.com/">中文主页:
-chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en">English Homepage:
-chenxiaosong.com/en</a></li>
-<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频:
-陈孝松</a></li>
-<li><a href="https://chenxiaosong.com/course.html">课程:
-chenxiaosong.com/course</a></li>
-<li><a href="https://chenxiaosong.com/blog.html">博客:
-chenxiaosong.com/blog</a></li>
-<li><a href="https://chenxiaosong.com/contribution.html">贡献:
-chenxiaosong.com/contribution</a></li>
-<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206,
-点击查看群介绍</a></li>
+<li><a href="https://chenxiaosong.com/">中文主页: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en">English Homepage: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/video.html">哔哩哔哩教学视频: 陈孝松</a></li>
+<li><a href="https://chenxiaosong.com/course.html">课程: chenxiaosong.com/course</a></li>
+<li><a href="https://chenxiaosong.com/blog.html">博客: chenxiaosong.com/blog</a></li>
+<li><a href="https://chenxiaosong.com/contribution.html">贡献: chenxiaosong.com/contribution</a></li>
+<li>邮箱: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/q.html">QQ交流群: 544216206, 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
 <h1 class="title">nfs多路径</h1>
 </header>
-<nav id="TOC" role="doc-toc">
+<nav id="TOC">
 <ul>
-<li><a href="#多个网卡环境" id="toc-多个网卡环境"><span
-class="toc-section-number">1</span> 多个网卡环境</a></li>
-<li><a href="#主线nconnect挂载选项" id="toc-主线nconnect挂载选项"><span
-class="toc-section-number">2</span>
-主线<code>nconnect</code>挂载选项</a>
-<ul>
-<li><a
-href="#tagsv5.3-rc1-21f0ffaff510-sunrpc-add-basic-load-balancing-to-the-transport-switch"
-id="toc-tagsv5.3-rc1-21f0ffaff510-sunrpc-add-basic-load-balancing-to-the-transport-switch"><span
-class="toc-section-number">2.1</span> 1/9
-<code>tags/v5.3-rc1 21f0ffaff510 SUNRPC: Add basic load balancing to the transport switch</code></a></li>
-<li><a
-href="#b41f808a9-sunrpc-allow-creation-of-rpc-clients-with-multiple-connections"
-id="toc-b41f808a9-sunrpc-allow-creation-of-rpc-clients-with-multiple-connections"><span
-class="toc-section-number">2.2</span> 2/9 612b41f808a9 SUNRPC: Allow
-creation of RPC clients with multiple connections</a></li>
-<li><a
-href="#a0c257f8e0f-nfs-send-state-management-on-a-single-connection."
-id="toc-a0c257f8e0f-nfs-send-state-management-on-a-single-connection."><span
-class="toc-section-number">2.3</span> 3/9 5a0c257f8e0f NFS: send state
-management on a single connection.</a></li>
-<li><a
-href="#db56917bcb-sunrpc-enhance-rpc_clnt_show_stats-to-report-on-all-xprts."
-id="toc-db56917bcb-sunrpc-enhance-rpc_clnt_show_stats-to-report-on-all-xprts."><span
-class="toc-section-number">2.4</span> 4/9 10db56917bcb SUNRPC: enhance
-rpc_clnt_show_stats() to report on all xprts.</a></li>
-<li><a
-href="#f34b8bfae19-sunrpc-add-links-for-all-client-xprts-to-debugfs"
-id="toc-f34b8bfae19-sunrpc-add-links-for-all-client-xprts-to-debugfs"><span
-class="toc-section-number">2.5</span> 5/9 2f34b8bfae19 SUNRPC: add links
-for all client xprts to debugfs</a></li>
-<li><a
-href="#cc5cd8c68f-nfs-add-a-mount-option-to-specify-number-of-tcp-connections-to-use"
-id="toc-cc5cd8c68f-nfs-add-a-mount-option-to-specify-number-of-tcp-connections-to-use"><span
-class="toc-section-number">2.6</span> 6/9 28cc5cd8c68f NFS: Add a mount
-option to specify number of TCP connections to use</a></li>
-<li><a
-href="#d0540-nfsv4-allow-multiple-connections-to-nfsv4.x-x0-servers"
-id="toc-d0540-nfsv4-allow-multiple-connections-to-nfsv4.x-x0-servers"><span
-class="toc-section-number">2.7</span> 7/9 6619079d0540 NFSv4: Allow
-multiple connections to NFSv4.x (x&gt;0) servers</a></li>
-<li><a href="#bb71e4a5d7eb-pnfs-allow-multiple-connections-to-the-ds"
-id="toc-bb71e4a5d7eb-pnfs-allow-multiple-connections-to-the-ds"><span
-class="toc-section-number">2.8</span> 8/9 bb71e4a5d7eb pNFS: Allow
-multiple connections to the DS</a></li>
-<li><a
-href="#c326307156-nfs-allow-multiple-connections-to-a-nfsv2-or-nfsv3-server"
-id="toc-c326307156-nfs-allow-multiple-connections-to-a-nfsv2-or-nfsv3-server"><span
-class="toc-section-number">2.9</span> 9/9 53c326307156 NFS: Allow
-multiple connections to a NFSv2 or NFSv3 server</a></li>
+<li><a href="#多个网卡环境"><span class="toc-section-number">1</span> 多个网卡环境</a></li>
+<li><a href="#主线nconnect挂载选项"><span class="toc-section-number">2</span> 主线<code>nconnect</code>挂载选项</a><ul>
+<li><a href="#tagsv5.3-rc1-21f0ffaff510-sunrpc-add-basic-load-balancing-to-the-transport-switch"><span class="toc-section-number">2.1</span> 1/9 <span><code>tags/v5.3-rc1 21f0ffaff510 SUNRPC: Add basic load balancing to the transport switch</code></span></a></li>
+<li><a href="#b41f808a9-sunrpc-allow-creation-of-rpc-clients-with-multiple-connections"><span class="toc-section-number">2.2</span> 2/9 612b41f808a9 SUNRPC: Allow creation of RPC clients with multiple connections</a></li>
+<li><a href="#a0c257f8e0f-nfs-send-state-management-on-a-single-connection."><span class="toc-section-number">2.3</span> 3/9 5a0c257f8e0f NFS: send state management on a single connection.</a></li>
+<li><a href="#db56917bcb-sunrpc-enhance-rpc_clnt_show_stats-to-report-on-all-xprts."><span class="toc-section-number">2.4</span> 4/9 10db56917bcb SUNRPC: enhance rpc_clnt_show_stats() to report on all xprts.</a></li>
+<li><a href="#f34b8bfae19-sunrpc-add-links-for-all-client-xprts-to-debugfs"><span class="toc-section-number">2.5</span> 5/9 2f34b8bfae19 SUNRPC: add links for all client xprts to debugfs</a></li>
+<li><a href="#cc5cd8c68f-nfs-add-a-mount-option-to-specify-number-of-tcp-connections-to-use"><span class="toc-section-number">2.6</span> 6/9 28cc5cd8c68f NFS: Add a mount option to specify number of TCP connections to use</a></li>
+<li><a href="#d0540-nfsv4-allow-multiple-connections-to-nfsv4.x-x0-servers"><span class="toc-section-number">2.7</span> 7/9 6619079d0540 NFSv4: Allow multiple connections to NFSv4.x (x&gt;0) servers</a></li>
+<li><a href="#bb71e4a5d7eb-pnfs-allow-multiple-connections-to-the-ds"><span class="toc-section-number">2.8</span> 8/9 bb71e4a5d7eb pNFS: Allow multiple connections to the DS</a></li>
+<li><a href="#c326307156-nfs-allow-multiple-connections-to-a-nfsv2-or-nfsv3-server"><span class="toc-section-number">2.9</span> 9/9 53c326307156 NFS: Allow multiple connections to a NFSv2 or NFSv3 server</a></li>
 </ul></li>
-<li><a href="#主线max_connect挂载选项"
-id="toc-主线max_connect挂载选项"><span
-class="toc-section-number">3</span>
-主线<code>max_connect</code>挂载选项</a>
-<ul>
-<li><a href="#代码流程" id="toc-代码流程"><span
-class="toc-section-number">3.1</span> 代码流程</a></li>
+<li><a href="#主线max_connect挂载选项"><span class="toc-section-number">3</span> 主线<code>max_connect</code>挂载选项</a><ul>
+<li><a href="#代码流程"><span class="toc-section-number">3.1</span> 代码流程</a></li>
 </ul></li>
 </ul>
 </nav>
-<p><a
-href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
-<p><a
-href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
-<p>分析了<a
-href="https://chenxiaosong.com/course/nfs/openeuler-enfs.html">openeuler的nfs+</a>并帮助华为修复了几个问题后，
-对内核社区主线代码的多路径特性感兴趣了，准备整理一篇文章，顺便看看能不能在sunrpc模块发点补丁，
-用<code>git log --oneline --date=short --format="%an &lt;%ae&gt; %cd %h %s" net/sunrpc/</code>命令查看发现不友好的Trond
-Myklebust不是主要贡献者。</p>
-<h1 data-number="1" id="多个网卡环境"><span
-class="header-section-number">1</span> 多个网卡环境</h1>
-<p>请查看<a
-href="https://chenxiaosong.com/course/kernel/environment.html#qemu-multi-nic">《内核开发环境》</a></p>
-<h1 data-number="2" id="主线nconnect挂载选项"><span
-class="header-section-number">2</span>
-主线<code>nconnect</code>挂载选项</h1>
-<p><a
-href="https://patchwork.kernel.org/project/linux-nfs/cover/155917564898.3988.6096672032831115016.stgit@noble.brown/">Multiple
-network connections for a single NFS mount.</a></p>
+<p><a href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
+<p><a href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<p>分析了<a href="https://chenxiaosong.com/course/nfs/openeuler-enfs.html">openeuler的nfs+</a>并帮助华为修复了几个问题后， 对内核社区主线代码的多路径特性感兴趣了，准备整理一篇文章，顺便看看能不能在sunrpc模块发点补丁， 用<code>git log --oneline --date=short --format="%an &lt;%ae&gt; %cd %h %s" net/sunrpc/</code>命令查看发现不友好的Trond Myklebust不是主要贡献者。</p>
+<h1 id="多个网卡环境"><span class="header-section-number">1</span> 多个网卡环境</h1>
+<p>请查看<a href="https://chenxiaosong.com/course/kernel/environment.html#qemu-multi-nic">《内核开发环境》</a></p>
+<h1 id="主线nconnect挂载选项"><span class="header-section-number">2</span> 主线<code>nconnect</code>挂载选项</h1>
+<p><a href="https://patchwork.kernel.org/project/linux-nfs/cover/155917564898.3988.6096672032831115016.stgit@noble.brown/">Multiple network connections for a single NFS mount.</a></p>
 <p>cover-letter翻译:</p>
 <pre><code>这组补丁基于 git://git.linux-nfs.org/projects/trondmy/nfs-2.6.git 中的 multipath_tcp 分支。
 
@@ -221,52 +144,21 @@ Trond 树中的负载均衡代码存在一个 bug。在 xprt 附加到客户端�
 欢迎任何评论。我很希望看到这项工作，或类似的功能能够被合并。
 
 谢谢， NeilBrown</code></pre>
-<h2 data-number="2.1"
-id="tagsv5.3-rc1-21f0ffaff510-sunrpc-add-basic-load-balancing-to-the-transport-switch"><span
-class="header-section-number">2.1</span> 1/9 <a
-href="https://patchwork.kernel.org/project/linux-nfs/patch/155917688854.3988.7703839883828652258.stgit@noble.brown/"><code>tags/v5.3-rc1 21f0ffaff510 SUNRPC: Add basic load balancing to the transport switch</code></a></h2>
+<h2 id="tagsv5.3-rc1-21f0ffaff510-sunrpc-add-basic-load-balancing-to-the-transport-switch"><span class="header-section-number">2.1</span> 1/9 <a href="https://patchwork.kernel.org/project/linux-nfs/patch/155917688854.3988.7703839883828652258.stgit@noble.brown/"><code>tags/v5.3-rc1 21f0ffaff510 SUNRPC: Add basic load balancing to the transport switch</code></a></h2>
 <pre><code>SUNRPC: 为传输切换添加基础负载均衡
 
 目前，仅计算队列长度。这比计算队列中字节数的方式不够精确，但实现起来更容易。</code></pre>
-<h2 data-number="2.2"
-id="b41f808a9-sunrpc-allow-creation-of-rpc-clients-with-multiple-connections"><span
-class="header-section-number">2.2</span> 2/9 612b41f808a9 SUNRPC: Allow
-creation of RPC clients with multiple connections</h2>
-<h2 data-number="2.3"
-id="a0c257f8e0f-nfs-send-state-management-on-a-single-connection."><span
-class="header-section-number">2.3</span> 3/9 5a0c257f8e0f NFS: send
-state management on a single connection.</h2>
-<h2 data-number="2.4"
-id="db56917bcb-sunrpc-enhance-rpc_clnt_show_stats-to-report-on-all-xprts."><span
-class="header-section-number">2.4</span> 4/9 10db56917bcb SUNRPC:
-enhance rpc_clnt_show_stats() to report on all xprts.</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/self/mountstats <span class="kw">|</span> <span class="fu">less</span></span></code></pre></div>
-<h2 data-number="2.5"
-id="f34b8bfae19-sunrpc-add-links-for-all-client-xprts-to-debugfs"><span
-class="header-section-number">2.5</span> 5/9 2f34b8bfae19 SUNRPC: add
-links for all client xprts to debugfs</h2>
-<h2 data-number="2.6"
-id="cc5cd8c68f-nfs-add-a-mount-option-to-specify-number-of-tcp-connections-to-use"><span
-class="header-section-number">2.6</span> 6/9 28cc5cd8c68f NFS: Add a
-mount option to specify number of TCP connections to use</h2>
-<h2 data-number="2.7"
-id="d0540-nfsv4-allow-multiple-connections-to-nfsv4.x-x0-servers"><span
-class="header-section-number">2.7</span> 7/9 6619079d0540 NFSv4: Allow
-multiple connections to NFSv4.x (x&gt;0) servers</h2>
-<h2 data-number="2.8"
-id="bb71e4a5d7eb-pnfs-allow-multiple-connections-to-the-ds"><span
-class="header-section-number">2.8</span> 8/9 bb71e4a5d7eb pNFS: Allow
-multiple connections to the DS</h2>
-<h2 data-number="2.9"
-id="c326307156-nfs-allow-multiple-connections-to-a-nfsv2-or-nfsv3-server"><span
-class="header-section-number">2.9</span> 9/9 53c326307156 NFS: Allow
-multiple connections to a NFSv2 or NFSv3 server</h2>
-<h1 data-number="3" id="主线max_connect挂载选项"><span
-class="header-section-number">3</span>
-主线<code>max_connect</code>挂载选项</h1>
-<p><a
-href="https://patchwork.kernel.org/project/linux-nfs/cover/20210827183719.41057-1-olga.kornievskaia@gmail.com/">do
-not collapse trunkable transports</a></p>
+<h2 id="b41f808a9-sunrpc-allow-creation-of-rpc-clients-with-multiple-connections"><span class="header-section-number">2.2</span> 2/9 612b41f808a9 SUNRPC: Allow creation of RPC clients with multiple connections</h2>
+<h2 id="a0c257f8e0f-nfs-send-state-management-on-a-single-connection."><span class="header-section-number">2.3</span> 3/9 5a0c257f8e0f NFS: send state management on a single connection.</h2>
+<h2 id="db56917bcb-sunrpc-enhance-rpc_clnt_show_stats-to-report-on-all-xprts."><span class="header-section-number">2.4</span> 4/9 10db56917bcb SUNRPC: enhance rpc_clnt_show_stats() to report on all xprts.</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">cat</span> /proc/self/mountstats <span class="kw">|</span> <span class="fu">less</span></a></code></pre></div>
+<h2 id="f34b8bfae19-sunrpc-add-links-for-all-client-xprts-to-debugfs"><span class="header-section-number">2.5</span> 5/9 2f34b8bfae19 SUNRPC: add links for all client xprts to debugfs</h2>
+<h2 id="cc5cd8c68f-nfs-add-a-mount-option-to-specify-number-of-tcp-connections-to-use"><span class="header-section-number">2.6</span> 6/9 28cc5cd8c68f NFS: Add a mount option to specify number of TCP connections to use</h2>
+<h2 id="d0540-nfsv4-allow-multiple-connections-to-nfsv4.x-x0-servers"><span class="header-section-number">2.7</span> 7/9 6619079d0540 NFSv4: Allow multiple connections to NFSv4.x (x&gt;0) servers</h2>
+<h2 id="bb71e4a5d7eb-pnfs-allow-multiple-connections-to-the-ds"><span class="header-section-number">2.8</span> 8/9 bb71e4a5d7eb pNFS: Allow multiple connections to the DS</h2>
+<h2 id="c326307156-nfs-allow-multiple-connections-to-a-nfsv2-or-nfsv3-server"><span class="header-section-number">2.9</span> 9/9 53c326307156 NFS: Allow multiple connections to a NFSv2 or NFSv3 server</h2>
+<h1 id="主线max_connect挂载选项"><span class="header-section-number">3</span> 主线<code>max_connect</code>挂载选项</h1>
+<p><a href="https://patchwork.kernel.org/project/linux-nfs/cover/20210827183719.41057-1-olga.kornievskaia@gmail.com/">do not collapse trunkable transports</a></p>
 <p>cover-letter翻译:</p>
 <pre><code>这组补丁系列尝试允许对同一服务器（即支持 NFSv4.1+ 会话可拆分的服务器）但不同网络地址的新挂载使用与这些挂载关联的连接，同时仍然使用相同的客户端结构。
 
@@ -275,51 +167,46 @@ not collapse trunkable transports</a></p>
 v5：修复编译警告
 
 v4： 未对 5 个补丁做任何更改。 删除了补丁 6。 新增了手册页补丁。</code></pre>
-<p>1/5 tags/v5.15-rc1 3a3f976639f2 SUNRPC keep track of number of
-transports to unique addresses</p>
-<p>2/5 df205d0a8ea1 SUNRPC add xps_nunique_destaddr_xprts to
-xprt_switch_info in sysfs</p>
+<p>1/5 tags/v5.15-rc1 3a3f976639f2 SUNRPC keep track of number of transports to unique addresses</p>
+<p>2/5 df205d0a8ea1 SUNRPC add xps_nunique_destaddr_xprts to xprt_switch_info in sysfs</p>
 <p>3/5 7e134205f629 NFSv4 introduce max_connect mount options</p>
-<p>4/5 dc48e0abee24 SUNRPC enforce creation of no more than max_connect
-xprts</p>
-<p>5/5 2a7a451a9084 NFSv4.1 add network transport when session trunking
-is detected</p>
-<h2 data-number="3.1" id="代码流程"><span
-class="header-section-number">3.1</span> 代码流程</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=4.1,nconnect=4,max_connect=4 192.168.122.76:s_test /mnt</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> nfs <span class="at">-o</span> vers=4.1,nconnect=4,max_connect=4 localhost:s_test /mnt2</span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mount</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  do_mount</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    path_mount</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      do_new_mount</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        parse_monolithic_mount_data</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>          nfs_fs_context_parse_monolithic</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            nfs23_parse_monolithic</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>              generic_parse_monolithic</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                vfs_parse_fs_string</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                  vfs_parse_fs_param</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                    nfs_fs_context_parse_param</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                      ctx<span class="op">-&gt;</span>nfs_server<span class="op">.</span>nconnect <span class="op">=</span> result<span class="op">.</span>uint_32</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>                      ctx<span class="op">-&gt;</span>nfs_server<span class="op">.</span>max_connect <span class="op">=</span> result<span class="op">.</span>uint_32</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        vfs_get_tree</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>          nfs_get_tree</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>            nfs4_try_get_tree</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>              nfs4_create_server</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>                nfs4_init_server</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>                  nfs4_set_client</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>                    nfs_get_client</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>                      nfs4_alloc_client</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>                        nfs_alloc_client</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>                          clp<span class="op">-&gt;</span>cl_nconnect <span class="op">=</span> cl_init<span class="op">-&gt;</span>nconnect</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>                          clp<span class="op">-&gt;</span>cl_max_connect <span class="co">// at least 1</span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>                        nfs_create_rpc_client</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>                          <span class="op">.</span>nconnect <span class="op">=</span> clp<span class="op">-&gt;</span>cl_nconnect</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>                          rpc_create</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>                            rpc_clnt_add_xprt <span class="co">// for(i = 0; i &lt; args-&gt;nconnect - 1; i++)</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>                          clnt<span class="op">-&gt;</span>cl_max_connect <span class="op">=</span> clp<span class="op">-&gt;</span>cl_max_connect</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>                      nfs4_init_client</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>                        nfs4_add_trunk <span class="co">// 挂载两个不同ip时</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>                          rpc_clnt_add_xprt</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>                            rpc_clnt_test_and_add_xprt</span></code></pre></div>
+<p>4/5 dc48e0abee24 SUNRPC enforce creation of no more than max_connect xprts</p>
+<p>5/5 2a7a451a9084 NFSv4.1 add network transport when session trunking is detected</p>
+<h2 id="代码流程"><span class="header-section-number">3.1</span> 代码流程</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">mount</span> -t nfs -o vers=4.1,nconnect=4,max_connect=4 192.168.122.76:s_test /mnt</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="fu">mount</span> -t nfs -o vers=4.1,nconnect=4,max_connect=4 localhost:s_test /mnt2</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb6-1" title="1">mount</a>
+<a class="sourceLine" id="cb6-2" title="2">  do_mount</a>
+<a class="sourceLine" id="cb6-3" title="3">    path_mount</a>
+<a class="sourceLine" id="cb6-4" title="4">      do_new_mount</a>
+<a class="sourceLine" id="cb6-5" title="5">        parse_monolithic_mount_data</a>
+<a class="sourceLine" id="cb6-6" title="6">          nfs_fs_context_parse_monolithic</a>
+<a class="sourceLine" id="cb6-7" title="7">            nfs<span class="dv">23</span><span class="er">_parse_monolithic</span></a>
+<a class="sourceLine" id="cb6-8" title="8">              generic_parse_monolithic</a>
+<a class="sourceLine" id="cb6-9" title="9">                vfs_parse_fs_string</a>
+<a class="sourceLine" id="cb6-10" title="10">                  vfs_parse_fs_param</a>
+<a class="sourceLine" id="cb6-11" title="11">                    nfs_fs_context_parse_param</a>
+<a class="sourceLine" id="cb6-12" title="12">                      ctx-&gt;nfs_server.nconnect = result.uint_<span class="dv">32</span></a>
+<a class="sourceLine" id="cb6-13" title="13">                      ctx-&gt;nfs_server.max_connect = result.uint_<span class="dv">32</span></a>
+<a class="sourceLine" id="cb6-14" title="14">        vfs_get_tree</a>
+<a class="sourceLine" id="cb6-15" title="15">          nfs_get_tree</a>
+<a class="sourceLine" id="cb6-16" title="16">            nfs<span class="dv">4</span><span class="er">_try_get_tree</span></a>
+<a class="sourceLine" id="cb6-17" title="17">              nfs<span class="dv">4</span><span class="er">_create_server</span></a>
+<a class="sourceLine" id="cb6-18" title="18">                nfs<span class="dv">4</span><span class="er">_init_server</span></a>
+<a class="sourceLine" id="cb6-19" title="19">                  nfs<span class="dv">4</span><span class="er">_set_client</span></a>
+<a class="sourceLine" id="cb6-20" title="20">                    nfs_get_client</a>
+<a class="sourceLine" id="cb6-21" title="21">                      nfs<span class="dv">4</span><span class="er">_alloc_client</span></a>
+<a class="sourceLine" id="cb6-22" title="22">                        nfs_alloc_client</a>
+<a class="sourceLine" id="cb6-23" title="23">                          clp-&gt;cl_nconnect = cl_init-&gt;nconnect</a>
+<a class="sourceLine" id="cb6-24" title="24">                          clp-&gt;cl_max_connect <span class="co">// at least 1</span></a>
+<a class="sourceLine" id="cb6-25" title="25">                        nfs_create_rpc_client</a>
+<a class="sourceLine" id="cb6-26" title="26">                          .nconnect = clp-&gt;cl_nconnect</a>
+<a class="sourceLine" id="cb6-27" title="27">                          rpc_create</a>
+<a class="sourceLine" id="cb6-28" title="28">                            rpc_clnt_add_xprt <span class="co">// for(i = 0; i &lt; args-&gt;nconnect - 1; i++)</span></a>
+<a class="sourceLine" id="cb6-29" title="29">                          clnt-&gt;cl_max_connect = clp-&gt;cl_max_connect</a>
+<a class="sourceLine" id="cb6-30" title="30">                      nfs<span class="dv">4</span><span class="er">_init_client</span></a>
+<a class="sourceLine" id="cb6-31" title="31">                        nfs4_add_trunk <span class="co">// 挂载两个不同ip时</span></a>
+<a class="sourceLine" id="cb6-32" title="32">                          rpc_clnt_add_xprt</a>
+<a class="sourceLine" id="cb6-33" title="33">                            rpc_clnt_test_and_add_xprt</a></code></pre></div>
 </body>
 </html>

@@ -5,22 +5,11 @@
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>SMB patches contributed by ChenXiaoSong</title>
-  <style>
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
 </head>
@@ -28,672 +17,279 @@
 <header id="title-block-header">
 <ul>
 <li>Author: 陈孝松 (ChenXiaoSong)</li>
-<li><a href="https://chenxiaosong.com/">Chinese Homepage:
-chenxiaosong.com</a></li>
-<li><a href="https://chenxiaosong.com/en/">English Homepage:
-chenxiaosong.com/en</a></li>
-<li><a href="https://chenxiaosong.com/en/smb-contribution.html">SMB
-Contributions</a></li>
-<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com"
-class="email">chenxiaosong@chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/">Chinese Homepage: chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en/">English Homepage: chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/en/smb-contribution.html">SMB Contributions</a></li>
+<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com" class="email">chenxiaosong@chenxiaosong.com</a></li>
 </ul>
 <h1 class="title">SMB patches contributed by ChenXiaoSong</h1>
 </header>
-<nav id="TOC" role="doc-toc">
+<nav id="TOC">
 <ul>
-<li><a href="#section" id="toc-section"><span
-class="toc-section-number">1</span> 2026</a></li>
-<li><a href="#section-1" id="toc-section-1"><span
-class="toc-section-number">2</span> 2025</a></li>
-<li><a href="#section-2" id="toc-section-2"><span
-class="toc-section-number">3</span> 2024</a></li>
-<li><a href="#section-3" id="toc-section-3"><span
-class="toc-section-number">4</span> 2023</a></li>
-<li><a href="#section-4" id="toc-section-4"><span
-class="toc-section-number">5</span> 2022</a></li>
+<li><a href="#section"><span class="toc-section-number">1</span> 2026</a></li>
+<li><a href="#section-1"><span class="toc-section-number">2</span> 2025</a></li>
+<li><a href="#section-2"><span class="toc-section-number">3</span> 2024</a></li>
+<li><a href="#section-3"><span class="toc-section-number">4</span> 2023</a></li>
+<li><a href="#section-4"><span class="toc-section-number">5</span> 2022</a></li>
 </ul>
 </nav>
 <p>It is really enjoyable and exciting to contribute to SMB.</p>
-<p><a href="https://lore.kernel.org/linux-cifs/?q=chenxiaosong">Click
-here to see my emails on the SMB mailing list</a>.</p>
-<p><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/?qt=grep&amp;q=chenxiaosong">Click
-here to see my upstream Linux kernel commit history on kernel.org</a>
-（The page may take a moment to load, you can directly check the patch
-links listed below）</p>
-<p><a
-href="https://chenxiaosong.com/course/kernel/contribution.html">Click
-here to see my other kernel module patches</a>.</p>
-<h1 data-number="1" id="section"><span
-class="header-section-number">1</span> 2026</h1>
+<p><a href="https://lore.kernel.org/linux-cifs/?q=chenxiaosong">Click here to see my emails on the SMB mailing list</a>.</p>
+<p><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/?qt=grep&amp;q=chenxiaosong">Click here to see my upstream Linux kernel commit history on kernel.org</a> （The page may take a moment to load, you can directly check the patch links listed below）</p>
+<p><a href="https://chenxiaosong.com/course/kernel/contribution.html">Click here to see my other kernel module patches</a>.</p>
+<h1 id="section"><span class="header-section-number">1</span> 2026</h1>
 <ul>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20260107043109.1456095-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-cifs-utils v3 0/1] smbinfo: add notify subcommand</a></p></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20251219041552.317198-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-cifs-utils] cifs.upcall: fix calloc() argument order in
-main()</a></p></li>
-<li><p>Review: <a
-href="https://lore.kernel.org/linux-cifs/shU8wpo2oNyUu4RkVuN0VHmIES1SzKRN9in6AJDn4EKDDGwMkzl2ShJ8i-4AfFOSKDDnEhxZVGH_w8y9JxO683d_QQzMJOig7eOb0AmaFBs=@denisons.org/">Decimated
-subseconds in smbinfo filebasicinfo timestamp output</a></p></li>
-<li><p>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=34420cb92dbb">34420cb92dbb
-smb/client: ensure smb2_mapping_table rebuild on cmd changes</a>
-(Author: Huiwen He <a href="mailto:hehuiwen@kylinos.cn"
-class="email">hehuiwen@kylinos.cn</a>)</p></li>
-<li><p>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=309b44ed6844">309b44ed6844
-ksmbd: fix memory leaks and NULL deref in smb2_lock()</a> (Author:
-Werner Kasselman <a href="mailto:werner@verivus.com"
-class="email">werner@verivus.com</a>)</p>
+<li><a href="https://lore.kernel.org/linux-cifs/20260107043109.1456095-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH cifs-utils v3 0/1] smbinfo: add notify subcommand</a></li>
+<li><a href="https://lore.kernel.org/linux-cifs/20251219041552.317198-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH cifs-utils] cifs.upcall: fix calloc() argument order in main()</a></li>
+<li><p>Review: <a href="https://lore.kernel.org/linux-cifs/shU8wpo2oNyUu4RkVuN0VHmIES1SzKRN9in6AJDn4EKDDGwMkzl2ShJ8i-4AfFOSKDDnEhxZVGH_w8y9JxO683d_QQzMJOig7eOb0AmaFBs=@denisons.org/">[PATCH cifs-utils] Decimated subseconds in smbinfo filebasicinfo timestamp output</a></p></li>
+<li><p>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=235e32320a47">235e32320a47 ksmbd: fix use-after-free in __ksmbd_close_fd() via durable scavenger</a></p></li>
+<li><a href="https://lore.kernel.org/linux-cifs/20260303151317.136332-1-zhang.guodong@linux.dev/">[PATCH v5 0/7] smb: fix some bugs, move duplicate definitions into common header file, part 2</a>
 <ul>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/308acd9f-58d9-4519-aaa6-be96f140177d@chenxiaosong.com/">Re:
-[PATCH] ksmbd: fix memory leaks and NULL deref in smb2_lock()</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/9192ff4b-770a-411b-af5d-ab06d20248f8@chenxiaosong.com/">Re:
-[PATCH] ksmbd: fix memory leaks and NULL deref in smb2_lock()</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/02e11b2c-a472-46ac-95a4-ffe7013c3133@chenxiaosong.com/">Re:
-[PATCH v2] ksmbd: fix memory leaks and NULL deref in
-smb2_lock()</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=95e1d378ce30">95e1d378ce30 smb: move filesystem_vol_info into common/fscc.h</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=31884d4bc981">31884d4bc981 smb: move file_basic_info into common/fscc.h</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a5e581093b1d">a5e581093b1d smb: move some definitions from common/smb2pdu.h into common/fscc.h</a></li>
 </ul></li>
-<li><p>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=48623ec358c1">48623ec358c1
-ksmbd: fix use-after-free and NULL deref in smb_grant_oplock()</a>
-(Author: Werner Kasselman <a href="mailto:werner@verivus.com"
-class="email">werner@verivus.com</a>)</p>
+<li><p>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=bc1a64d23641">bc1a64d23641 smb: client: add missing MODULE_DESCRIPTION() to smb1maperror_test</a></p></li>
+<li><p>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=59ea368431dd">59ea368431dd smb/client: move smb2maperror declarations to smb2proto.h</a></p></li>
+<li><a href="https://lore.kernel.org/linux-cifs/20260402141839.461257-1-huiwen.he@linux.dev/">[PATCH v3 00/13] smb: improve search speed of SMB1 maperror</a>
 <ul>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/6b98c261-b17b-45a8-ab09-efdb0d658f4e@chenxiaosong.com/">Re:
-[PATCH] ksmbd: fix use-after-free and NULL deref in
-smb_grant_oplock()</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/1e0882ea-4e59-4b70-b1ae-90fde86c252b@chenxiaosong.com/">Re:
-[PATCH] ksmbd: fix use-after-free and NULL deref in
-smb_grant_oplock()</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/435dda9f-93f5-41db-9d21-70371d31857b@chenxiaosong.com/">Re:
-[PATCH v3] ksmbd: fix use-after-free and NULL deref in
-smb_grant_oplock()</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/7ecf9af4-096a-45f5-9d00-fc7ae750e7db@chenxiaosong.com/">Re:
-[PATCH] ksmbd: fix use-after-free and NULL deref in
-smb_grant_oplock()</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=85274a3bd40f">85274a3bd40f smb/client: introduce KUnit tests to check DOS/SRV err mapping search</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8c028dd086ad">8c028dd086ad smb/client: check if SMB1 DOS/SRV error mapping arrays are sorted</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=95e6b7340957">95e6b7340957 smb/client: use binary search for SMB1 DOS/SRV error mapping</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=58ac796bb3c0">58ac796bb3c0 smb/client: autogenerate SMB1 DOS/SRV to POSIX error mapping</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cd4e653a2f75">cd4e653a2f75 smb/client: annotate smberr.h with POSIX error codes</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=669c3eedaefa">669c3eedaefa smb/client: move ERRnetlogonNotStarted to DOS error class</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e3ac6352a84d">e3ac6352a84d smb/client: introduce KUnit test to check ntstatus_to_dos_map search</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=010ad1e895db">010ad1e895db smb/client: check if ntstatus_to_dos_map is sorted</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3c6c23ed9424">3c6c23ed9424 smb/client: use binary search for NT status to DOS mapping</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=772d5920c3d4">772d5920c3d4 smb/client: refactor ntstatus_to_dos() to return mapping entry</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c825f6b7432a">c825f6b7432a smb/client: replace nt_errs with ntstatus_to_dos_map</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=415c5b8c9a41">415c5b8c9a41 smb/client: autogenerate SMB1 NT status to DOS error mapping</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=378f75b7d6ea">378f75b7d6ea smb/client: annotate nterr.h with DOS error codes</a></li>
 </ul></li>
-<li><p>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=40e75e42f49c">40e75e42f49c
-smb: client: fix open handle lookup in cifs_open()</a> (Author: Paulo
-Alcantara <a href="mailto:pc@manguebit.org"
-class="email">pc@manguebit.org</a>)</p></li>
-<li><p>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=88d37abb366b">88d37abb366b
-smb/client: only export symbol for ‘smb2maperror-test’ module</a>
-(Author: Ye Bin <a href="mailto:yebin10@huawei.com"
-class="email">yebin10@huawei.com</a>)</p></li>
-<li><p>Review: <a
-href="https://lore.kernel.org/linux-cifs/e2763a4a-48ad-4fb5-8f40-4b78882fbc0e@chenxiaosong.com/">Re:
-[PATCH v4 5/5] smb: introduce struct file_posix_info</a></p></li>
-<li><p>Review: <a
-href="https://lore.kernel.org/linux-cifs/634dbb0b-9a5d-4f3d-ab5f-f4dc75e3527e@chenxiaosong.com/">Re:
-[PATCH v4 5/5] smb: introduce struct file_posix_info</a></p></li>
-<li><p>Review: <a
-href="https://lore.kernel.org/linux-cifs/87181afa-553a-475c-8f08-3c292ba30ffb@chenxiaosong.com/">Re:
-[PATCH v4 5/5] smb: introduce struct file_posix_info</a></p></li>
-<li><p>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c15e7c62feb3">c15e7c62feb3
-smb/server: Fix another refcount leak in smb2_open()</a> (Author:
-Guenter Roeck <a href="mailto:linux@roeck-us.net"
-class="email">linux@roeck-us.net</a>)</p>
+<li><p>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=53cf44fa7271">53cf44fa7271 smb/client: avoid null-ptr-deref when tests fail in test_cmp_map()</a></p></li>
+<li><p>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=34420cb92dbb">34420cb92dbb smb/client: ensure smb2_mapping_table rebuild on cmd changes</a> (Author: Huiwen He <a href="mailto:hehuiwen@kylinos.cn" class="email">hehuiwen@kylinos.cn</a>)</p></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=309b44ed6844">309b44ed6844 ksmbd: fix memory leaks and NULL deref in smb2_lock()</a> (Author: Werner Kasselman <a href="mailto:werner@verivus.com" class="email">werner@verivus.com</a>)
 <ul>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/32c1704c-7c9e-4dbe-b852-0fff0124ddc4@chenxiaosong.com/">Re:
-[PATCH] smb/server: Fix another refcount leak in smb2_open()</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/739c9e8d-238a-4f2d-938c-ed0ab9706098@chenxiaosong.com/">Re:
-[PATCH v2 1/1] smb/server: fix refcount leak in smb2_open()</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/90fdfba1-e0be-4656-87fc-1921d233da37@chenxiaosong.com/">Re:
-[PATCH v2 1/1] smb/server: fix refcount leak in smb2_open()</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/308acd9f-58d9-4519-aaa6-be96f140177d@chenxiaosong.com/">Re: [PATCH] ksmbd: fix memory leaks and NULL deref in smb2_lock()</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/9192ff4b-770a-411b-af5d-ab06d20248f8@chenxiaosong.com/">Re: [PATCH] ksmbd: fix memory leaks and NULL deref in smb2_lock()</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/02e11b2c-a472-46ac-95a4-ffe7013c3133@chenxiaosong.com/">Re: [PATCH v2] ksmbd: fix memory leaks and NULL deref in smb2_lock()</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20260303151317.136332-1-zhang.guodong@linux.dev/">[PATCH
-v5 0/7] smb: fix some bugs, move duplicate definitions into common
-header file, part 2</a> (Author: ZhangGuoDong <a
-href="mailto:zhangguodong@kylinos.cn"
-class="email">zhangguodong@kylinos.cn</a>)</p>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=48623ec358c1">48623ec358c1 ksmbd: fix use-after-free and NULL deref in smb_grant_oplock()</a> (Author: Werner Kasselman <a href="mailto:werner@verivus.com" class="email">werner@verivus.com</a>)
 <ul>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8098179dc981">8098179dc981
-smb/client: remove unused SMB311_posix_query_info()</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9621b996e4db">9621b996e4db
-smb/client: fix buffer size for smb311_posix_qinfo in
-SMB311_posix_query_info()</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=12c43a062acb">12c43a062acb
-smb/client: fix buffer size for smb311_posix_qinfo in
-smb2_compound_op()</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6f0402539b7d">6f0402539b7d
-smb: update some doc references</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/6b98c261-b17b-45a8-ab09-efdb0d658f4e@chenxiaosong.com/">Re: [PATCH] ksmbd: fix use-after-free and NULL deref in smb_grant_oplock()</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/1e0882ea-4e59-4b70-b1ae-90fde86c252b@chenxiaosong.com/">Re: [PATCH] ksmbd: fix use-after-free and NULL deref in smb_grant_oplock()</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/435dda9f-93f5-41db-9d21-70371d31857b@chenxiaosong.com/">Re: [PATCH v3] ksmbd: fix use-after-free and NULL deref in smb_grant_oplock()</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/7ecf9af4-096a-45f5-9d00-fc7ae750e7db@chenxiaosong.com/">Re: [PATCH] ksmbd: fix use-after-free and NULL deref in smb_grant_oplock()</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20260221080712.491144-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH]
-smb/client: make SMB2 maperror KUnit tests a separate module</a></p>
+<li><p>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=40e75e42f49c">40e75e42f49c smb: client: fix open handle lookup in cifs_open()</a> (Author: Paulo Alcantara <a href="mailto:pc@manguebit.org" class="email">pc@manguebit.org</a>)</p></li>
+<li><p>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=88d37abb366b">88d37abb366b smb/client: only export symbol for ‘smb2maperror-test’ module</a> (Author: Ye Bin <a href="mailto:yebin10@huawei.com" class="email">yebin10@huawei.com</a>)</p></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/e2763a4a-48ad-4fb5-8f40-4b78882fbc0e@chenxiaosong.com/">Re: [PATCH v4 5/5] smb: introduce struct file_posix_info</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/634dbb0b-9a5d-4f3d-ab5f-f4dc75e3527e@chenxiaosong.com/">Re: [PATCH v4 5/5] smb: introduce struct file_posix_info</a></li>
+<li><p>Review: <a href="https://lore.kernel.org/linux-cifs/87181afa-553a-475c-8f08-3c292ba30ffb@chenxiaosong.com/">Re: [PATCH v4 5/5] smb: introduce struct file_posix_info</a></p></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c15e7c62feb3">c15e7c62feb3 smb/server: Fix another refcount leak in smb2_open()</a> (Author: Guenter Roeck <a href="mailto:linux@roeck-us.net" class="email">linux@roeck-us.net</a>)
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7d0bf050a587">7d0bf050a587
-smb/client: make SMB2 maperror KUnit tests a separate module</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/32c1704c-7c9e-4dbe-b852-0fff0124ddc4@chenxiaosong.com/">Re: [PATCH] smb/server: Fix another refcount leak in smb2_open()</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/739c9e8d-238a-4f2d-938c-ed0ab9706098@chenxiaosong.com/">Re: [PATCH v2 1/1] smb/server: fix refcount leak in smb2_open()</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/90fdfba1-e0be-4656-87fc-1921d233da37@chenxiaosong.com/">Re: [PATCH v2 1/1] smb/server: fix refcount leak in smb2_open()</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20260122052402.2209206-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-0/7] smb/client: update SMB1 maperror, part 2</a></p>
+<li><a href="https://lore.kernel.org/linux-cifs/20260303151317.136332-1-zhang.guodong@linux.dev/">[PATCH v5 0/7] smb: fix some bugs, move duplicate definitions into common header file, part 2</a> (Author: ZhangGuoDong <a href="mailto:zhangguodong@kylinos.cn" class="email">zhangguodong@kylinos.cn</a>)
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3774289f525c">3774289f525c
-smb/client: move NT_STATUS_MORE_ENTRIES</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=617a5d2473dc">617a5d2473dc
-smb/client: rename to NT_ERROR_INVALID_DATATYPE</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fa34d0a57033">fa34d0a57033
-smb/client: rename to NT_STATUS_SOME_NOT_MAPPED</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4da735c48a27">4da735c48a27
-smb/client: map NT_STATUS_PRIVILEGE_NOT_HELD</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3e5f08342860">3e5f08342860
-smb/client: map NT_STATUS_MORE_PROCESSING_REQUIRED</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e4424687fc6d">e4424687fc6d
-smb/client: map NT_STATUS_BUFFER_OVERFLOW</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ba39063ca3ee">ba39063ca3ee
-smb/client: map NT_STATUS_NOTIFY_ENUM_DIR</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8098179dc981">8098179dc981 smb/client: remove unused SMB311_posix_query_info()</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9621b996e4db">9621b996e4db smb/client: fix buffer size for smb311_posix_qinfo in SMB311_posix_query_info()</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=12c43a062acb">12c43a062acb smb/client: fix buffer size for smb311_posix_qinfo in smb2_compound_op()</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6f0402539b7d">6f0402539b7d smb: update some doc references</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20260121114912.2138032-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-00/17] smb/client: update SMB1 maperror</a> (Author: Huiwen He <a
-href="mailto:hehuiwen@kylinos.cn"
-class="email">hehuiwen@kylinos.cn</a>)</p>
+<li><a href="https://lore.kernel.org/linux-cifs/20260221080712.491144-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH] smb/client: make SMB2 maperror KUnit tests a separate module</a>
 <ul>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fbcdc61e7846">fbcdc61e7846
-smb/client: remove useless comment in mapping_table_ERRSRV</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=be9fc9033a0a">be9fc9033a0a
-smb/client: remove some literal NT error codes from
-ntstatus_to_dos_map</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=199e7a1a2ed9">199e7a1a2ed9
-smb/client: add NT_STATUS_VOLUME_NOT_UPGRADED</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0bf7e53fec61">0bf7e53fec61
-smb/client: add NT_STATUS_NO_USER_KEYS</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ded739a08228">ded739a08228
-smb/client: add NT_STATUS_WRONG_EFS</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3988b5675296">3988b5675296
-smb/client: add NT_STATUS_NO_EFS</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2ef4f6b46f3c">2ef4f6b46f3c
-smb/client: add NT_STATUS_NO_RECOVERY_POLICY</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=47b84c745ba0">47b84c745ba0
-smb/client: add NT_STATUS_RANGE_NOT_FOUND</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fbf88e79c53e">fbf88e79c53e
-smb/client: add NT_STATUS_DECRYPTION_FAILED</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2ed0cdab5fcc">2ed0cdab5fcc
-smb/client: add NT_STATUS_ENCRYPTION_FAILED</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=096be7202493">096be7202493
-smb/client: add NT_STATUS_DIRECTORY_IS_A_REPARSE_POINT</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7982ddb7af9b">7982ddb7af9b
-smb/client: add NT_STATUS_VOLUME_DISMOUNTED</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=563318fa6dcc">563318fa6dcc
-smb/client: add NT_STATUS_BIOS_FAILED_TO_CONNECT_INTERRUPT</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=29aaf48e24b7">29aaf48e24b7
-smb/client: add NT_STATUS_VARIABLE_NOT_FOUND</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ac635d68bac8">ac635d68bac8
-smb/client: rename ERRinvlevel to ERRunknownlevel</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cd55c6e31189">cd55c6e31189
-smb/client: add NT_STATUS_OS2_INVALID_LEVEL</a></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b0a22915942f">b0a22915942f
-smb/client: map NT_STATUS_INVALID_INFO_CLASS to ERRbadpipe</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7d0bf050a587">7d0bf050a587 smb/client: make SMB2 maperror KUnit tests a separate module</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20260118091313.1988168-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v9 0/1] smb: improve search speed of SMB2 maperror</a></p>
+<li><a href="https://lore.kernel.org/linux-cifs/20260122052402.2209206-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH 0/7] smb/client: update SMB1 maperror, part 2</a>
 <ul>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=10dfb0738a9d">10dfb0738a9d
-cifs: Label SMB2 statuses with errors</a> (Author: David Howells <a
-href="mailto:dhowells@redhat.com" class="email">dhowells@redhat.com</a>)
-<ul>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/ff731375-b565-49f0-985b-7cb9022206d6@linux.dev/">Re:
-[PATCH 1/2] cifs: Label SMB2 statuses with errors</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/f82a5d14-e4cc-46b5-be22-ce447dc65cbc@linux.dev/">Re:
-[PATCH 1/2] cifs: Label SMB2 statuses with errors</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3774289f525c">3774289f525c smb/client: move NT_STATUS_MORE_ENTRIES</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=617a5d2473dc">617a5d2473dc smb/client: rename to NT_ERROR_INVALID_DATATYPE</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fa34d0a57033">fa34d0a57033 smb/client: rename to NT_STATUS_SOME_NOT_MAPPED</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4da735c48a27">4da735c48a27 smb/client: map NT_STATUS_PRIVILEGE_NOT_HELD</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3e5f08342860">3e5f08342860 smb/client: map NT_STATUS_MORE_PROCESSING_REQUIRED</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e4424687fc6d">e4424687fc6d smb/client: map NT_STATUS_BUFFER_OVERFLOW</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ba39063ca3ee">ba39063ca3ee smb/client: map NT_STATUS_NOTIFY_ENUM_DIR</a></li>
 </ul></li>
-<li>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c527e13a7a66">c527e13a7a66
-cifs: Autogenerate SMB2 error mapping table</a> (Author: David Howells
-<a href="mailto:dhowells@redhat.com"
-class="email">dhowells@redhat.com</a>)
+<li><a href="https://lore.kernel.org/linux-cifs/20260121114912.2138032-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH 00/17] smb/client: update SMB1 maperror</a> (Author: Huiwen He <a href="mailto:hehuiwen@kylinos.cn" class="email">hehuiwen@kylinos.cn</a>)
 <ul>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/8f3290fe-d74c-4cd6-86f4-017c52e1872e@linux.dev/">Re:
-[PATCH 2/2] cifs: Autogenerate SMB2 error mapping table</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fbcdc61e7846">fbcdc61e7846 smb/client: remove useless comment in mapping_table_ERRSRV</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=be9fc9033a0a">be9fc9033a0a smb/client: remove some literal NT error codes from ntstatus_to_dos_map</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=199e7a1a2ed9">199e7a1a2ed9 smb/client: add NT_STATUS_VOLUME_NOT_UPGRADED</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0bf7e53fec61">0bf7e53fec61 smb/client: add NT_STATUS_NO_USER_KEYS</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ded739a08228">ded739a08228 smb/client: add NT_STATUS_WRONG_EFS</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3988b5675296">3988b5675296 smb/client: add NT_STATUS_NO_EFS</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2ef4f6b46f3c">2ef4f6b46f3c smb/client: add NT_STATUS_NO_RECOVERY_POLICY</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=47b84c745ba0">47b84c745ba0 smb/client: add NT_STATUS_RANGE_NOT_FOUND</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fbf88e79c53e">fbf88e79c53e smb/client: add NT_STATUS_DECRYPTION_FAILED</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2ed0cdab5fcc">2ed0cdab5fcc smb/client: add NT_STATUS_ENCRYPTION_FAILED</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=096be7202493">096be7202493 smb/client: add NT_STATUS_DIRECTORY_IS_A_REPARSE_POINT</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7982ddb7af9b">7982ddb7af9b smb/client: add NT_STATUS_VOLUME_DISMOUNTED</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=563318fa6dcc">563318fa6dcc smb/client: add NT_STATUS_BIOS_FAILED_TO_CONNECT_INTERRUPT</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=29aaf48e24b7">29aaf48e24b7 smb/client: add NT_STATUS_VARIABLE_NOT_FOUND</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ac635d68bac8">ac635d68bac8 smb/client: rename ERRinvlevel to ERRunknownlevel</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cd55c6e31189">cd55c6e31189 smb/client: add NT_STATUS_OS2_INVALID_LEVEL</a></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b0a22915942f">b0a22915942f smb/client: map NT_STATUS_INVALID_INFO_CLASS to ERRbadpipe</a></li>
 </ul></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=480afcb19b61">480afcb19b61
-smb/client: introduce KUnit test to check search result of
-smb2_error_map_table</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=75563adbb91d">75563adbb91d
-smb/client: use bsearch() to find target in
-smb2_error_map_table</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=453382f15b0e">453382f15b0e
-smb/client: check whether smb2_error_map_table is sorted in ascending
-order</a></li>
-</ul></li>
-<li><p>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ebbbc4bfad4c">ebbbc4bfad4c
-smb: client: fix potential UAF and double free in smb2_open_file()</a>
-(Author: Paulo Alcantara <a href="mailto:pc@manguebit.org"
-class="email">pc@manguebit.org</a>)</p>
+<li><a href="https://lore.kernel.org/linux-cifs/20260118091313.1988168-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v9 0/1] smb: improve search speed of SMB2 maperror</a>
 <ul>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/bfa4a0be-8429-4ea1-8bd6-691c3a47ff00@linux.dev/">Re:
-[PATCH] smb: client: fix potential UAF and double free it
-smb2_open_file()</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/cbedb833-0cf9-467e-8751-e975b965c467@linux.dev/">Re:
-[PATCH] smb: client: fix potential UAF and double free it
-smb2_open_file()</a></li>
-</ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20260202094906.1933479-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v3 0/1] smb/client: fix memory leaks</a></p>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=10dfb0738a9d">10dfb0738a9d cifs: Label SMB2 statuses with errors</a> (Author: David Howells <a href="mailto:dhowells@redhat.com" class="email">dhowells@redhat.com</a>)
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=67b3da8d3051">67b3da8d3051
-smb/client: fix memory leak in SendReceive()</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e3a43633023e">e3a43633023e
-smb/client: fix memory leak in smb2_open_file()</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/ff731375-b565-49f0-985b-7cb9022206d6@linux.dev/">Re: [PATCH 1/2] cifs: Label SMB2 statuses with errors</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/f82a5d14-e4cc-46b5-be22-ce447dc65cbc@linux.dev/">Re: [PATCH 1/2] cifs: Label SMB2 statuses with errors</a></li>
+</ul></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c527e13a7a66">c527e13a7a66 cifs: Autogenerate SMB2 error mapping table</a> (Author: David Howells <a href="mailto:dhowells@redhat.com" class="email">dhowells@redhat.com</a>)
+<ul>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/8f3290fe-d74c-4cd6-86f4-017c52e1872e@linux.dev/">Re: [PATCH 2/2] cifs: Autogenerate SMB2 error mapping table</a></li>
+</ul></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=480afcb19b61">480afcb19b61 smb/client: introduce KUnit test to check search result of smb2_error_map_table</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=75563adbb91d">75563adbb91d smb/client: use bsearch() to find target in smb2_error_map_table</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=453382f15b0e">453382f15b0e smb/client: check whether smb2_error_map_table is sorted in ascending order</a></li>
+</ul></li>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ebbbc4bfad4c">ebbbc4bfad4c smb: client: fix potential UAF and double free in smb2_open_file()</a> (Author: Paulo Alcantara <a href="mailto:pc@manguebit.org" class="email">pc@manguebit.org</a>)
+<ul>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/bfa4a0be-8429-4ea1-8bd6-691c3a47ff00@linux.dev/">Re: [PATCH] smb: client: fix potential UAF and double free it smb2_open_file()</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/cbedb833-0cf9-467e-8751-e975b965c467@linux.dev/">Re: [PATCH] smb: client: fix potential UAF and double free it smb2_open_file()</a></li>
+</ul></li>
+<li><a href="https://lore.kernel.org/linux-cifs/20260202094906.1933479-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v3 0/1] smb/client: fix memory leaks</a>
+<ul>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=67b3da8d3051">67b3da8d3051 smb/client: fix memory leak in SendReceive()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e3a43633023e">e3a43633023e smb/client: fix memory leak in smb2_open_file()</a></li>
 </ul></li>
 </ul>
-<h1 data-number="2" id="section-1"><span
-class="header-section-number">2</span> 2025</h1>
+<h1 id="section-1"><span class="header-section-number">2</span> 2025</h1>
 <ul>
-<li><p>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fa2fd0b10f66">fa2fd0b10f66
-smb: client: fix UBSAN array-index-out-of-bounds in
-smb2_copychunk_range</a> (Author: Henrique Carvalho <a
-href="mailto:henrique.carvalho@suse.com"
-class="email">henrique.carvalho@suse.com</a>)</p>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fa2fd0b10f66">fa2fd0b10f66 smb: client: fix UBSAN array-index-out-of-bounds in smb2_copychunk_range</a> (Author: Henrique Carvalho <a href="mailto:henrique.carvalho@suse.com" class="email">henrique.carvalho@suse.com</a>)
 <ul>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/2feaf0ac-172d-431c-805c-7b3440f1ebd5@linux.dev/">Re:
-generic/013 failure to Samba</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/141824e7-50ab-4072-b611-5db5fa01bb86@linux.dev/">Re:
-generic/013 failure to Samba</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/2feaf0ac-172d-431c-805c-7b3440f1ebd5@linux.dev/">Re: generic/013 failure to Samba</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/141824e7-50ab-4072-b611-5db5fa01bb86@linux.dev/">Re: generic/013 failure to Samba</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20251229031518.1027240-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v2 0/1] smb/server: fix some refcount leaks</a></p>
+<li><a href="https://lore.kernel.org/linux-cifs/20251229031518.1027240-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v2 0/1] smb/server: fix some refcount leaks</a>
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f416c556997a">f416c556997a
-smb/server: fix refcount leak in smb2_open()</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3296c3012a9d">3296c3012a9d
-smb/server: fix refcount leak in parse_durable_handle_context()</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/bcd3d847-c38f-4c88-af07-3da09dad476b@linux.dev/">xfstests
-failed test cases</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/f1b9cd58-8a61-4fa7-a7e9-198c2c468c59@linux.dev/">Re:
-xfstests failed test cases</a></li>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/9751f02d-d1df-4265-a7d6-b19761b21834@linux.dev/">Re:
-xfstests failed test cases</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f416c556997a">f416c556997a smb/server: fix refcount leak in smb2_open()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3296c3012a9d">3296c3012a9d smb/server: fix refcount leak in parse_durable_handle_context()</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/bcd3d847-c38f-4c88-af07-3da09dad476b@linux.dev/">xfstests failed test cases</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/f1b9cd58-8a61-4fa7-a7e9-198c2c468c59@linux.dev/">Re: xfstests failed test cases</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/9751f02d-d1df-4265-a7d6-b19761b21834@linux.dev/">Re: xfstests failed test cases</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20251228145101.1010774-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH]
-smb/server: call ksmbd_session_rpc_close() on error path in
-create_smb2_pipe()</a></p>
+<li><a href="https://lore.kernel.org/linux-cifs/20251228145101.1010774-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH] smb/server: call ksmbd_session_rpc_close() on error path in create_smb2_pipe()</a>
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7c28f8eef5ac">7c28f8eef5ac
-smb/server: call ksmbd_session_rpc_close() on error path in
-create_smb2_pipe()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7c28f8eef5ac">7c28f8eef5ac smb/server: call ksmbd_session_rpc_close() on error path in create_smb2_pipe()</a></li>
 </ul></li>
-<li><p>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cb6d5aa9c0f1">cb6d5aa9c0f1
-cifs: Fix memory and information leak in smb3_reconfigure()</a> (Author:
-Zilin Guan <a href="mailto:zilin@seu.edu.cn"
-class="email">zilin@seu.edu.cn</a>)</p></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20251220132551.351932-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v4 0/2] smb/server: fix minimum PDU size</a></p>
+<li><p>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cb6d5aa9c0f1">cb6d5aa9c0f1 cifs: Fix memory and information leak in smb3_reconfigure()</a> (Author: Zilin Guan <a href="mailto:zilin@seu.edu.cn" class="email">zilin@seu.edu.cn</a>)</p></li>
+<li><a href="https://lore.kernel.org/linux-cifs/20251220132551.351932-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v4 0/2] smb/server: fix minimum PDU size</a>
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4c7d8eb9a79a">4c7d8eb9a79a
-smb/server: fix minimum SMB2 PDU size</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3b9c30eb8f5a">3b9c30eb8f5a
-smb/server: fix minimum SMB1 PDU size</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4c7d8eb9a79a">4c7d8eb9a79a smb/server: fix minimum SMB2 PDU size</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3b9c30eb8f5a">3b9c30eb8f5a smb/server: fix minimum SMB1 PDU size</a></li>
 </ul></li>
-<li><p>Review: <a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0a70cac78967">0a70cac78967
-ksmbd: Fix to handle removal of rfc1002 header from smb_hdr</a> (Author:
-David Howells <a href="mailto:dhowells@redhat.com"
-class="email">dhowells@redhat.com</a>)</p>
+<li>Review: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0a70cac78967">0a70cac78967 ksmbd: Fix to handle removal of rfc1002 header from smb_hdr</a> (Author: David Howells <a href="mailto:dhowells@redhat.com" class="email">dhowells@redhat.com</a>)
 <ul>
-<li>Review: <a
-href="https://lore.kernel.org/linux-cifs/cb002f72-3e2a-4d23-b08d-f6d987a29661@linux.dev/">Re:
-[PATCH] ksmbd: Fix to handle removal of rfc1002 header from
-smb_hdr</a></li>
+<li>Review: <a href="https://lore.kernel.org/linux-cifs/cb002f72-3e2a-4d23-b08d-f6d987a29661@linux.dev/">Re: [PATCH] ksmbd: Fix to handle removal of rfc1002 header from smb_hdr</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20251211143228.172470-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v2 0/7] smb: move duplicate definitions into common header file, part
-2</a></p>
+<li><a href="https://lore.kernel.org/linux-cifs/20251211143228.172470-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v2 0/7] smb: move duplicate definitions into common header file, part 2</a>
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=94d5b8dbc5d9">94d5b8dbc5d9
-smb: move some SMB1 definitions into common/smb1pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2b6abb893e71">2b6abb893e71
-smb: move File Attributes definitions into common/fscc.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c97503321ed3">c97503321ed3
-smb: update struct duplicate_extents_to_file_ex</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2e0d224d8988">2e0d224d8988
-smb/server: add comment to FileSystemName of
-FileFsAttributeInformation</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ab0347e67dac">ab0347e67dac
-smb/client: remove DeviceType Flags and Device Characteristics
-definitions</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=08c2a7d2bae9">08c2a7d2bae9
-smb: move file_notify_information to common/fscc.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6539e18517b6">6539e18517b6
-smb: move SMB2 Notify Action Flags into common/smb2pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9ec7629b430a">9ec7629b430a
-smb: move notify completion filter flags into common/smb2pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=bcdd6cfaf2ec">bcdd6cfaf2ec
-smb: add documentation references for smb2 change notify
-definitions</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=94d5b8dbc5d9">94d5b8dbc5d9 smb: move some SMB1 definitions into common/smb1pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2b6abb893e71">2b6abb893e71 smb: move File Attributes definitions into common/fscc.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c97503321ed3">c97503321ed3 smb: update struct duplicate_extents_to_file_ex</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2e0d224d8988">2e0d224d8988 smb/server: add comment to FileSystemName of FileFsAttributeInformation</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ab0347e67dac">ab0347e67dac smb/client: remove DeviceType Flags and Device Characteristics definitions</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=08c2a7d2bae9">08c2a7d2bae9 smb: move file_notify_information to common/fscc.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6539e18517b6">6539e18517b6 smb: move SMB2 Notify Action Flags into common/smb2pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9ec7629b430a">9ec7629b430a smb: move notify completion filter flags into common/smb2pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=bcdd6cfaf2ec">bcdd6cfaf2ec smb: add documentation references for smb2 change notify definitions</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-00/30] smb: improve search speed of SMB1 maperror</a></p>
+<li><a href="https://lore.kernel.org/linux-cifs/20251208062100.3268777-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH 00/30] smb: improve search speed of SMB1 maperror</a>
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a71a4aab4834">a71a4aab4834
-smb/client: add parentheses to NT error code definitions containing
-bitwise OR operator</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a9adafd40165">a9adafd40165
-smb/client: add 4 NT error code definitions</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=98def4eb0244">98def4eb0244
-smb/server: remove unused nterr.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9f99caa8950a">9f99caa8950a
-smb/client: fix NT_STATUS_UNABLE_TO_FREE_VM value</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b2b50fca34da">b2b50fca34da
-smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a1237c203f17">a1237c203f17
-smb/client: fix NT_STATUS_NO_DATA_DETECTED value</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a71a4aab4834">a71a4aab4834 smb/client: add parentheses to NT error code definitions containing bitwise OR operator</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a9adafd40165">a9adafd40165 smb/client: add 4 NT error code definitions</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=98def4eb0244">98def4eb0244 smb/server: remove unused nterr.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9f99caa8950a">9f99caa8950a smb/client: fix NT_STATUS_UNABLE_TO_FREE_VM value</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b2b50fca34da">b2b50fca34da smb/client: fix NT_STATUS_DEVICE_DOOR_OPEN value</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a1237c203f17">a1237c203f17 smb/client: fix NT_STATUS_NO_DATA_DETECTED value</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20260118091313.1988168-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v9 0/1] smb: improve search speed of SMB2 maperror</a></p>
+<li><a href="https://lore.kernel.org/linux-cifs/20260118091313.1988168-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v9 0/1] smb: improve search speed of SMB2 maperror</a>
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d8f52650b24d9018dfb65d2c60e17636b077e63e">d8f52650b24d
-smb/client: update some SMB2 status strings</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d159702c9492de46cc1b39b3d83fd0c8a6bdb829">d159702c9492
-smb/client: add two elements to smb2_error_map_table array</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=523ecd976632523006c1b442e0eba4fe3c4f7e0c">523ecd976632
-smb: rename to STATUS_SMB_NO_PREAUTH_INTEGRITY_HASH_OVERLAP</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=bf80d1517dc847eb7b4d8b3c14bfe6ed48fa27ae">bf80d1517dc8
-smb/client: remove unused elements from smb2_error_map_table
-array</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6c1eb31ecb97c07b4a880d59b3a83665359def36">6c1eb31ecb97
-smb/client: reduce loop count in map_smb2_to_linux_error() by
-half</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=01ab0d1640e3">01ab0d1640e3
-smb/server: rename include guard in smb_common.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d8f52650b24d9018dfb65d2c60e17636b077e63e">d8f52650b24d smb/client: update some SMB2 status strings</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d159702c9492de46cc1b39b3d83fd0c8a6bdb829">d159702c9492 smb/client: add two elements to smb2_error_map_table array</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=523ecd976632523006c1b442e0eba4fe3c4f7e0c">523ecd976632 smb: rename to STATUS_SMB_NO_PREAUTH_INTEGRITY_HASH_OVERLAP</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=bf80d1517dc847eb7b4d8b3c14bfe6ed48fa27ae">bf80d1517dc8 smb/client: remove unused elements from smb2_error_map_table array</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6c1eb31ecb97c07b4a880d59b3a83665359def36">6c1eb31ecb97 smb/client: reduce loop count in map_smb2_to_linux_error() by half</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=01ab0d1640e3">01ab0d1640e3 smb/server: rename include guard in smb_common.h</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20251117112838.473051-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v9 0/1] smb: move duplicate definitions to common header file</a></p>
+<li><a href="https://lore.kernel.org/linux-cifs/20251117112838.473051-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v9 0/1] smb: move duplicate definitions to common header file</a>
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c4a2a49f7df48147529158a092edfde1597d12f3">c4a2a49f7df4
-smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/fscc.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=5003ad718af7705d6a519445a897843fac88167a">5003ad718af7
-smb: move create_durable_reconn to common/smb2pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e7e60e8bfcc5bfff0dc40a3b8ab275a4da6990a0">e7e60e8bfcc5
-smb: fix some warnings reported by scripts/checkpatch.pl</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=95e8c1bfa56ebbc243779ee23782b30744da02f6">95e8c1bfa56e
-smb: do some cleanups</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=464b913993a14b539e978db10c755bb202ab14ed">464b913993a1
-smb: move FILE_SYSTEM_SIZE_INFO to common/fscc.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d7edd3892d97e6746e30f36f4f13f887ec4d80ed">d7edd3892d97
-smb: move some duplicate struct definitions to common/fscc.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=84d8d4cf8873b4a9da0d76e9ba9d94ec88311cfd">84d8d4cf8873
-smb: move list of FileSystemAttributes to common/fscc.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d8ac9879182a1e1f3b97d166f5ba5e2f1b3e8535">d8ac9879182a
-smb: move SMB_NEGOTIATE_REQ to common/smb2pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=1172d8598499a006d172bb24bebaa3fdc99064a8">1172d8598499
-smb: move some duplicate definitions to common/smb2pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=96721fd292264d712b7b9a51752ab87de5035db4">96721fd29226
-smb: move create_durable_rsp_v2 to common/smb2pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=81a45de432c6c7d82821fb09cb9fc1cf58629f3a">81a45de432c6
-smb: move create_durable_handle_reconnect_v2 to
-common/smb2pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=833a75fc9ecc3856a52223d8c245e52703e0a9f1">833a75fc9ecc
-smb: move create_durable_req_v2 to common/smb2pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=884a1d4e9c09b4a0dbe748890bdd48aac8e5a6b6">884a1d4e9c09
-smb: move MAX_CIFS_SMALL_BUFFER_SIZE to common/smbglob.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4a7f9607803203fe637c12b4ffce9973d85ee169">4a7f96078032
-smb/client: fix CAP_BULK_TRANSFER value</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9c98f5eec877976dad1179149038a4b164e236b1">9c98f5eec877
-smb: move resume_key_ioctl_rsp to common/smb2pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cc26f593dc193567bdb059a6ffde58e627a44f65">cc26f593dc19
-smb: move copychunk definitions to common/smb2pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7844d50ca239f0788e732608820f7026cb0cc8fb">7844d50ca239
-smb: move smb_sockaddr_in and smb_sockaddr_in6 to
-common/smb2pdu.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cd311445d9f5510979f6e9f4344178b9f5a4d981">cd311445d9f5
-smb: move SMB1_PROTO_NUMBER to common/smbglob.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=36c31540cf5279262bfd148d8537cd04866499f2">36c31540cf52
-smb: move get_rfc1002_len() to common/smbglob.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=34cf191bb6a349dc88ec2c4f6355fe006ac669e0">34cf191bb6a3
-smb: move smb_version_values to common/smbglob.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=94b955167e3b11372e314f45f4b2fbf4f92493b9">94b955167e3b
-smb: rename common/cifsglob.h to common/smbglob.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d877470b59910b5c50383d634dda3782386bba51">d877470b5991
-smb: move some duplicate definitions to common/cifsglob.h</a></li>
-<li><a
-href="https://nvd.nist.gov/vuln/detail/CVE-2025-40285">CVE-2025-40285</a>:
-<a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=379510a815cb2e64eb0a379cb62295d6ade65df0">379510a815cb
-smb/server: fix possible refcount leak in smb2_sess_setup()</a></li>
-<li><a
-href="https://nvd.nist.gov/vuln/detail/CVE-2025-40286">CVE-2025-40286</a>:
-<a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6fced056d2cc8d01b326e6fcfabaacb9850b71a4">6fced056d2cc
-smb/server: fix possible memory leak in smb2_read()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c4a2a49f7df48147529158a092edfde1597d12f3">c4a2a49f7df4 smb: move FILE_SYSTEM_ATTRIBUTE_INFO to common/fscc.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=5003ad718af7705d6a519445a897843fac88167a">5003ad718af7 smb: move create_durable_reconn to common/smb2pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e7e60e8bfcc5bfff0dc40a3b8ab275a4da6990a0">e7e60e8bfcc5 smb: fix some warnings reported by scripts/checkpatch.pl</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=95e8c1bfa56ebbc243779ee23782b30744da02f6">95e8c1bfa56e smb: do some cleanups</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=464b913993a14b539e978db10c755bb202ab14ed">464b913993a1 smb: move FILE_SYSTEM_SIZE_INFO to common/fscc.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d7edd3892d97e6746e30f36f4f13f887ec4d80ed">d7edd3892d97 smb: move some duplicate struct definitions to common/fscc.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=84d8d4cf8873b4a9da0d76e9ba9d94ec88311cfd">84d8d4cf8873 smb: move list of FileSystemAttributes to common/fscc.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d8ac9879182a1e1f3b97d166f5ba5e2f1b3e8535">d8ac9879182a smb: move SMB_NEGOTIATE_REQ to common/smb2pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=1172d8598499a006d172bb24bebaa3fdc99064a8">1172d8598499 smb: move some duplicate definitions to common/smb2pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=96721fd292264d712b7b9a51752ab87de5035db4">96721fd29226 smb: move create_durable_rsp_v2 to common/smb2pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=81a45de432c6c7d82821fb09cb9fc1cf58629f3a">81a45de432c6 smb: move create_durable_handle_reconnect_v2 to common/smb2pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=833a75fc9ecc3856a52223d8c245e52703e0a9f1">833a75fc9ecc smb: move create_durable_req_v2 to common/smb2pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=884a1d4e9c09b4a0dbe748890bdd48aac8e5a6b6">884a1d4e9c09 smb: move MAX_CIFS_SMALL_BUFFER_SIZE to common/smbglob.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4a7f9607803203fe637c12b4ffce9973d85ee169">4a7f96078032 smb/client: fix CAP_BULK_TRANSFER value</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9c98f5eec877976dad1179149038a4b164e236b1">9c98f5eec877 smb: move resume_key_ioctl_rsp to common/smb2pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cc26f593dc193567bdb059a6ffde58e627a44f65">cc26f593dc19 smb: move copychunk definitions to common/smb2pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7844d50ca239f0788e732608820f7026cb0cc8fb">7844d50ca239 smb: move smb_sockaddr_in and smb_sockaddr_in6 to common/smb2pdu.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cd311445d9f5510979f6e9f4344178b9f5a4d981">cd311445d9f5 smb: move SMB1_PROTO_NUMBER to common/smbglob.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=36c31540cf5279262bfd148d8537cd04866499f2">36c31540cf52 smb: move get_rfc1002_len() to common/smbglob.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=34cf191bb6a349dc88ec2c4f6355fe006ac669e0">34cf191bb6a3 smb: move smb_version_values to common/smbglob.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=94b955167e3b11372e314f45f4b2fbf4f92493b9">94b955167e3b smb: rename common/cifsglob.h to common/smbglob.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d877470b59910b5c50383d634dda3782386bba51">d877470b5991 smb: move some duplicate definitions to common/cifsglob.h</a></li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2025-40285">CVE-2025-40285</a>: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=379510a815cb2e64eb0a379cb62295d6ade65df0">379510a815cb smb/server: fix possible refcount leak in smb2_sess_setup()</a></li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2025-40286">CVE-2025-40286</a>: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6fced056d2cc8d01b326e6fcfabaacb9850b71a4">6fced056d2cc smb/server: fix possible memory leak in smb2_read()</a></li>
 </ul></li>
-<li><p><a
-href="https://lore.kernel.org/linux-cifs/20251017104613.3094031-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH
-v2 0/6] smb/server: fix return values of smb2_0_server_cmds proc</a></p>
+<li><a href="https://lore.kernel.org/linux-cifs/20251017104613.3094031-1-chenxiaosong.chenxiaosong@linux.dev/">[PATCH v2 0/6] smb/server: fix return values of smb2_0_server_cmds proc</a>
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7d9f51d36b6c24e02b8a379cbaf1a273511ed403">7d9f51d36b6c
-smb/server: update some misguided comment of smb2_0_server_cmds
-proc</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a3c4445fdbbb83aa94ea1778717ef57006164814">a3c4445fdbbb
-smb/server: fix return value of smb2_oplock_break()</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=269df046c1e15ab34fa26fd90db9381f022a0963">269df046c1e1
-smb/server: fix return value of smb2_ioctl()</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=dafe22bc676d4fcb1ccb193c8cc3dda57942509d">dafe22bc676d
-smb/server: fix return value of smb2_query_dir()</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d1a30b9ddc3d4c0e38666bd166d51863cb39f1c4">d1a30b9ddc3d
-smb/server: fix return value of smb2_notify()</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c5b462e35373a68a5a7954f5e00383998cc7fe92">c5b462e35373
-smb/server: fix return value of smb2_read()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7d9f51d36b6c24e02b8a379cbaf1a273511ed403">7d9f51d36b6c smb/server: update some misguided comment of smb2_0_server_cmds proc</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a3c4445fdbbb83aa94ea1778717ef57006164814">a3c4445fdbbb smb/server: fix return value of smb2_oplock_break()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=269df046c1e15ab34fa26fd90db9381f022a0963">269df046c1e1 smb/server: fix return value of smb2_ioctl()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=dafe22bc676d4fcb1ccb193c8cc3dda57942509d">dafe22bc676d smb/server: fix return value of smb2_query_dir()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d1a30b9ddc3d4c0e38666bd166d51863cb39f1c4">d1a30b9ddc3d smb/server: fix return value of smb2_notify()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c5b462e35373a68a5a7954f5e00383998cc7fe92">c5b462e35373 smb/server: fix return value of smb2_read()</a></li>
 </ul></li>
 </ul>
-<h1 data-number="3" id="section-2"><span
-class="header-section-number">3</span> 2024</h1>
+<h1 id="section-2"><span class="header-section-number">3</span> 2024</h1>
 <ul>
-<li><a
-href="https://lore.kernel.org/linux-cifs/20240822082101.391272-1-chenxiaosong@chenxiaosong.com/">[PATCH
-v2 00/12] smb: fix some bugs, move duplicate definitions to common
-header file, and some small cleanups</a>
+<li><a href="https://lore.kernel.org/linux-cifs/20240822082101.391272-1-chenxiaosong@chenxiaosong.com/">[PATCH v2 00/12] smb: fix some bugs, move duplicate definitions to common header file, and some small cleanups</a>
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e2fcd3fa0351ea2133d1238fcc6a9f140c52d36f">e2fcd3fa0351
-smb: add comment to STATUS_MCA_OCCURED</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=78181a5504a401e421e65d0257a33f904e0e7c29">78181a5504a4
-smb: move SMB2 Status code to common header file</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b51174da743b6b7cd87c02e882ebe60dcb99f8bf">b51174da743b
-smb: move some duplicate definitions to common/smbacl.h</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=09bedafc1e2c5c82aad3cbfe1359e2b0bf752f3a">09bedafc1e2c
-smb/client: rename cifs_ace to smb_ace</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=251b93ae73805b216e84ed2190b525f319da4c87">251b93ae7380
-smb/client: rename cifs_acl to smb_acl</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7f599d8fb3e087aff5be4e1392baaae3f8d42419">7f599d8fb3e0
-smb/client: rename cifs_sid to smb_sid</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3651487607ae778df1051a0a38bb34a5bd34e3b7">3651487607ae
-smb/client: rename cifs_ntsd to smb_ntsd</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=5e51224d2afbda57f33f47485871ee5532145e18">5e51224d2afb
-smb/client: fix typo: GlobalMid_Sem -&gt; GlobalMid_Lock</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2b7e0573a49064d9c94c114b4471327cd96ae39c">2b7e0573a490
-smb/server: update misguided comment of smb2_allocate_rsp_buf()</a></li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0dd771b7d60b8281f10f6721783c60716d22075f">0dd771b7d60b
-smb/server: remove useless assignment of ‘file_present’ in
-smb2_open()</a></li>
-<li><a
-href="https://nvd.nist.gov/vuln/detail/CVE-2024-46742">CVE-2024-46742</a>:
-<a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4e8771a3666c8f216eefd6bd2fd50121c6c437db">4e8771a3666c
-smb/server: fix potential null-ptr-deref of lease_ctx_info in
-smb2_open()</a>（<a
-href="https://chenxiaosong.com/course/kernel/my-patch/CVE-2024-46742.html">查看分析</a>）</li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2186a116538a715b20e15f84fdd3545e5fe0a39b">2186a116538a
-smb/server: fix return value of smb2_open()</a>（<a
-href="https://lore.kernel.org/all/20240822082101.391272-2-chenxiaosong@chenxiaosong.com/">邮件列表</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e2fcd3fa0351ea2133d1238fcc6a9f140c52d36f">e2fcd3fa0351 smb: add comment to STATUS_MCA_OCCURED</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=78181a5504a401e421e65d0257a33f904e0e7c29">78181a5504a4 smb: move SMB2 Status code to common header file</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b51174da743b6b7cd87c02e882ebe60dcb99f8bf">b51174da743b smb: move some duplicate definitions to common/smbacl.h</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=09bedafc1e2c5c82aad3cbfe1359e2b0bf752f3a">09bedafc1e2c smb/client: rename cifs_ace to smb_ace</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=251b93ae73805b216e84ed2190b525f319da4c87">251b93ae7380 smb/client: rename cifs_acl to smb_acl</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7f599d8fb3e087aff5be4e1392baaae3f8d42419">7f599d8fb3e0 smb/client: rename cifs_sid to smb_sid</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3651487607ae778df1051a0a38bb34a5bd34e3b7">3651487607ae smb/client: rename cifs_ntsd to smb_ntsd</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=5e51224d2afbda57f33f47485871ee5532145e18">5e51224d2afb smb/client: fix typo: GlobalMid_Sem -&gt; GlobalMid_Lock</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2b7e0573a49064d9c94c114b4471327cd96ae39c">2b7e0573a490 smb/server: update misguided comment of smb2_allocate_rsp_buf()</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0dd771b7d60b8281f10f6721783c60716d22075f">0dd771b7d60b smb/server: remove useless assignment of ‘file_present’ in smb2_open()</a></li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-46742">CVE-2024-46742</a>: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4e8771a3666c8f216eefd6bd2fd50121c6c437db">4e8771a3666c smb/server: fix potential null-ptr-deref of lease_ctx_info in smb2_open()</a>（<a href="https://chenxiaosong.com/course/kernel/my-patch/CVE-2024-46742.html">查看分析</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2186a116538a715b20e15f84fdd3545e5fe0a39b">2186a116538a smb/server: fix return value of smb2_open()</a>（<a href="https://lore.kernel.org/all/20240822082101.391272-2-chenxiaosong@chenxiaosong.com/">邮件列表</a>）</li>
 </ul></li>
-<li><a
-href="https://lore.kernel.org/linux-cifs/20240619161753.385508-1-chenxiaosong@chenxiaosong.com/">[PATCH]
-ksmbd: remove duplicate SMB2 Oplock levels definitions</a>
+<li><a href="https://lore.kernel.org/linux-cifs/20240619161753.385508-1-chenxiaosong@chenxiaosong.com/">[PATCH] ksmbd: remove duplicate SMB2 Oplock levels definitions</a>
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ac5399d48616644cb6ddfe39f8babe807d5f5cbd">ac5399d48616
-ksmbd: remove duplicate SMB2 Oplock levels definitions</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ac5399d48616644cb6ddfe39f8babe807d5f5cbd">ac5399d48616 ksmbd: remove duplicate SMB2 Oplock levels definitions</a></li>
 </ul></li>
 </ul>
-<h1 data-number="4" id="section-3"><span
-class="header-section-number">4</span> 2023</h1>
+<h1 id="section-3"><span class="header-section-number">4</span> 2023</h1>
 <ul>
-<li><a
-href="https://lore.kernel.org/linux-cifs/20230302135804.2583061-1-chenxiaosong2@huawei.com/">[PATCH]
-ksmbd: fix possible refcount leak in smb2_open()</a>
+<li><a href="https://lore.kernel.org/linux-cifs/20230302135804.2583061-1-chenxiaosong2@huawei.com/">[PATCH] ksmbd: fix possible refcount leak in smb2_open()</a>
 <ul>
-<li><a
-href="https://nvd.nist.gov/vuln/detail/CVE-2023-53061">CVE-2023-53061</a>:
-<a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2624b445544ffc1472ccabfb6ec867c199d4c95c">2624b445544f
-ksmbd: fix possible refcount leak in smb2_open()</a></li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2023-53061">CVE-2023-53061</a>: <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2624b445544ffc1472ccabfb6ec867c199d4c95c">2624b445544f ksmbd: fix possible refcount leak in smb2_open()</a></li>
 </ul></li>
 </ul>
-<h1 data-number="5" id="section-4"><span
-class="header-section-number">5</span> 2022</h1>
+<h1 id="section-4"><span class="header-section-number">5</span> 2022</h1>
 <ul>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=502487847743018c93d75b401eac2ea4c4973123">502487847743
-cifs: fix missing unlock in cifs_file_copychunk_range()</a>（<a
-href="https://patchwork.kernel.org/project/cifs-client/patch/20221119045159.1400244-1-chenxiaosong2@huawei.com/">邮件列表</a>）</li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=542228db2f28fdf775b301f2843e1fe486e7c797">542228db2f28
-cifs: fix use-after-free on the link name</a>（<a
-href="https://patchwork.kernel.org/project/cifs-client/patch/20221104074441.634677-1-chenxiaosong2@huawei.com/">邮件列表</a>）</li>
-<li><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2b058acecf56f6b8fac781911a683219b9ca3b7b">2b058acecf56
-cifs: return the more nuanced writeback error on close()</a>（<a
-href="https://lore.kernel.org/all/20220518145649.2487377-1-chenxiaosong2@huawei.com/">邮件列表</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=502487847743018c93d75b401eac2ea4c4973123">502487847743 cifs: fix missing unlock in cifs_file_copychunk_range()</a>（<a href="https://patchwork.kernel.org/project/cifs-client/patch/20221119045159.1400244-1-chenxiaosong2@huawei.com/">邮件列表</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=542228db2f28fdf775b301f2843e1fe486e7c797">542228db2f28 cifs: fix use-after-free on the link name</a>（<a href="https://patchwork.kernel.org/project/cifs-client/patch/20221104074441.634677-1-chenxiaosong2@huawei.com/">邮件列表</a>）</li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2b058acecf56f6b8fac781911a683219b9ca3b7b">2b058acecf56 cifs: return the more nuanced writeback error on close()</a>（<a href="https://lore.kernel.org/all/20220518145649.2487377-1-chenxiaosong2@huawei.com/">邮件列表</a>）</li>
 </ul>
 </body>
 </html>
