@@ -125,15 +125,27 @@ class="toc-section-number">3</span> smb协议分析</a></li>
 <li><a href="#tcpdump抓包分析" id="toc-tcpdump抓包分析"><span
 class="toc-section-number">4</span> tcpdump抓包分析</a></li>
 <li><a href="#samba代码分析" id="toc-samba代码分析"><span
-class="toc-section-number">5</span> samba代码分析</a></li>
+class="toc-section-number">5</span> samba代码分析</a>
+<ul>
+<li><a href="#入口" id="toc-入口"><span
+class="toc-section-number">5.1</span> 入口</a></li>
+<li><a href="#监听" id="toc-监听"><span
+class="toc-section-number">5.2</span> 监听</a></li>
+<li><a href="#处理事件" id="toc-处理事件"><span
+class="toc-section-number">5.3</span> 处理事件</a></li>
+<li><a href="#取消监听" id="toc-取消监听"><span
+class="toc-section-number">5.4</span> 取消监听</a></li>
+<li><a href="#其他" id="toc-其他"><span
+class="toc-section-number">5.5</span> 其他</a></li>
+</ul></li>
+<li><a href="#fanotify" id="toc-fanotify"><span
+class="toc-section-number">6</span> fanotify</a></li>
 <li><a href="#smb-server内核代码分析"
 id="toc-smb-server内核代码分析"><span
-class="toc-section-number">6</span> smb server内核代码分析</a></li>
+class="toc-section-number">7</span> smb server内核代码分析</a></li>
 <li><a href="#smb-client内核代码分析"
 id="toc-smb-client内核代码分析"><span
-class="toc-section-number">7</span> smb client内核代码分析</a></li>
-<li><a href="#fanotify" id="toc-fanotify"><span
-class="toc-section-number">8</span> fanotify</a></li>
+class="toc-section-number">8</span> smb client内核代码分析</a></li>
 </ul>
 </nav>
 <p><a
@@ -200,10 +212,20 @@ CHANGE_NOTIFY feature》</a>。</p>
 class="header-section-number">5</span> samba代码分析</h1>
 <p>samba的调试方法请查看<a
 href="https://chenxiaosong.com/course/smb/debug.html#samba-print">《smb调试方法》</a>。</p>
-<p>详细的分析过程请查看英文网页<a
-href="https://chenxiaosong.com/en/smb2-change-notify.html#samba-code">《SMB2
-CHANGE_NOTIFY feature》</a>。</p>
-<p>入口:</p>
+<p>Some code (e.g., the definition of <code>NT_STATUS_PENDING</code>) is
+generated during compilation. To see the full code, the project must be
+compiled first.</p>
+<p>You can use macros like <code>DBG_ERR()</code>, …,
+<code>DBG_DEBUG()</code>, etc., to print debug information.</p>
+<p>Use <code>log_stack_trace()</code> to print the function stack. If
+you get a compilation error indicating that
+<code>log_stack_trace()</code> cannot be found, you can refer to the
+changes in the patch <a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/0001-dump-stack-of-smbd_parent_loop.patch"><code>0001-dump-stack-of-smbd_parent_loop.patch</code></a>.</p>
+<p>The logs can be found in
+<code>/usr/local/samba/var/log.smbd</code>.</p>
+<h2 data-number="5.1" id="入口"><span
+class="header-section-number">5.1</span> 入口</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>main</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  smbd_parent_loop</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    _tevent_loop_wait</span>
@@ -240,6 +262,8 @@ CHANGE_NOTIFY feature》</a>。</p>
 <span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_io_handler</span>
 <span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>      smbd_smb2_advance_incoming</span>
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>        smbd_smb2_request_dispatch</span></code></pre></div>
+<h2 data-number="5.2" id="监听"><span
+class="header-section-number">5.2</span> 监听</h2>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>NT_TRANSACT_NOTIFY_CHANGE <span class="co">// SMB1</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>messaging_dispatch_classic</span>
@@ -251,148 +275,234 @@ CHANGE_NOTIFY feature》</a>。</p>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        mask <span class="op">|=</span> <span class="op">(</span>IN_MASK_ADD <span class="op">|</span> IN_ONLYDIR<span class="op">);</span> <span class="co">// todo</span></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        talloc_set_destructor<span class="op">(</span>w<span class="op">,</span> watch_destructor<span class="op">);</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>tevent_common_invoke_fd_handler</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  inotify_handler</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    inotify_dispatch</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>      <span class="co">// 过滤无关事件</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">((</span>e<span class="op">-&gt;</span>mask <span class="op">&amp;</span> <span class="op">(</span>IN_ATTRIB<span class="op">|</span>IN_MODIFY<span class="op">|</span>IN_CREATE<span class="op">|</span>IN_DELETE<span class="op">|</span>IN_MOVED_FROM<span class="op">|</span>IN_MOVED_TO<span class="op">))</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>      <span class="co">// rename from</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>e<span class="op">-&gt;</span>mask <span class="op">&amp;</span> IN_MOVED_FROM<span class="op">)</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>      save_moved_from <span class="co">// 只缓存，不触发回调</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        tevent_add_timer <span class="co">// 100ms</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>      <span class="co">// rename to</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>e<span class="op">-&gt;</span>mask <span class="op">&amp;</span> IN_MOVED_TO<span class="op">)</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>      handle_local_rename<span class="op">(</span>w<span class="op">,</span> e<span class="op">);</span>  <span class="co">// 生成 OLD_NAME + NEW_NAME</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>      <span class="co">// 只有to</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>e<span class="op">-&gt;</span>mask <span class="op">&amp;</span> IN_MOVED_TO<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>      ne<span class="op">.</span>action <span class="op">=</span> NOTIFY_ACTION_ADDED<span class="op">;</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>      inotify_map_mask_to_filter</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>filter_match<span class="op">(</span>w<span class="op">,</span> e<span class="op">))</span></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>      notifyd_sys_callback <span class="co">// w-&gt;callback</span></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_process_close</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_close_send</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_close</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>      close_file_smb</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>        fsp_unbind_smb</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>          notify_remove</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>            messaging_send_iov <span class="co">// 通知notifyd注销</span></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co">// 从 notify_remove 通知过来</span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>messaging_dispatch_classic</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  notifyd_rec_change</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    notifyd_apply_rec_change</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>      TALLOC_FREE</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>        talloc_free</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>          _talloc_free</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>            _talloc_free_internal</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>              _tc_free_internal</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>                watch_destructor</span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>change_notify_reply</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>  notify_marshall_changes</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>    data_blob_append</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>      data_blob_realloc</span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>        blob<span class="op">-&gt;</span>length <span class="op">=</span> length</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_notify_reply<span class="op">(...,</span> blob<span class="op">.</span>length<span class="op">)</span> <span class="co">// reply_fn</span></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>len <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    state<span class="op">-&gt;</span>status <span class="op">=</span> NT_STATUS_NOTIFY_ENUM_DIR</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>notifyd_rec_change</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>log<span class="op">-&gt;</span>num_recs <span class="op">&gt;=</span> <span class="dv">100</span><span class="op">)</span> <span class="co">// 大于100条就立刻广播</span></span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>notifyd_broadcast_reclog_send</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 1秒定时器</span></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>  tevent_wakeup_send<span class="op">(...,</span> timeval_current_ofs_msec<span class="op">(</span><span class="dv">1000</span><span class="op">))</span></span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_pending_timer</span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>  async_id <span class="op">=</span> message_id<span class="op">;</span> <span class="co">/* keep it simple for now... */</span></span></code></pre></div>
-<h1 data-number="6" id="smb-server内核代码分析"><span
-class="header-section-number">6</span> smb server内核代码分析</h1>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>smbd_smb2_notify_send</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  change_notify_create</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    notify_add</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>      messaging_send_iov</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  change_notify_add_request</span></code></pre></div>
+<h2 data-number="5.3" id="处理事件"><span
+class="header-section-number">5.3</span> 处理事件</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tevent_common_invoke_fd_handler</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  inotify_handler</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    inotify_dispatch</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      <span class="co">// 过滤无关事件</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">((</span>e<span class="op">-&gt;</span>mask <span class="op">&amp;</span> <span class="op">(</span>IN_ATTRIB<span class="op">|</span>IN_MODIFY<span class="op">|</span>IN_CREATE<span class="op">|</span>IN_DELETE<span class="op">|</span>IN_MOVED_FROM<span class="op">|</span>IN_MOVED_TO<span class="op">))</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      <span class="co">// rename from</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>e<span class="op">-&gt;</span>mask <span class="op">&amp;</span> IN_MOVED_FROM<span class="op">)</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      save_moved_from <span class="co">// 只缓存，不触发回调</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        tevent_add_timer <span class="co">// 100ms</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      <span class="co">// rename to</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>e<span class="op">-&gt;</span>mask <span class="op">&amp;</span> IN_MOVED_TO<span class="op">)</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>      handle_local_rename<span class="op">(</span>w<span class="op">,</span> e<span class="op">);</span>  <span class="co">// 生成 OLD_NAME + NEW_NAME</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>      <span class="co">// 只有to</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>e<span class="op">-&gt;</span>mask <span class="op">&amp;</span> IN_MOVED_TO<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>      ne<span class="op">.</span>action <span class="op">=</span> NOTIFY_ACTION_ADDED<span class="op">;</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>      inotify_map_mask_to_filter</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>filter_match<span class="op">(</span>w<span class="op">,</span> e<span class="op">))</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>      notifyd_sys_callback <span class="co">// w-&gt;callback</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>change_notify_reply</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  notify_marshall_changes</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    data_blob_append</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>      data_blob_realloc</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        blob<span class="op">-&gt;</span>length <span class="op">=</span> length</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_notify_reply<span class="op">(...,</span> blob<span class="op">.</span>length<span class="op">)</span> <span class="co">// reply_fn</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>len <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    state<span class="op">-&gt;</span>status <span class="op">=</span> NT_STATUS_NOTIFY_ENUM_DIR</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>notifyd_rec_change</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>log<span class="op">-&gt;</span>num_recs <span class="op">&gt;=</span> <span class="dv">100</span><span class="op">)</span> <span class="co">// 大于100条就立刻广播</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>notifyd_broadcast_reclog_send</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 1秒定时器</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  tevent_wakeup_send<span class="op">(...,</span> timeval_current_ofs_msec<span class="op">(</span><span class="dv">1000</span><span class="op">))</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_pending_timer</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>  async_id <span class="op">=</span> message_id<span class="op">;</span> <span class="co">/* keep it simple for now... */</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_pending_queue</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>req<span class="op">-&gt;</span>current_idx <span class="op">&gt;</span> <span class="dv">1</span><span class="op">)</span> <span class="co">// compound 前面已经有完成的响应</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>  smb2_send_async_interim_response <span class="co">// 发出前缀</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    nreq<span class="op">-&gt;</span>out<span class="op">.</span>vector_count <span class="op">-=</span> SMBD_SMB2_NUM_IOV_PER_REQ<span class="op">;</span> <span class="co">// 丢掉最后一个 async 请求的响应槽</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    SIVAL<span class="op">(</span>outhdr<span class="op">,</span> SMB2_HDR_NEXT_COMMAND<span class="op">,</span> <span class="dv">0</span><span class="op">);</span> <span class="co">// 把前一个 response 的 NextCommand 改成 0</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>  req<span class="op">-&gt;</span>current_idx <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> memmove <span class="co">// 把原请求的 in/out vectors 前缀移除</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_pending_timer</span></code></pre></div>
+<h2 data-number="5.4" id="取消监听"><span
+class="header-section-number">5.4</span> 取消监听</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_process_close</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_close_send</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_close</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      close_file_smb</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        fsp_unbind_smb</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>          notify_remove</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            messaging_send_iov <span class="co">// 通知notifyd注销</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">// 从 notify_remove 通知过来</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>messaging_dispatch_classic</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  notifyd_rec_change</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    notifyd_apply_rec_change</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>      TALLOC_FREE</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        talloc_free</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>          _talloc_free</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>            _talloc_free_internal</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>              _tc_free_internal</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>                watch_destructor</span></code></pre></div>
+<h2 data-number="5.5" id="其他"><span
+class="header-section-number">5.5</span> 其他</h2>
+<p>When samba receive <code>Create Request</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_dispatch</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_process_create</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_create_send</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      smbd_smb2_create_finish</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="co">// save the fsp, and return immediately when file_fsp_smb2() is called later</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        smb2req<span class="op">-&gt;</span>compat_chain_fsp <span class="op">=</span> smb1req<span class="op">-&gt;</span>chain_fsp</span></code></pre></div>
+<p>When samba receive <code>Notify Request</code>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_dispatch</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_process_notify</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// both persistent_id and volatile_id are -1 when `Create Request` and `Notify Request` are in the same compound request</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    file_fsp_smb2</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> smb2req<span class="op">-&gt;</span>compat_chain_fsp</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_notify_send</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      change_notify_create</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>change_notify_fsp_has_changes<span class="op">(</span>fsp<span class="op">)</span> <span class="co">// have change information</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>      change_notify_reply <span class="co">// notify immediately</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="co">// reply NT_STATUS_OK</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>      change_notify_add_request <span class="co">// No changes for now, wait in the queue</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_request_pending_queue <span class="co">// nothing to notify, start the timer</span></span></code></pre></div>
+<p>Start the timer:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_pending_timer</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// reply NT_STATUS_PENDING</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// SMB2_HDR_OPCODE defines the offset of the Command field in struct smb2_hdr</span></span></code></pre></div>
+<p>When Windows exits the directory, samba receive
+<code>Cancel Request</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_dispatch</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_process_cancel</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    _tevent_req_cancel</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      smbd_smb2_notify_cancel</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        smbd_notify_cancel_by_smbreq</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>          smbd_notify_cancel_by_map</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>            change_notify_reply</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>              <span class="co">// reply NT_STATUS_CANCELLED</span></span></code></pre></div>
+<p>Samba send <code>Notify Response</code> when change information is
+available:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>messaging_dispatch_classic</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  notify_handler</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    notify_callback</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>      files_forall</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        notify_fsp_cb</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>          notify_fsp</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>            change_notify_reply</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>              <span class="co">// reply NT_STATUS_OK</span></span></code></pre></div>
+<h1 data-number="6" id="fanotify"><span
+class="header-section-number">6</span> fanotify</h1>
+<p><a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/fs-monitor.c">Click
+here to view userspace fanotify usage examples
+<code>fs-monitor.c</code></a>:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">-o</span> fs-monitor fs-monitor.c</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./fs-monitor</span> /path/to/file</span></code></pre></div>
+<p>When reading a file:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>read</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  ksys_read</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    vfs_read</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>      fanotify_read</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        add_wait_queue <span class="co">// wait here</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        copy_event_to_user</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>vfs_read <span class="op">/</span> __kernel_read</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  fsnotify_access</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    fsnotify_file</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>      fsnotify_path</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        fsnotify_parent</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>          __fsnotify_parent</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>            fsnotify</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>              send_to_group</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>                fanotify_handle_event</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>                  fsnotify_insert_event</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// wake up the wait queue in fanotify_read()</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>                    wake_up<span class="op">(&amp;</span>group<span class="op">-&gt;</span>notification_waitq<span class="op">)</span></span></code></pre></div>
+<h1 data-number="7" id="smb-server内核代码分析"><span
+class="header-section-number">7</span> smb server内核代码分析</h1>
 <p>异步等待和唤醒:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>smb2_lock</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  setup_async_work<span class="op">(...,</span> smb2_remove_blocked_lock<span class="op">,</span> <span class="op">...)</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    work<span class="op">-&gt;</span>cancel_fn <span class="op">=</span> fn</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  smb2_send_interim_resp<span class="op">(</span>work<span class="op">,</span> STATUS_PENDING<span class="op">);</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  ksmbd_vfs_posix_lock_wait</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>smb2_cancel</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  iter<span class="op">-&gt;</span>state <span class="op">=</span> KSMBD_WORK_CANCELLED</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  smb2_remove_blocked_lock <span class="co">// iter-&gt;cancel_fn</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    locks_delete_block</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      __locks_delete_block</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        __locks_wake_up_blocks</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>          locks_wake_up_waiter</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>            wake_up<span class="op">(&amp;</span>flc<span class="op">-&gt;</span>flc_wait<span class="op">)</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>ksmbd_conn_handler_loop <span class="co">// default_conn_ops.process_fn</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  ksmbd_server_process_request</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    queue_ksmbd_work</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>      ksmbd_alloc_work_struct</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        ksmbd_queue_work</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>          handle_ksmbd_work <span class="co">// queue_work(ksmbd_wq,</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>            __handle_ksmbd_work</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>              __process_request</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>              ksmbd_conn_try_dequeue_request</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>                list_del_init<span class="op">(&amp;</span>work<span class="op">-&gt;</span>request_entry<span class="op">)</span> <span class="co">// 从async_requests链表中删除</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>                release_async_work</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>smb2_lock</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  setup_async_work<span class="op">(...,</span> smb2_remove_blocked_lock<span class="op">,</span> <span class="op">...)</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    work<span class="op">-&gt;</span>cancel_fn <span class="op">=</span> fn</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  smb2_send_interim_resp<span class="op">(</span>work<span class="op">,</span> STATUS_PENDING<span class="op">);</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  ksmbd_vfs_posix_lock_wait</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>smb2_cancel</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  iter<span class="op">-&gt;</span>state <span class="op">=</span> KSMBD_WORK_CANCELLED</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  smb2_remove_blocked_lock <span class="co">// iter-&gt;cancel_fn</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    locks_delete_block</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>      __locks_delete_block</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        __locks_wake_up_blocks</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>          locks_wake_up_waiter</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>            wake_up<span class="op">(&amp;</span>flc<span class="op">-&gt;</span>flc_wait<span class="op">)</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>ksmbd_conn_handler_loop <span class="co">// default_conn_ops.process_fn</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  ksmbd_server_process_request</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    queue_ksmbd_work</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>      ksmbd_alloc_work_struct</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>        ksmbd_queue_work</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>          handle_ksmbd_work <span class="co">// queue_work(ksmbd_wq,</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>            __handle_ksmbd_work</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>              __process_request</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>              ksmbd_conn_try_dequeue_request</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>                list_del_init<span class="op">(&amp;</span>work<span class="op">-&gt;</span>request_entry<span class="op">)</span> <span class="co">// 从async_requests链表中删除</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>                release_async_work</span></code></pre></div>
 <p>文件名处理:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>smb2_query_info</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  smb2_get_info_filesystem</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> smb2_query_info_rsp <span class="co">// MS-SMB2 2.2.38</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> <span class="op">(</span>FILE_SYSTEM_ATTRIBUTE_INFO <span class="op">*)</span>rsp<span class="op">-&gt;</span>Buffer<span class="op">;</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  smb2_get_info_file</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    smb2_get_ea</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      ptr <span class="op">=</span> <span class="op">(</span><span class="dt">char</span> <span class="op">*)</span>rsp<span class="op">-&gt;</span>Buffer</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      eainfo <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> smb2_ea_info <span class="op">*)</span>ptr<span class="op">;</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>__handle_ksmbd_work</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  smb2_allocate_rsp_buf <span class="co">// conn-&gt;ops-&gt;allocate_rsp_buf</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span>max_trans_size <span class="op">=</span> SMB3_DEFAULT_TRANS_SIZE<span class="op">,</span></span></code></pre></div>
-<h1 data-number="7" id="smb-client内核代码分析"><span
-class="header-section-number">7</span> smb client内核代码分析</h1>
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ioctl</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  cifs_ioctl</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    smb3_notify</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      SMB2_open<span class="op">(</span>xid<span class="op">,</span> <span class="op">&amp;</span>oparms<span class="op">,</span> <span class="op">...)</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        SMB2_open_init</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>          smb2_plain_req_init<span class="op">(</span>SMB2_CREATE<span class="op">,</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      SMB2_change_notify</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        SMB2_notify_init</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>          smb2_plain_req_init<span class="op">(</span>SMB2_CHANGE_NOTIFY<span class="op">,</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        cifs_send_recv</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>          compound_send_recv</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>            smb2_setup_request <span class="co">// .setup_request</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>              smb2_seq_num_into_buf</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                smb2_seq_num_into_buf<span class="op">(</span>server<span class="op">,</span> shdr<span class="op">);</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>      SMB2_cancel</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        cifs_send_recv</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>          compound_send_recv</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>            smb_send_rqst</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>              __smb_send_rqst</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>                rc <span class="op">=</span> <span class="op">-</span>ERESTARTSYS</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="op">(</span>fatal_signal_pending<span class="op">(</span>current<span class="op">))</span> <span class="op">{</span> <span class="co">// 进程将要退出</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>                <span class="cf">goto</span> out</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="op">-</span>ERESTARTSYS</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>      SMB2_close</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        __SMB2_close</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>          rc <span class="op">=</span> cifs_send_recv <span class="co">// -ERESTARTSYS</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>          smb2_handle_cancelled_close</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>            __smb2_handle_cancelled_cmd</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>              smb2_cancelled_close_fid <span class="co">// INIT_WORK(&amp;cancelled-&gt;work,</span></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>                SMB2_close<span class="op">(</span><span class="dv">0</span><span class="op">,</span> tcon<span class="op">,</span> <span class="co">// 在工作队列中再次尝试</span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>kthread</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>  cifs_demultiplex_thread</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    cifs_handle_standard</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>      smb2_is_status_pending</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>revert_current_mid</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>revert_current_mid_from_hdr</span></code></pre></div>
-<h1 data-number="8" id="fanotify"><span
-class="header-section-number">8</span> fanotify</h1>
-<p>详细的分析过程请查看英文网页<a
-href="https://chenxiaosong.com/en/smb2-change-notify.html#fanotify">《SMB2
-CHANGE_NOTIFY feature》</a>。</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>smb2_query_info</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  smb2_get_info_filesystem</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> smb2_query_info_rsp <span class="co">// MS-SMB2 2.2.38</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> <span class="op">(</span>FILE_SYSTEM_ATTRIBUTE_INFO <span class="op">*)</span>rsp<span class="op">-&gt;</span>Buffer<span class="op">;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  smb2_get_info_file</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    smb2_get_ea</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>      ptr <span class="op">=</span> <span class="op">(</span><span class="dt">char</span> <span class="op">*)</span>rsp<span class="op">-&gt;</span>Buffer</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>      eainfo <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> smb2_ea_info <span class="op">*)</span>ptr<span class="op">;</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>__handle_ksmbd_work</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  smb2_allocate_rsp_buf <span class="co">// conn-&gt;ops-&gt;allocate_rsp_buf</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span>max_trans_size <span class="op">=</span> SMB3_DEFAULT_TRANS_SIZE<span class="op">,</span></span></code></pre></div>
+<h1 data-number="8" id="smb-client内核代码分析"><span
+class="header-section-number">8</span> smb client内核代码分析</h1>
+<div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>ioctl</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  cifs_ioctl</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    smb3_notify</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>      SMB2_open<span class="op">(</span>xid<span class="op">,</span> <span class="op">&amp;</span>oparms<span class="op">,</span> <span class="op">...)</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        SMB2_open_init</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>          smb2_plain_req_init<span class="op">(</span>SMB2_CREATE<span class="op">,</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>      SMB2_change_notify</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        SMB2_notify_init</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>          smb2_plain_req_init<span class="op">(</span>SMB2_CHANGE_NOTIFY<span class="op">,</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        cifs_send_recv</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>          compound_send_recv</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>            smb2_setup_request <span class="co">// .setup_request</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>              smb2_seq_num_into_buf</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                smb2_seq_num_into_buf<span class="op">(</span>server<span class="op">,</span> shdr<span class="op">);</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>      SMB2_cancel</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>        cifs_send_recv</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>          compound_send_recv</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>            smb_send_rqst</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>              __smb_send_rqst</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>                rc <span class="op">=</span> <span class="op">-</span>ERESTARTSYS</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="op">(</span>fatal_signal_pending<span class="op">(</span>current<span class="op">))</span> <span class="op">{</span> <span class="co">// 进程将要退出</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>                <span class="cf">goto</span> out</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="op">-</span>ERESTARTSYS</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>      SMB2_close</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>        __SMB2_close</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>          rc <span class="op">=</span> cifs_send_recv <span class="co">// -ERESTARTSYS</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>          smb2_handle_cancelled_close</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>            __smb2_handle_cancelled_cmd</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>              smb2_cancelled_close_fid <span class="co">// INIT_WORK(&amp;cancelled-&gt;work,</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>                SMB2_close<span class="op">(</span><span class="dv">0</span><span class="op">,</span> tcon<span class="op">,</span> <span class="co">// 在工作队列中再次尝试</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>kthread</span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>  cifs_demultiplex_thread</span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>    cifs_handle_standard</span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>      smb2_is_status_pending</span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>revert_current_mid</span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>revert_current_mid_from_hdr</span></code></pre></div>
 </body>
 </html>

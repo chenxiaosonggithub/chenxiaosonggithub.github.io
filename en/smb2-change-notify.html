@@ -136,10 +136,6 @@ tcpdump</a>
 <li><a href="#samba-20251110-2016" id="toc-samba-20251110-2016"><span
 class="toc-section-number">6.1</span> samba 20251110-2016</a></li>
 </ul></li>
-<li><a href="#samba-code" id="toc-samba-code"><span
-class="toc-section-number">7</span> samba code analysis</a></li>
-<li><a href="#fanotify" id="toc-fanotify"><span
-class="toc-section-number">8</span> fanotify</a></li>
 </ul>
 </nav>
 <p><a
@@ -325,92 +321,5 @@ smb server</li>
 <li>server respond
 <code>20:17:54.095 Notify Response No.285 [Response to: 239]</code></li>
 </ul>
-<h1 data-number="7" id="samba-code"><span
-class="header-section-number">7</span> samba code analysis</h1>
-<p>Some code (e.g., the definition of <code>NT_STATUS_PENDING</code>) is
-generated during compilation. To see the full code, the project must be
-compiled first.</p>
-<p>You can use macros like <code>DBG_ERR()</code>, …,
-<code>DBG_DEBUG()</code>, etc., to print debug information.</p>
-<p>Use <code>log_stack_trace()</code> to print the function stack. If
-you get a compilation error indicating that
-<code>log_stack_trace()</code> cannot be found, you can refer to the
-changes in the patch <a
-href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/0001-dump-stack-of-smbd_parent_loop.patch"><code>0001-dump-stack-of-smbd_parent_loop.patch</code></a>.</p>
-<p>The logs can be found in
-<code>/usr/local/samba/var/log.smbd</code>.</p>
-<p>When samba receive <code>Create Request</code>:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_dispatch</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_process_create</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_create_send</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>      smbd_smb2_create_finish</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>        <span class="co">// save the fsp, and return immediately when file_fsp_smb2() is called later</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>        smb2req<span class="op">-&gt;</span>compat_chain_fsp <span class="op">=</span> smb1req<span class="op">-&gt;</span>chain_fsp</span></code></pre></div>
-<p>When samba receive <code>Notify Request</code>:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_dispatch</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_process_notify</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// both persistent_id and volatile_id are -1 when `Create Request` and `Notify Request` are in the same compound request</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    file_fsp_smb2</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> smb2req<span class="op">-&gt;</span>compat_chain_fsp</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_notify_send</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>      change_notify_create</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>change_notify_fsp_has_changes<span class="op">(</span>fsp<span class="op">)</span> <span class="co">// have change information</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>      change_notify_reply <span class="co">// notify immediately</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>        <span class="co">// reply NT_STATUS_OK</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>      change_notify_add_request <span class="co">// No changes for now, wait in the queue</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    smbd_smb2_request_pending_queue <span class="co">// nothing to notify, start the timer</span></span></code></pre></div>
-<p>Start the timer:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_pending_timer</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// reply NT_STATUS_PENDING</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// SMB2_HDR_OPCODE defines the offset of the Command field in struct smb2_hdr</span></span></code></pre></div>
-<p>When Windows exits the directory, samba receive
-<code>Cancel Request</code>:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>smbd_smb2_request_dispatch</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  smbd_smb2_request_process_cancel</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    _tevent_req_cancel</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>      smbd_smb2_notify_cancel</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>        smbd_notify_cancel_by_smbreq</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>          smbd_notify_cancel_by_map</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>            change_notify_reply</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>              <span class="co">// reply NT_STATUS_CANCELLED</span></span></code></pre></div>
-<p>Samba send <code>Notify Response</code> when change information is
-available:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>messaging_dispatch_classic</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  notify_handler</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    notify_callback</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>      files_forall</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>        notify_fsp_cb</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>          notify_fsp</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>            change_notify_reply</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>              <span class="co">// reply NT_STATUS_OK</span></span></code></pre></div>
-<h1 data-number="8" id="fanotify"><span
-class="header-section-number">8</span> fanotify</h1>
-<p><a
-href="https://github.com/chenxiaosonggithub/blog/blob/master/course/smb/src/fs-monitor.c">Click
-here to view userspace fanotify usage examples
-<code>fs-monitor.c</code></a>:</p>
-<div class="sourceCode" id="cb26"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">-o</span> fs-monitor fs-monitor.c</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./fs-monitor</span> /path/to/file</span></code></pre></div>
-<p>When reading a file:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>read</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  ksys_read</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    vfs_read</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>      fanotify_read</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>        add_wait_queue <span class="co">// wait here</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>        copy_event_to_user</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>vfs_read <span class="op">/</span> __kernel_read</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  fsnotify_access</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    fsnotify_file</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>      fsnotify_path</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>        fsnotify_parent</span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>          __fsnotify_parent</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>            fsnotify</span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>              send_to_group</span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>                fanotify_handle_event</span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>                  fsnotify_insert_event</span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// wake up the wait queue in fanotify_read()</span></span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>                    wake_up<span class="op">(&amp;</span>group<span class="op">-&gt;</span>notification_waitq<span class="op">)</span></span></code></pre></div>
 </body>
 </html>
