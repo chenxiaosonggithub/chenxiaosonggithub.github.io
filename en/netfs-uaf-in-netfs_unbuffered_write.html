@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>netfs UAF in netfs_unbuffered_write()</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+</head>
+<body>
+<header id="title-block-header">
+<ul>
+<li>Author: 陈孝松 (ChenXiaoSong)</li>
+<li><a href="https://chenxiaosong.com/">Chinese Homepage:
+chenxiaosong.com</a></li>
+<li><a href="https://chenxiaosong.com/en/">English Homepage:
+chenxiaosong.com/en</a></li>
+<li><a href="https://chenxiaosong.com/en/smb-contribution.html">SMB
+Contributions</a></li>
+<li>Email: <a href="mailto:chenxiaosong@chenxiaosong.com"
+class="email">chenxiaosong@chenxiaosong.com</a></li>
+</ul>
+<h1 class="title">netfs UAF in netfs_unbuffered_write()</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#issue-description" id="toc-issue-description"><span
+class="toc-section-number">1</span> Issue description</a></li>
+<li><a href="#reproducer" id="toc-reproducer"><span
+class="toc-section-number">2</span> Reproducer</a></li>
+<li><a href="#tracing-log" id="toc-tracing-log"><span
+class="toc-section-number">3</span> Tracing log</a></li>
+</ul>
+</nav>
+<h1 data-number="1" id="issue-description"><span
+class="header-section-number">1</span> Issue description</h1>
+<p><a
+href="https://syzkaller.appspot.com/bug?extid=3c74b1f0c372e98efc32">Syzkaller
+reported the following issue</a>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.627050] WARNING: lib/refcount.c:28 <span class="er">at</span> <span class="ex">refcount_warn_saturate+0x6b/0xa0,</span> CPU#3: a.out/951</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.655474] Call Trace:</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">542.656124</span><span class="ex">]</span>  <span class="op">&lt;</span>TASK<span class="op">&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.656674]  netfs_put_subrequest+0xc6/0x180</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>[  542.657678]  <span class="er">netfs_clear_subrequests+0x51/0xe0</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.658756]  netfs_unbuffered_write+0x777/0x960</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>[  542.659846]  <span class="er">netfs_unbuffered_write_iter_locked+0x160/0x210</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.660724]  netfs_unbuffered_write_iter+0x18c/0x210</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>[  542.661426]  <span class="er">v9fs_file_write_iter+0x4d/0x80</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.662115]  vfs_write+0x2bf/0x3d0</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>[  542.662655]  <span class="er">ksys_write+0x72/0x100</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.663159]  __x64_sys_write+0x1f/0x30</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>[  542.663750]  <span class="er">x64_sys_call+0x2762/0x3030</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.664328]  do_syscall_64+0xf0/0x3b0</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>[  542.664936]  <span class="er">entry_SYSCALL_64_after_hwframe+0x76/0x7e</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.665709] RIP: 0033:0x7fe80fedcd5d</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="er">[</span>  <span class="er">542.666243</span><span class="ex">]</span> Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <span class="op">&lt;</span>48<span class="op">&gt;</span> 3d 01 f0 ff ff 73 01 c3 48 8b  8</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.669017] RSP: 002b:00007fe80fdbee68 <span class="er">EFLAGS:</span> <span class="ex">00000246</span> ORIG_RAX: 0000000000000001</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.670208] RAX: ffffffffffffffda <span class="er">RBX:</span> <span class="ex">00007fe80fdbfcdc</span> RCX: 00007fe80fedcd5d</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.671336] RDX: 00000000fffffdd8 <span class="er">RSI:</span> <span class="ex">0000200000000540</span> RDI: 0000000000000003</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.672420] RBP: 00007fe80fdbee90 <span class="er">R08:</span> <span class="ex">000000000000000f</span> R09: 203a6362696c6720</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.673526] R10: 0000000000000078 <span class="er">R11:</span> <span class="ex">0000000000000246</span> R12: 00007fe80fdbf6c0</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.674648] R13: ffffffffffffff88 <span class="er">R14:</span> <span class="ex">0000000000000000</span> R15: 00007ffc02debb60</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  542.675737]  <span class="er">&lt;</span>/TASK<span class="er">&gt;</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>[  542.676079] <span class="er">---[</span> <span class="ex">end</span> trace 0000000000000000 ]---</span></code></pre></div>
+<h1 data-number="2" id="reproducer"><span
+class="header-section-number">2</span> Reproducer</h1>
+<p>Enable <code>9P_FS=y or 9P_FS=m</code>.</p>
+<p>QEMU should be started with the following <code>virtfs</code> option
+(<a
+href="https://github.com/chenxiaosonggithub/blog/blob/master/course/kernel/src/x86_64/update-base.sh">you
+can refer to the script I used</a>):</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">-virtfs</span> ...,mount_tag=syz,...</span></code></pre></div>
+<p><a
+href="https://syzkaller.appspot.com/text?tag=ReproC&amp;x=171b697e580000"><code>test.c</code></a>
+(<a
+href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/netfs/netfs-uaf-in-netfs_unbuffered_write/test.c">you
+can also get it from my GitHub</a>).</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> test.c</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./a.out</span></span></code></pre></div>
+<h1 data-number="3" id="tracing-log"><span
+class="header-section-number">3</span> Tracing log</h1>
+<p><a
+href="https://github.com/chenxiaosonggithub/tmp/blob/master/gnu-linux/netfs/netfs-uaf-in-netfs_unbuffered_write/trace.txt">Click
+here to see the tracing log</a>.</p>
+<p><a
+href="https://lore.kernel.org/netfs/2912807.1782231053@warthog.procyon.org.uk/">You
+can also get the tracing log using the steps below</a>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /sys/kernel/tracing/events/netfs/netfs_read/enable</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /sys/kernel/tracing/events/netfs/netfs_write/enable</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /sys/kernel/tracing/events/netfs/netfs_rreq/enable</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /sys/kernel/tracing/events/netfs/netfs_sreq/enable</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /sys/kernel/tracing/events/netfs/netfs_failure/enable</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> 1 <span class="op">&gt;</span> /sys/kernel/tracing/events/error_report/enable</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /sys/kernel/debug/tracing/trace</span></code></pre></div>
+</body>
+</html>
