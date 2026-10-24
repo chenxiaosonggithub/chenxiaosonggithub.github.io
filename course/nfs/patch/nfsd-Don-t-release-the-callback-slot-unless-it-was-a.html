@@ -47,6 +47,21 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 class="title">e6abc8caa6de nfsd: Don't release the callback slot
 unless it was actually held</h1>
 </header>
@@ -63,5 +78,20 @@ href="https://lore.kernel.org/all/20190405155437.5545-1-trond.myklebust@hammersp
 此外，nfsd4_cb_sequence_done() 中的 &#39;retry_nowait&#39; 路径会在不先释放槽的情况下返回 nfsd4_cb_prepare()，这会在第二次调用 nfsd41_cb_get_slot() 时导致死锁。
 
 因此，该补丁添加了一个布尔值来跟踪回调是否实际获取了槽，以便在这两种情况下做出正确的处理。</code></pre>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 </body>
 </html>

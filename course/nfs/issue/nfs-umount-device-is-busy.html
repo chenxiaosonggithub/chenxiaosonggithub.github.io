@@ -111,6 +111,21 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 class="title">umount nfs报错device is busy的问题</h1>
 </header>
 <nav id="TOC" role="doc-toc">
@@ -213,8 +228,6 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt <span class="co"># 正常卸载，不报错</span></span></code></pre></div>
 <h2 data-number="4.2" id="代码分析"><span
 class="header-section-number">4.2</span> 代码分析</h2>
-<p>系统调用的跟踪调试请查看<a
-href="https://chenxiaosong.com/course/kernel/fs.html#lazy-umount">《文件系统延迟卸载》</a>。</p>
 <p>只有在用户空间打开文件时会把文件描述符放到<code>files_struct -&gt; fdt</code>中:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>openat</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  do_sys_open</span>
@@ -226,5 +239,20 @@ href="https://chenxiaosong.com/course/kernel/fs.html#lazy-umount">《文件系�
 href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/kprobe-fd_install.c"><code>kprobe-fd_install.c</code></a>调试，
 其中<code>mydebug_dump_stack()</code>相关的用法可以查看<a
 href="https://chenxiaosong.com/course/kernel/debug.html#mydebug">《mydebug模块》</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 </body>
 </html>

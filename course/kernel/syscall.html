@@ -111,6 +111,21 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 class="title">系统调用</h1>
 </header>
 <nav id="TOC" role="doc-toc">
@@ -214,5 +229,20 @@ class="header-section-number">3.2</span> 实现</h2>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="dt">unsigned</span> <span class="dt">long</span> copy_to_user<span class="op">(</span><span class="dt">void</span> __user <span class="op">*</span>to<span class="op">,</span> <span class="dt">const</span> <span class="dt">void</span> <span class="op">*</span>from<span class="op">,</span> <span class="dt">unsigned</span> <span class="dt">long</span> n<span class="op">)</span></span></code></pre></div>
 <p>检查权限用函数<code>capable()</code>，参数传入<code>CAP_CHOWN</code>等宏定义。</p>
 <p>内核执行系统调用时，处于进程上下文，<code>current</code>指针指向触发系统调用的用户态进程。在进程上下文中，可以休眠，可以被其他进程抢占。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 </body>
 </html>

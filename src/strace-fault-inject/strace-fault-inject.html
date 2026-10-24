@@ -111,6 +111,21 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 class="title">strace内存分配失败故障注入</h1>
 </header>
 <nav id="TOC" role="doc-toc">
@@ -163,5 +178,20 @@ Fail client initialisation if state manager thread can’t
 run</a>，大家可以尝试在主线版本回退这个补丁进行测试。</p>
 <p>示例脚本是对nfs的<code>mount</code>系统调用进入故障注入，可以换成任何其他的系统调用，也可以换成其他文件系统，当然了，并不局限于文件系统。</p>
 <p>除了看循环有没卡住，还可以看<code>dmesg</code>命令中有没有空指针解引用以及有没内存之类的报错，还可以看<code>kmemleak</code>有没内存泄露。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 </body>
 </html>

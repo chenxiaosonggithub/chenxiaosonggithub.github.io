@@ -111,6 +111,21 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 class="title">使用kprobe监控scsi的读写数据</h1>
 </header>
 <nav id="TOC" role="doc-toc">
@@ -151,5 +166,20 @@ href="https://gitee.com/chenxiaosonggitee/blog/blob/master/src/kernel/Makefile">
 <p>再把<code>file</code>文件内容变成正确的，再查看内核日志:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=3rd-right of=/dev/sda2 bs=1 seek=184557568 count=4096 <span class="co"># 写第3个正确的页，45056 * 4096 + 8192</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=file-expect of=/dev/sda2 bs=4096 seek=45056 count=10240 <span class="co"># 或把 file 重置, 全部正确</span></span></code></pre></div>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 </body>
 </html>

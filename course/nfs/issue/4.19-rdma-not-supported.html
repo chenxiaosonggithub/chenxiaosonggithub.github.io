@@ -111,6 +111,21 @@ class="email">chenxiaosong@chenxiaosong.com</a></li>
 点击查看群介绍</a></li>
 </ul>
 <!-- sign end -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 class="title">4.19 nfs rdma协议不支持的问题</h1>
 </header>
 <nav id="TOC" role="doc-toc">
@@ -259,5 +274,20 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#
 <span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="ex">vermagic:</span>       4.19.90-24 SMP mod_unload modversions</span></code></pre></div>
 <p><code>echo 'rdma 20049' &gt; /proc/fs/nfsd/portlist</code>执行成功。</p>
 <p>出问题时<code>/lib/modules/4.19.90-24.4.v2101.ky10.x86_64/updates/net/sunrpc/xprtrdma/rpcrdma.ko</code>下的ko是编译驱动时重新编译的，依赖的是<code>mlx_compat</code>模块。因此只要使用最原生的<code>rpcrdma</code>模块就能解决此问题。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 </body>
 </html>
