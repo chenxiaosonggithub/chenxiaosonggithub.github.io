@@ -20,9 +20,11 @@
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+  type="text/javascript"></script>
 </head>
 <body>
 <header id="title-block-header">
@@ -641,41 +643,33 @@ class="header-section-number">3.2</span> 3.2
 也没用：对自己不够，对邻居又太强。系统需要换终端配对、调整速率或功率，或者改为分时发送。</p>
 <p>下面的双链路模型，就是把这两关写得更精确；它是教学模型，不是标准规定的唯一算法。</p>
 <ul>
-<li><span
-class="math inline"><em>P</em><sub><em>A</em></sub>, <em>P</em><sub><em>B</em></sub></span>
-是两个 AP
+<li><span class="math inline">\(P_A,P_B\)</span> 是两个 AP
 的<strong>线性发射功率</strong>，即可直接用于乘除计算的功率数值。</li>
-<li><span
-class="math inline"><em>g</em><sub><em>A</em><em>a</em></sub></span> 是
-AP-A 到 STA-a
+<li><span class="math inline">\(g_{Aa}\)</span> 是 AP-A 到 STA-a
 的<strong>功率增益</strong>，即接收功率与发射功率的比例，可以远小于
 1。下标第一个字母是发送 AP，第二个是接收终端，因此 <span
-class="math inline"><em>g</em><sub><em>B</em><em>a</em></sub></span>
-表示 B 对 a 的交叉传播关系，<span
-class="math inline"><em>g</em><sub><em>B</em><em>b</em></sub></span>、<span
-class="math inline"><em>g</em><sub><em>A</em><em>b</em></sub></span>
-同理。</li>
-<li><span
-class="math inline"><em>N</em><sub><em>a</em></sub>, <em>N</em><sub><em>b</em></sub></span>
+class="math inline">\(g_{Ba}\)</span> 表示 B 对 a 的交叉传播关系，<span
+class="math inline">\(g_{Bb}\)</span>、<span
+class="math inline">\(g_{Ab}\)</span> 同理。</li>
+<li><span class="math inline">\(N_a,N_b\)</span>
 是两端背景噪声及模型计入的其他干扰功率。</li>
 </ul>
-<p><span class="math display">$$
+<p><span class="math display">\[
 \mathrm{SINR}_a=\frac{P_Ag_{Aa}}{N_a+P_Bg_{Ba}},\qquad
 \mathrm{SINR}_b=\frac{P_Bg_{Bb}}{N_b+P_Ag_{Ab}}.
-$$</span></p>
+\]</span></p>
 <p>分子是想收到的信号，分母是噪声与另一 AP
 带来的干扰。假设两端所需的最低目标
 SINR，也就是<strong>门限</strong>，分别为 <span
-class="math inline"><em>γ</em><sub><em>a</em></sub>, <em>γ</em><sub><em>b</em></sub></span>；满足它们，是模型中正确<strong>解码</strong>（从信号还原数据）的要求。固定
-<span class="math inline"><em>P</em><sub><em>A</em></sub></span> 后，B
-的功率范围为：</p>
-<p><span class="math display">$$
+class="math inline">\(\gamma_a,\gamma_b\)</span>；满足它们，是模型中正确<strong>解码</strong>（从信号还原数据）的要求。固定
+<span class="math inline">\(P_A\)</span> 后，B 的功率范围为：</p>
+<p><span class="math display">\[
 \underbrace{\frac{\gamma_b(N_b+P_Ag_{Ab})}{g_{Bb}}}_{\text{保证 STA-b
 解码所需的下限}}
 \le P_B \le
 \underbrace{\frac{P_Ag_{Aa}/\gamma_a-N_a}{g_{Ba}}}_{\text{保护 STA-a
 所允许的上限}}.
-$$</span></p>
+\]</span></p>
 <p>左边是“自己听得清”的下限，右边是“邻居还能正常接收”的上限。当下限大于上限，或上限为负，就没有可行配置；同时还要满足设备功率限制。</p>
 <p>这个模型忽略了具体接收机、<strong>衰落</strong>（接收强弱随移动、遮挡等变化）与门限误差，因此实际部署还应留<strong>裕量</strong>，给不确定性留些余地。常见功率单位
 <strong>dBm</strong> 是相对于 1 毫瓦的对数单位，0 dBm 等于 1
@@ -735,13 +729,15 @@ BSS 零陷研究</a></p>
 的工作比“把天线朝手机转过去”复杂得多；它需要知道传播条件，再计算各根天线该怎样输出。</p>
 <p><strong>多看一步：公式只表达两个要求。</strong>
 先考虑一路独立数据，也就是<strong>单流</strong>。对各天线信号按权重作乘法和叠加，称为<strong>线性预编码</strong>。希望达到的效果是：</p>
-<p><span
-class="math display">|<strong>h</strong><sub><em>A</em><em>a</em></sub><sup><em>H</em></sup><strong>w</strong><sub><em>A</em></sub>|<sup>2</sup> 保持足够大,   |<strong>h</strong><sub><em>A</em><em>b</em></sub><sup><em>H</em></sup><strong>w</strong><sub><em>A</em></sub>|<sup>2</sup> 尽量小.</span></p>
+<p><span class="math display">\[
+|\mathbf h_{Aa}^{H}\mathbf w_A|^2\ \text{保持足够大},\qquad
+|\mathbf h_{Ab}^{H}\mathbf w_A|^2\ \text{尽量小}.
+\]</span></p>
 <p>第一项对应本 AP 的目标终端，第二项对应要保护的邻居终端。<span
-class="math inline"><strong>h</strong></span>
+class="math inline">\(\mathbf h\)</span>
 是<strong>复数信道向量</strong>，即同时记录信号衰减与相位变化的一组数；<span
-class="math inline"><strong>w</strong><sub><em>A</em></sub></span> 是 A
-的发射权重。<span class="math inline"><em>H</em></span>
+class="math inline">\(\mathbf w_A\)</span> 是 A 的发射权重。<span
+class="math inline">\(H\)</span>
 表示<strong>共轭转置</strong>，是组合信道与权重时使用的数学运算。竖线表示取幅度，外面的平方衡量信号强弱。</p>
 <p>理想的<strong>零迫设计</strong>会尝试用数学约束让第二项为零。实际系统存在测量、移动和硬件误差，所以这里的零应理解为理想目标，不能当作“邻居从此完全听不到干扰”的保证。</p>
 <h2 data-number="4.2" id="小林挪了座位旧设置还管用吗"><span
@@ -850,8 +846,10 @@ ms。把发送速度翻倍，发送只剩 1 ms，总耗时仍有 19 ms。</p>
 ms。这个教学算例说明：<strong>对于大部分时间都在等的包，减少等待很有价值。</strong>
 它不是 Co-TDMA 的固定性能承诺。</p>
 <p>把一次成功交付的无线侧耗时拆开，大致可以写成：</p>
-<p><span
-class="math display"><em>D</em> = <em>D</em><sub>queue</sub> + <em>D</em><sub>access</sub> + <em>D</em><sub>tx</sub> + <em>D</em><sub>retransmission</sub>.</span></p>
+<p><span class="math display">\[
+D = D_{\mathrm{queue}} + D_{\mathrm{access}}
+  + D_{\mathrm{tx}} + D_{\mathrm{retransmission}}.
+\]</span></p>
 <p>四项依次是排队（queue）、竞争接入（access）、实际发送（tx）和重传（retransmission）的耗时。它是解释用分解，统计时应避免把重传中的接入时间重复算两遍。</p>
 <p>Co-TDMA
 主要影响随机接入等待。设备争用时会<strong>退避</strong>，即按规则随机等一段时间再尝试；伙伴分享的机会，可以减少某些反复等待。但
