@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -198,12 +199,32 @@ class="toc-section-number">7.7</span> 页表</a></li>
 </ul></li>
 <li><a href="#伙伴算法" id="toc-伙伴算法"><span
 class="toc-section-number">8</span> 伙伴算法</a></li>
+<li><a href="#页高速缓存" id="toc-页高速缓存"><span
+class="toc-section-number">9</span> 页高速缓存</a></li>
 </ul>
 </nav>
 <p><a
 href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
+<!--
+https://mp.weixin.qq.com/mp/homepage?__biz=MzI3NzA5MzUxNA==&hid=14&sn=a7deb8f4a4986e1d148671008bd1403c&scene=1&devicetype=iMac+Mac14%2C2+OSX+OSX+14.5+build(23F79)&version=13080414&lang=zh_CN&nettype=WIFI&ascene=0&uin=&key=&fontScale=100
+-->
 <h1 data-number="1" id="内存地址"><span
 class="header-section-number">1</span> 内存地址</h1>
 <p>操作系统是横跨软件和硬件的桥梁，其中内存寻址是操作系统设计的硬件基础之一。</p>
@@ -234,6 +255,40 @@ Management
 Unit），最终转换成物理地址。MMU以page大小为单位管理内存，虚拟内存的最小单位就是page。</p>
 <h1 data-number="2" id="页"><span class="header-section-number">2</span>
 页</h1>
+<!--
+```c
+/*
+ * 系统中的每个物理页面都有一个 struct page 结构与之关联，
+ * 以跟踪我们当前使用该页面的用途。注意，我们无法跟踪哪些任务在使用页面，
+ * 但如果它是一个页缓存页面，rmap 结构可以告诉我们谁在映射它。
+ *
+ * 如果使用 alloc_pages() 分配页面，可以使用 struct page 中的一些空间
+ * 供自己使用。主联合中的五个字是可用的，除了第一个字的位0必须保持清零。
+ * 许多用户使用这个字来存储一个保证对齐的对象指针。
+ * 如果使用与 page->mapping 相同的存储空间，必须在释放页面之前将其恢复为 NULL。
+ *
+ * 如果你的页面不会映射到用户空间，还可以使用 mapcount 联合中的四个字节，
+ * 但在释放之前必须调用 page_mapcount_reset()。
+ *
+ * 如果想使用 refcount 字段，必须以不会导致其他 CPU 临时增加然后减少
+ * 引用计数时出现问题的方式使用。在从 alloc_pages() 接收到页面时，
+ * 引用计数将为正。
+ *
+ * 如果分配 order > 0 的页面，可以使用每个子页面中的某些字段，
+ * 但之后可能需要恢复其中一些值。
+ *
+ * SLUB 使用 cmpxchg_double() 来原子性地更新其空闲列表和计数器。
+ * 这要求在 struct slab 中空闲列表和计数器是相邻的并且是双字对齐的。
+ * 由于 struct slab 目前只是重新解释 struct page 的位，
+ * 我们将所有 struct page 对齐到双字边界，并确保 'freelist' 在 struct slab 中是对齐的。
+ */
+#ifdef CONFIG_HAVE_ALIGNED_STRUCT_PAGE                              
+#define _struct_page_alignment  __aligned(2 * sizeof(unsigned long))
+#else                                                               
+#define _struct_page_alignment  __aligned(sizeof(unsigned long))    
+#endif                                                              
+```
+-->
 <h2 data-number="2.1" id="struct-page"><span
 class="header-section-number">2.1</span> <code>struct page</code></h2>
 <p>系统中的每个物理页面都用<code>struct page</code>描述:</p>
@@ -1818,6 +1873,17 @@ page的页块插入<code>free_area[4]</code>的链表中，另一个16
 page的页块再分成2个8 page的页块，一个8
 page的页块插入<code>free_area[3]</code>的链表中，另一个8
 page的页块用于最终分配。具体请查看<code>__rmqueue_smallest()</code>和<code>expand()</code>函数。访问虚拟内存时，如果物理内存还没分配，会发生缺页异常，内核将从磁盘或交换文件（SWAP）中将要访问的页装入物理内存，最终调用<code>alloc_pages()</code>为进程分配page，并将虚拟内存和物理内存的映射关系写入页表。内核总是<strong>尽量延后</strong>分配用户空间的内存。</p>
+<h1 data-number="9" id="页高速缓存"><span
+class="header-section-number">9</span> 页高速缓存</h1>
+<p>访问磁盘的速度要远低于访问内存的速度。</p>
+<p>缓存策略有三种:</p>
+<ul>
+<li>不缓存，直接写到磁盘，同时让缓存中的数据失效。</li>
+<li>Write Through，写操作同时更新内存缓存和磁盘。</li>
+<li>Write
+Back，写操作先写到内存缓存中，磁盘不会立刻更新，先标记脏页，然后将脏页周期性的写到磁盘中。</li>
+</ul>
+<p>Linux的缓存回收是选择没有标记为脏的页进行简单替换。最近最少使用算法，LRU，</p>
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 

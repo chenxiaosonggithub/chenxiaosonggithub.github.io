@@ -86,13 +86,29 @@ openEuler的nfs多路径（nfs+）贡献</a></li>
 href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 data-number="1" id="mainline"><span
 class="header-section-number">1</span>
 Linux内核上游（Upstream）mainline仓库贡献</h1>
 <p><a
 href="https://lore.kernel.org/all/?q=chenxiaosong">点击查看kernel.org网站Linux内核邮件列表我和社区的沟通</a></p>
 <p><a
-href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/?qt=grep&amp;q=chenxiaosong">点击查看kernel.org网站上我的Linux内核上游仓库提交记录</a>（加载需要一丢丢时间哈，可以直接查看下面列出的补丁链接）</p>
+href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/?qt=grep&amp;q=chenxiaosong">点击查看kernel.org网站上我的Linux内核上游仓库提交记录</a>（加载需要一丢丢时间哈，可以直接查看下面列出的补丁链接）
+<!-- next: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log/?qt=grep&q=chenxiaosong --></p>
 <p>Linux内核是我现在的工作，更是我的兴趣和信仰（自由软件），在内核社区里可以让我这个小菜鸟直接和世上最顶尖的程序员交流。</p>
 <p>主要从事的方向是<strong>文件系统</strong>（nfs，smb等），修复多个<strong>内核社区CVE</strong>（通用漏洞披露，Common
 Vulnerabilities and Exposures）。</p>
@@ -174,7 +190,13 @@ href="https://lore.kernel.org/all/20220809064730.2316892-1-chenxiaosong2@huawei.
 <li><a
 href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=001c179c4e26d04db8c9f5e3fef9558b58356be6">001c179c4e26
 xfs: fix NULL pointer dereference in xfs_getbmap()</a>（<a
-href="https://chenxiaosong.com/course/kernel/my-patch/xfs-fix-NULL-pointer-dereference-in-xfs_getbmap.html">查看分析</a>）</li>
+href="https://chenxiaosong.com/course/kernel/my-patch/xfs-fix-NULL-pointer-dereference-in-xfs_getbmap.html">查看分析</a>）
+<!--
+只是为了让 check-contribution.sh 脚本不查找这几个补丁
+[63095f4f3af5 ntfs: check overflow when iterating ATTR_RECORDs](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=63095f4f3af5)
+[36a4d82dddbb ntfs: fix out-of-bounds read in ntfs_attr_find()](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=36a4d82dddbb)
+[d85a1bec8e8d ntfs: fix use-after-free in ntfs_attr_find()](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d85a1bec8e8d)
+--></li>
 <li><a
 href="https://nvd.nist.gov/vuln/detail/CVE-2023-26607">CVE-2023-26607</a>:
 <a

@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -149,6 +150,21 @@ class="toc-section-number">4</span> 补丁</a></li>
 href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 data-number="1" id="问题描述"><span
 class="header-section-number">1</span> 问题描述</h1>
 <p>麒麟server
@@ -225,6 +241,20 @@ class="header-section-number">3</span> 结论</h1>
 class="header-section-number">4</span> 补丁</h1>
 <p><a
 href="https://lore.kernel.org/all/20230911-acl-fix-v3-1-b25315333f6c@kernel.org/"><code>tags/v6.7-rc1 5aa8fd9cea2e fs: add a new SB_I_NOUMASK flag</code></a></p>
+<!--
+fs: add a new SB_I_NOUMASK flag
+NFS: Further optimisations for 'ls -l'
+NFS: Support larger readdir buffers
+NFS: Remove unnecessary kmap in nfs_readdir_xdr_to_array()
+NFS: Clean up nfs_readdir_page_filler()
+NFS: Clean up directory array handling
+nfs: pass the correct prototype to read_cache_page
+NFS: Clean up readdir struct nfs_cache_array
+nfs: Replace zero-length array with flexible-array member
+NFS: Ensure contents of struct nfs_open_dir_context are consistent
+NFS: Use the 64-bit server readdir cookies when possible
+nfs: optimise readdir cache page invalidation
+-->
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 

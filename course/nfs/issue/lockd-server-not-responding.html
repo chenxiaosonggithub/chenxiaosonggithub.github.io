@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -175,6 +176,21 @@ class="toc-section-number">5.3</span> 结论</a></li>
 href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 data-number="1" id="问题描述"><span
 class="header-section-number">1</span> 问题描述</h1>
 <p>4.19内核日志:</p>
@@ -189,6 +205,10 @@ class="header-section-number">1</span> 问题描述</h1>
 <p>挂载参数:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rw,relatime,vers=3,rsize=262144,wsize=262144,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountvers=3,mountproto=tcp,local_lock=none,_netdev</span></span></code></pre></div>
 <p>需要回答以下问题:</p>
+<!--
+- 核外: ftp哪些请求加锁，哪些请求解锁，怎么加锁？
+- 核外: 请求加锁是同步锁还是异步锁怎么判断？
+-->
 <ul>
 <li>lockd有哪些请求？哪些请求超时会报lockd信息？</li>
 <li>超时时间参数？</li>

@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -197,6 +198,28 @@ class="toc-section-number">9</span> 硬实时</a></li>
 href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
+<!--
+http://mp.weixin.qq.com/mp/homepage?__biz=MzI3NzA5MzUxNA==&hid=14&sn=a7deb8f4a4986e1d148671008bd1403c&scene=18#wechat_redirect
+
+https://mp.weixin.qq.com/s/5iJpFOOE49OByFds7notqw
+
+https://mp.weixin.qq.com/s/dWPWuDtxQBM9Z_GXwKe0KQ
+-->
 <h1 data-number="1" id="进程"><span
 class="header-section-number">1</span> 进程</h1>
 <h2 data-number="1.1" id="简介"><span
@@ -513,7 +536,16 @@ class="header-section-number">3.3</span> 调度策略</h2>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SCHED_DEADLINE          </span><span class="dv">6</span><span class="pp">    </span><span class="co">// 截止期限调度策略</span></span></code></pre></div>
 <p>某个进程的调度策略可以用<code>cat /proc/&lt;pid&gt;/sched | grep policy</code>查看。</p>
 <p>调试策略的具体实现用<code>struct sched_class</code>表示，可以查看宏定义<code>DEFINE_SCHED_CLASS</code>的引用。</p>
-<p>比较重要的数据结构还有<code>struct rq</code>（管理可运行状态进程，表示一个可运行队列，也就是就绪队列）和<code>struct sched_entity</code>（调度器中调度实体）。</p>
+<p>比较重要的数据结构还有<code>struct rq</code>（管理可运行状态进程，表示一个可运行队列，也就是就绪队列）和<code>struct sched_entity</code>（调度器中调度实体）。
+<!--
+/*
+ * 这是主要的、每个CPU对应的运行队列数据结构。
+ *
+ * 锁定规则: 那些需要锁定多个运行队列的地方（例如负载均衡或线程迁移代码），
+ * 锁的获取操作必须按 &runqueue 的地址升序进行。
+ */
+struct rq {
+--></p>
 <p>CFS相关的函数流程如下:</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>schedule</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  __schedule</span>
@@ -527,6 +559,15 @@ class="header-section-number">3.3</span> 调度策略</h2>
 <code>SCHED_FIFO</code>和<code>SCHED_RR</code>，这两种调度策略的进程比<code>SCHED_NORMAL</code>的进程优先级更高。<code>SCHED_RR</code>是带有时间片的<code>SCHED_FIFO</code>。这两种实时调度器使用静态优先级，高优先级的实时进程总能抢占低优先级进程。Linux内核是软实时，内核调度进程，尽力使进程在限定时间到来前运行，但不保证总能满足这些进程的要求，对于实时任务的调度不做任何保证，但性能还是不错的。实时优先级范围是<code>0 ~ MAX_RT_PRIO-1</code>，而<code>SCHED_NORMAL</code>进程的范围是<code>MAX_RT_PRIO ~ MAX_RT_PRIO+40</code>（对应<code>-20 ~ +19</code>的nice值）。</p>
 <h2 data-number="3.4" id="on和o1调度器"><span
 class="header-section-number">3.4</span> O(n)和O(1)调度器</h2>
+<!--
+**静态优先级**（100 ~ 139）
+
+静态优先级<120，基本时间片=max((140-静态优先级)*20, MIN_TIMESLICE)
+
+静态优先级>=120，基本时间片=max((140-静态优先级)*5, MIN_TIMESLICE)
+
+**动态优先级**=max(100 , min(静态优先级 - bonus + 5) , 139))，I/O消耗型进程bonus为正
+-->
 <p><strong>内核2.4</strong>版本的简陋的<strong>O(n)</strong>调度算法,进程数量多时，调度效率非常低:</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span>系统中的每个进程<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    重新计算时间片<span class="op">;</span></span>
@@ -544,6 +585,15 @@ class="header-section-number">3.4</span> O(n)和O(1)调度器</h2>
 <span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  进程链表<span class="op">[</span><span class="dv">140</span><span class="op">];</span> <span class="co">//对应动态优先级0~139</span></span>
 <span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> prio_array<span class="op">;</span> <span class="co">// 优先级数组</span></span></code></pre></div>
 <p>进程从活跃数组移动到过期数组前，已经重新计算好了时间片，本质就是采用<strong>分散计算时间片</strong>的方法。当活跃进程数组中没有进程时，只需要交换两个数组的指针，原来的过期数组变为活跃数组。因此只需要<strong>依次遍历</strong>位图的第一位，找到第一个置位，对应的进程链表上的所有进程都是优先级最高的，选取链表头的进程来执行即可。</p>
+<!--
+请阅读2.6.11内核`linux/kernel/sched.c`中的下列函数:
+
+时间片分配: `task_timeslice`
+
+运行队列操作: `enqueque_task、dequeque_task`
+
+更新时间片: `schedule_tick`
+-->
 <h1 data-number="4" id="完全公平调度器"><span
 class="header-section-number">4</span> 完全公平调度器</h1>
 <p>Completely Fair
@@ -659,7 +709,8 @@ Processing，SMP），每个cpu都参与调度操作系统的所有任务。每�
 <li>超线程:
 intel发明的，当前线程在访问内存的间隙，处理器可以使用它的机器周期支执行另一个线程。一个超线程的物理cpu可以被Linux看作几个不同的逻辑cpu。</li>
 <li>NUMA: Non-Uniform Memory
-Access，非统一内存访问，把cpu和RAM以本地”节点”为单位分组。当cpu访问与它在同一个节点中的”本地”RAM，几乎没有竞争，访问非常快。</li>
+Access，非统一内存访问，把cpu和RAM以本地”节点”为单位分组。当cpu访问与它在同一个节点中的”本地”RAM，几乎没有竞争，访问非常快。
+<!-- - AMD CCX 架构 --></li>
 </ul>
 <p>可以使用<code>lscpu</code>命令查看，<code>Thread(s) per core</code>代表每个核心的线程数，如果大于1，说明启用了超线程；<code>NUMA node(s)</code>表示NUMA节点的数量，如果只有一个节点，则表明不是NUMA架构，内存是所有CPU共享的。</p>
 <p><code>schedule()</code>函数从本地cpu运行队列中挑选进程运行，每个cpu有自己的运行队列，一个可运行进程只在一个队列中。</p>

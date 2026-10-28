@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -160,6 +161,21 @@ class="toc-section-number">8</span> 解决方案</a></li>
 href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 data-number="1" id="问题描述"><span
 class="header-section-number">1</span> 问题描述</h1>
 <p>nfsv3的文件占用缓存太多，使用<code>echo 3 &gt; /proc/sys/vm/drop_caches</code>命令依然无法释放缓存。</p>
@@ -340,6 +356,18 @@ class="header-section-number">8</span> 解决方案</h1>
 <p>回退补丁<a
 href="https://lore.kernel.org/all/20190407175912.23528-20-trond.myklebust@hammerspace.com/">14bebe3c90b3
 NFS: Don’t interrupt file writeout due to fatal errors</a>。</p>
+<!--
+```sh
+git log --grep=nfs_inode_remove_request --oneline --date=short --format="%cd %h %s %an <%ae>"
+# 2025-08-19 76d2e3890fb1 NFS: Fix a race when updating an existing write Trond Myklebust <trond.myklebust@hammerspace.com>
+# 2024-07-08 b571cfcb9dca nfs: don't reuse partially completed requests in nfs_lock_and_join_requests Christoph Hellwig <hch@lst.de>
+# 2023-10-11 6a6d4644ce93 NFS: Fix potential oops in nfs_inode_remove_request() Scott Mayhew <smayhew@redhat.com>
+# 2023-09-28 dd1b2026323a nfs: decrement nrequests counter before releasing the req Jeff Layton <jlayton@kernel.org>
+# 2020-01-15 b8946d7bfb94 NFS: Revalidate the file mapping on all fatal writeback errors Trond Myklebust <trondmy@gmail.com>
+# 2019-10-02 33ea5aaa87cd nfs: Fix nfsi->nrequests count error on nfs_inode_remove_request ZhangXiaoxu <zhangxiaoxu5@huawei.com>
+# 2019-08-19 06c9fdf3b9f1 NFS: On fatal writeback errors, we need to call nfs_inode_remove_request() Trond Myklebust <trond.myklebust@hammerspace.com>
+```
+-->
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 

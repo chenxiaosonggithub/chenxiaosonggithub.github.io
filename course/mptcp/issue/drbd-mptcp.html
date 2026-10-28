@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -141,6 +142,25 @@ class="toc-section-number">4</span> 代码分析</a></li>
 </nav>
 <p><a
 href="https://chenxiaosong.com/course/mptcp/mptcp.html">点击跳转到MPTCP课程所有目录</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
+<!--
+v1: https://patchwork.kernel.org/project/mptcp/cover/cover.1747904572.git.tanggeliang@kylinos.cn/
+v11: https://patchwork.kernel.org/project/mptcp/cover/cover.1757723270.git.tanggeliang@kylinos.cn/
+-->
 <p>DRBD 类似磁盘阵列的RAID 1（镜像），只不过 RAID 1 是在同一台电脑内，而
 DRBD 是透过网络。</p>
 <p>准备试试让DRBD支持mptcp。</p>

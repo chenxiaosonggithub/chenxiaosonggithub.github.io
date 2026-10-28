@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -199,6 +200,21 @@ class="toc-section-number">8.7</span> suse</a></li>
 </nav>
 <p><a
 href="https://chenxiaosong.com/course/gnu-linux/gnu-linux.html">点击跳转到GNU/Linux课程所有目录</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <p>在GNU/Linux发行版的选择上，我们这里是学习的目的，所以就选用能体验最新特性的<a
 href="https://ubuntu.com/download">Ubuntu</a>和<a
 href="https://fedoraproject.org/">Fedora</a>，都是每年发布两个版本。</p>
@@ -377,6 +393,15 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb20-1"><a href="#
 class="header-section-number">5</span> VNC远程桌面</h1>
 <p>参考<a
 href="https://linux.vbird.org/linux_server/centos6/0310telnetssh.php#vnc">鸟哥Linux私房菜</a>。</p>
+<!--
+https://blog.csdn.net/u011795345/article/details/78681213
+https://cloud.tencent.com/developer/article/2148538
+
+virt-install --virt-type kvm --name kylin-desktop --vcpus=4 --ram 4096 --cdrom=Kylin-Desktop-V10-SP1-General-Release-2303-ARM64.iso --disk image.qcow2,format=qcow2 --network network=default --graphics vnc,listen=0.0.0.0,port=5955 --os-type=linux
+
+qemu-img create -f qcow2 kylin-sp1-210528.qcow2 100G
+virt-install --virt-type kvm --name kylin-sp1-210528 --vcpus=4 --ram 4096 --cdrom=/root/virtual-machine/Kylin-Server-10-SP1-Release-Build20-20210518-x86_64.iso  --disk /root/virtual-machine/kylin-sp1-210528.qcow2,format=qcow2 --network network=default --graphics vnc,listen=0.0.0.0,port=5913 --os-type=linux 
+-->
 <h2 data-number="5.1" id="vnc软件"><span
 class="header-section-number">5.1</span> vnc软件</h2>
 <h3 data-number="5.1.1" id="ubuntu"><span
@@ -563,6 +588,12 @@ class="header-section-number">8.5</span> 麒麟系统</h2>
 href="https://www.kylinos.cn/support/trial.html">产品试用申请</a>后就可以下载iso文件。</p>
 <p>注意桌面麒麟系统在arm芯片的macos上无法用vmware fusion安装，可以用<a
 href="https://github.com/utmapp/UTM">UTM</a>安装。</p>
+<!--
+UTM安装时磁盘格式使用raw可能有以下问题（使用qcow2格式镜像就没有以下问题）:
+安装虚拟机时cpu、内存、硬盘不要分配太大，比如我用的是M2的Macbook Air（8G内存，8核，256G硬盘），只需分配2G内存（已验证分配4G无法安装），磁盘64G（默认分区方式要求硬盘必须大于50G）。
+安装完成后再次启动前可以把配置改大，但8G内存的电脑分配的内存不要超过2G，否则容易卡死（比如当启动其他虚拟机时）。安装时最好使用自定义分区，`efi`分区`512M`（注意要在下拉选项中选择），
+swap分区可以分配稍大一些，剩下全给`/`，备份分区在虚拟机中就不分配了。注意要修改成不休眠，默认10分钟锁屏幕，15分钟进入休眠，utm虚拟机就无法唤醒了。
+-->
 <p>基于openeuler的服务器麒麟系统用<code>qemu</code>命令行启动时，编辑网络用命令<code>nmtui</code>，网络接口名改成和<code>ifconfig</code>中一样的名，再<code>启用连接 -&gt; 激活</code>。
 arm64版本无法用<a
 href="https://gitee.com/src-openeuler/kernel/issues/I7LDS2">VMware以及UTM等虚拟机安装</a>，

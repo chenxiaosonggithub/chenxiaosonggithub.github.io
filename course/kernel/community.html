@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -167,6 +168,37 @@ class="toc-section-number">4.7</span> git发送邮件</a></li>
 href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
+<!--
+v6.13     2025-01-19
+v6.14-rc1 2025-02-02 14天
+
+v6.14     2025-03-24
+v6.15-rc1 2025-04-06 13天
+
+v6.15     2025-05-25
+v6.16-rc1 2025-06-08 13天
+
+v6.16     2025-07-27
+v6.17-rc1 2025-08-10 14天
+
+v6.17     2025-09-28
+预计10月10日或11日出v6.18-rc1
+-->
 <h1 data-number="1" id="内核社区"><span
 class="header-section-number">1</span> 内核社区</h1>
 <p>说到Linux内核，很多人可能会认为只有Linus这样的神才懂。但事实是任何人都能参与，比如我这样能力差的也参与到Linux内核社区了。可能很多人早就想贡献Linux内核了，但就是不知道怎么开始。</p>
@@ -295,6 +327,17 @@ href="https://subspace.kernel.org/lists.linux.dev.html">如果找不到再查这
 <p>比如我订阅linux-cifs模块，会向<a
 href="mailto:linux-cifs+subscribe@vger.kernel.org"
 class="email">linux-cifs+subscribe@vger.kernel.org</a>发送一封邮件，主题和正文可为空。过一会儿就会收到一封回复邮件，按照指示操作即可。</p>
+<!--
+Your message to <majordomo@vger.kernel.org> was not processed, because
+Majordomo is no longer used at vger.kernel.org after migration to the new
+platform.
+
+To subscribe or unsubscribe to lists, please visit
+https://subspace.kernel.org/vger.kernel.org.html
+and use the "sub/unsub" links next to the list you want.
+
+For other information and help about this list, send a message to <linux-cifs+help@vger.kernel.org>.
+-->
 <h2 data-number="4.2" id="准备补丁"><span
 class="header-section-number">4.2</span> 准备补丁</h2>
 <p>你可以通过<a href="https://bugzilla.kernel.org/">bugzilla</a>或<a

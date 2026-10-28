@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -218,12 +219,37 @@ class="toc-section-number">7.3</span> 跟踪函数</a></li>
 </ul></li>
 <li><a href="#bpftrace" id="toc-bpftrace"><span
 class="toc-section-number">8</span> bpftrace</a></li>
+<li><a href="#perf" id="toc-perf"><span
+class="toc-section-number">9</span> <code>perf</code></a>
+<ul>
+<li><a href="#编译" id="toc-编译"><span
+class="toc-section-number">9.1</span> 编译</a></li>
+</ul></li>
+<li><a href="#oops" id="toc-oops"><span
+class="toc-section-number">10</span> <code>oops</code></a></li>
+<li><a href="#strace" id="toc-strace"><span
+class="toc-section-number">11</span> <code>strace</code></a></li>
 </ul>
 </nav>
 <p><a
 href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <p>内核开发环境章节我们介绍过的<a
 href="https://chenxiaosong.com/course/kernel/environment.html#gdb">GDB调试方法</a>只适用于虚拟机中，
 我们平时看代码学习时可以用一下，如果是在工作中客户遇到的问题，GDB调试方法就用不上了，这时就需要用到其他调试方法了。</p>
@@ -288,6 +314,25 @@ class="header-section-number">2</span> <code>ftrace</code></h1>
 href="https://github.com/torvalds/linux/tree/master/Documentation/trace">Documentation/trace</a></li>
 </ul>
 <p>名字来源于 function trace。</p>
+<!--
+https://cloud.tencent.com/developer/article/1429041
+
+```shell
+#!/bin/bash
+func_name=do_dentry_open
+
+cd /sys/kernel/debug/tracing/
+echo nop > current_tracer
+echo 0 > tracing_on
+echo $$ > set_ftrace_pid # 当前脚本程序的pid
+echo function_graph > current_tracer
+echo $func_name > set_graph_function
+echo 1 > tracing_on
+exec "$@" # 用 $@ 进程替换当前shell进程，并且保持PID不变, 注意后面的命令不会执行
+
+cat trace > ftrace_output # 在脚本中这个命令不会执行
+```
+-->
 <div class="sourceCode" id="cb11"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_FTRACE</span><span class="op">=</span>y</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="va">CONFIG_HAVE_FUNCTION_TRACER</span><span class="op">=</span>y</span>
@@ -536,6 +581,7 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb30-1"><a href="#
 <h1 data-number="6" id="kdump-crash"><span
 class="header-section-number">6</span>
 <code>kdump</code>和<code>crash</code></h1>
+<!-- https://github.com/gatieme/LDD-LinuxDeviceDrivers/blob/master/study/debug/tools/systemtap/01-install/README.md -->
 <h2 data-number="6.1" id="源码安装crash"><span
 class="header-section-number">6.1</span> 源码安装crash</h2>
 <p>如果内核版本不是最新的（比如4.19或5.10等），那么发行版的包管理器安装的crash就可以用，但如果内核版本是最新的，可能就需要通过源码安装crash:</p>
@@ -582,6 +628,14 @@ class="header-section-number">6.3</span> ubuntu环境</h2>
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update <span class="at">-y</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install linux-crashdump <span class="at">-y</span></span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install crash <span class="at">-y</span></span></code></pre></div>
+<!--
+重新编译内核:
+```sh
+cp /boot/config-6.8.0-35-generic build/.config
+make O=build menuconfig # 清除 CONFIG_SYSTEM_TRUSTED_KEYS 和 CONFIG_SYSTEM_REVOCATION_KEYS 的值
+make O=build -j8
+```
+-->
 <p>修改<code>/etc/default/grub</code>文件，在<code>GRUB_CMDLINE_LINUX=</code>一行的最后添加以下内容:</p>
 <div class="sourceCode" id="cb39"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="va">GRUB_CMDLINE_LINUX</span><span class="op">=</span><span class="st">&quot;... crashkernel=512M&quot;</span> <span class="co"># 根据内存大小来决定</span></span></code></pre></div>
@@ -609,6 +663,7 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb43-1"><a href="#
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span> /var/crash/<span class="va">${date</span><span class="op">-</span>time<span class="va">}</span>/dump.<span class="va">${date</span><span class="op">-</span>time<span class="va">}</span> /usr/lib/debug/boot/vmlinux-<span class="kw">`</span><span class="fu">uname</span> <span class="at">-r</span><span class="kw">`</span></span></code></pre></div>
 <h2 data-number="6.4" id="qemu环境"><span
 class="header-section-number">6.4</span> qemu环境</h2>
+<!-- https://blog.csdn.net/yanghao23/article/details/135892612 -->
 <p>qemu启动的命令行最好指定<code>-append "nokaslr ..."</code>。</p>
 <p>在qemu环境中运行，不需要安装<code>kdump</code>工具。有些发行版默认发生oops时不会panic，需要修改配置（注意这样修改重启后会还原）:</p>
 <div class="sourceCode" id="cb45"><pre
@@ -659,8 +714,8 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb51-1"><a href="#
 <p>加载ko模块:</p>
 <div class="sourceCode" id="cb52"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> help mod <span class="co"># 帮助命令</span></span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="op">&lt;</span>ko path<span class="op">&gt;</span> # 加载</span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-d</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> # 删除</span></code></pre></div>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="op">&lt;</span>ko path<span class="op">&gt;</span> <span class="co"># 加载</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-d</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="co"># 删除</span></span></code></pre></div>
 <h2 data-number="6.5" id="crash常用命令"><span
 class="header-section-number">6.5</span> <code>crash</code>常用命令</h2>
 <p>启动<code>crash</code>:</p>
@@ -677,7 +732,7 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb55-1"><a href="#
 <p><code>bt</code>命令:</p>
 <div class="sourceCode" id="cb56"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="co"># 查看崩溃瞬间正在运行的进程的内核栈</span></span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="op">&lt;</span>pid<span class="op">&gt;</span> # 查看指定pid进程的栈</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="op">&lt;</span>pid<span class="op">&gt;</span> <span class="co"># 查看指定pid进程的栈</span></span>
 <span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -F[F]: 类似于 -f，不同之处在于当适用时以符号方式显示堆栈数据；如果堆栈数据引用了 slab cache 对象，将在方括号内显示 slab cache 的名称；在 ia64 架构上，将以符号方式替代参数寄存器的内容。如果输入 -F 两次，并且堆栈数据引用了 slab cache 对象，将同时显示地址和 slab cache 的名称在方括号中。</span></span>
 <span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="at">-F</span></span>
 <span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="at">-FF</span></span>
@@ -694,8 +749,8 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb57-1"><a href="#
 <p><code>mod</code>命令:</p>
 <div class="sourceCode" id="cb58"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="co"># 显示所有模块的信息</span></span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="op">&lt;</span>ko path<span class="op">&gt;</span> # 加载</span>
-<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-d</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> # 删除</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="op">&lt;</span>ko path<span class="op">&gt;</span> <span class="co"># 加载</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-d</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="co"># 删除</span></span>
 <span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-S</span> <span class="co"># 从某个特定目录加载所有模块，默认从/lib/modules/`uname -r` 目录</span></span></code></pre></div>
 <p><code>sym</code>命令（解析符号信息）:</p>
 <div class="sourceCode" id="cb59"><pre
@@ -996,6 +1051,35 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb85-1"><a href="#
 class="header-section-number">8</span> bpftrace</h1>
 <p>请查看<a
 href="https://chenxiaosong.com/course/kernel/bpf.html">《BPF》</a>。</p>
+<h1 data-number="9" id="perf"><span
+class="header-section-number">9</span> <code>perf</code></h1>
+<h2 data-number="9.1" id="编译"><span
+class="header-section-number">9.1</span> 编译</h2>
+<p>在内核编译环境上，在内核代码目录下:</p>
+<div class="sourceCode" id="cb86"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 根据 make 命令报错提示安装</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install <span class="at">-y</span> libtraceevent-dev</span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> tools/perf</span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a><span class="co"># export ARCH=arm64</span></span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a><span class="co"># export CROSS_COMPILE=aarch64-linux-gnu-</span></span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span></code></pre></div>
+<p>但这样编译出来的<code>perf</code>，在虚拟机中还要安装相关依赖库。</p>
+<p>建议直接在虚拟机中编译，把内核仓库代码复制到虚拟机中:</p>
+<div class="sourceCode" id="cb87"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fedora</span></span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> install <span class="at">-y</span> asciidoc xmlto libtraceevent-devel</span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> tools/perf</span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span></code></pre></div>
+<h1 data-number="10" id="oops"><span
+class="header-section-number">10</span> <code>oops</code></h1>
+<p>发生<code>oops</code>时，除了导出<code>vmcore</code>后使用<code>crash</code>分析外，还可以用其他方法分析。</p>
+<p>编译外部模块时，要在<code>Makefile</code>中指定<code>KBUILD_CFLAGS += -g</code>参数添加符号信息表。</p>
+<div class="sourceCode" id="cb88"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 交叉编译用 aarch64-linux-gnu-objdump</span></span></code></pre></div>
+<h1 data-number="11" id="strace"><span
+class="header-section-number">11</span> <code>strace</code></h1>
+<p><code>strace -o strace.out -f -v -s 4096 bash -c 'echo something &gt; /mnt/file'</code></p>
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 

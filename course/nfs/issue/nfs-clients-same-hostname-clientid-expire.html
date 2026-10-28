@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -155,14 +156,30 @@ class="toc-section-number">6</span> 结论</a></li>
 href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 data-number="1" id="问题描述"><span
 class="header-section-number">1</span> 问题描述</h1>
 <p>NFS客户端采用NFSv4.2(vers=4.2)挂载时，tcpdump抓包发现，NFS服务端经常SEQUENCE
 返回 NFS4ERR_BADSESSION错误导致
 客户端主动DESTROY_SESSION和CREATE_SESSION，
 客户端创建会话时，服务端返回NFS4ERR_STATLE_CLIENTID错误，客户端需要重新EXCHANGE_ID后CREATE_SESSION才成功，因为反复出现这种现象，导致客户端读写文件会出现偶尔错误，系统errno
-会返回5。</p>
-<p>client日志中打印了<code>NFS: nfs4_reclaim_open_state: Lock reclaim failed!</code>，server日志中打印了<code>NFSD: client xx.xx.xx.xx testing state ID with incorrect client ID</code>。</p>
+会返回5。
+<!-- 客户端改成 NFSv4.0和NFSv4.1没有出现这种现象（暂不确定）。 -->
+client日志中打印了<code>NFS: nfs4_reclaim_open_state: Lock reclaim failed!</code>，server日志中打印了<code>NFSD: client xx.xx.xx.xx testing state ID with incorrect client ID</code>。</p>
 <p>挂载参数:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">ro,noexec,relatime,vers=4.1,rsize=1048576,wsize=1048576,namlen=255,soft,proto=tcp,timeo=10,retrans=2,sec=sys,clientaddr=xx.xx.xx.xx,local_lock=none,addr=xx.xx.xx.xx</span><span class="kw">)</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">ro,noexec,relatime,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,soft,proto=tcp,timeo=10,retrans=2,sec=sys,clientaddr=xx.xx.xx.xx,local_lock=none,addr=xx.xx.xx.xx</span><span class="kw">)</span></span></code></pre></div>

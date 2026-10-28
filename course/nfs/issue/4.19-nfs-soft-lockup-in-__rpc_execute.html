@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -168,6 +169,21 @@ class="toc-section-number">7</span> 下一步计划</a></li>
 href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 data-number="1" id="问题描述"><span
 class="header-section-number">1</span> 问题描述</h1>
 <p>nfs client挂载选项如下:</p>
@@ -466,10 +482,34 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb21-1"><a href="#
 <h1 data-number="6" id="补丁"><span
 class="header-section-number">6</span> 补丁</h1>
 <ul>
-<li><p><code>ed0172af5d6f SUNRPC: Fix a race to wake a sync task</code>
-（修复的是同步rpc任务相关的问题，与此问题无关）</p></li>
-<li><p><code>6258cf25d5e3 SUNRPC: avoid soft lockup when transmitting UDP to reachable server.</code></p></li>
+<li><code>ed0172af5d6f SUNRPC: Fix a race to wake a sync task</code>
+（修复的是同步rpc任务相关的问题，与此问题无关）</li>
 </ul>
+<!--
+```
+我们观察到，NFS 客户端在 __rpc_execute 中的同步任务在等待 RPC_TASK_QUEUED 时没有响应来自 rpc_make_runnable() 的唤醒。 我怀疑这个问题通常不会被注意到，因为在一个忙碌的客户端上，任务最终会通过另一个任务完成或 xprt 事件重新被唤醒。然而，如果状态管理器正在清空插槽表，一个没有被唤醒的同步任务可能会导致客户端挂起。
+
+我们已经能够证明，rpc_make_runnable() 中的唤醒操作会成功调用 wake_up_bit()（即没有竞争条件影响 tk_runstate），但 wake_up_bit() 的调用没有唤醒等待者。我怀疑唤醒者缺少对位的 wait_queue_head 的加载，所以 waitqueue_active() 返回 false。在 wake_up_bit()、prepare_to_wait() 和 waitqueue_active() 之上有一些非常有用的注释，帮助说明了这个问题。
+
+通过在 wake_up_bit() 之前插入 smp_mb__after_atomic()，来解决这个问题，这样可以与 prepare_to_wait() 调用的 set_current_state() 成对使用。
+```
+-->
+<ul>
+<li><code>6258cf25d5e3 SUNRPC: avoid soft lockup when transmitting UDP to reachable server.</code></li>
+</ul>
+<!--
+```
+SUNRPC：避免在向可达服务器传输 UDP 时发生软锁死
+
+在下面提到的提交之前，call_transmit_status() 会处理与无法访问的服务器相关的错误（如 -EPERM），通过跳转到 call_status() 来处理，这会添加一个 3 秒的延迟，并将失败视为超时。
+
+自从该提交之后，call_transmit_status() 直接跳转到 handle_bind()。对于 UDP，这会直接进入 handle_connect() 和 handle_transmit()，因此我们立即重新传输，很可能会遇到相同的错误。
+
+这导致了 __rpc_execute() 中的无限循环，并触发了软锁死警告。
+
+对于那些表示无法访问的服务器的错误，call_transmit_status() 应该像以前一样回退到 call_status()。这样做不会导致之前补丁所避免的“雷鸣般的洪流”，因为 call_status() 会插入一个延迟。
+```
+-->
 <h1 data-number="7" id="下一步计划"><span
 class="header-section-number">7</span> 下一步计划</h1>
 <p>使用以下脚本，下次再复现出soft

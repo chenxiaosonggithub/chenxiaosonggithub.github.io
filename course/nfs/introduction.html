@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -139,6 +140,30 @@ class="toc-section-number">2</span> rfc协议</a></li>
 href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
+<!--
+client和server要有相同的账号
+
+server端口2049
+
+rpc最主要功能指定每个功能对应的端口，固定111端口监听client需求并回复正确的端口
+
+`rpc.nfsd`, `rpc.mountd`, `rpc.lockd`, `rpc.statd`
+-->
 <h1 data-number="1" id="sunrpc和nfs"><span
 class="header-section-number">1</span> sunrpc和nfs</h1>
 <p>client端通过nfs操作存储设备经过的路径如下图所示:</p>

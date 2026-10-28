@@ -75,6 +75,21 @@ class="toc-section-number">2</span> </a></li>
 href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 data-number="1" id="简介"><span
 class="header-section-number">1</span> 简介</h1>
 <p>除了事件驱动的函数，内核中更多的是时间驱动的函数。周期执行的函数，推后执行的操作，系统的运行时间，以及日期和时间，都需要内核的时间管理。系统定时器是一种可编程硬件芯片，以固定频率产生中断（定时器中断）。动态定时器是一种用来推迟执行程序的工具。</p>

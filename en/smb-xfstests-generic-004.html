@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -275,6 +276,94 @@ class="header-section-number">5.2</span> Test Results of smbtorture</h2>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="ex">2nd</span> open should not break and get DELETE_PENDING</span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ex">time:</span> 2026-05-18 09:29:21.110553</span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ex">success:</span> doc</span></code></pre></div>
+<!--
+# ksmbd code analysis {#ksmbd-code}
+
+```c
+cifs_tmpfile
+  __cifs_do_create
+    cifs_open_create_options
+
+smb2_open
+  if (ksmbd_inode_pending_delete(fp)) // true
+  rc = -EBUSY
+  rsp->hdr.Status = STATUS_DELETE_PENDING
+
+// bash smbtorture.sh 192.168.53.209 ksmbd
+handle_ksmbd_work
+  smb2_set_info
+    set_file_disposition_info
+      ksmbd_set_inode_pending_delete
+        ci->m_flags |= S_DEL_PENDING
+
+smb2_open
+  if (req->CreateOptions & FILE_DELETE_ON_CLOSE_LE)
+  ksmbd_fd_set_delete_on_close
+```
+
+# samba code analysis {#samba-code}
+
+```c
+smbd_smb2_request_dispatch
+  smbd_smb2_request_process_create
+    smbd_smb2_create_send
+      smb_vfs_call_create_file
+        vfswrap_create_file
+          create_file_default
+            create_file_unixpath
+              open_file_ntcreate
+                share_mode_entry_prepare_lock_add
+                  _share_mode_entry_prepare_lock
+                    g_lock_lock
+                      dbwrap_do_locked
+                        dbwrap_watched_do_locked
+                          dbwrap_do_locked
+                            db_tdb_do_locked
+                              dbwrap_watched_do_locked_fn
+                                g_lock_lock_simple_fn
+                                  g_lock_lock_cb_run_and_store
+                                    share_mode_entry_prepare_lock_fn
+                                      open_ntcreate_lock_add_entry
+                                        check_and_store_share_mode
+                                          has_delete_on_close
+                  if (create_options & FILE_DELETE_ON_CLOSE) {
+                  fsp->fsp_flags.initial_delete_on_close = true;
+
+smb_set_file_disposition_info
+  set_delete_on_close
+    share_mode_do_locked_vfs_denied
+      _share_mode_do_locked_vfs_denied
+        share_mode_do_locked_vfs_denied_fn
+          set_delete_on_close_locked // state->fn
+```
+
+# test steps
+
+```sh
+umount /tmp/test
+rm /tmp/test/tst-tmpfile-flink
+bash /root/ksmbd-svr-setup.sh
+mount -t cifs -o username=root,password=1 //192.168.53.210/test /tmp/test
+/usr/sbin/xfs_io -i -T -c "pwrite 0 4096" -c "pread 0 4096" -c "flink /tmp/test/tst-tmpfile-flink" /tmp/test
+umount /tmp/test
+
+umount /tmp/test
+rm /tmp/test/tst-tmpfile-flink
+bash /root/samba-svr-setup.sh
+mount -t cifs -o username=root,password=1 //192.168.53.210/test /tmp/test
+/usr/sbin/xfs_io -i -T -c "pwrite 0 4096" -c "pread 0 4096" -c "flink /tmp/test/tst-tmpfile-flink" /tmp/test
+umount /tmp/test
+
+
+rm /tmp/test/tst-tmpfile-flink
+bash /root/ksmbd-svr-setup.sh
+./check generic/004
+
+rm /tmp/test/tst-tmpfile-flink
+bash /root/samba-svr-setup.sh
+./check generic/004
+```
+-->
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 

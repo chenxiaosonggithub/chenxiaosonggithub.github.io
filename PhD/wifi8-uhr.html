@@ -22,7 +22,6 @@
     }
   </style>
   <link rel="stylesheet" href="https://chenxiaosong.com/stylesheet.css" />
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
   type="text/javascript"></script>
 </head>
@@ -276,38 +275,38 @@ Layer（物理层）：这一层把数据变成无线信号，再把信号还原
 <col style="width: 50%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>术语</th>
 <th>通俗说明</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>STA（Station，站点）</td>
 <td>本文特指手机、电脑等无线终端；在严格的标准用语中，AP
 也属于站点的一种</td>
 </tr>
-<tr class="even">
+<tr>
 <td>BSS（Basic Service Set，基本服务集）</td>
 <td>本文指一个 AP 及其服务的终端组成的无线服务组，可近似理解为一个 Wi-Fi
 小区</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>OFDMA（Orthogonal Frequency Division Multiple
 Access，正交频分多址）</td>
 <td>把频率资源划成小块，一次安排多个用户各用其中一部分</td>
 </tr>
-<tr class="even">
+<tr>
 <td>MU-MIMO（Multi-User Multiple-Input
 Multiple-Output，多用户多输入多输出）</td>
 <td>利用多根天线区分不同用户的信号，在相同时间与频率资源上服务多个用户</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>SINR（Signal-to-Interference-plus-Noise
 Ratio，信号与干扰加噪声比）</td>
 <td>想接收的信号，相对于其他发送造成的干扰和背景噪声有多强；不能只看手机上的信号格数判断</td>
 </tr>
-<tr class="even">
+<tr>
 <td>队列与数据包</td>
 <td>信息通常拆成一个个数据包传送；等待发送的数据排成队列，来得比处理得快时就会积压</td>
 </tr>
@@ -321,28 +320,28 @@ Ratio，信号与干扰加噪声比）</td>
 <col style="width: 33%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>典型场景</th>
 <th>Wi-Fi 7 网络仍可能遇到的问题</th>
 <th>对业务的具体影响</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>高密度接入：较小范围内有很多 AP/终端，例如会议厅、体育场</td>
 <td>同频（使用相同或重叠频率资源）的设备反复竞争；单个 AP 内的
 OFDMA/MU-MIMO 调度无法独自解决邻居 BSS
 的竞争；隐藏节点（彼此听不到，却可能干扰同一接收方的发送设备）可能同时发送</td>
 <td>接入等待和队列积压，少量数据包等待特别久</td>
 </tr>
-<tr class="even">
+<tr>
 <td>复杂干扰：公寓、商场、工业现场</td>
 <td>邻近 BSS
 的信号互相影响，即交叉干扰；主信道是常规侦听和竞争所依据的指定频率部分，侦听就是先判断有没有其他设备在发送；主信道可能被占用，而其他部分仍空闲</td>
 <td>SINR
 降低，引起速率回退（降低发送速率以争取可靠接收）、重传（未确认成功后再次发送）</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>移动切换：语音终端、机器人、XR 设备；XR 为 Extended
 Reality，扩展现实，包括虚拟/增强现实等体验</td>
 <td>扫描（寻找周围
@@ -381,27 +380,27 @@ href="https://standards.ieee.org/ieee/802.11bn/11393/">IEEE
 <col style="width: 33%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>指标</th>
 <th>项目目标</th>
 <th>阅读时必须保留的条件</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>吞吐量</td>
 <td>提高 25%</td>
 <td>在至少一个 SINR 水平上，以 MAC
 数据服务接入点的吞吐量衡量；这里的“服务接入点”是 MAC
 向上层交付数据的逻辑接口，不是物理设备 AP</td>
 </tr>
-<tr class="even">
+<tr>
 <td>尾部时延：关注等待特别久的那一部分数据</td>
 <td>时延分布第 95 百分位降低 25%</td>
 <td>P95 表示约 95%
 的样本不超过该时延；不等于平均值、最大值，也不是保证每次都按时完成的硬实时上界</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>MPDU 丢失</td>
 <td>在给定场景中降低 25%</td>
 <td>MPDU 是 MAC Protocol Data Unit（MAC
@@ -500,7 +499,7 @@ Opportunity，发送机会）：一段按规则取得、可以安排发送的时
 <col style="width: 25%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>机制</th>
 <th>主要协调变量</th>
 <th>同一时频资源上能否同时发送？</th>
@@ -508,21 +507,21 @@ Opportunity，发送机会）：一段按规则取得、可以安排发送的时
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>Co-SR：Coordinated Spatial Reuse，协同空间复用</td>
 <td>发射功率、干扰容限（接收方能承受的额外干扰）、参与的 AP–STA
 配对</td>
 <td>可以，商量好功率后一起发</td>
 <td>原本过度退让，或缺乏功率协调而无法可靠并发</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Co-BF：Coordinated
 Beamforming，协同波束成形，即让多天线配合改变信号在不同位置的强弱</td>
 <td>信道信息、预编码权重（发送前对各天线强弱与相位所作调整的数值）、需保护的邻居终端</td>
 <td>可以，通过空间零陷（让特定接收位置的信号尽量弱）降低交叉干扰</td>
 <td>单纯调功率难以兼顾两条链路，但空间传播特征可以区分</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Co-TDMA：Coordinated Time Division Multiple
 Access，协同时分接入</td>
 <td>TXOP 内的时间分配、执行顺序、共享时长</td>
@@ -552,35 +551,35 @@ TXOP，再确定这次和谁配合、分多少资源。常用信息如下，具�
 <col style="width: 33%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>信息类别</th>
 <th>典型内容</th>
 <th>服务于什么决策</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>能力与协议</td>
 <td>支持的协同机制、信道、带宽、伙伴身份</td>
 <td>双方是否可以协作，采用何种操作</td>
 </tr>
-<tr class="even">
+<tr>
 <td>链路与干扰</td>
 <td>接收功率、可接受干扰、目标 STA；Co-BF 还需要 CSI（Channel State
 Information，信道状态信息，描述信号传播后怎样变弱、改变相位等）</td>
 <td>能否并发、怎样调功率或配置零陷</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>业务需求</td>
 <td>队列状态、业务优先级、所需空口时间</td>
 <td>谁先发送、共享多少时间；具体调度策略由实现选择</td>
 </tr>
-<tr class="even">
+<tr>
 <td>执行约束</td>
 <td>可用 TXOP 时间、起止时刻、反馈与保护安排</td>
 <td>保证数据和确认均落入允许的资源范围</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>运行反馈</td>
 <td>BA（Block
 Acknowledgment，块确认，一次反馈多个帧的接收情况）、重传结果、实际时延、信息新鲜度</td>
@@ -927,24 +926,24 @@ class="header-section-number">6.3</span> 6.3
 <col style="width: 33%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>技术</th>
 <th>解决问题的主要方式</th>
 <th>不能混同之处</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>前导打孔（Preamble Puncturing）</td>
 <td>在允许的宽带发送中，按规则暂不使用某些子信道；“打孔”是比喻，不是物理开孔</td>
 <td>不等于主信道忙时可以任意改用非主信道发起接入</td>
 </tr>
-<tr class="even">
+<tr>
 <td>MLO</td>
 <td>在多链路设备建立的链路之间利用资源，分流（将不同数据分配到不同链路）或选择发送路径</td>
 <td>另一条链路是独立配置的链路，不只是当前信道的一个空闲子块</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>NPCA</td>
 <td>在符合条件的主信道阻塞期间，临时使用约定的非主接入资源</td>
 <td>仍有接入与切换成本，不是新增频谱，也不自动消除其他干扰</td>
@@ -1064,29 +1063,29 @@ class="header-section-number">7.3</span> 7.3
 <col style="width: 33%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>改进环节</th>
 <th>对丢包的作用</th>
 <th>对尾部时延和中断的作用</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>提前准备目标侧状态</td>
 <td>降低旧链路恶化后仍无可用目标的风险</td>
 <td>缩短实际切换时需要完成的工作</td>
 </tr>
-<tr class="even">
+<tr>
 <td>有序迁移数据和确认状态</td>
 <td>减少在途帧遗失、错误重复或重排序异常</td>
 <td>减少业务等待重传、重排序恢复的尖峰</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>及时更新分布系统转发</td>
 <td>减少下行继续送往旧 AP 的情况</td>
 <td>缩短已切换无线链路但业务仍未恢复的空档</td>
 </tr>
-<tr class="even">
+<tr>
 <td>配合支持的多链路能力</td>
 <td>在条件允许时维持可用业务路径</td>
 <td>有机会进一步缩短感知中断，但取决于射频和协议能力</td>
@@ -1121,7 +1120,7 @@ class="header-section-number">8.1</span> 8.1
 <col style="width: 25%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>维度</th>
 <th>Wi-Fi 7 已有基础</th>
 <th>Wi-Fi 8 本文所述增量</th>
@@ -1129,31 +1128,31 @@ class="header-section-number">8.1</span> 8.1
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>跨 BSS 空间复用</td>
 <td>既有空间复用、信道侦听和功率相关规则</td>
 <td>Co-SR 显式协调伙伴与功率/干扰约束</td>
 <td>兼容配对可减少不必要等待；不适合的几何关系不能强行并发</td>
 </tr>
-<tr class="even">
+<tr>
 <td>跨 BSS 空间干扰</td>
 <td>波束成形与 MU-MIMO 等能力</td>
 <td>Co-BF 获取相关跨 BSS CSI，保护邻居接收端</td>
 <td>提高并发成功率；受空间自由度、CSI 误差与开销限制</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>跨 AP 接入</td>
 <td>AP 内调度及各类 TXOP 使用机制</td>
 <td>Co-TDMA 向邻居 AP 分配已获得的发送时间</td>
 <td>减少重复竞争与等待波动；仍受全局竞争和负载影响</td>
 </tr>
-<tr class="even">
+<tr>
 <td>主信道阻塞</td>
 <td>MLO、打孔等可缓解部分资源受限情况</td>
 <td>NPCA 临时接入约定的非主资源</td>
 <td>有合适空闲窗口才有净收益</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>移动</td>
 <td>802.11k/v/r、MLO 及厂商漫游优化</td>
 <td>SMD 下更连续的状态和路径迁移</td>
@@ -1205,7 +1204,7 @@ Markov Chain（连续时间马尔可夫链），例如研究系统怎样从等�
 <col style="width: 25%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>机制与资料</th>
 <th>场景及比较基线</th>
 <th>作者报告的结果</th>
@@ -1213,7 +1212,7 @@ Markov Chain（连续时间马尔可夫链），例如研究系统怎样从等�
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>Co-SR，<a href="https://arxiv.org/html/2407.16390v2">2024 年研究
 v2，第 IV-B 节</a></td>
 <td>4 AP、每 AP 1 STA、AP 间距 10 m 的部署方案 1（Deployment 1）；仅一对
@@ -1222,7 +1221,7 @@ AP 可并发；全缓冲，对比 DCF</td>
 <td>采用固定功率与作者的分组/调度模型，不是当前双 AP
 自适应功率协调的完整验证</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Co-BF，<a href="https://arxiv.org/html/2606.13759v1">2026 年研究，第
 V-A 节</a></td>
 <td>2 AP、各 1 STA，80 MHz、8 阵元、满缓冲，对比 DCF</td>
@@ -1231,7 +1230,7 @@ V-A 节</a></td>
 <td>假设纯视距、完美即时 CSI；方向重合时某 BSS
 可降至零吞吐，不能只引用峰值</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Co-TDMA，<a href="https://arxiv.org/html/2606.13759v1">同一研究，第
 V-C 节</a></td>
 <td>3 AP 线状部分重叠，40 MHz，每 AP 泊松到达业务 60 Mb/s，AP
@@ -1239,7 +1238,7 @@ V-C 节</a></td>
 <td>接入时延约降低 <strong>70%</strong></td>
 <td>没有完全解决中间 AP 的吞吐饥饿；不是 P95 端到端时延降低 70%</td>
 </tr>
-<tr class="even">
+<tr>
 <td>NPCA，<a href="https://arxiv.org/html/2504.15774v2">性能分析 v2，第
 V-A 节</a></td>
 <td>A 为 160 MHz，B 占其中包含主 20 MHz 信道的那一侧 80
@@ -1266,29 +1265,29 @@ IEEE 规定的一整套测试。</p>
 <col style="width: 33%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>测试拓扑</th>
 <th>控制变量</th>
 <th>主要观察量</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>双 AP 同信道，改变终端位置与交叉干扰</td>
 <td>相同带宽、天线、功率上限、业务负载；分别开关 Co-SR/Co-BF</td>
 <td>聚合与每 STA 吞吐、重传率、P95/P99 时延、探测开销</td>
 </tr>
-<tr class="even">
+<tr>
 <td>三 AP 线状部分重叠</td>
 <td>固定共享策略与业务优先级，分别开关 Co-TDMA</td>
 <td>中间 AP 公平性、接入间隔、尾部时延与业务超时率</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>主信道有可控 OBSS 占用，其余子信道可空闲</td>
 <td>改变占用时长、非主资源占用和射频切换时间</td>
 <td>NPCA 净收益、切换开销、漏听/碰撞以及队列丢弃</td>
 </tr>
-<tr class="even">
+<tr>
 <td>STA 沿同一路径移动经过两个 AP</td>
 <td>相同速度、覆盖、业务与分布系统条件，固定漫游配置</td>
 <td>漫游前后丢包、乱序、最大无包间隔、应用恢复时刻</td>
@@ -1313,34 +1312,34 @@ AP-X 的占用也会变；适合上一刻的安排，不一定适合下一刻。
 <col style="width: 33%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>办公室里发生了什么</th>
 <th>可以考虑的办法</th>
 <th>对应的动作</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>小林和同事都靠近各自的 AP，交叉干扰可控</td>
 <td>评估 Co-SR 的功率配置</td>
 <td>用双方都能接受的功率，同时发送</td>
 </tr>
-<tr class="even">
+<tr>
 <td>降功率难以兼顾两端，但传播特征可区分、CSI 足够新</td>
 <td>评估 Co-BF</td>
 <td>调整多天线输出，照顾目标终端、保护邻居</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>同时发容易失败，AP-B 又有急需发送的数据</td>
 <td>在合法 TXOP 内评估 Co-TDMA</td>
 <td>分一段允许共享的时间给伙伴</td>
 </tr>
-<tr class="even">
+<tr>
 <td>AP-X 占了主信道，约定的非主资源仍有足够窗口</td>
 <td>评估 NPCA</td>
 <td>双方临时转到约定资源，按规则接入并返回</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>小林从会议室走向工位区</td>
 <td>进行 SMD 目标准备与切换</td>
 <td>提前准备，核对进度，更新数据路径</td>
@@ -1465,7 +1464,7 @@ Domain，具体机制仍以正文说明的标准版本与适用条件为准。</
 <col style="width: 25%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>术语或缩写</th>
 <th>英文全称或对应表达</th>
 <th>中文名称</th>
@@ -1473,170 +1472,170 @@ Domain，具体机制仍以正文说明的标准版本与适用条件为准。</
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>AC</td>
 <td>Access Category</td>
 <td>接入类别</td>
 <td>区分语音、视频等业务的接入优先级，帮助决定谁更容易获得发送机会。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>AP</td>
 <td>Access Point</td>
 <td>无线接入点</td>
 <td>为手机、电脑提供 Wi-Fi
 接入的设备角色；家用无线路由器通常包含此功能。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>AP MLD</td>
 <td>Access Point Multi-Link Device</td>
 <td>接入点多链路设备</td>
 <td>接入点一侧能够以统一设备身份管理多条无线链路的设备。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>BA／Block ACK</td>
 <td>Block Acknowledgment</td>
 <td>块确认</td>
 <td>接收方一次报告多个帧的接收情况，相当于批量核对收货清单。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>BSS</td>
 <td>Basic Service Set</td>
 <td>基本服务集</td>
 <td>本文指一个 AP 与其服务的终端组成的无线服务组，可近似理解为一个 Wi-Fi
 小区。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>BSS Coloring</td>
 <td>Basic Service Set Coloring</td>
 <td>BSS 着色</td>
 <td>给帧加上逻辑标记，帮助设备区分本小区和邻居的发送；并非真的改变颜色。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>CCA</td>
 <td>Clear Channel Assessment</td>
 <td>空闲信道评估</td>
 <td>发送前侦听、判断信道是否忙碌；本地判断空闲不保证接收方也没有干扰。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Co-BF</td>
 <td>Coordinated Beamforming</td>
 <td>协同波束成形</td>
 <td>多个 AP
 协调多天线输出，增强各自目标终端的信号，并压低对邻居终端的干扰。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Co-SR</td>
 <td>Coordinated Spatial Reuse</td>
 <td>协同空间复用</td>
 <td>AP 商量发射功率和保护要求，在互扰可接受时同时使用相同频率资源。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Co-TDMA</td>
 <td>Coordinated Time Division Multiple Access</td>
 <td>协同时分接入</td>
 <td>获得发送机会的 AP
 按规则分一段时间给伙伴，让双方轮流发送，减少重复竞争。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>CSI</td>
 <td>Channel State Information</td>
 <td>信道状态信息</td>
 <td>描述信号经过传播后如何变弱、改变相位等的信息，用来判断怎样发送更合适。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>CTMC</td>
 <td>Continuous-Time Markov Chain</td>
 <td>连续时间马尔可夫链</td>
 <td>用状态及随机状态转换研究系统的数学模型，例如分析 AP
 在等待和发送状态间如何变化。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>CTS</td>
 <td>Clear to Send</td>
 <td>允许发送</td>
 <td>在相关控制交换中表示接收端就绪的响应；图 6 中用于回应共享安排。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>D（如 D2.1）</td>
 <td>Draft</td>
 <td>草案</td>
 <td>尚未定稿的标准文本；后面的数字是版本号。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>DCF</td>
 <td>Distributed Coordination Function</td>
 <td>分布式协调功能</td>
 <td>传统竞争接入机制：设备先侦听，再通过随机等待等规则争取发送机会。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>DS</td>
 <td>Distribution System</td>
 <td>分布系统</td>
 <td>连接各 AP 与网络其他部分、帮助转送数据的系统。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>EHT</td>
 <td>Extremely High Throughput</td>
 <td>极高吞吐量</td>
 <td>IEEE 802.11be 的技术名称，对应 Wi-Fi 7；也是本文 UHR
 目标采用的比较基础。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>IEEE</td>
 <td>Institute of Electrical and Electronics Engineers</td>
 <td>电气与电子工程师协会</td>
 <td>制定工程技术标准的专业组织；802.11 系列属于其无线局域网标准。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>IP</td>
 <td>Internet Protocol</td>
 <td>网际协议</td>
 <td>让数据包在网络之间传递的协议；IP 地址用于标识网络中的通信接口。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>JT</td>
 <td>Joint Transmission</td>
 <td>联合传输</td>
 <td>多个 AP 联合服务同一接收端的传输方式；不同于本文中各 AP
 发送各自数据的 Co-BF。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>MAC</td>
 <td>Medium Access Control</td>
 <td>介质访问控制层</td>
 <td>管理共享信道的使用，以及确认、重传等，可理解为安排“谁何时发、如何确认收到”。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>MAPC</td>
 <td>Multi-Access Point Coordination</td>
 <td>多 AP 协同</td>
 <td>多个接入点交换必要信息，协调无线资源的使用。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>MLD</td>
 <td>Multi-Link Device</td>
 <td>多链路设备</td>
 <td>能够以统一设备身份管理多条无线链路的设备。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>MLO</td>
 <td>Multi-Link Operation</td>
 <td>多链路操作</td>
 <td>管理、选择或分配多条无线通信路径；能否同时收发取决于设备能力。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>MPDU</td>
 <td>MAC Protocol Data Unit</td>
 <td>MAC 协议数据单元</td>
 <td>带有链路控制信息的数据“信封”；数量不一定与应用程序的数据包一一对应。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>MU-MIMO</td>
 <td>Multi-User Multiple-Input Multiple-Output</td>
 <td>多用户多输入多输出</td>
 <td>利用多根天线区分不同用户的信号，在同一时间和频率资源上服务多个用户。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>MU-RTS TXS</td>
 <td>Multi-User Request-to-Send；Triggered TXOP Sharing</td>
 <td>多用户请求发送／触发式 TXOP 共享</td>
@@ -1644,26 +1643,26 @@ Domain，具体机制仍以正文说明的标准版本与适用条件为准。</
 的全称见下方对应行。<a
 href="https://arxiv.org/html/2606.13759v1">帧流程来源</a></td>
 </tr>
-<tr class="even">
+<tr>
 <td>non-AP MLD</td>
 <td>Non-Access-Point Multi-Link Device</td>
 <td>非 AP 多链路设备</td>
 <td>本文指手机、电脑等客户端一侧的多链路设备。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>NPCA</td>
 <td>Non-Primary Channel Access</td>
 <td>非主信道接入</td>
 <td>主信道被占用时，符合条件的双方临时转到预先约定的非主资源接入，之后按规则返回。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>OBSS</td>
 <td>Overlapping Basic Service Sets</td>
 <td>重叠基本服务集</td>
 <td>覆盖或干扰范围相互重叠的 Wi-Fi
 小区，彼此可能竞争资源或产生干扰。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>OBSS/PD</td>
 <td>Overlapping Basic Service Set Packet Detection</td>
 <td>重叠 BSS 分组检测</td>
@@ -1671,32 +1670,32 @@ href="https://arxiv.org/html/2606.13759v1">帧流程来源</a></td>
 的无线发送，结合信号强弱等条件判断是否有空间复用机会；其中 PD 是 Packet
 Detection（分组检测）。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>OFDMA</td>
 <td>Orthogonal Frequency Division Multiple Access</td>
 <td>正交频分多址</td>
 <td>把频率资源划成小块，一次安排多个用户分别使用其中一部分。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>P95／P99</td>
 <td>95th／99th Percentile</td>
 <td>第 95／99 百分位</td>
 <td>用于时延时，表示约 95%／99%
 的样本不超过的值；不是平均值、最大值或每个包的保证值。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>PHY</td>
 <td>Physical Layer</td>
 <td>物理层</td>
 <td>负责把数据变成无线信号并还原，解决“怎样把信号发出去、接回来”。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>PN</td>
 <td>Packet Number</td>
 <td>分组号</td>
 <td>无线加密处理中使用的计数值，有助于识别旧数据冒充新数据的重放；作用不同于普通排序序号。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>QAM／4096-QAM</td>
 <td>Quadrature Amplitude Modulation／4096-ary Quadrature Amplitude
 Modulation</td>
@@ -1704,463 +1703,463 @@ Modulation</td>
 <td>用信号强弱与相位的不同组合表示数据；4096
 表示可供区分的信号状态数量。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>RU</td>
 <td>Resource Unit</td>
 <td>资源单元</td>
 <td>从信道中划出、可分配给用户的一小块频率资源；多 RU
 分配允许同一用户使用多个块。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>SINR</td>
 <td>Signal-to-Interference-plus-Noise Ratio</td>
 <td>信号与干扰加噪声比</td>
 <td>想接收的信号，相对于其他发送造成的干扰和背景噪声有多强；越高通常越容易可靠接收。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>SMD</td>
 <td>Seamless Mobility Domain</td>
 <td>无缝移动域</td>
 <td>共享相应移动性管理的逻辑范围，帮助终端换 AP
 时接续必要的连接状态。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>SMD-ME</td>
 <td>Seamless Mobility Domain Management Entity</td>
 <td>无缝移动域管理实体</td>
 <td>协调域内连接与移动状态的逻辑管理角色，不必是一台独立物理设备。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>SN</td>
 <td>Sequence Number</td>
 <td>序号</td>
 <td>给帧标记先后顺序，帮助识别重复及恢复接收顺序。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>SSID</td>
 <td>Service Set Identifier</td>
 <td>服务集标识</td>
 <td>通常就是手机 Wi-Fi 列表中看到的网络名称；名称相同不代表已经具备 SMD
 能力。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>STA</td>
 <td>Station</td>
 <td>站点</td>
 <td>本文通常指手机、电脑等无线终端；在标准的严格用语中，AP
 也属于站点的一种。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>TGbn</td>
 <td>Task Group bn</td>
 <td>802.11bn 任务组</td>
 <td>负责推进 802.11bn 修订工作的标准任务组。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>TXOP</td>
 <td>Transmission Opportunity</td>
 <td>发送机会</td>
 <td>按规则取得的一段可安排发送的时间，不一定是提前固定预约的时段。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>UHR</td>
 <td>Ultra High Reliability</td>
 <td>超高可靠性</td>
 <td>Wi-Fi 8
 关注的技术目标：让数据更稳定、及时地送达，减少长等待、丢包和中断。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>WLAN</td>
 <td>Wireless Local Area Network</td>
 <td>无线局域网</td>
 <td>家庭、办公室等局部范围内通过无线方式连接设备的网络。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>XR</td>
 <td>Extended Reality</td>
 <td>扩展现实</td>
 <td>虚拟现实、增强现实等体验的统称，对数据能否及时到达通常较敏感。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>802.11k／802.11v／802.11r</td>
 <td>Radio Resource Measurement／Wireless Network Management／Fast BSS
 Transition</td>
 <td>无线资源测量／无线网络管理／快速 BSS 转换</td>
 <td>已有标准修订的编号，分别帮助获得环境信息、接受网络管理建议和加快连接转移；不是三个新缩写。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Mesh</td>
 <td>Mesh Networking</td>
 <td>网状组网</td>
 <td>多个节点互联协作以扩展覆盖；不能据此推断它们支持本文所有协同机制。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>sharing／coordinating AP</td>
 <td>Sharing Access Point／Coordinating Access Point</td>
 <td>共享发起 AP／协调 AP</td>
 <td>在当前协同操作中取得机会并安排共享资源的一方。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>shared／coordinated AP</td>
 <td>Shared Access Point／Coordinated Access Point</td>
 <td>接受共享的 AP／被协调 AP</td>
 <td>接受伙伴分配的资源、按约定执行的一方；这些是操作角色，不是固定设备等级。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>协议／帧／数据包</td>
 <td>Protocol／Frame／Packet</td>
 <td>通信规则／帧／数据包</td>
 <td>协议规定怎样交流；帧是按链路规则打包的数据；数据包是信息分块传送时的常用说法，须结合所在层次理解。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>拓扑</td>
 <td>Network Topology</td>
 <td>网络拓扑</td>
 <td>展示设备怎样连接，以及谁可能影响谁的关系图。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>链路</td>
 <td>Link</td>
 <td>通信链路</td>
 <td>通信双方之间的一条连接；多链路设备可以管理不止一条。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>信道</td>
 <td>Channel</td>
 <td>无线信道</td>
 <td>谈接入时常指使用的频率资源；谈 CSI
 时则强调信号从发送端到接收端的传播条件。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>带宽／子信道</td>
 <td>Bandwidth／Subchannel</td>
 <td>信道带宽／子信道</td>
 <td>带宽是频率资源有多宽；子信道是宽信道中较小的一段，均不直接等于实际下载速度。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>主信道／非主信道</td>
 <td>Primary Channel／Non-Primary Channel</td>
 <td>主信道／非主信道</td>
 <td>主信道是常规侦听和竞争的指定基准；非主信道是当前工作信道范围内的其他部分。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>频谱／频谱碎片</td>
 <td>Spectrum／Spectrum Fragmentation</td>
 <td>频率资源／频谱碎片化</td>
 <td>频谱指所讨论的频率资源；可用部分被已占用部分隔开、成为不连续小块时，称为频谱碎片。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>空口／回传</td>
 <td>Air Interface／Backhaul</td>
 <td>无线交互部分／回传连接</td>
 <td>空口指设备间通过无线电交互的部分；回传是 AP
 通往后端网络的连接，可有线也可无线。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>上行／下行</td>
 <td>Uplink／Downlink</td>
 <td>上行传输／下行传输</td>
 <td>在本文 Wi-Fi 链路中，上行是终端到 AP，下行是 AP 到终端。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>关联／漫游</td>
 <td>Association／Roaming</td>
 <td>关联／漫游</td>
 <td>关联是终端与接入网络建立服务关系；漫游是将连接从一个 AP 转到另一个
 AP。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>上下文／安全上下文</td>
 <td>Context／Security Context</td>
 <td>通信状态／安全相关状态</td>
 <td>上下文是接续通信所需的一组状态；安全上下文是其中与身份验证、密钥及安全处理有关的部分。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>密钥／重放</td>
 <td>Cryptographic Key／Replay</td>
 <td>加密密钥／重放</td>
 <td>密钥参与加密等安全操作；重放是旧数据被冒充新数据再次提交，不能与正常重传混为一谈。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Block ACK 窗口</td>
 <td>Block Acknowledgment Window</td>
 <td>块确认窗口</td>
 <td>当前跟踪的一段帧序号范围，用于管理哪些已收到、哪些仍待确认。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>重排序</td>
 <td>Reordering</td>
 <td>接收顺序恢复</td>
 <td>数据可能因不同路径或重传而先后颠倒；接收方按序号等信息恢复应有顺序。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>MAC 数据服务接入点</td>
 <td>MAC Data Service Access Point</td>
 <td>MAC 数据服务接入点</td>
 <td>MAC 向上层交付数据的逻辑接口，不是供手机连接的物理设备 AP。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>单射频</td>
 <td>Single Radio</td>
 <td>单射频实现</td>
 <td>本文指使用一套可切换工作配置的无线电收发装置；不等于只有一根天线。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>侦听／退避／争用</td>
 <td>Carrier Sensing／Backoff／Contention</td>
 <td>信道侦听／随机退避／竞争接入</td>
 <td>分别是判断是否有人发送、按规则随机等待、与其他设备竞争发送机会。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>调度</td>
 <td>Scheduling</td>
 <td>资源调度</td>
 <td>决定谁在什么时候、使用哪些资源发送。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>并发／串行</td>
 <td>Concurrent Transmission／Sequential Transmission</td>
 <td>同时发送／先后发送</td>
 <td>并发让多条链路同时工作；串行让它们依次工作，并发是否有利取决于互扰条件。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>空间复用</td>
 <td>Spatial Reuse</td>
 <td>空间复用</td>
 <td>不同位置的设备在互扰可接受时，同时使用相同频率资源。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>隐藏节点</td>
 <td>Hidden Node</td>
 <td>隐藏节点</td>
 <td>两个发送方彼此听不到，却可能干扰同一个接收方。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>碰撞／重传</td>
 <td>Collision／Retransmission</td>
 <td>发送碰撞／重复发送</td>
 <td>碰撞是发送相互干扰造成接收失败；重传是在未确认成功后再次发送，并非所有并发都会碰撞。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>速率回退</td>
 <td>Rate Fallback</td>
 <td>降低发送速率</td>
 <td>信号质量不足时采用较低发送速率，争取更可靠地接收；不等于重新发送同一个包。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>功率／功率增益</td>
 <td>Power／Power Gain</td>
 <td>发射功率／功率增益</td>
 <td>功率描述信号强弱；正文模型中的功率增益是接收功率与发射功率之比，可以远小于
 1。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>干扰容限／门限</td>
 <td>Interference Tolerance／Threshold</td>
 <td>可承受干扰／判定门限</td>
 <td>前者是接收方能承受多少额外干扰；后者是作判断用的界线，如模型中的最低目标
 SINR。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>相位／符号</td>
 <td>Phase／Symbol</td>
 <td>波形相位／调制符号</td>
 <td>相位是波形在一次周期中所处的位置；符号是一次用于表示数据的信号状态。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>多径／衰落</td>
 <td>Multipath Propagation／Fading</td>
 <td>多径传播／信号衰落</td>
 <td>信号可能经直达、反射等多条路径到达；位置、移动和遮挡等变化又会使接收强弱发生变化。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>阵列／阵元</td>
 <td>Antenna Array／Array Element</td>
 <td>天线阵列／阵列单元</td>
 <td>阵列是一组配合工作的天线；阵元是其中的单元。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>波束成形／预编码权重</td>
 <td>Beamforming／Precoding Weights</td>
 <td>波束成形／预编码权重</td>
 <td>调整各天线输出的强弱和相位，改变不同接收位置的效果；权重就是这些调整所用的数值。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>零陷／零迫</td>
 <td>Spatial Null／Zero Forcing</td>
 <td>空间零陷／零迫设计</td>
 <td>零陷是特定接收位置的低响应；零迫是试图用数学约束把指定干扰项压到零的设计方法，实际效果受误差限制。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>空间自由度／阵列增益</td>
 <td>Spatial Degrees of Freedom／Array Gain</td>
 <td>独立空间控制能力／阵列增益</td>
 <td>多天线能独立控制信号的余地，以及配合发送带来的信号增强；保护更多邻居可能消耗这些能力。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>探测／反馈</td>
 <td>Channel Sounding／Feedback</td>
 <td>信道探测／测量反馈</td>
 <td>先发已知信号测量传播条件，再把结果报告给需要作决策的设备。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>前导／前导打孔</td>
 <td>Preamble／Preamble Puncturing</td>
 <td>前导信号／前导打孔</td>
 <td>前导帮助接收端识别和对准发送；打孔是在允许的宽带发送中按规则暂不使用某些子信道。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>相干合成</td>
 <td>Coherent Combining</td>
 <td>相干合成</td>
 <td>精确配合多个信号的相位，使它们在接收端按预期叠加；要求比仅协调发送时间更严格。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>信令／开销</td>
 <td>Signaling／Overhead</td>
 <td>控制信令／额外开销</td>
 <td>信令用于安排通信；为协调、测量、确认等付出的时间和资源属于开销，需要计入整体收益。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>队列／缓存溢出</td>
 <td>Queue／Buffer Overflow</td>
 <td>等待队列／缓存溢出</td>
 <td>待处理数据先排队；积压超过临时存储容量时，就可能有数据被丢弃。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>吞吐量／聚合吞吐量</td>
 <td>Throughput／Aggregate Throughput</td>
 <td>实际交付速率／总吞吐量</td>
 <td>前者是每秒成功交付多少数据；后者是所考察链路吞吐量的总和，不是帧聚合的大小。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>时延／尾部时延</td>
 <td>Latency／Tail Latency</td>
 <td>交付耗时／慢包时延</td>
 <td>时延是从规定起点到终点花的时间；尾部时延关注等待特别久的那部分数据，常用
 P95、P99 观察。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>接入时延／接入间隔</td>
 <td>Channel Access Delay／Inter-Access Time</td>
 <td>获得发送机会的等待／接入间隔</td>
 <td>具体统计起止点必须说明；本文 NPCA
 研究的平均接入间隔含自身传输，不能直接当成包时延。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>端到端／最大无包间隔</td>
 <td>End-to-End／Maximum Inter-Packet Gap</td>
 <td>全路径交付／最长收包空档</td>
 <td>端到端覆盖发送应用到接收应用的路径；最大无包间隔用于观察业务最长有多久收不到包。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>丢包率／超时</td>
 <td>Packet Loss Rate／Timeout</td>
 <td>数据丢失比例／超过等待时限</td>
 <td>前者需明确统计哪一层的数据；后者指数据等得过久，可能已不满足业务要求。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>重传率</td>
 <td>Retransmission Rate</td>
 <td>重复发送比例</td>
 <td>衡量重复发送的情况；重传后仍可能成功，因此不能直接当成最终丢包率。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>业务负载</td>
 <td>Traffic Load</td>
 <td>待处理业务量</td>
 <td>网络需要处理多少业务；相同设备在轻负载与持续拥塞时的表现可能差别很大。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>满缓冲／全缓冲</td>
 <td>Full-Buffer Traffic</td>
 <td>持续有数据可发的业务模型</td>
 <td>假设发送队列一直有业务，用于考察高负载；不表示缓存已经溢出。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>帧聚合</td>
 <td>Frame Aggregation</td>
 <td>多帧合并发送</td>
 <td>将多个帧合到一次发送中；聚合上限规定最多合并多少。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>泊松到达</td>
 <td>Poisson Arrivals</td>
 <td>泊松业务到达模型</td>
 <td>用概率模型描述数据随机到来、长期平均到达速率一定；短时间内仍可能忽多忽少。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>纯视距／完美即时 CSI</td>
 <td>Pure Line-of-Sight／Perfect Instantaneous Channel State
 Information</td>
 <td>仅直达路径／理想即时信道信息</td>
 <td>研究中只考虑直达传播，并假设准确掌握当前信道；真实环境通常没有这么理想。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>吞吐饥饿</td>
 <td>Throughput Starvation</td>
 <td>长期服务不足</td>
 <td>某个 AP 总是难以得到足够发送机会，导致其业务长期落后。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>随机种子／样本量</td>
 <td>Random Seed／Sample Size</td>
 <td>随机数起始设置／观测数量</td>
 <td>换种子可以重复不同的模拟随机情况；样本量说明统计结果来自多少次观测。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>置信区间</td>
 <td>Confidence Interval</td>
 <td>统计估计的不确定范围</td>
 <td>用统计方法表达估计结果有多不确定；不是单个数据包的时延上下限。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>最邻近秩法</td>
 <td>Nearest-Rank Method</td>
 <td>按排序位置取分位数的方法</td>
 <td>先将样本从小到大排列，再取“样本数乘所求百分比、向上取整”对应位置的值。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>基线／归一化</td>
 <td>Baseline／Normalization</td>
 <td>比较参考／统一比例表示</td>
 <td>基线是拿来比较的方案；归一化把参考值统一写成如
 100，以便看相对变化。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>硬实时保证</td>
 <td>Hard Real-Time Guarantee</td>
 <td>严格截止时间保证</td>
 <td>要求在规定条件下每次任务都在截止时间前完成，不能由平均时延或 P95
 改善直接推出。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>MHz</td>
 <td>Megahertz</td>
 <td>兆赫</td>
 <td>1 MHz
 等于一百万赫兹；本文用于描述频率范围或信道带宽，不是数据传输速度。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>dBm</td>
 <td>Decibels Relative to One Milliwatt</td>
 <td>相对 1 毫瓦的对数功率单位</td>
 <td>0 dBm 等于 1 毫瓦；不能把 dBm
 数字直接代入正文使用线性功率的乘除公式。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Mb/s／MB/s</td>
 <td>Megabits per Second／Megabytes per Second</td>
 <td>每秒百万比特／每秒百万字节</td>
 <td>小写 b 是比特，大写 B 是字节；1 字节等于 8 比特，二者不能混用。</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>ms</td>
 <td>Millisecond</td>
 <td>毫秒</td>
 <td>1,000 ms 等于 1 秒，用于表示发送、等待和切换等耗时。</td>
 </tr>
-<tr class="even">
+<tr>
 <td>bit／byte</td>
 <td>Binary Digit／Byte</td>
 <td>比特／字节</td>

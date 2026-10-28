@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -181,9 +182,50 @@ class="toc-section-number">4</span> KUnit</a></li>
 href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <p>下面介绍一些Linux内核的测试工具。</p>
 <h1 data-number="1" id="syzkaller"><span
 class="header-section-number">1</span> syzkaller</h1>
+<!--
+https://i-m.dev/posts/20200313-143737.html
+
+配置: https://github.com/google/syzkaller/blob/master/pkg/mgrconfig/config.go
+
+复现:
+```shell
+./syz-execprog -executor=./syz-executor -repeat=0 -procs=16 -cover=0 ./log0
+```
+
+```sh
+CONFIG_KCOV=y
+CONFIG_KCOV_INSTRUMENT_ALL=y
+CONFIG_KCOV_ENABLE_COMPARISONS=y
+CONFIG_DEBUG_FS=y
+
+CONFIG_CMDLINE_BOOL=y
+CONFIG_CMDLINE="net.ifnames=0"
+
+CONFIG_E1000=y
+CONFIG_E1000E=y
+CONFIG_E1000E_HWTS=y
+
+CONFIG_BINFMT_MISC=y
+```
+-->
 <p>参考:</p>
 <ul>
 <li><a href="https://github.com/google/syzkaller">syzkaller源码</a></li>
@@ -331,6 +373,13 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /proc/sys/kernel/panic_on_oops <span class="co"># 确认是否生效</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">./linux_amd64/syz-execprog</span> <span class="at">-executor</span><span class="op">=</span>./linux_amd64/syz-executor <span class="at">-repeat</span><span class="op">=</span>0 <span class="at">-procs</span><span class="op">=</span>16 <span class="at">-cover</span><span class="op">=</span>0 crash-log</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ex">./linux_amd64/syz-execprog</span> <span class="at">-executor</span><span class="op">=</span>./linux_amd64/syz-executor <span class="at">-repeat</span><span class="op">=</span>0 <span class="at">-procs</span><span class="op">=</span>16 <span class="at">-cover</span><span class="op">=</span>0 file-with-a-single-program</span></code></pre></div>
+<!--
+./syz-prog2c -prog linux_amd64/test.txt -enable=all -threaded -repeat=2 -procs=8 -sandbox=namespace -segv -tmpdir
+
+将程序转换为c代码，repeat默认为1，当转换不成功时，增加重复数量。
+
+也可在转换为c代码前，排除掉单个程序中不会导致崩溃的系统调用，得到最终某几个系统调用触发的崩溃，在用syz-prog2c进行c代码的转换。
+-->
 <h1 data-number="2" id="xfstests"><span
 class="header-section-number">2</span> xfstests</h1>
 <ul>

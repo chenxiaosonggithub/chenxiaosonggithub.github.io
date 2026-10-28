@@ -189,6 +189,21 @@ class="toc-section-number">3.14</span> 图解Linux内核-基于6.x</a></li>
 href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <p>讲完了开发环境的准备，在讲具体内核模块知识点之前，我想先列一下曾经读过的几本书，其中有的书我看过很多遍，当然也有一些只看过一部分。总体来说，这些书是网上推荐比较多的。如果发现有其他好书，我还会继续补充，各位朋友如果有推荐的书也可以告诉我。</p>
 <p>各位朋友可以<a
 href="https://chenxiaosong.com/baidunetdisk">点击这里从百度网盘下载pdf电子书</a>。电子书请仅作为学习用途，有需要的话建议购买纸质书。</p>
@@ -207,24 +222,24 @@ id="四库全书之一linux内核设计与实现-基于2.6.34内核"><span
 class="header-section-number">2.1</span> 四库全书之一<a
 href="https://book.douban.com/subject/6097773/">《Linux内核设计与实现》</a>-基于2.6.34内核</h2>
 <p>这本书我看过很多很多遍，是我的内核启蒙书，没那么厚，对内核知识概括得很好，看完可以对内核知识有一个总体的掌握，但讲得不那么细，也正是因为这样，第一遍我看的时候有点晕，但第二第三遍再看时很爽。</p>
-<pre><code>第1章 Linux内核简介 
-第2章 从内核出发 
-第3章 进程管理 
-第4章 进程调度 
-第5章 系统调用 
+<pre><code>第1章 Linux内核简介 &lt;!-- 内核简介 --&gt;
+第2章 从内核出发 &lt;!-- 内核社区 --&gt;
+第3章 进程管理 &lt;!-- 进程管理和调度 --&gt;
+第4章 进程调度 &lt;!-- 进程管理和调度 --&gt;
+第5章 系统调用 &lt;!-- 系统调用 --&gt;
 第6章 内核数据结构
-第7章 中断和中断处理 
+第7章 中断和中断处理 &lt;!-- 中断 --&gt;
 第8章 下半部和推后执行的工作 &lt;-- 中断 --&gt;
 第9章 内核同步介绍
 第10章 内核同步方法
 第11章 定时器和时间管理
-第12章 内存管理 
-第13章 虚拟文件系统 
-第14章 块I/O层 
-第15章 进程地址空间 
+第12章 内存管理 &lt;!-- 内存管理 --&gt;
+第13章 虚拟文件系统 &lt;!-- 文件系统 --&gt;
+第14章 块I/O层 &lt;!-- 块I/O层 --&gt;
+第15章 进程地址空间 &lt;!-- 内存管理 --&gt;
 第16章 页高速缓存和页回写
 第17章 设备与模块
-第18章 调试 
+第18章 调试 &lt;!-- 内核调试方法 --&gt;
 第19章 可移植性
 第20章 补丁、开发和社区参考资料</code></pre>
 <h2 data-number="2.2"
@@ -311,7 +326,7 @@ href="https://book.douban.com/subject/4843567/">《深入Linux内核架构》</a
 第9章 Ext文件系统族
 第10章 无持久存储的文件系统
 第11章 扩展属性和访问控制表
-第12章 网络 
+第12章 网络 &lt;!-- 网络 --&gt;
 第13章 系统调用
 第14章 内核活动
 第15章 时间管理
@@ -362,10 +377,10 @@ href="https://book.douban.com/subject/26600201/">《Linux设备驱动开发详�
 第４章 Linux内核模块 92
 第５章 Linux文件系统与设备文件 104
 第６章 字符设备驱动 134
-第７章 Linux设备驱动中的并发控制 158 
+第７章 Linux设备驱动中的并发控制 158 &lt;!-- 内核同步 --&gt;
 第８章 Linux设备驱动中的阻塞与非阻塞I/O 189
 第９章 Linux设备驱动中的异步通知与异步I/O 206
-第10章 中断与时钟 224 
+第10章 中断与时钟 224 &lt;!-- 中断 --&gt;
 第11章 内存与I/O访问 251
 第12章 Linux设备驱动的软件架构思想 286
 第13章 Linux块设备驱动 331
@@ -482,7 +497,7 @@ href="https://www.wiley.com/en-us/Beginning+Linux+Programming%2C+4th+Edition-p-9
 第12章 posix线程 416
 第13章 进程间通信: 管道 443
 第14章 信号量、共享内存和消息队列 488
-第15章 套接字 513 
+第15章 套接字 513 &lt;!-- 网络 --&gt;
 第16章 用gtk+进行gnome编程 546
 第17章 用qt进行kde编程 593
 第18章 linux标准 633</code></pre>

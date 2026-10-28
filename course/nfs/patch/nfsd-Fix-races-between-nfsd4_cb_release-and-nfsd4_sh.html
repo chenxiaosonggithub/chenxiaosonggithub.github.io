@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -142,6 +143,21 @@ class="toc-section-number">3</span> 代码分析</a></li>
 href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 data-number="1" id="邮件内容"><span
 class="header-section-number">1</span> 邮件内容</h1>
 <p><a
@@ -230,6 +246,27 @@ class="header-section-number">3</span> 代码分析</h1>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    idr_destroy</span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      radix_tree_free_nodes</span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        radix_tree_node_free <span class="co">// nfsd41_cb_inflight_wait_complete唤醒后才会执行到这里，没有并发的情况</span></span></code></pre></div>
+<!--
+调试:
+```c
+// 重启服务 systemctl restart nfs-server
+nfsd_svc
+  nfsd_destroy_serv
+    nfsd_shutdown_net
+      nfs4_state_shutdown_net
+        nfs4_state_destroy_net
+          destroy_client
+            __destroy_client
+              nfsd4_shutdown_callback
+
+// 挂载 4.0
+rpc_async_schedule
+  __rpc_execute
+    rpc_exit_task
+      nfsd4_cb_probe_done
+        nfsd4_mark_cb_state(clp, NFSD4_CB_UP)
+```
+-->
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 

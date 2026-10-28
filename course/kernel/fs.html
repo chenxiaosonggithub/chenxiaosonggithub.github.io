@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -205,21 +206,31 @@ class="toc-section-number">3.5</span> 工具软件</a></li>
 id="toc-开发一个新文件系统的步骤"><span
 class="toc-section-number">3.6</span> 开发一个新文件系统的步骤</a></li>
 </ul></li>
+<li><a href="#ext4文件系统" id="toc-ext4文件系统"><span
+class="toc-section-number">4</span> ext4文件系统</a>
+<ul>
+<li><a href="#jbd2" id="toc-jbd2"><span
+class="toc-section-number">4.1</span> jbd2</a></li>
+</ul></li>
+<li><a href="#procfs" id="toc-procfs"><span
+class="toc-section-number">5</span> procfs</a></li>
+<li><a href="#sysfs" id="toc-sysfs"><span
+class="toc-section-number">6</span> sysfs</a></li>
 <li><a href="#minix文件系统" id="toc-minix文件系统"><span
-class="toc-section-number">4</span> minix文件系统</a>
+class="toc-section-number">7</span> minix文件系统</a>
 <ul>
 <li><a href="#使用" id="toc-使用"><span
-class="toc-section-number">4.1</span> 使用</a></li>
+class="toc-section-number">7.1</span> 使用</a></li>
 <li><a href="#独立模块编译" id="toc-独立模块编译"><span
-class="toc-section-number">4.2</span> 独立模块编译</a></li>
+class="toc-section-number">7.2</span> 独立模块编译</a></li>
 <li><a href="#util-linux" id="toc-util-linux"><span
-class="toc-section-number">4.3</span> <code>util-linux</code></a></li>
+class="toc-section-number">7.3</span> <code>util-linux</code></a></li>
 <li><a href="#数据结构" id="toc-数据结构"><span
-class="toc-section-number">4.4</span> 数据结构</a></li>
+class="toc-section-number">7.4</span> 数据结构</a></li>
 <li><a href="#函数流程" id="toc-函数流程"><span
-class="toc-section-number">4.5</span> 函数流程</a></li>
+class="toc-section-number">7.5</span> 函数流程</a></li>
 <li><a href="#支持长文件名" id="toc-支持长文件名"><span
-class="toc-section-number">4.6</span> 支持长文件名</a></li>
+class="toc-section-number">7.6</span> 支持长文件名</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -227,6 +238,21 @@ class="toc-section-number">4.6</span> 支持长文件名</a></li>
 href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <p>一般的Linux书籍都是先讲解进程和内存相关的知识，但我想先讲解文件系统。
 第一，因为我就是做文件系统的，更擅长这一块，其他模块的内容我还要再去好好看看书，毕竟不能误人子弟嘛；第二，是
 因为文件系统模块更接近于用户态，是相对比较好理解的内容（当然想深入还是要下大功夫的），由文件系统入手比较适合初学者。</p>
@@ -1086,7 +1112,7 @@ class="header-section-number">3.1.1</span> 块组</h3>
 <col style="width: 15%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>超级块</th>
 <th>组描<br>述符</th>
 <th>数据块位图</th>
@@ -1096,7 +1122,7 @@ class="header-section-number">3.1.1</span> 块组</h3>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>1个块</td>
 <td>k个块</td>
 <td>1个块</td>
@@ -1109,7 +1135,7 @@ class="header-section-number">3.1.1</span> 块组</h3>
 <p>启动扇区和块组:</p>
 <table>
 <thead>
-<tr class="header">
+<tr>
 <th>启动块</th>
 <th>块组0</th>
 <th>块组1</th>
@@ -1554,8 +1580,15 @@ class="header-section-number">3.3</span> 管理磁盘空间</h2>
 经过缓存写调用<code>ext2_file_write_iter() -&gt; generic_file_write_iter()</code>。</p>
 <h2 data-number="3.4" id="调试ext2磁盘布局"><span
 class="header-section-number">3.4</span> 调试ext2磁盘布局</h2>
+<!-- 格式化 `superfortat` `fdformat` -->
 <p><code>mkfs.ext2 /dev/sda</code>相当于<code>mke2fs -t 2 -b 1024 -m 5</code>，块大小默认<code>1024</code>字节，保留块百分比默认<code>5%</code>，每<code>8192</code>字节设置一个索引节点，<code>lost+found</code>目录放丢失和找到的缺陷块。</p>
-<p>我们举个例子，一个比较小的磁盘（也可以打开内核配置<code>CONFIG_BLK_DEV_LOOP</code>然后对文件执行同样的操作），执行完以下命令:</p>
+<p>我们举个例子，一个比较小的磁盘（也可以打开内核配置<code>CONFIG_BLK_DEV_LOOP</code>然后对文件执行同样的操作），执行完以下命令:
+<!--
+```sh
+# od选项: 以十六进制格式，每行输出一个字节，并且每个字节都输出其地址，具体查看命令 man 1 od
+# dd if=/dev/sda bs=1K count=2048 | od -tx1 -Ax > image # 也可以试试 debugfs
+```
+--></p>
 <div class="sourceCode" id="cb36"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mkfs.ext2</span> <span class="at">-F</span> /dev/sda <span class="co"># 8412KB大小</span></span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/dev/sda of=image bs=1K count=8412</span>
@@ -1642,6 +1675,8 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb38-1"><a href="#
 </ul>
 <h2 data-number="3.5" id="工具软件"><span
 class="header-section-number">3.5</span> 工具软件</h2>
+<!-- `defrag.ext2` `dumpesfs` -->
+<!-- https://access.redhat.com/documentation/zh-cn/red_hat_enterprise_linux/8/html/managing_file_systems/comparison-of-tools-used-with-ext4-and-xfs_getting-started-with-an-ext4-file-system -->
 <p>最后再介绍几个ext文件系统相关的用户态工具:</p>
 <ul>
 <li><code>mke2fs</code>:
@@ -1714,10 +1749,64 @@ client为<code>cifs_dentry_ops</code>和<code>cifs_ci_dentry_ops</code>。</li>
 <li>定义文件系统类型<code>ext2_fs_type</code>。</li>
 <li>模块加载卸载方法，<code>init_ext2_fs</code>和<code>exit_ext2_fs</code>。</li>
 </ol>
-<h1 data-number="4" id="minix文件系统"><span
-class="header-section-number">4</span> minix文件系统</h1>
-<h2 data-number="4.1" id="使用"><span
-class="header-section-number">4.1</span> 使用</h2>
+<h1 data-number="4" id="ext4文件系统"><span
+class="header-section-number">4</span> ext4文件系统</h1>
+<h2 data-number="4.1" id="jbd2"><span
+class="header-section-number">4.1</span> jbd2</h2>
+<p>ext2不是日志（journal）文件系统，文件系统的状态存放在<code>struct ext2_super_block</code>结构体的<code>s_state</code>字段中，如果不等于<code>EXT2_VALID_FS</code>，说明没有正常卸载，<code>e2fsck</code>要检查所有磁盘数据结构，文件数和目录数很多、或者磁盘很大，一致性检查要花费非常久的时间。</p>
+<p>ext4是日志文件系统，对文件系统的高级修改分两步:</p>
+<ul>
+<li>把待写块的副本存放在journal中。</li>
+<li>当发往journal的I/O数据传送完成时（数据提交到日志），块就被写入fs。</li>
+</ul>
+<p>当发往fs的I/O数据传送终止时（把数据提交给fs），日志的块副本被丢弃。</p>
+<p><code>e2fsck</code>检查时，有两种情况:</p>
+<ul>
+<li>提交到日志之前系统故障发生。高级修改的块副本要么从日志中丢失，要么是不完整的，忽略。</li>
+<li>提交到日志之后系统故障发生。块的副本有效，<code>e2fsck</code>写入fs。</li>
+</ul>
+<p>注意，日志功能只能保证系统调用级别的一致性。</p>
+<p>ext文件系统有6种元数据:
+超级块，块组描述符，索引节点，间接块，数据块位图块，索引节点位图块。</p>
+<p>有3种不同的日志模式:</p>
+<ul>
+<li>journal: 所有数据和元数据的改变都被记入日志，最安全最慢。</li>
+<li>ordered:
+只有元数据的改变才被记入日志，数据在元数据之前写入磁盘，默认的日志模式。</li>
+<li>writeback:
+只有元数据的改变才被记入日志，不保证数据在元数据之前写入磁盘，速度最快。</li>
+</ul>
+<p>ext4本身不处理日志，而是利用日志块设备（journal block device,
+JBD2）。ext4和jbd2之间的交互基于3个基本单元:</p>
+<ul>
+<li>日志记录:
+描述一个磁盘块的一次更新。由低级操作所修改的整个<code>buffer</code>组成，直接操作<code>buffer</code>和<code>buffer_head</code>，在日志内部表现为普通的数据块或元数据。</li>
+<li>原子操作处理:
+一次高级修改对应的日志记录，修改文件系统的每个系统调用都引起一次单独的原子操作处理。</li>
+<li>事务: 包括几个原子操作处理。</li>
+</ul>
+<h1 data-number="5" id="procfs"><span
+class="header-section-number">5</span> procfs</h1>
+<p>全称process data filesystem,
+翻译为进程数据文件系统，一般挂载到<code>/proc</code>目录，也可以挂载到其他目录。</p>
+<p>proc文件系统中的信息分为以下几类:</p>
+<ul>
+<li>内存管理；</li>
+<li>系统进程的特征数据；</li>
+<li>文件系统；</li>
+<li>设备驱动程序；</li>
+<li>系统总线；</li>
+<li>电源管理；</li>
+<li>终端；</li>
+<li>系统控制参数。</li>
+</ul>
+<p>proc文件系统中的信息太多，一般不再增加新项。</p>
+<h1 data-number="6" id="sysfs"><span
+class="header-section-number">6</span> sysfs</h1>
+<h1 data-number="7" id="minix文件系统"><span
+class="header-section-number">7</span> minix文件系统</h1>
+<h2 data-number="7.1" id="使用"><span
+class="header-section-number">7.1</span> 使用</h2>
 <p>虚拟机启动时，不能使用4k盘，qemu启动命令<code>logical_block_size</code>和<code>physical_block_size</code>参数要使用512:</p>
 <div class="sourceCode" id="cb39"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="ex">-drive</span> file=1,if=none,format=raw,cache=writeback,file.locking=off,id=dd_1 <span class="dt">\</span></span>
@@ -1737,14 +1826,14 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb41-1"><a href="#
 <div class="sourceCode" id="cb42"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> minix /dev/sda /mnt</span></code></pre></div>
 <p>或者格式化文件，通过loop设备挂载，注意这时需要打开<code>CONFIG_BLK_DEV_LOOP</code>配置。</p>
-<h2 data-number="4.2" id="独立模块编译"><span
-class="header-section-number">4.2</span> 独立模块编译</h2>
+<h2 data-number="7.2" id="独立模块编译"><span
+class="header-section-number">7.2</span> 独立模块编译</h2>
 <p>如果我们要在minix文件系统的基础上再开发，为了方便开发测试，可以<code>fs/minix</code>复制出来，<a
 href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/kernel/src/0001-myminix.patch">然后打上补丁<code>0001-myminix.patch</code></a>，这里我把文件系统类型名改为了<code>myminix</code>，挂载时要指定挂载选项，如通过loop设备挂载:</p>
 <div class="sourceCode" id="cb43"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">-t</span> myminix <span class="at">-o</span> loop image /mnt</span></code></pre></div>
-<h2 data-number="4.3" id="util-linux"><span
-class="header-section-number">4.3</span> <code>util-linux</code></h2>
+<h2 data-number="7.3" id="util-linux"><span
+class="header-section-number">7.3</span> <code>util-linux</code></h2>
 <p>用户态工具源码包含在<a
 href="https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/tree/disk-utils"><code>util-linux</code></a>中，<a
 href="https://github.com/util-linux/util-linux">github仓库</a>。</p>
@@ -1754,8 +1843,8 @@ href="https://github.com/util-linux/util-linux/blob/master/Documentation/howto-c
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apt</span> install <span class="at">-y</span> autopoint gettext flex bison sqlite3 libsqlite3-dev</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./autogen.sh</span> <span class="kw">&amp;&amp;</span> <span class="ex">./configure</span> <span class="kw">&amp;&amp;</span> <span class="fu">make</span> <span class="at">-j</span><span class="kw">`</span><span class="fu">nproc</span><span class="kw">`</span></span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="co"># make install # 默认安装到/usr/sbin/mkfs.minix</span></span></code></pre></div>
-<h2 data-number="4.4" id="数据结构"><span
-class="header-section-number">4.4</span> 数据结构</h2>
+<h2 data-number="7.4" id="数据结构"><span
+class="header-section-number">7.4</span> 数据结构</h2>
 <ol type="1">
 <li>超级块结构。</li>
 </ol>
@@ -1799,8 +1888,8 @@ class="header-section-number">4.4</span> 数据结构</h2>
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>        block_t key<span class="op">;</span> <span class="co">// 块号</span></span>
 <span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> buffer_head <span class="op">*</span>bh<span class="op">;</span> <span class="co">// 缓冲头，内存中保存块的数据</span></span>
 <span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> Indirect<span class="op">;</span></span></code></pre></div>
-<h2 data-number="4.5" id="函数流程"><span
-class="header-section-number">4.5</span> 函数流程</h2>
+<h2 data-number="7.5" id="函数流程"><span
+class="header-section-number">7.5</span> 函数流程</h2>
 <p>写文件流程:</p>
 <div class="sourceCode" id="cb46"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>write</span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  ksys_write</span>
@@ -1833,8 +1922,8 @@ class="header-section-number">4.5</span> 函数流程</h2>
 <span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a>                            nr <span class="op">=</span> minix_new_block<span class="op">(</span>inode<span class="op">)</span></span>
 <span id="cb46-30"><a href="#cb46-30" aria-hidden="true" tabindex="-1"></a>                            bh <span class="op">=</span> sb_getblk <span class="co">// 获取间接块对应的buffer_head</span></span>
 <span id="cb46-31"><a href="#cb46-31" aria-hidden="true" tabindex="-1"></a>                          map_bh <span class="co">// 将buffer_head映射到块</span></span></code></pre></div>
-<h2 data-number="4.6" id="支持长文件名"><span
-class="header-section-number">4.6</span> 支持长文件名</h2>
+<h2 data-number="7.6" id="支持长文件名"><span
+class="header-section-number">7.6</span> 支持长文件名</h2>
 <p>我们来看一个有趣的问题:
 让minix文件系统（v3）支持最大长度4095字节的文件名。</p>
 <p>当我们使用<code>touch</code>命令创建一个4095字节长度的文件时，会执行到<code>minix_lookup</code>函数。而当创建一个4096字节长度的文件时，不会执行到<code>minix_lookup</code>函数，说明在<code>vfs</code>已经拦截了。</p>

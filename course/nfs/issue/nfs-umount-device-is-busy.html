@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -150,6 +151,21 @@ class="toc-section-number">4.2</span> 代码分析</a></li>
 href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 data-number="1" id="问题描述"><span
 class="header-section-number">1</span> 问题描述</h1>
 <p>卸载nfsv3挂载点时报错<code>device is busy</code>，但用<code>lsof +D &lt;挂载点&gt;</code>和<code>fuser -m &lt;挂载点&gt;</code>都无法找到使用挂载点的进程。</p>
@@ -227,6 +243,9 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">umount</span> /mnt <span class="co"># 正常卸载，不报错</span></span></code></pre></div>
 <h2 data-number="4.2" id="代码分析"><span
 class="header-section-number">4.2</span> 代码分析</h2>
+<!--
+系统调用的跟踪调试请查看[《文件系统延迟卸载》]()。
+-->
 <p>只有在用户空间打开文件时会把文件描述符放到<code>files_struct -&gt; fdt</code>中:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>openat</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  do_sys_open</span>
@@ -238,6 +257,83 @@ class="header-section-number">4.2</span> 代码分析</h2>
 href="https://gitee.com/chenxiaosonggitee/blog/blob/master/course/nfs/src/kprobe-fd_install.c"><code>kprobe-fd_install.c</code></a>调试，
 其中<code>mydebug_dump_stack()</code>相关的用法可以查看<a
 href="https://chenxiaosong.com/course/kernel/debug.html#mydebug">《mydebug模块》</a>。</p>
+<!--
+# `mmap()`可以找到进程 {#mmap-open-file}
+
+下面的内容对你没啥卵用，不用看了。只是我吃饱撑的尝试一下，顺便再记录一下。
+
+`mmap.c`:
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+    // 打开文件，修改挂载点
+    int fd = open("/mnt/file", O_RDONLY);
+    if (fd == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+
+    // 获取文件信息
+    struct stat file_stat;
+    if (fstat(fd, &file_stat) == -1) {
+        perror("fstat");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    // 检查文件是否为空
+    if (file_stat.st_size == 0) {
+        fprintf(stderr, "File is empty\n");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    // 内存映射文件
+    void *mapped = mmap(NULL, file_stat.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    if (mapped == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    // 映射成功后即可关闭文件描述符
+    close(fd);
+
+    // 将文件内容输出到标准输出
+    if (fwrite(mapped, 1, file_stat.st_size, stdout) != file_stat.st_size) {
+        fprintf(stderr, "Error writing to stdout\n");
+    }
+
+    printf("will loop\n");
+    while (1) {
+        ;
+    }
+
+    // 解除内存映射
+    if (munmap(mapped, file_stat.st_size) == -1) {
+        perror("munmap");
+        exit(EXIT_FAILURE);
+    }
+
+    return EXIT_SUCCESS;
+}
+```
+
+```sh
+gcc -o mmap mmap.c
+./mmap &
+lsof +D <挂载点> # 能找到进程
+fuser -m <挂载点> # 能找到进程
+```
+
+说了不用看了，你还看。
+-->
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 

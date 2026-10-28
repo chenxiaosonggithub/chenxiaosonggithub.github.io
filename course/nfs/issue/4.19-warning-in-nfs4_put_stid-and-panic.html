@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -156,6 +157,21 @@ class="toc-section-number">5</span> 代码分析</a></li>
 href="https://chenxiaosong.com/course/nfs/video.html">点击这里查看配套的教学视频</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/nfs/nfs.html">点击跳转到nfs课程所有目录</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 data-number="1" id="问题描述"><span
 class="header-section-number">1</span> 问题描述</h1>
 <p>邮件列表类似问题的讨论: <a
@@ -286,6 +302,11 @@ class="header-section-number">2.1</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff505f0a38d7a8</span> <span class="op">&lt;</span>delete_node+0x90<span class="op">&gt;</span>:  cmp     x3, x0</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff505f0a38d7ac</span> <span class="op">&lt;</span>delete_node+0x94<span class="op">&gt;</span>:  b.eq    0xffff505f0a38d8e8</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="ex">0xffff505f0a38d7b0</span> <span class="op">&lt;</span>delete_node+0x98<span class="op">&gt;</span>:  brk     <span class="co">#0x800</span></span></code></pre></div>
+<!--
+# 汇编的意思是下面的两行，但好像不成立
+x0 == ffffff00, [x0] + 24 == private_list
+[x0 + 24] == &private_list == next # 这里不成立
+-->
 <p>我们看到panic时无法读的地址<code>ffffa628c7d2bb28</code>是报<code>WARNING</code>时的<code>x3</code>寄存器，解析vmcore
 <code>crash&gt; struct radix_tree_node.private_list -xo</code>
 可知<code>private_list</code>的偏移量为<code>24</code>，根据<code>&lt;delete_node+0x64&gt;:  add     x3, x0, #0x18</code>这一行的汇编可知<code>x3</code>是<code>&amp;node-&gt;private_list</code>，为什么在<code>lib/radix-tree.c: 762 if (node-&gt;count) {</code>这一行取出<code>&amp;node-&gt;private_list</code>的值呢，是gcc优化所致。</p>
@@ -454,6 +475,98 @@ class="header-section-number">5</span> 代码分析</h1>
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>                INIT_LIST_HEAD<span class="op">(&amp;</span>node<span class="op">-&gt;</span>private_list<span class="op">);</span> <span class="co">// panic时还未执行到</span></span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>              </span></code></pre></div>
 <p>其中<code>idr_remove()</code>移除的id是在<code>nfs4_alloc_stid() -&gt; idr_alloc_cyclic()</code>分配的。</p>
+<!--
+# 构造
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+
+    const char filename[] = "/mnt/file";
+
+    // 以只读模式打开文件
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+
+    while (1) {
+        sleep(1); // 每秒暂停一次，减少CPU占用
+    }
+
+    return 0;
+}
+```
+
+`echo something > /mnt/file; echo 3 > /proc/sys/vm/drop_caches; cat /mnt/file`:
+```c
+kthread
+  nfsd
+    svc_recv
+      svc_handle_xprt
+        svc_process
+          svc_process_common
+            nfsd_dispatch
+              nfsd4_proc_compound
+                nfsd4_open
+                  nfsd4_process_open2
+                    nfs4_open_delegation
+                      nfs4_set_delegation
+                        alloc_init_deleg
+                          nfs4_alloc_stid
+                nfsd4_close
+                  nfs4_put_stid
+```
+
+`rm /tmp/s_test/file`:
+```c
+rpc_async_schedule
+  __rpc_execute
+    rpc_release_task
+      rpc_final_put_task
+        rpc_free_task
+          rpc_release_calldata
+            nfsd4_cb_release
+              nfsd41_destroy_cb
+                nfsd4_cb_recall_release
+                  nfs4_put_stid
+                    idr_remove
+                      radix_tree_delete_item
+                        __radix_tree_delete
+                          delete_node
+                            radix_tree_node_free
+```
+
+`umount /mnt`:
+```c
+
+```
+
+`systemctl restart nfs-server`:
+```c
+write
+  ksys_write
+    vfs_write
+      nfsctl_transaction_write
+        write_threads
+          nfsd_svc
+            nfsd_destroy_serv
+              nfsd_shutdown_net
+                nfs4_state_shutdown_net
+                  nfs4_state_destroy_net
+                    destroy_client
+                      __destroy_client
+                        free_client
+                          idr_destroy
+                            radix_tree_free_nodes
+                              radix_tree_node_free
+```
+-->
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 

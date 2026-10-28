@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -155,12 +156,33 @@ class="toc-section-number">5.5</span> Noop</a></li>
 </ul></li>
 <li><a href="#drbd" id="toc-drbd"><span
 class="toc-section-number">6</span> drbd</a></li>
+<li><a href="#mq-deadline" id="toc-mq-deadline"><span
+class="toc-section-number">7</span> mq-deadline</a></li>
+<li><a href="#bfq" id="toc-bfq"><span
+class="toc-section-number">8</span> bfq</a></li>
+<li><a href="#kyber" id="toc-kyber"><span
+class="toc-section-number">9</span> kyber</a></li>
 </ul>
 </nav>
 <p><a
 href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <h1 data-number="1" id="简介"><span
 class="header-section-number">1</span> 简介</h1>
 <p>块设备（block
@@ -373,12 +395,24 @@ class="header-section-number">5.4</span> CFQ(Complete Fair Queuing)</h2>
 I/O调度器已经被BFQ取代。CFQ是给每个进程维护一个请求队列，然后每个队列按扇区方向排序，以时间片轮转调度队列，从每个队列选取4个请求数。</p>
 <h2 data-number="5.5" id="noop"><span
 class="header-section-number">5.5</span> Noop</h2>
+<!-- https://www.cnblogs.com/liulianzhen99/articles/18021188 -->
 <p>最新的代码中已经没有这个I/O调度器了，已经被多队列版本的none取代了。</p>
 <p>Noop只做了合并的操作，适用于“寻址”代价小或没有代价的块设备。</p>
 <h1 data-number="6" id="drbd"><span
 class="header-section-number">6</span> drbd</h1>
 <p>请查看<a
 href="https://chenxiaosong.com/course/mptcp/issue/drbd-mptcp.html">《drbd支持mptcp》</a>。</p>
+<h1 data-number="7" id="mq-deadline"><span
+class="header-section-number">7</span> mq-deadline</h1>
+<p><a
+href="https://github.com/torvalds/linux/blob/master/Documentation/block/deadline-iosched.rst">参考文档</a></p>
+<p>在<code>945ffb60c11d mq-deadline: add blk-mq adaptation of the deadline IO scheduler</code>引入。</p>
+<h1 data-number="8" id="bfq"><span
+class="header-section-number">8</span> bfq</h1>
+<p>https://github.com/torvalds/linux/blob/master/Documentation/block/bfq-iosched.rst</p>
+<h1 data-number="9" id="kyber"><span
+class="header-section-number">9</span> kyber</h1>
+<p>https://github.com/torvalds/linux/blob/master/Documentation/block/kyber-iosched.rst</p>
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 

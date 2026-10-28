@@ -79,6 +79,21 @@ class="toc-section-number">4</span> EXT文件系统</a></li>
 href="https://chenxiaosong.com/course/kernel/kernel.html">点击跳转到内核课程所有目录</a>。</p>
 <p><a
 href="https://chenxiaosong.com/course/kernel/video.html">点击这里查看配套的教学视频</a>。</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (code) {
+      pre.textContent = code.textContent;
+    }
+  });
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default'
+  });
+</script>
 <p>本文章列出一些内核补丁的分析，有些是我写的，有些是我定位问题时遇到的。</p>
 <h1 data-number="1" id="我写的补丁"><span
 class="header-section-number">1</span> 我写的补丁</h1>
@@ -88,10 +103,20 @@ href="https://chenxiaosong.com/course/kernel/contribution.html">点击这里查�
 class="header-section-number">2</span> NFS（网络文件系统）</h1>
 <p><a
 href="https://chenxiaosong.com/course/nfs/patch.html">点击这里查看NFS相关补丁</a></p>
+<!--
+# SMB(CIFS)文件系统
+
+[点击这里查看SMB相关补丁](https://chenxiaosong.com/course/smb/patch.html)
+-->
 <h1 data-number="3" id="调度"><span
 class="header-section-number">3</span> 调度</h1>
 <p><a
 href="https://chenxiaosong.com/course/kernel/patch/sched-EEVDF-and-latency-nice-and-or-slice-attr.html"><code>sched: EEVDF and latency-nice and/or slice-attr</code></a></p>
+<!--
+# VFS（虚拟文件系统）
+
+[`4595a298d556 iomap: Set all uptodate bits for an Uptodate page`](https://chenxiaosong.com/course/kernel/patch/iomap-Set-all-uptodate-bits-for-an-Uptodate-page.html)
+-->
 <h1 data-number="4" id="ext文件系统"><span
 class="header-section-number">4</span> EXT文件系统</h1>
 <p><a

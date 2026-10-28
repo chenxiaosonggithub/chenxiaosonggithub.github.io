@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -161,6 +162,7 @@ href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/xfs/xfs-shut
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">xfs_repair</span> <span class="at">-n</span> dm.img <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> xfs_repair-log.txt</span></code></pre></div>
 <h1 data-number="2" id="分析镜像"><span
 class="header-section-number">2</span> 分析镜像</h1>
+<!-- 镜像在百度网盘中 xfs-shutdown-fs-image.metadump.zip -->
 <p>日志<a
 href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/xfs/xfs-shutdown-fs/xfs_repair-log.txt"><code>xfs_repair-log.txt</code></a>中:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">agf_freeblks</span> 3997090, counted 4111777 in ag 0</span>
@@ -172,6 +174,13 @@ href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/xfs/xfs-shut
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">xfs_db</span><span class="op">&gt;</span> p</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">freeblks</span> = 3997090 <span class="co"># AG0中空闲块数量</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">longest</span> = 14556 <span class="co"># AG0中可用的最长连续空闲块的数量</span></span></code></pre></div>
+<!--
+```sh
+xfs_db> sb 0
+xfs_db> p
+fdblocks = 36891964 # 超级块中存放的所有AG的空闲块总和
+```
+-->
 <p>查看日志:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">xfs_logprint</span> <span class="at">-n</span> dm.img <span class="op">&gt;</span> xfs_logprint-n-log.txt <span class="co"># 不尝试解释日志数据，只解释日志头信息。</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">xfs_logprint</span> dm.img <span class="op">&gt;</span> xfs_logprint-log.txt <span class="co"># 解释日志数据和日志头信息</span></span></code></pre></div>
@@ -225,12 +234,160 @@ href="https://gitee.com/chenxiaosonggitee/tmp/blob/master/gnu-linux/xfs/xfs-shut
 <p><code>lsn = 0x383dc00078a00 = (0x383dc, 0x00078a00) = (230364, 494080)</code></p>
 <p>再看之后AGF相关的记录:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-r</span> <span class="st">&quot;0x58 0x41 0x47 0x46 0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00&quot;</span> xfs_logprint-n-log.txt <span class="at">--line-number</span></span></code></pre></div>
+<!--
+分别在以下各行号的位置，对应的`tail_lsn`分别为:
+```sh
+48263  lsn: 230650,371712   tail_lsn: 230650,293888
+52116  lsn: 230650,386560   tail_lsn: 230650,293888
+54569  lsn: 230650,389632   tail_lsn: 230650,293888
+69739  lsn: 230650,390656   tail_lsn: 230650,293888
+85321  lsn: 230650,414208   tail_lsn: 230650,293888
+89628  lsn: 230650,426496   tail_lsn: 230650,425472
+98543  lsn: 230650,447488   tail_lsn: 230650,426496
+101617 lsn: 230650,460800   tail_lsn: 230650,426496
+107632 lsn: 230650,475648   tail_lsn: 230650,426496
+109327 lsn: 230650,476672   tail_lsn: 230650,426496
+114815 lsn: 230650,480256   tail_lsn: 230650,426496
+115618 lsn: 230650,481792   tail_lsn: 230650,426496
+119204 lsn: 230650,482816   tail_lsn: 230650,426496
+121800 lsn: 230650,488448   tail_lsn: 230650,487424
+126108 lsn: 230650,489472   tail_lsn: 230650,487424
+134746 lsn: 230650,498688   tail_lsn: 230650,488448
+153605 lsn: 230650,509952   tail_lsn: 230650,488448
+157287 lsn: 230650,511488   tail_lsn: 230650,488448
+205193 lsn: 230651,140288   tail_lsn: 230651,133120
+217883 lsn: 230651,147968   tail_lsn: 230651,146944
+218254 lsn: 230651,148480   tail_lsn: 230651,146944
+222805 lsn: 230651,148992   tail_lsn: 230651,146944
+224547 lsn: 230651,149504   tail_lsn: 230651,146944
+226171 lsn: 230651,150016   tail_lsn: 230651,147968
+227624 lsn: 230651,153088   tail_lsn: 230651,147968
+229392 lsn: 230651,154624   tail_lsn: 230651,147968
+```
+-->
 <p>查看AG1的信息:</p>
 <div class="sourceCode" id="cb10"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">xfs_db</span><span class="op">&gt;</span> agf 1</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">xfs_db</span><span class="op">&gt;</span> p </span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">lsn</span> = 0x384fb00032800</span></code></pre></div>
 <p><code>lsn = 0x384fb00032800 = (0x384fb, 0x00032800) = (230651, 206848)</code>也大于前面分析的<code>lsn: 230651,154624</code>。</p>
+<!--
+# 代码分析
+
+```c
+// echo <9000个字节> > /mnt/file
+kthread
+  worker_thread
+    process_scheduled_works
+      process_one_work
+        wb_workfn
+          wb_do_writeback
+            wb_check_start_all
+              wb_writeback
+                __writeback_inodes_wb
+                  writeback_sb_inodes
+                    __writeback_single_inode
+                      do_writepages
+                        xfs_vm_writepages
+                          iomap_writepages
+                            iomap_writepage_map
+                              iomap_writepage_map_blocks
+                                xfs_map_blocks
+                                  xfs_bmapi_convert_delalloc
+                                    xfs_bmapi_convert_one_delalloc
+                                      xfs_bmapi_allocate
+                                        xfs_bmap_alloc_userdata
+                                          xfs_bmap_btalloc
+```
+
+```c
+// echo <9000个字节> > /mnt/file
+xfs_bmap_btalloc
+  xfs_bmap_btalloc_best_length
+    xfs_alloc_vextent_start_ag
+      xfs_alloc_vextent_iterate_ags
+        xfs_alloc_vextent_prepare_ag
+          xfs_alloc_fix_freelist
+            xfs_alloc_read_agf
+      xfs_alloc_vextent_finish
+        xfs_alloc_update_counters(tp=0xffff88810558c828, agbp=0xffff88810210a700, len=-3)
+
+mount
+  do_mount
+    path_mount
+      do_new_mount
+        vfs_get_tree
+          xfs_fs_get_tree
+            get_tree_bdev
+              xfs_fs_fill_super
+                xfs_mountfs
+                  xfs_log_mount
+                    xlog_alloc_log
+                      // 初始化 l_iclog_bufs 个 xlog_in_core_t
+                      INIT_WORK(&iclog->ic_end_io_work, xlog_ioend_work);
+
+// sync 命令
+kthread
+  worker_thread
+    process_scheduled_works
+      process_one_work
+        xlog_cil_push_work
+          xlog_cil_write_chain
+            xlog_write
+              xlog_write_full
+                xlog_write_iovec
+              xlog_state_release_iclog
+
+// sync 命令
+sync
+  ksys_sync
+    iterate_supers
+      sync_fs_one_sb
+        xfs_fs_sync_fs
+          xfs_log_force
+
+// 写操作后过一段时间触发
+kthread
+  worker_thread
+    process_scheduled_works
+      process_one_work
+        xfs_log_worker
+          xfs_log_force
+
+xfs_log_force
+  xlog_force_and_check_iclog
+    xlog_force_iclog
+      xlog_state_release_iclog
+        xlog_sync
+          xlog_write_iclog
+            iclog->ic_bio.bi_end_io = xlog_bio_end_io
+            submit_bio // 落盘成功后调用到 xlog_bio_end_io
+
+kthread
+  smpboot_thread_fn
+    run_ksoftirqd
+      handle_softirqs
+        blk_done_softirq
+          blk_complete_reqs
+            lo_complete_rq
+              blk_mq_end_request
+                __blk_mq_end_request
+                  flush_end_io
+                    blk_flush_complete_seq
+                      blk_mq_end_request
+                        blk_update_request
+                          bio_endio
+                            xlog_bio_end_io
+                              queue_work(..., &iclog->ic_end_io_work) // 触发 xlog_ioend_work
+
+kthread
+  worker_thread
+    process_scheduled_works
+      process_one_work
+        xlog_ioend_work // 由 xlog_bio_end_io 触发
+          xlog_state_done_syncing
+```
+-->
 <h1 data-number="3" id="构造"><span
 class="header-section-number">3</span> 构造</h1>
 <p>打上补丁<a

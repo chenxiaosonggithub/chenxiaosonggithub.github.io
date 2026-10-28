@@ -21,8 +21,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -235,7 +236,20 @@ class="header-section-number">4</span> 开发过程</h1>
 <p>为了方便调试，引入调试日志函数接口<code>myfs_debug()</code>。接着在<code>myfs_fill_super()</code>函数中获取<code>root inode</code>，但mount时却报错:
 <code>mount: /mnt: mount(2) system call failed: Not a directory.</code>。查看代码发现是<code>root inode</code>不是目录类型，所以将<code>root inode</code>的<code>i_mode</code>设置成目录类型，这时就能挂载成功。</p>
 <p>但这时<code>df -Th</code>命令还不能输出<code>myfs</code>相关的信息，引入<code>struct super_operations myfs_sops</code>且实现<code>.statfs</code>方法，<code>df -Th</code>命令就可输出相关信息。</p>
-<p>引入<code>myfs_dir_operations</code>和<code>myfs_file_operations</code>，但是<code>ls /mnt</code>还是报错<code>ls: cannot open directory '/mnt': Not a directory</code>，具体原因待定位。</p>
+<p>引入<code>myfs_dir_operations</code>和<code>myfs_file_operations</code>，但是<code>ls /mnt</code>还是报错<code>ls: cannot open directory '/mnt': Not a directory</code>，具体原因待定位。
+<!--
+```c
+openat
+  do_sys_open
+    do_sys_openat2
+      do_filp_open
+        path_openat
+          do_open
+            vfs_open
+              do_dentry_open
+                ext2_dir_open
+```
+--></p>
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 
