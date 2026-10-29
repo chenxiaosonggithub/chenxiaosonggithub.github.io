@@ -21,9 +21,8 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
-    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -714,8 +713,8 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb51-1"><a href="#
 <p>加载ko模块:</p>
 <div class="sourceCode" id="cb52"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> help mod <span class="co"># 帮助命令</span></span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="op">&lt;</span>ko path<span class="op">&gt;</span> <span class="co"># 加载</span></span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-d</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="co"># 删除</span></span></code></pre></div>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="op">&lt;</span>ko path<span class="op">&gt;</span> # 加载</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-d</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> # 删除</span></code></pre></div>
 <h2 data-number="6.5" id="crash常用命令"><span
 class="header-section-number">6.5</span> <code>crash</code>常用命令</h2>
 <p>启动<code>crash</code>:</p>
@@ -732,7 +731,7 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb55-1"><a href="#
 <p><code>bt</code>命令:</p>
 <div class="sourceCode" id="cb56"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="co"># 查看崩溃瞬间正在运行的进程的内核栈</span></span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="op">&lt;</span>pid<span class="op">&gt;</span> <span class="co"># 查看指定pid进程的栈</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="op">&lt;</span>pid<span class="op">&gt;</span> # 查看指定pid进程的栈</span>
 <span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -F[F]: 类似于 -f，不同之处在于当适用时以符号方式显示堆栈数据；如果堆栈数据引用了 slab cache 对象，将在方括号内显示 slab cache 的名称；在 ia64 架构上，将以符号方式替代参数寄存器的内容。如果输入 -F 两次，并且堆栈数据引用了 slab cache 对象，将同时显示地址和 slab cache 的名称在方括号中。</span></span>
 <span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="at">-F</span></span>
 <span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> bt <span class="at">-FF</span></span>
@@ -749,8 +748,8 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb57-1"><a href="#
 <p><code>mod</code>命令:</p>
 <div class="sourceCode" id="cb58"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="co"># 显示所有模块的信息</span></span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="op">&lt;</span>ko path<span class="op">&gt;</span> <span class="co"># 加载</span></span>
-<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-d</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="co"># 删除</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-s</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> <span class="op">&lt;</span>ko path<span class="op">&gt;</span> # 加载</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-d</span> <span class="op">&lt;</span>module name<span class="op">&gt;</span> # 删除</span>
 <span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="ex">crash</span><span class="op">&gt;</span> mod <span class="at">-S</span> <span class="co"># 从某个特定目录加载所有模块，默认从/lib/modules/`uname -r` 目录</span></span></code></pre></div>
 <p><code>sym</code>命令（解析符号信息）:</p>
 <div class="sourceCode" id="cb59"><pre

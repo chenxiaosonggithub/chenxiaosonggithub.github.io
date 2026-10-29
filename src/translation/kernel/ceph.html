@@ -73,8 +73,8 @@ class="toc-section-number">2</span> 挂载选项</a></li>
 class="toc-section-number">3</span> 更多信息</a></li>
 </ul>
 </nav>
-<p>本文档翻译自`ceph.rst
-&lt;https://github.com/torvalds/linux/blob/master/Documentation/filesystems/ceph.rst&gt;`_，翻译时文件的最新提交是<code>93a2221c9c1ae32643df67c482dc4c4c591b7514 doc: ceph: update userspace command to get CephFS metadata</code>。大部分借助于ChatGPT翻译，仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
+<p>本文档翻译自<a
+href="https://github.com/torvalds/linux/blob/master/Documentation/filesystems/ceph.rst">ceph.rst</a>，翻译时文件的最新提交是<code>93a2221c9c1ae32643df67c482dc4c4c591b7514 doc: ceph: update userspace command to get CephFS metadata</code>。大部分借助于ChatGPT翻译，仅作为我个人的参考，如果你想查阅，建议看英文文档，因为我不确定我记录的中文翻译是否完整和正确。</p>
 <p>Ceph
 是一个分布式网络文件系统，设计目的是提供良好的性能、可靠性和可扩展性。</p>
 <p>基本特性包括：</p>
@@ -112,9 +112,10 @@ class="title-ref">rmdir .snap/foo</span>。</p>
 <ul>
 <li>名称不能以下划线 ('_') 开头，因为这些名称保留给 MDS 内部使用。</li>
 <li>名称不能超过 240 个字符。这是因为 MDS
-在内部使用了较长的快照名称，格式为：`_&lt;SNAPSHOT-NAME&gt;_&lt;INODE-NUMBER&gt;`。由于文件名通常不能超过
-255 个字符，而 <span class="title-ref">&lt;node-id&gt;</span> 占用 13
-个字符，因此最长的快照名称可以达到 255 - 1 - 1 - 13 = 240。</li>
+在内部使用了较长的快照名称，格式为：`_&lt;SNAPSHOT-NAME&gt;_&lt;INODE-NUMBER&gt;<span
+class="title-ref">。由于文件名通常不能超过 255 个字符，而
+</span>&lt;node-id&gt;` 占用 13 个字符，因此最长的快照名称可以达到 255 -
+1 - 1 - 13 = 240。</li>
 </ul>
 <p>Ceph 还提供了一些对嵌套文件和字节的递归统计。可以运行以下命令:</p>
 <pre><code>getfattr -n ceph.dir.rfiles /some/dir
